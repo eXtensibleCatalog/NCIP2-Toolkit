@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <display-name>NCIP version 2.0 responder</display-name>
+
+    <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>/WEB-INF/spring/ncipv2-core-context.xml</param-value>
+    </context-param>
+
+	<listener>
+		<listener-class>org.extensiblecatalog.ncip.v2.common.NCIPContextListener</listener-class>
+	</listener>
+	
+	<servlet>
+        <servlet-name>NCIPServlet</servlet-name>
+        <servlet-class>org.extensiblecatalog.ncip.v2.responder.implprof1.NCIPServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NCIPServlet</servlet-name>
+        <url-pattern>/NCIPResponder/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>StatisticsReportServlet</servlet-name>
+        <servlet-class>org.extensiblecatalog.ncip.v2.responder.implprof1.StatisticsReportServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>StatisticsReportServlet</servlet-name>
+        <url-pattern>/Statistics/*</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+      <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

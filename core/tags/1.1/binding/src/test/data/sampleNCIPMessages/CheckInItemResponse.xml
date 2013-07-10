@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:CheckInItemResponse>
+        <ns1:ItemId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:ItemIdentifierValue>10923123</ns1:ItemIdentifierValue>
+        </ns1:ItemId>
+    </ns1:CheckInItemResponse>
+</ns1:NCIPMessage>

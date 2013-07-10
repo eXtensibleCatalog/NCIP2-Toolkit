@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sirsi-API.t
+lib/Sirsi/API.pm

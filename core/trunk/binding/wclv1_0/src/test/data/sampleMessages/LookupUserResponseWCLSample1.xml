@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd"
+    xmlns:ns1="http://www.niso.org/2008/ncip" xmlns:ns2="http://oclc.org/WCL/ncip/2011/extensions">
+    <ns1:LookupUserResponse>
+        <ns1:UserId>
+            <ns1:UserIdentifierValue>91923040970919801912438</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:UserFiscalAccount>
+            <ns1:AccountBalance>
+                <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+                <ns1:MonetaryValue>1000</ns1:MonetaryValue>
+            </ns1:AccountBalance>
+            <ns1:AccountDetails>
+                <ns1:AccrualDate>2011-07-12T12:18:21Z</ns1:AccrualDate>
+                <ns1:FiscalTransactionInformation>
+                    <ns1:FiscalActionType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/fiscalactiontype.scm">Balance</ns1:FiscalActionType>
+                    <ns1:FiscalTransactionReferenceId>
+                        <ns1:AgencyId ns1:Scheme="http://oclc.org/ncip/schemes/agencyid.scm">12391</ns1:AgencyId>
+                        <ns1:FiscalTransactionIdentifierValue>190191101169467101</ns1:FiscalTransactionIdentifierValue>
+                    </ns1:FiscalTransactionReferenceId>       
+                    <ns1:FiscalTransactionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/fiscaltransactiontype/fiscaltransactiontype.scm">Fine</ns1:FiscalTransactionType>
+                    <ns1:Amount>
+                        <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+                        <ns1:MonetaryValue>100</ns1:MonetaryValue>
+                    </ns1:Amount>
+                    <ns1:FiscalTransactionDescription>Overdue fine</ns1:FiscalTransactionDescription>
+                    <ns1:ItemDetails>
+                        <ns1:ItemId>
+                            <ns1:AgencyId ns1:Scheme="http://oclc.org/ncip/schemes/agencyid.scm">12391</ns1:AgencyId>
+                            <ns1:ItemIdentifierValue>8776465432234578</ns1:ItemIdentifierValue>
+                        </ns1:ItemId>
+                        <ns1:BibliographicDescription>
+                            <ns1:Author>Bodfish, James W.</ns1:Author>
+                            <ns1:BibliographicRecordId>
+                                <ns1:BibliographicRecordIdentifier>16736453</ns1:BibliographicRecordIdentifier>
+                                <ns1:BibliographicRecordIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">OCLC</ns1:BibliographicRecordIdentifierCode>
+                            </ns1:BibliographicRecordId>                            
+                            <ns1:Edition>1</ns1:Edition>
+                            <ns1:PublicationDate>1986</ns1:PublicationDate>
+                            <ns1:Publisher>University of Alabama</ns1:Publisher>
+                            <ns1:Title>Temporal order memory : a comparison of mentally retarded and nonretarded persons</ns1:Title>
+                            <ns1:Language ns1:Scheme="http://lcweb.loc.gov/standards/iso639-2/bibcodes.html">eng</ns1:Language>
+                            <ns1:MediumType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/mediumtype.scm">Book</ns1:MediumType>
+                        </ns1:BibliographicDescription>
+                    </ns1:ItemDetails>                    
+                </ns1:FiscalTransactionInformation>
+            </ns1:AccountDetails>            
+            <ns1:AccountDetails>
+                <ns1:AccrualDate>2011-07-22T12:10:31Z</ns1:AccrualDate>
+                <ns1:FiscalTransactionInformation>
+                    <ns1:FiscalActionType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/fiscalactiontype.scm">Balance</ns1:FiscalActionType>
+                    <ns1:FiscalTransactionReferenceId>
+                        <ns1:AgencyId ns1:Scheme="http://oclc.org/ncip/schemes/agencyid.scm">12391</ns1:AgencyId>
+                        <ns1:FiscalTransactionIdentifierValue>190191101169478201</ns1:FiscalTransactionIdentifierValue>
+                    </ns1:FiscalTransactionReferenceId>       
+                    <ns1:FiscalTransactionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/fiscaltransactiontype/fiscaltransactiontype.scm">Fine</ns1:FiscalTransactionType>
+                    <ns1:Amount>
+                        <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+                        <ns1:MonetaryValue>150</ns1:MonetaryValue>
+                    </ns1:Amount>
+                    <ns1:PaymentMethodType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/paymentmethodtype/paymentmethodtype.scm">Cash</ns1:PaymentMethodType>
+                    <ns1:FiscalTransactionDescription>Overdue fine</ns1:FiscalTransactionDescription>
+                    <ns1:ItemDetails>
+                        <ns1:ItemId>
+                            <ns1:AgencyId ns1:Scheme="http://oclc.org/ncip/schemes/agencyid.scm">12391</ns1:AgencyId>
+                            <ns1:ItemIdentifierValue>8776402437399143</ns1:ItemIdentifierValue>
+                        </ns1:ItemId>
+                        <ns1:BibliographicDescription>
+                            <ns1:Author>Bodfish, John</ns1:Author>
+                            <ns1:BibliographicRecordId>
+                                <ns1:BibliographicRecordIdentifier>9999999</ns1:BibliographicRecordIdentifier>
+                                <ns1:BibliographicRecordIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">OCLC</ns1:BibliographicRecordIdentifierCode>
+                            </ns1:BibliographicRecordId>                            
+                            <ns1:Edition>2</ns1:Edition>
+                            <ns1:PublicationDate>2011</ns1:PublicationDate>
+                            <ns1:Publisher>OCLC, Inc.</ns1:Publisher>
+                            <ns1:Title>WorldCat Local NCIP Application Profile</ns1:Title>
+                            <ns1:Language ns1:Scheme="http://lcweb.loc.gov/standards/iso639-2/bibcodes.html">eng</ns1:Language>
+                            <ns1:MediumType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/mediumtype.scm">Book</ns1:MediumType>
+                        </ns1:BibliographicDescription>
+                    </ns1:ItemDetails>                    
+                </ns1:FiscalTransactionInformation>
+            </ns1:AccountDetails>            
+        </ns1:UserFiscalAccount>
+        <ns1:LoanedItemsCount>
+            <ns1:CirculationStatus ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/circulationstatus.scm">On Loan</ns1:CirculationStatus>
+            <ns1:LoanedItemCountValue>1</ns1:LoanedItemCountValue>
+        </ns1:LoanedItemsCount>
+        <ns1:LoanedItem>
+            <ns1:ItemId>
+                <ns1:ItemIdentifierValue>8776465448750932</ns1:ItemIdentifierValue>
+            </ns1:ItemId>
+            <ns1:ReminderLevel>2</ns1:ReminderLevel>
+            <ns1:DateDue>2011-10-31T14:30:00Z</ns1:DateDue>
+            <ns1:Amount>
+                <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+                <ns1:MonetaryValue>0</ns1:MonetaryValue>
+            </ns1:Amount>
+            <ns1:Ext>
+                <ns1:RenewalCount>2</ns1:RenewalCount>
+                <ns1:DateCheckedOut>2011-05-21T10:24:19Z</ns1:DateCheckedOut>
+                <ns1:BibliographicDescription>
+                    <ns1:Author>Walker, Brenda</ns1:Author>
+                    <ns1:BibliographicRecordId>
+                        <ns1:BibliographicRecordIdentifier>220894576</ns1:BibliographicRecordIdentifier>
+                        <ns1:BibliographicRecordIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">OCLC</ns1:BibliographicRecordIdentifierCode>
+                    </ns1:BibliographicRecordId>
+                    <ns1:Edition>1</ns1:Edition>
+                    <ns1:PublicationDate>1991</ns1:PublicationDate>
+                    <ns1:Publisher>Association for the Blind of W.A</ns1:Publisher>
+                    <ns1:Title>Crush</ns1:Title>
+                    <ns1:Language ns1:Scheme="http://lcweb.loc.gov/standards/iso639-2/bibcodes.html">eng</ns1:Language>
+                    <ns1:MediumType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/mediumtype.scm">Audiobook Tape</ns1:MediumType>
+                </ns1:BibliographicDescription>
+            </ns1:Ext>
+        </ns1:LoanedItem>
+        <ns1:RequestedItemsCount>
+            <ns1:CirculationStatus ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/circulationstatus.scm">On Hold</ns1:CirculationStatus>
+            <ns1:RequestedItemCountValue>1</ns1:RequestedItemCountValue>
+        </ns1:RequestedItemsCount>
+        <ns1:RequestedItem>
+            <ns1:RequestId>
+                <ns1:RequestIdentifierValue>1980198</ns1:RequestIdentifierValue>
+            </ns1:RequestId>            
+            <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Hold</ns1:RequestType>
+            <ns1:RequestStatusType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requeststatustype/requeststatustype.scm">In Process</ns1:RequestStatusType>
+            <ns1:DatePlaced>2011-08-01T17:02:00Z</ns1:DatePlaced>
+            <ns1:PickupLocation>092219</ns1:PickupLocation>
+            <ns1:HoldQueuePosition>1</ns1:HoldQueuePosition>
+            <ns1:Ext>
+                <ns1:BibliographicDescription>
+                    <ns1:Author>Little Walter</ns1:Author>
+                    <ns1:BibliographicRecordId>
+                    <ns1:BibliographicRecordIdentifier>308263412</ns1:BibliographicRecordIdentifier>
+                        <ns1:BibliographicRecordIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">OCLC</ns1:BibliographicRecordIdentifierCode>
+                    </ns1:BibliographicRecordId>
+                    <ns1:Edition>Limted ed</ns1:Edition>
+                    <ns1:PublicationDate>2009</ns1:PublicationDate>
+                    <ns1:Publisher>Geffen</ns1:Publisher>
+                    <ns1:Title>The complete Chess masters : 1950-1967</ns1:Title>
+                    <ns1:Language ns1:Scheme="http://lcweb.loc.gov/standards/iso639-2/bibcodes.html">eng</ns1:Language>
+                    <ns1:MediumType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/mediumtype.scm">Music CD</ns1:MediumType>
+                </ns1:BibliographicDescription>
+                <ns1:EarliestDateNeeded>2011-08-02T10:00:00Z</ns1:EarliestDateNeeded>
+                <ns1:HoldQueueLength>2</ns1:HoldQueueLength>
+                <ns2:SuspensionStartDate>2011-09-10T10:00:00Z</ns2:SuspensionStartDate>
+                <ns2:SuspensionEndDate>2011-09-18T10:00:00Z</ns2:SuspensionEndDate>
+            </ns1:Ext>
+        </ns1:RequestedItem>
+        <ns1:Ext>
+            <ns2:UserFiscalAccountSummary>
+                <ns2:ChargesCount>2</ns2:ChargesCount>
+                <ns1:AccountBalance>
+                    <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+                    <ns1:MonetaryValue>1000</ns1:MonetaryValue>
+                </ns1:AccountBalance>
+            </ns2:UserFiscalAccountSummary>
+            <ns2:SubsequentElementControl>
+                <ns2:ElementType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/elementtype.scm">Account Details</ns2:ElementType>
+                <ns2:NextElement>3</ns2:NextElement>
+            </ns2:SubsequentElementControl>
+        </ns1:Ext>
+    </ns1:LookupUserResponse>
+</ns1:NCIPMessage>

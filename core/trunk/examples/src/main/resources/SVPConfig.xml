@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2010 eXtensible Catalog.  All rights reserved. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+
+    <!--
+         This is a Spring configuration file that adds to, or supplements, the configuration in the properties files.
+    -->
+
+     <!-- An example of a locally-defined Scheme, in this case for ItemIdentifierType. -->
+    <bean id="exampleItemIdentifierTypes" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.examples.ExampleItemIdentifierType.loadAll</value></property>
+    </bean>
+
+    <!--
+         An example of some Schemes for which we don't need the Scheme URI - it's agreed by convention between
+         the initiator and the responder.
+    -->
+    <bean id="allowNullScheme" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.allowNullScheme</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AgencyElementType</value>
+          <value>org.extensiblecatalog.ncip.v2.service.ItemElementType</value>
+          <value>org.extensiblecatalog.ncip.v2.service.RequestElementType</value>
+          <value>org.extensiblecatalog.ncip.v2.service.UserElementType</value>
+        </list>
+      </property>
+    </bean>
+
+    <!-- An example of how to disable Scheme/Value validation for some Schemes -->
+    <bean id="setBehaviorForAgencyId" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AgencyId</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForApplicationProfileType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.ApplicationProfileType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorAuthenticationDataFormatType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorAuthenticationInputType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AuthenticationInputType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForFromSystemId" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.FromSystemId</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForPickupLocation" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.PickupLocation</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForRequestIdentifierType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.RequestIdentifierType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForToSystemId" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.ToSystemId</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+
+</beans>

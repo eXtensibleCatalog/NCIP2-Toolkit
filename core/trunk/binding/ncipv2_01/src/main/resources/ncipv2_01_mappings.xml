@@ -1,0 +1,2689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <configuration>
+        <custom-converters>
+
+            <!--
+                 These handle conversion from the JAXBElement that appears in classes where JAXB requires the getContent
+                 method to access its fields.
+            -->
+            <converter type="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.CalendarConverter" >
+              <class-a>java.util.GregorianCalendar</class-a>
+              <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.BigDecimalConverter" >
+              <class-a>java.math.BigDecimal</class-a>
+              <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.StringConverter" >
+              <class-a>java.lang.String</class-a>
+              <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+
+
+            <!-- Any class which in the service package is a sub-class of SchemeValuePair must use a sub-class of
+                 BaseSchemeValuePairConverter to map to & from the JAXB SchemeValuePair class, and
+                 BaseJAXBElementSchemeValuePairConverter to map to & from the JAXBElement class. JAXBElements are used for fields
+                 of a JAXB class that requires the getContent method to access its fields; SchemeValuePair is used in the
+                 remaining JAXB classes.
+            -->
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyAddressRoleTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyAddressRoleTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyElementTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyElementType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyElementTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyElementType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyIdSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyId</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyIdJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyId</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyUserPrivilegeTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AgencyUserPrivilegeTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ApplicationProfileSupportedTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ApplicationProfileSupportedType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ApplicationProfileSupportedTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ApplicationProfileSupportedType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ApplicationProfileTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ApplicationProfileType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ApplicationProfileTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ApplicationProfileType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AuthenticationDataFormatTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AuthenticationDataFormatTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AuthenticationInputTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AuthenticationInputType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AuthenticationInputTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AuthenticationInputType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AuthenticationPromptTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AuthenticationPromptType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.AuthenticationPromptTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.AuthenticationPromptType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BibliographicItemIdentifierCodeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BibliographicItemIdentifierCodeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BibliographicLevelSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicLevel</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BibliographicLevelJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicLevel</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BibliographicRecordIdentifierCodeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BibliographicRecordIdentifierCodeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BlockOrTrapTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BlockOrTrapType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.BlockOrTrapTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.BlockOrTrapType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.CirculationStatusSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.CirculationStatus</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.CirculationStatusJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.CirculationStatus</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ComponentIdentifierTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ComponentIdentifierTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ConsortiumAgreementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ConsortiumAgreement</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ConsortiumAgreementJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ConsortiumAgreement</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.CurrencyCodeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.CurrencyCode</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.CurrencyCodeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.CurrencyCode</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ElectronicAddressTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ElectronicAddressType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ElectronicAddressTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ElectronicAddressType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ElectronicDataFormatTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ElectronicDataFormatType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ElectronicDataFormatTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ElectronicDataFormatType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ElementTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ElementType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.FiscalActionTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.FiscalActionType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.FiscalActionTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.FiscalActionType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.FiscalTransactionTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.FiscalTransactionType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.FiscalTransactionTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.FiscalTransactionType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.FromSystemIdSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.FromSystemId</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.FromSystemIdJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.FromSystemId</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemDescriptionLevelSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemDescriptionLevelJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemElementTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemElementType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemElementTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemElementType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemIdentifierTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemIdentifierType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemIdentifierTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemIdentifierType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemUseRestrictionTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ItemUseRestrictionTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.LanguageSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.Language</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.LanguageJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.Language</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.LocationTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.LocationType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.LocationTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.LocationType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.MediumTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.MediumType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.MediumTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.MediumType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NoticeTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.NoticeType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NoticeTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.NoticeType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.OrganizationNameTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.OrganizationNameType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.OrganizationNameTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.OrganizationNameType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PaymentMethodTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PaymentMethodType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PaymentMethodTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PaymentMethodType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PhysicalAddressTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PhysicalAddressType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PhysicalAddressTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PhysicalAddressType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PhysicalConditionTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PhysicalConditionType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PhysicalConditionTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PhysicalConditionType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PickupLocationSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PickupLocation</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.PickupLocationJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PickupLocation</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ProblemTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ProblemType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ProblemTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ProblemType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestedActionTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestedActionType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestedActionTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestedActionType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestElementTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestElementType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestElementTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestElementType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestIdentifierTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestIdentifierType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestIdentifierTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestIdentifierType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestScopeTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestScopeType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestScopeTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestScopeType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestStatusTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestStatusType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestStatusTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestStatusType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.RequestTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.SecurityMarkerSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.SecurityMarker</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.SecurityMarkerJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.SecurityMarker</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.SortFieldSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.SortField</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.SortOrderTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.SortOrderType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ToSystemIdSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ToSystemId</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.ToSystemIdJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ToSystemId</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UnstructuredAddressTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UnstructuredAddressType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UnstructuredAddressTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UnstructuredAddressType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserAddressRoleTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserAddressRoleType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserAddressRoleTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserAddressRoleType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserElementTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserElementType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserElementTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserElementType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserIdentifierTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserIdentifierType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserIdentifierTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserIdentifierType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserLanguageSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserLanguage</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserLanguageJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserLanguage</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserPrivilegeStatusTypeSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.UserPrivilegeStatusTypeJAXBElementSchemeValuePairConverter">
+                <class-a>org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType</class-a>
+                <class-b>javax.xml.bind.JAXBElement</class-b>
+            </converter>
+
+            <!-- Handle JAXB-generated objects that don't have specified fields, just the getContent method. -->
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CancelRequestItem</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CancelRequestItemResponse</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ChronologyLevelInstance</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ChronologyLevelInstance</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.Destination</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Destination</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.EnumerationLevelInstance</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.EnumerationLevelInstance</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemRequestCancelledInitiationData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRequestCancelled</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.ItemShippedInitiationData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemShipped</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.LookupItemResponseData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupItemResponse</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.LookupRequestResponseData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupRequestResponse</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.PersonalNameInformation</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.PersonalNameInformation</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestedItem</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RequestedItem</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RequestItem</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.RequestItemResponseData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RequestItemResponse</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.StructuredAddress</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.StructuredAddress</class-b>
+            </converter>
+            <converter type="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ContentMappingFactory">
+                <class-a>org.extensiblecatalog.ncip.v2.service.StructuredHoldingsData</class-a>
+                <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.StructuredHoldingsData</class-b>
+            </converter>
+
+        </custom-converters>
+    </configuration>
+
+    <!-- Handle mapping objects with fields that require non-default behavior:
+         1) the field is repeatable in JAXB object so in the service object its name is plural (use field names and
+         a hint for the type of the objects in the JAXB object's List).
+         2) the field is an ...ElementType in the JAXB object and a boolean flag in the service object (use the
+         element-specific sub-class of the BaseSchemeValuePairToBooleanConverter custom converter).
+         3) the field is an empty element in the JAXB object and a boolean flag in the service object (use the
+          EmptyFieldConverter custom converter).
+         4) the field is an extension (use the binding sub-module's sub-class of BaseExtensionConverter custom converter).
+    -->
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AcceptItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AcceptItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.IndeterminateLoanPeriodFlag">
+            <a>indeterminateLoanPeriodFlag</a>
+            <b>indeterminateLoanPeriodFlag</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RenewalNotPermitted">
+            <a>renewalNotPermitted</a>
+            <b>renewalNotPermitted</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NonReturnableFlag">
+            <a>nonReturnableFlag</a>
+            <b>nonReturnableFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AcceptItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AcceptItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AddAgencyFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AddAgencyFields</class-b>
+        <field>
+            <a>authenticationPrompts</a>
+            <b>authenticationPrompt</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationPrompt</b-hint>
+        </field>
+        <field>
+            <a>applicationProfileSupportedTypes</a>
+            <b>applicationProfileSupportedType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>organizationNameInformations</a>
+            <b>organizationNameInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.OrganizationNameInformation</b-hint>
+        </field>
+        <field>
+            <a>consortiumAgreements</a>
+            <b>consortiumAgreement</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyUserPrivilegeTypes</a>
+            <b>agencyUserPrivilegeType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyAddressInformations</a>
+            <b>agencyAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyAddressInformation</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AddItemFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AddItemFields</class-b>
+        <field>
+            <a>locations</a>
+            <b>location</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Location</b-hint>
+        </field>
+        <field>
+            <a>itemUseRestrictionTypes</a>
+            <b>itemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SensitizationFlag">
+            <a>sensitizationFlag</a>
+            <b>sensitizationFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AddRequestFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AddRequestFields</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01AtomicTypeExtensionConverter"
+                custom-converter-param="java.util.GregorianCalendar,SuspensionStartDate">
+            <a>suspensionStartDate</a>
+            <b>ext</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01AtomicTypeExtensionConverter"
+                custom-converter-param="java.util.GregorianCalendar,SuspensionEndDate">
+            <a>suspensionEndDate</a>
+            <b>ext</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AddUserFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AddUserFields</class-b>
+        <field>
+            <a>userPrivileges</a>
+            <b>userPrivilege</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserPrivilege</b-hint>
+        </field>
+        <field>
+            <a>userLanguages</a>
+            <b>userLanguage</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>userAddressInformations</a>
+            <b>userAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserAddressInformation</b-hint>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field>
+            <a>blockOrTraps</a>
+            <b>blockOrTrap</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BlockOrTrap</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AgencyCreatedInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyCreated</class-b>
+        <field>
+            <a>authenticationPrompts</a>
+            <b>authenticationPrompt</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationPrompt</b-hint>
+        </field>
+        <field>
+            <a>applicationProfileSupportedTypes</a>
+            <b>applicationProfileSupportedType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>organizationNameInformations</a>
+            <b>organizationNameInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.OrganizationNameInformation</b-hint>
+        </field>
+        <field>
+            <a>consortiumAgreements</a>
+            <b>consortiumAgreement</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyUserPrivilegeTypes</a>
+            <b>agencyUserPrivilegeType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyAddressInformations</a>
+            <b>agencyAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyAddressInformation</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AgencyCreatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyCreatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.AgencyUpdatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyUpdatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.BibliographicDescription</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BibliographicDescription</class-b>
+        <field>
+            <a>bibliographicItemIds[0]</a>
+            <b>bibliographicItemId</b>
+            <a-hint>org.extensiblecatalog.ncip.v2.service.BibliographicItemId</a-hint>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BibliographicItemId</b-hint>
+        </field>
+        <field>
+            <a>bibliographicRecordIds[0]</a>
+            <b>bibliographicRecordId</b>
+            <a-hint>org.extensiblecatalog.ncip.v2.service.BibliographicRecordId</a-hint>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BibliographicRecordId</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CancelRecallItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CancelRecallItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CancelRecallItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CancelRecallItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CheckInItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CheckInItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CheckInItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CheckInItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CheckOutItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CheckOutItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field>
+            <a>acknowledgedItemUseRestrictionTypes</a>
+            <b>acknowledgedItemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ResourceDesired">
+            <a>resourceDesired</a>
+            <b>resourceDesired</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ELECTRONIC_RESOURCE">
+            <a>electronicResourceDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CheckOutItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CheckOutItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+        <field>
+            <a>requiredItemUseRestrictionTypes</a>
+            <b>requiredItemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.IndeterminateLoanPeriodFlag">
+            <a>indeterminateLoanPeriodFlag</a>
+            <b>indeterminateLoanPeriodFlag</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NonReturnableFlag">
+            <a>nonReturnableFlag</a>
+            <b>nonReturnableFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CirculationStatusChangeReportedInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CirculationStatusChangeReported</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReportedMissing">
+            <a>itemReportedMissing</a>
+            <b>itemReportedMissing</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReportedLost">
+            <a>itemReportedLost</a>
+            <b>itemReportedLost</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReportedNeverBorrowed">
+            <a>itemReportedNeverBorrowed</a>
+            <b>itemReportedNeverBorrowed</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CirculationStatusChangeReportedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CirculationStatusChangeReportedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CirculationStatusUpdatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CirculationStatusUpdatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateAgencyInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateAgency</class-b>
+        <field>
+            <a>authenticationPrompts</a>
+            <b>authenticationPrompt</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationPrompt</b-hint>
+        </field>
+        <field>
+            <a>applicationProfileSupportedTypes</a>
+            <b>applicationProfileSupportedType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>organizationNameInformations</a>
+            <b>organizationNameInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.OrganizationNameInformation</b-hint>
+        </field>
+        <field>
+            <a>consortiumAgreements</a>
+            <b>consortiumAgreement</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyUserPrivilegeTypes</a>
+            <b>agencyUserPrivilegeType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyAddressInformations</a>
+            <b>agencyAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyAddressInformation</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateAgencyResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateAgencyResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateItem</class-b>
+        <field>
+            <a>locations</a>
+            <b>location</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Location</b-hint>
+        </field>
+        <field>
+            <a>itemUseRestrictionTypes</a>
+            <b>itemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SensitizationFlag">
+            <a>sensitizationFlag</a>
+            <b>sensitizationFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateUserInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateUser</class-b>
+        <field>
+            <a>userPrivileges</a>
+            <b>userPrivilege</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserPrivilege</b-hint>
+        </field>
+        <field>
+            <a>userLanguages</a>
+            <b>userLanguage</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>userAddressInformations</a>
+            <b>userAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserAddressInformation</b-hint>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field>
+            <a>blockOrTraps</a>
+            <b>blockOrTrap</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BlockOrTrap</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateUserFiscalTransactionInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateUserFiscalTransaction</class-b>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateUserFiscalTransactionResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateUserFiscalTransactionResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.CreateUserResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CreateUserResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteAgencyFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteAgencyFields</class-b>
+        <field>
+            <a>authenticationPrompts</a>
+            <b>authenticationPrompt</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationPrompt</b-hint>
+        </field>
+        <field>
+            <a>applicationProfileSupportedTypes</a>
+            <b>applicationProfileSupportedType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>organizationNameInformations</a>
+            <b>organizationNameInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.OrganizationNameInformation</b-hint>
+        </field>
+        <field>
+            <a>consortiumAgreements</a>
+            <b>consortiumAgreement</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyUserPrivilegeTypes</a>
+            <b>agencyUserPrivilegeType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyAddressInformations</a>
+            <b>agencyAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyAddressInformation</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteItemFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteItemFields</class-b>
+        <field>
+            <a>locations</a>
+            <b>location</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Location</b-hint>
+        </field>
+        <field>
+            <a>itemUseRestrictionTypes</a>
+            <b>itemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SensitizationFlag">
+            <a>sensitizationFlag</a>
+            <b>sensitizationFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteUserInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteUser</class-b>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteRequestFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteRequestFields</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01AtomicTypeExtensionConverter"
+                custom-converter-param="java.util.GregorianCalendar,SuspensionStartDate">
+            <a>suspensionStartDate</a>
+            <b>ext</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01AtomicTypeExtensionConverter"
+                custom-converter-param="java.util.GregorianCalendar,SuspensionEndDate">
+            <a>suspensionEndDate</a>
+            <b>ext</b>
+        </field>
+    </mapping>
+
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteUserFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteUserFields</class-b>
+        <field>
+            <a>userPrivileges</a>
+            <b>userPrivilege</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserPrivilege</b-hint>
+        </field>
+        <field>
+            <a>userLanguages</a>
+            <b>userLanguage</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>userAddressInformations</a>
+            <b>userAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserAddressInformation</b-hint>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field>
+            <a>blockOrTraps</a>
+            <b>blockOrTrap</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BlockOrTrap</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.DeleteUserResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.DeleteUserResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.FiscalTransactionInformation</class-b>
+        <field>
+            <a>relatedFiscalTransactionReferenceIds</a>
+            <b>relatedFiscalTransactionReferenceId</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RelatedFiscalTransactionReferenceId</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.HoldingsChronology</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.HoldingsChronology</class-b>
+        <field>
+            <a>chronologyLevelInstances</a>
+            <b>chronologyLevelInstance</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ChronologyLevelInstance</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.HoldingsEnumeration</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.HoldingsEnumeration</class-b>
+        <field>
+            <a>enumerationLevelInstances</a>
+            <b>enumerationLevelInstance</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.EnumerationLevelInstance</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.HoldingsInformation</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.HoldingsInformation</class-b>
+        <field>
+            <a>structuredHoldingsData</a>
+            <b>structuredHoldingsData</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.StructuredHoldingsData</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemCheckedInResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemCheckedInResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemCheckedOutInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemCheckedOut</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.IndeterminateLoanPeriodFlag">
+            <a>indeterminateLoanPeriodFlag</a>
+            <b>indeterminateLoanPeriodFlag</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ElectronicResourceProvidedFlag">
+            <a>electronicResourceProvidedFlag</a>
+            <b>electronicResourceProvidedFlag</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NonReturnableFlag">
+            <a>nonReturnableFlag</a>
+            <b>nonReturnableFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemCheckedOutResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemCheckedOutResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemCreatedInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemCreated</class-b>
+        <field>
+            <a>locations</a>
+            <b>location</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Location</b-hint>
+        </field>
+        <field>
+            <a>itemUseRestrictionTypes</a>
+            <b>itemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SensitizationFlag">
+            <a>sensitizationFlag</a>
+            <b>sensitizationFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemCreatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemCreatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemDetails</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemDetails</class-b>
+        <field>
+            <a>dateReneweds</a>
+            <b>dateRenewed</b>
+            <a-hint>java.util.GregorianCalendar</a-hint>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.XMLGregorianCalendar</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.IndeterminateLoanPeriodFlag">
+            <a>indeterminateLoanPeriodFlag</a>
+            <b>indeterminateLoanPeriodFlag</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NonReturnableFlag">
+            <a>nonReturnableFlag</a>
+            <b>nonReturnableFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemOptionalFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemOptionalFields</class-b>
+        <field>
+            <a>locations</a>
+            <b>location</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Location</b-hint>
+        </field>
+        <field>
+            <a>itemUseRestrictionTypes</a>
+            <b>itemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SensitizationFlag">
+            <a>sensitizationFlag</a>
+            <b>sensitizationFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemRecallCancelledResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRecallCancelledResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemRecalledResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRecalledResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemReceivedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReceivedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemRenewedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRenewedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemRequestCancelledResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRequestCancelledResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemRequestUpdatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRequestUpdatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemRequestedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemRequestedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemShippedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemShippedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemTransaction</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemTransaction</class-b>
+        <field>
+            <a>currentRequesters</a>
+            <b>currentRequester</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CurrentRequester</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ItemUpdatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemUpdatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LoanedItem</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LoanedItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.IndeterminateLoanPeriodFlag">
+            <a>indeterminateLoanPeriodFlag</a>
+            <b>indeterminateLoanPeriodFlag</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01AtomicTypeExtensionConverter"
+                custom-converter-param="java.math.BigDecimal,RenewalCount">
+            <a>renewalCount</a>
+            <b>ext</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01AtomicTypeExtensionConverter"
+                custom-converter-param="java.util.GregorianCalendar,DateCheckedOut">
+            <a>dateCheckedOut</a>
+            <b>ext</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.BibliographicDescription,org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BibliographicDescription">
+            <a>bibliographicDescription</a>
+            <b>ext</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LocationName</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LocationName</class-b>
+        <field>
+            <a>locationNameInstances</a>
+            <b>locationNameInstance</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LocationNameInstance</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupAgency</class-b>
+        <field>
+            <a>agencyElementTypes</a>
+            <b>agencyElementType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LookupAgencyResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupAgencyResponse</class-b>
+        <field>
+            <a>authenticationPrompts</a>
+            <b>authenticationPrompt</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationPrompt</b-hint>
+        </field>
+        <field>
+            <a>applicationProfileSupportedTypes</a>
+            <b>applicationProfileSupportedType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>organizationNameInformations</a>
+            <b>organizationNameInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.OrganizationNameInformation</b-hint>
+        </field>
+        <field>
+            <a>consortiumAgreements</a>
+            <b>consortiumAgreement</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyUserPrivilegeTypes</a>
+            <b>agencyUserPrivilegeType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>agencyAddressInformations</a>
+            <b>agencyAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AgencyAddressInformation</b-hint>
+        </field>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CurrentRequestersDesired">
+            <a>currentRequestersDesired</a>
+            <b>currentRequestersDesired</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.CurrentBorrowerDesired">
+            <a>currentBorrowerDesired</a>
+            <b>currentBorrowerDesired</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupRequest</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field>
+            <a>requestElementTypes</a>
+            <b>requestElementType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupUser</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LoanedItemsDesired">
+            <a>loanedItemsDesired</a>
+            <b>loanedItemsDesired</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RequestedItemsDesired">
+            <a>requestedItemsDesired</a>
+            <b>requestedItemsDesired</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserFiscalAccountDesired">
+            <a>userFiscalAccountDesired</a>
+            <b>userFiscalAccountDesired</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.LookupUserResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupUserResponse</class-b>
+        <field>
+            <a>requestedItems</a>
+            <b>requestedItem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RequestedItem</b-hint>
+        </field>
+        <field>
+            <a>requestedItemsCounts</a>
+            <b>requestedItemsCount</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RequestedItemsCount</b-hint>
+        </field>
+        <field>
+            <a>userFiscalAccounts</a>
+            <b>userFiscalAccount</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserFiscalAccount</b-hint>
+        </field>
+        <field>
+            <a>loanedItemsCounts</a>
+            <b>loanedItemsCount</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LoanedItemsCount</b-hint>
+        </field>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+        <field>
+            <a>loanedItems</a>
+            <b>loanedItem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LoanedItem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.NameInformation</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NameInformation</class-b>
+        <field>
+            <a>organizationNameInformations</a>
+            <b>organizationNameInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.OrganizationNameInformation</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.NCIPMessage</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NCIPMessage</class-b>
+        <field>
+            <a>version</a>
+            <b>version</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData,org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupItemSet">
+            <a>lookupItemSet</a>
+            <b>ext</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01ExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData,org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.LookupItemSetResponse">
+            <a>lookupItemSetResponse</a>
+            <b>ext</b>
+        </field>
+        <field>
+            <a>problemResponse.problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.PromptInput</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.PromptInput</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SensitiveDataFlag">
+            <a>sensitiveDataFlag</a>
+            <b>sensitiveDataFlag</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.RecallItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RecallItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.RecallItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RecallItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RenewItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field>
+            <a>acknowledgedItemUseRestrictionTypes</a>
+            <b>acknowledgedItemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.RenewItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.RenewItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+        <field>
+            <a>requiredItemUseRestrictionTypes</a>
+            <b>requiredItemUseRestrictionType</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ReportCirculationStatusChangeInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ReportCirculationStatusChange</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReportedMissing">
+            <a>itemReportedMissing</a>
+            <b>itemReportedMissing</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReportedLost">
+            <a>itemReportedLost</a>
+            <b>itemReportedLost</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.EmptyFieldConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ItemReportedNeverBorrowed">
+            <a>itemReportedNeverBorrowed</a>
+            <b>itemReportedNeverBorrowed</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.ReportCirculationStatusChangeResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.ReportCirculationStatusChangeResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.SendUserNoticeResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SendUserNoticeResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UndoCheckOutItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UndoCheckOutItem</class-b>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UndoCheckOutItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UndoCheckOutItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateAgencyResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateAgencyResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateCirculationStatusResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateCirculationStatusResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateRequestItemInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateRequestItem</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
+            <a>authenticationInputDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.BLOCK_OR_TRAP">
+            <a>blockOrTrapDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.DATE_OF_BIRTH">
+            <a>dateOfBirthDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.NAME_INFORMATION">
+            <a>nameInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ADDRESS_INFORMATION">
+            <a>userAddressInformationDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_LANGUAGE">
+            <a>userLanguageDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_PRIVILEGE">
+            <a>userPrivilegeDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.USER_ID">
+            <a>userIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.PREVIOUS_USER_ID">
+            <a>previousUserIdDesired</a>
+            <b>userElementType</b>
+        </field>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.BIBLIOGRAPHIC_DESCRIPTION">
+            <a>bibliographicDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.CIRCULATION_STATUS">
+            <a>circulationStatusDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.HOLD_QUEUE_LENGTH">
+            <a>holdQueueLengthDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_DESCRIPTION">
+            <a>itemDescriptionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.ITEM_USE_RESTRICTION_TYPE">
+            <a>itemUseRestrictionTypeDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.LOCATION">
+            <a>locationDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.PHYSICAL_CONDITION">
+            <a>physicalConditionDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SECURITY_MARKER">
+            <a>securityMarkerDesired</a>
+            <b>itemElementType</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.dozer.NCIPv2_01SchemeValuePairToBooleanConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.SENSITIZATION_FLAG">
+            <a>sensitizationFlagDesired</a>
+            <b>itemElementType</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateRequestItemResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateRequestItemResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateUser</class-b>
+        <field>
+            <a>authenticationInputs</a>
+            <b>authenticationInput</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AuthenticationInput</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UpdateUserResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UpdateUserResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserCreatedInitiationData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserCreated</class-b>
+        <field>
+            <a>userPrivileges</a>
+            <b>userPrivilege</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserPrivilege</b-hint>
+        </field>
+        <field>
+            <a>userLanguages</a>
+            <b>userLanguage</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>userAddressInformations</a>
+            <b>userAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserAddressInformation</b-hint>
+        </field>
+        <field>
+            <a>blockOrTraps</a>
+            <b>blockOrTrap</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BlockOrTrap</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserCreatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserCreatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserFiscalAccount</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserFiscalAccount</class-b>
+        <field>
+            <a>accountDetails</a>
+            <b>accountDetails</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.AccountDetails</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserFiscalTransactionCreatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserFiscalTransactionCreatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserNoticeDetails</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserNoticeDetails</class-b>
+        <field>
+            <a>noticeItems</a>
+            <b>noticeItem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.NoticeItem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserNoticeSentResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserNoticeSentResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserOptionalFields</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserOptionalFields</class-b>
+        <field>
+            <a>userPrivileges</a>
+            <b>userPrivilege</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserPrivilege</b-hint>
+        </field>
+        <field>
+            <a>userLanguages</a>
+            <b>userLanguage</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.SchemeValuePair</b-hint>
+        </field>
+        <field>
+            <a>previousUserIds</a>
+            <b>previousUserId</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.PreviousUserId</b-hint>
+        </field>
+        <field>
+            <a>userAddressInformations</a>
+            <b>userAddressInformation</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserAddressInformation</b-hint>
+        </field>
+        <field>
+            <a>blockOrTraps</a>
+            <b>blockOrTrap</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.BlockOrTrap</b-hint>
+        </field>
+        <field>
+            <a>userIds</a>
+            <b>userId</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserId</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.service.UserUpdatedResponseData</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.UserUpdatedResponse</class-b>
+        <field>
+            <a>problems</a>
+            <b>problem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements.Problem</b-hint>
+        </field>
+    </mapping>
+
+</mappings>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:CancelRequestItem>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/registryid/registryid.scm">registry_id</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/registryid/registryid.scm">registry_id</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:AuthenticationInput>
+          <ns1:AuthenticationInputData>98765432</ns1:AuthenticationInputData>
+          <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
+          <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm">Barcode Id</ns1:AuthenticationInputType>
+        </ns1:AuthenticationInput>
+        <ns1:AuthenticationInput>
+          <ns1:AuthenticationInputData>password</ns1:AuthenticationInputData>
+          <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
+          <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm">Password</ns1:AuthenticationInputType>
+        </ns1:AuthenticationInput>
+        <ns1:RequestId>
+            <ns1:RequestIdentifierValue>101919</ns1:RequestIdentifierValue>
+        </ns1:RequestId>
+        <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Hold</ns1:RequestType>
+    </ns1:CancelRequestItem>
+</ns1:NCIPMessage>

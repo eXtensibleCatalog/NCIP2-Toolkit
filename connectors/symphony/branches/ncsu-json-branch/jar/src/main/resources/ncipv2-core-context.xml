@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2010 eXtensible Catalog.  All rights reserved. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <bean name="httpService"
+        class="org.extensiblecatalog.ncip.v2.symphony.SymphonyHttpService">
+        <property name="symphonyBaseURL"
+            value="${symphony.base.url}"/>
+        <property name="maxConnections" value="50"/>
+    </bean>
+
+	<bean name="NCIPConfiguration" class="org.extensiblecatalog.ncip.v2.common.NCIPConfiguration" scope="singleton">
+		<property name="locations">
+			<list>
+				<value>classpath:driver/driver_config.properties</value>
+				<value>classpath:NCIPToolkit_core_config.properties</value>
+			</list>
+		</property>
+		<property name="ignoreResourceNotFound" value="true" />
+        <property name="schemaURLs">
+          <list>
+              <!-- Uncomment the ncip_v2_0.xsd schema and comment-out the ncip_v2_0_extensions.xsd schema
+                   if you want to restrict the supported messages to the NCIP v2 standard, i.e. if you
+                   do *not* want to support extensions like the Lookup Item Set service.
+              -->
+              <!-- <value>ncip_v2_0.xsd</value> -->
+              <value>ncip_v2_0_extensions.xsd</value>
+          </list>
+        </property>
+	</bean>
+
+    <!-- Statistics -->
+    <bean id="toolkitStatistics" class="org.extensiblecatalog.ncip.v2.common.ToolkitStatisticsBean"/>
+
+    <!-- NCIP remote services manager  -->
+    <bean id="remoteServiceManager" class="${RemoteServiceManager.class}">
+        <property name="httpService" ref="httpService"/>
+    </bean>
+    
+    <!-- NCIP Services -->
+    <bean id="acceptItemService" class="${AcceptItemService.class}"/>
+    <bean id="checkInItemService" class="${CheckInItemService.class}"/>
+    <bean id="checkOutItemService" class="${CheckOutItemService.class}"/>
+    <bean id="lookupItemService" class="${LookupItemService.class}"/>
+    <bean id="lookupItemSetService" class="${LookupItemSetService.class}"/>
+    <bean id="lookupUserService" class="${LookupUserService.class}"/>
+    <bean id="cancelRequestItemService" class="${CancelRequestItemService.class}"/>
+    <bean id="renewItemService" class="${RenewItemService.class}"/>
+    <bean id="requestItemService" class="${RequestItemService.class}"/>
+
+
+
+    <bean id="supportedServices" class="org.springframework.beans.factory.config.MapFactoryBean">
+      <property name="sourceMap">
+         <map>
+
+             <entry key="org.extensiblecatalog.ncip.v2.service.AcceptItemInitiationData" value-ref="acceptItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.CheckOutItemInitiationData" value-ref="checkOutItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.CheckInItemInitiationData" value-ref="checkInItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData" value-ref="lookupItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData" value-ref="lookupItemSetService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData" value-ref="lookupUserService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData" value-ref="renewItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData" value-ref="cancelRequestItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData" value-ref="requestItemService"/>
+         </map>
+      </property>
+    </bean>
+
+    <!-- The NCIPServlet fetches this bean in its init method. Don't change the name of the bean. -->
+    <bean id="messageHandler" class="org.extensiblecatalog.ncip.v2.service.MessageHandler">
+      <constructor-arg index="0" ref="supportedServices"/>
+      <constructor-arg index="1" ref="remoteServiceManager"/>
+    </bean>
+
+    <!-- The NCIPServlet fetches this bean in its init method. Don't change the name of the bean. -->
+    <!-- You can change the class back to JAXBTranslator if you believe there's a problem with the Dozer version. -->
+    <bean id="translator" class="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.JAXBDozerTranslator">
+        <constructor-arg ref="toolkitStatistics"/>
+    </bean>
+
+    <!-- The NCIPServlet fetches this bean in its init method. Don't change the name of the bean. -->
+    <bean id="includeStackTracesInProblemResponses" class="java.lang.Boolean">
+        <constructor-arg index="0" value="false"/>
+    </bean>
+
+    <bean id="xcCirculationStatus" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.XcCirculationStatus.loadAll</value></property>
+    </bean>
+
+    <bean id="xcRequestType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.XcRequestType.loadAll</value></property>
+    </bean>
+        
+    <bean id="exampleItemIdentifierTypes" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.examples.ExampleItemIdentifierType.loadAll</value></property>
+    </bean>
+
+    <bean id="version1AcceptItemProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1AcceptItemProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1AuthenticationDataFormatType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1AuthenticationDataFormatType.loadAll</value></property>
+    </bean>
+    <bean id="version1AuthenticationInputType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType.loadAll</value></property>
+    </bean>
+    <bean id="version1BibliographicItemIdentifierCode" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode.loadAll</value></property>
+    </bean>
+    <bean id="version1BibliographicLevel" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1BibliographicLevel.loadAll</value></property>
+    </bean>
+    <bean id="version1BibliographicRecordIdentifierCode" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode.loadAll</value></property>
+    </bean>
+    <bean id="version1CheckInItemProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1CheckInItemProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1CheckOutItemProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1CheckOutItemProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1CirculationStatus" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus.loadAll</value></property>
+    </bean>
+    <bean id="version1ComponentIdentifierType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1ComponentIdentifierType.loadAll</value></property>
+    </bean>
+    <bean id="version1CurrencyCode" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1CurrencyCode.loadAll</value></property>
+    </bean>
+    <bean id="version1ElectronicDataFormatType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1ElectronicDataFormatType.loadAll</value></property>
+    </bean>
+    <bean id="version1FiscalActionType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1FiscalActionType.loadAll</value></property>
+    </bean>
+    <bean id="version1GeneralProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1ItemDescriptionLevel" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel.loadAll</value></property>
+    </bean>
+    <bean id="version1ItemElementType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1ItemElementType.loadAll</value></property>
+    </bean>
+    <bean id="version1ItemIdentifierType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType.loadAll</value></property>
+    </bean>
+    <bean id="version1ItemUseRestrictionType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType.loadAll</value></property>
+    </bean>
+    <bean id="version1Language" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1Language.loadAll</value></property>
+    </bean>
+    <bean id="version1LocationType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1LocationType.loadAll</value></property>
+    </bean>
+    <bean id="version1LookupItemProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1LookupUserProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1LookupUserProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1MediumType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1MediumType.loadAll</value></property>
+    </bean>
+    <bean id="version1OrganizationNameType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType.loadAll</value></property>
+    </bean>
+    <bean id="version1PhysicalAddressType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType.loadAll</value></property>
+    </bean>
+    <bean id="version1PhysicalConditionType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1PhysicalConditionType.loadAll</value></property>
+    </bean>
+    <bean id="version1RequestedActionType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1RequestedActionType.loadAll</value></property>
+    </bean>
+    <bean id="version1RequestElementType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1RequestElementType.loadAll</value></property>
+    </bean>
+    <bean id="version1RequestItemProcessingError" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1RequestItemProcessingError.loadAll</value></property>
+    </bean>
+    <bean id="version1RequestScopeType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType.loadAll</value></property>
+    </bean>
+    <bean id="version1RequestStatusType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType.loadAll</value></property>
+    </bean>
+    <bean id="version1RequestType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1RequestType.loadAll</value></property>
+    </bean>
+    <bean id="version1SecurityMarker" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1SecurityMarker.loadAll</value></property>
+    </bean>
+    <bean id="version1UnstructuredAddressType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType.loadAll</value></property>
+    </bean>
+    <bean id="version1UserElementType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.Version1UserElementType.loadAll</value></property>
+    </bean>
+    <bean id="setBehaviorForAgencyId" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AgencyId</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForApplicationProfileType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.ApplicationProfileType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForFromSystemId" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.FromSystemId</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForPickupLocation" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.PickupLocation</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForRequestIdentifierType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.RequestIdentifierType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorForToSystemId" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.ToSystemId</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorAuthenticationDataFormatType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="setBehaviorAuthenticationInputType" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.mapBehavior</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AuthenticationInputType</value>
+          <value>ALLOW_ANY</value>
+        </list>
+      </property>
+    </bean>
+    <bean id="allowNullScheme" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod"><value>org.extensiblecatalog.ncip.v2.service.SchemeValuePair.allowNullScheme</value></property>
+      <property name="arguments">
+        <list>
+          <value>org.extensiblecatalog.ncip.v2.service.AgencyElementType</value>
+          <value>org.extensiblecatalog.ncip.v2.service.ItemElementType</value>
+          <value>org.extensiblecatalog.ncip.v2.service.RequestElementType</value>
+          <value>org.extensiblecatalog.ncip.v2.service.UserElementType</value>
+        </list>
+      </property>
+    </bean>
+</beans>

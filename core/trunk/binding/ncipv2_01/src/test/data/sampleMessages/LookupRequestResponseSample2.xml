@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+  ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+  <ns1:LookupRequestResponse>
+	<ns1:ResponseHeader>
+      <ns1:FromSystemId ns1:Scheme="http://www.altova.com">String</ns1:FromSystemId>
+      <ns1:FromSystemAuthentication>String</ns1:FromSystemAuthentication>
+      <ns1:FromAgencyId>
+        <ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+      </ns1:FromAgencyId>
+      <ns1:FromAgencyAuthentication>String</ns1:FromAgencyAuthentication>
+      <ns1:ToSystemId ns1:Scheme="http://www.altova.com">String</ns1:ToSystemId>
+      <ns1:ToAgencyId>
+        <ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+      </ns1:ToAgencyId>
+	</ns1:ResponseHeader>
+    <ns1:ItemId>
+      <ns1:ItemIdentifierValue>09128312</ns1:ItemIdentifierValue>
+    </ns1:ItemId>
+    <ns1:UserId>
+      <ns1:UserIdentifierValue>UW0923</ns1:UserIdentifierValue>
+    </ns1:UserId>
+    <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Hold</ns1:RequestType>
+    <ns1:RequestScopeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/requestscopetype.scm">Bibliographic Item</ns1:RequestScopeType>
+    <ns1:RequestStatusType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requeststatustype/requeststatustype.scm">Available For Pickup</ns1:RequestStatusType>
+    <ns1:HoldQueuePosition>1</ns1:HoldQueuePosition>
+    <ns1:ShippingInformation>
+        <ns1:ShippingNote>Please package in recycled/recyclable packaging.</ns1:ShippingNote>
+        <ns1:PhysicalAddress>
+            <ns1:UnstructuredAddress>
+                <ns1:UnstructuredAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+                <ns1:UnstructuredAddressData>Mr. Wolf/Weretown, WA</ns1:UnstructuredAddressData>
+            </ns1:UnstructuredAddress>
+            <ns1:PhysicalAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Postal Address</ns1:PhysicalAddressType>
+        </ns1:PhysicalAddress>
+    </ns1:ShippingInformation>
+    <ns1:EarliestDateNeeded>2012-02-17T00:00:47Z</ns1:EarliestDateNeeded>
+    <ns1:NeedBeforeDate>2013-12-17T00:00:47Z</ns1:NeedBeforeDate>
+    <ns1:PickupDate>2012-03-01T00:00:47Z</ns1:PickupDate>
+    <ns1:PickupLocation>Main Circ Desk, Fromm Library</ns1:PickupLocation>
+    <ns1:PickupExpiryDate>2012-03-08T00:00:47.003Z</ns1:PickupExpiryDate>
+    <ns1:DateOfUserRequest>2011-02-17T00:00:47.010Z</ns1:DateOfUserRequest>
+    <ns1:DateAvailable>2012-03-01T00:00:47.100Z</ns1:DateAvailable>
+    <ns1:AcknowledgedFeeAmount>
+        <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+        <ns1:MonetaryValue>300</ns1:MonetaryValue>
+    </ns1:AcknowledgedFeeAmount>
+    <ns1:PaidFeeAmount>
+        <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+        <ns1:MonetaryValue>100</ns1:MonetaryValue>
+    </ns1:PaidFeeAmount>
+    <ns1:ItemOptionalFields>
+      <ns1:BibliographicDescription>
+        <ns1:Author>String</ns1:Author>
+        <ns1:AuthorOfComponent>String</ns1:AuthorOfComponent>
+        <ns1:BibliographicItemId>
+          <ns1:BibliographicItemIdentifier>String</ns1:BibliographicItemIdentifier>
+          <ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">CODEN</ns1:BibliographicItemIdentifierCode>
+        </ns1:BibliographicItemId>
+        <ns1:BibliographicRecordId>
+          <ns1:BibliographicRecordIdentifier>String</ns1:BibliographicRecordIdentifier>
+          <ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+        </ns1:BibliographicRecordId>
+        <ns1:ComponentId>
+          <ns1:ComponentIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/componentidentifiertype/componentidentifiertype.scm">BICI</ns1:ComponentIdentifierType>
+          <ns1:ComponentIdentifier>String</ns1:ComponentIdentifier>
+        </ns1:ComponentId>
+        <ns1:Edition>String</ns1:Edition>
+        <ns1:Pagination>String</ns1:Pagination>
+        <ns1:PlaceOfPublication>String</ns1:PlaceOfPublication>
+        <ns1:PublicationDate>String</ns1:PublicationDate>
+        <ns1:PublicationDateOfComponent>String</ns1:PublicationDateOfComponent>
+        <ns1:Publisher>String</ns1:Publisher>
+        <ns1:SeriesTitleNumber>String</ns1:SeriesTitleNumber>
+        <ns1:Title>String</ns1:Title>
+        <ns1:TitleOfComponent>String</ns1:TitleOfComponent>
+        <ns1:BibliographicLevel ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographiclevel/bibliographiclevel.scm">Monograph</ns1:BibliographicLevel>
+        <ns1:SponsoringBody>String</ns1:SponsoringBody>
+        <ns1:ElectronicDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">image/tiff</ns1:ElectronicDataFormatType>
+        <ns1:Language ns1:Scheme="http://lcweb.loc.gov/standards/iso639-2/bibcodes.html">eng</ns1:Language>
+        <ns1:MediumType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm">Book</ns1:MediumType>
+      </ns1:BibliographicDescription>
+      <ns1:ItemUseRestrictionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemuserestrictiontype/itemuserestrictiontype.scm">Available For Supply Without Return</ns1:ItemUseRestrictionType>
+      <ns1:ItemUseRestrictionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemuserestrictiontype/itemuserestrictiontype.scm">In Library Use Only</ns1:ItemUseRestrictionType>
+      <ns1:CirculationStatus ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/circulationstatus/circulationstatus.scm">Available On Shelf</ns1:CirculationStatus>
+      <ns1:HoldQueueLength>1</ns1:HoldQueueLength>
+      <ns1:ItemDescription>
+		<ns1:CallNumber>String</ns1:CallNumber>
+		<ns1:CopyNumber>String</ns1:CopyNumber>
+		<ns1:ItemDescriptionLevel ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemdescriptionlevel/itemdescriptionlevel.scm">Item</ns1:ItemDescriptionLevel>
+		<ns1:HoldingsInformation>
+			<ns1:StructuredHoldingsData>
+				<ns1:HoldingsChronology>
+					<ns1:ChronologyLevelInstance>
+						<ns1:ChronologyCaption>String</ns1:ChronologyCaption>
+						<ns1:ChronologyValue>String</ns1:ChronologyValue>
+					</ns1:ChronologyLevelInstance>
+					<ns1:ChronologyLevelInstance>
+						<ns1:ChronologyCaption>String</ns1:ChronologyCaption>
+						<ns1:ChronologyValue>String</ns1:ChronologyValue>
+					</ns1:ChronologyLevelInstance>
+				</ns1:HoldingsChronology>
+			</ns1:StructuredHoldingsData>
+			<ns1:StructuredHoldingsData>
+				<ns1:HoldingsChronology>
+					<ns1:ChronologyLevelInstance>
+						<ns1:ChronologyCaption>String</ns1:ChronologyCaption>
+						<ns1:ChronologyValue>String</ns1:ChronologyValue>
+					</ns1:ChronologyLevelInstance>
+					<ns1:ChronologyLevelInstance>
+						<ns1:ChronologyCaption>String</ns1:ChronologyCaption>
+						<ns1:ChronologyValue>String</ns1:ChronologyValue>
+					</ns1:ChronologyLevelInstance>
+				</ns1:HoldingsChronology>
+			</ns1:StructuredHoldingsData>
+		</ns1:HoldingsInformation>
+		<ns1:NumberOfPieces>2</ns1:NumberOfPieces>
+	</ns1:ItemDescription>
+	<ns1:Location>
+		<ns1:LocationType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/locationtype/locationtype.scm">Temporary Location</ns1:LocationType>
+		<ns1:LocationName>
+			<ns1:LocationNameInstance>
+				<ns1:LocationNameLevel>2</ns1:LocationNameLevel>
+				<ns1:LocationNameValue>String</ns1:LocationNameValue>
+			</ns1:LocationNameInstance>
+			<ns1:LocationNameInstance>
+				<ns1:LocationNameLevel>2</ns1:LocationNameLevel>
+				<ns1:LocationNameValue>String</ns1:LocationNameValue>
+			</ns1:LocationNameInstance>
+		</ns1:LocationName>
+		<ns1:ValidFromDate>2001-12-17T09:30:47Z</ns1:ValidFromDate>
+		<ns1:ValidToDate>2001-12-17T09:30:47Z</ns1:ValidToDate>
+	</ns1:Location>
+	<ns1:Location>
+        <ns1:LocationType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/locationtype/locationtype.scm">Permanent Location</ns1:LocationType>
+		<ns1:LocationName>
+			<ns1:LocationNameInstance>
+				<ns1:LocationNameLevel>2</ns1:LocationNameLevel>
+				<ns1:LocationNameValue>String</ns1:LocationNameValue>
+			</ns1:LocationNameInstance>
+			<ns1:LocationNameInstance>
+				<ns1:LocationNameLevel>2</ns1:LocationNameLevel>
+				<ns1:LocationNameValue>String</ns1:LocationNameValue>
+			</ns1:LocationNameInstance>
+		</ns1:LocationName>
+		<ns1:ValidFromDate>2001-12-17T09:30:47Z</ns1:ValidFromDate>
+		<ns1:ValidToDate>2001-12-17T09:30:47Z</ns1:ValidToDate>
+	</ns1:Location>
+	<ns1:PhysicalCondition>
+		<ns1:PhysicalConditionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicalconditiontype/physicalconditiontype.scm">Binding Weak</ns1:PhysicalConditionType>
+		<ns1:PhysicalConditionDetails>String</ns1:PhysicalConditionDetails>
+	</ns1:PhysicalCondition>
+	<ns1:ElectronicResource>
+		<ns1:ElectronicDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">image/tiff</ns1:ElectronicDataFormatType>
+		<ns1:ActualResource>String</ns1:ActualResource>
+	</ns1:ElectronicResource>
+	<ns1:SecurityMarker ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/securitymarker/securitymarker.scm">Checkpoint RFID</ns1:SecurityMarker>
+	<ns1:SensitizationFlag/>
+  </ns1:ItemOptionalFields>
+  <ns1:UserOptionalFields>
+    <ns1:NameInformation>
+        <ns1:PersonalNameInformation>
+            <ns1:UnstructuredPersonalUserName>Bodfish, John R.</ns1:UnstructuredPersonalUserName>
+        </ns1:PersonalNameInformation>
+    </ns1:NameInformation>
+  </ns1:UserOptionalFields>
+  </ns1:LookupRequestResponse>
+</ns1:NCIPMessage>

@@ -1,0 +1,6 @@
+Revision history for Perl extension Sirsi::API.
+
+0.01  Mon Nov 21 13:20:50 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Sirsi::API
+

@@ -1,0 +1,182 @@
+#####################################################################################################################
+#   To test against a different library, you should modify the data below appropriately
+#   
+#   Author: Rick Johnson	University of Notre Dame
+#	Date:	06/03/2009
+#
+#####################################################################################################################
+#Connection properties
+XSERVER_NAME=[INSERT VALUE HERE]
+XSERVER_PORT=[INSERT VALUE HERE]
+#Patron Info	
+USERNAME=[INSERT VALUE HERE]
+PASSWORD=[INSERT VALUE HERE]
+PATRON_ID=[INSERT VALUE HERE]
+FULLNAME=[INSERT VALUE HERE]
+ADDRESS=[INSERT VALUE HERE]
+#used for most requests
+EXPECTED_AGENCY=University of Notre Dame
+PATRON_ID_NOT_CHECKED_OUT=[INSERT VALUE HERE]
+
+#AGENCY INFO
+# If you modify below it currently expects at least two agencies to test availability across multiple ones
+AGENCY_1=University of Notre Dame
+AGENCY_2=Saint Mary's College
+AGENCY_3=Holy Cross College
+AGENCY_4=Bethel College
+
+#AGENCY ADM, BIB, and HOL sublibrary mappings	
+AGENCY_ADM_1=NDU50
+AGENCY_BIB_1=NDU01
+AGENCY_HOL_1=NDU60
+AGENCY_ADM_2=SMC50
+AGENCY_BIB_2=SMC01
+AGENCY_HOL_2=SMC60
+AGENCY_ADM_3=HCC50
+AGENCY_BIB_3=HCC01
+AGENCY_HOL_3=HCC60
+AGENCY_ADM_4=BCI50
+AGENCY_BIB_4=BCI01
+AGENCY_HOL_4=BCI60
+
+BIB_LIBRARY=NDU01
+ADM_LIBRARY=NDU50
+HOL_LIBRARY=NDU60
+	
+#ITEM DATA	
+#Generally available items
+AVAIL_ADM_ID1=001834556000010
+AVAIL_BIB_ID1=001820246
+AVAIL_HOLD_ID1=001856284
+AVAIL_BARCODE_1=00000020067138
+AVAIL_DOC_NUMBER_1=001834556
+
+AVAIL_ADM_ID2=002249515000010
+AVAIL_ADM_ID3=002386932000010
+AVAIL_BIB_ID3=002386932
+AVAIL_HOLD_ID2=002257092
+AVAIL_HOLD_ID3=002404654
+
+#restricted access item that should always show unavailable	
+RESTRICTED_ADM_ID=002323761000010
+RESTRICTED_BIB_ID=002323761
+	
+#must define four items that are checked out to patron listed above
+#currently Aleph 18 X-Services does not allow checkin/checkout so doing it manually for now
+#but once Aleph 20 is in use we should modify unit tests to do setup and cleanup to checkout and checkin items
+#used in testing
+#
+# One further note, if a field is undefined below, it should be commented out so the value shows up as null in the unit test
+# Simply having it set to an empty line is not enough.
+#
+
+#Expects this to be checked out by above user in agency 1
+BOTH_AGENCY_ADM_ID=000000001000010
+
+REQUEST_ADM_ID1=002249515000010
+REQUEST_BIB_ID1=002249341
+REQUEST_HOLD_ID1=002257092
+REQUEST_CALLNUMBER_1=LA 1646 .C85 2006
+REQUEST_ISBN_1=0791469018 (hbk.)
+#REQUEST_CIRCSTATUS_1=
+#REQUEST_AUTHOR_1
+REQUEST_MEDIUMTYPE_1=Book
+REQUEST_PUBLISHER_1=New York : State University of New York, c2006.
+REQUEST_TITLE_1=Cultures of Arab schooling : critical ethnographies from Egypt / edited by Linda Herrera, Carlos Alb
+REQUEST_LOCATION_1=Hesburgh Library
+
+LOAN_ADM_ID1=001616262000010
+LOAN_BIB_ID1=001616262
+LOAN_AUTHOR_1=Ramsay, William Mitchell, Sir, 1851-1939.
+LOAN_CALLNUMBER_1=BS 2685 .R29 1997
+LOAN_CIRC_STATUS_1=A
+LOAN_ISBN_1=0825436389 (alk. paper)
+LOAN_LOCATION_1=Hesburgh Library
+LOAN_MEDIUMTYPE_1=Book
+LOAN_PUBLISHER_1=Grand Rapids, MI : Kregel Publications, c1997.
+LOAN_TITLE_1=Historical commentary on Galatians / William M. Ramsay ; edited by Mark Wilson.
+LOAN_BARCODE_1=00000019081249
+LOAN_HOLD_ID_1=001669607
+LOAN_DESCRIPTION_1=366 p. : map ; 22 cm.; Rev. ed. of A historical commentary on St. Paul&apos;s Epistle to the Galatians. London : Hodder and Stoughton, 1899.
+#LOAN_SERIES_1=
+#LOAN_ERESOURCE_1=
+LOAN_MEDIUM_1=BOOK
+LOAN_AGENCY_1=University of Notre Dame
+LOAN_DOC_NUMBER_1=001616262
+LOAN_SEQ_NUMBER_1=000010
+	
+LOAN_BIB_ID2=001625048
+LOAN_ADM_ID2=001625048000010
+LOAN_AUTHOR_2=Kranemann, Benedikt.
+LOAN_ISBN_2=3402040611
+LOAN_TITLE_2=Sakramentliche Liturgie im Bistum Münster : eine Untersuchung handschriftlicher und gedruckter Ritu
+LOAN_CALLNUMBER_2=BV 170 .L738 Bd.83
+LOAN_PUBLISHER_2=Münster : Aschendorff, c1998.
+LOAN_DESCRIPTION_2=xxx, 360 p. ; 23 cm.; Revision of author&apos;s Habilitationsschrift (Universität Münster, 1993/1994).
+#LOAN_SERIES_2=null
+LOAN_LOCATION_2=Hesburgh Library
+#LOAN_ERESOURCE_2=null
+LOAN_MEDIUMTYPE_2=BOOK
+LOAN_CIRC_STATUS_2=A
+LOAN_BARCODE_2=00000018118281
+LOAN_HOLD_ID_2=001678105
+LOAN_AGENCY_2=University of Notre Dame
+	
+LOAN_BIB_ID3=000556360
+LOAN_ADM_ID3=000556360000010
+LOAN_AUTHOR_3=Dru, Alexander.
+LOAN_ISBN_3=000556360
+LOAN_TITLE_3=The Church in the nineteenth century: Germany 1800-1918.
+LOAN_CALLNUMBER_3=BX 1536 .D74 1963
+LOAN_PUBLISHER_3=London, Burns &amp; Oates [c1963]
+LOAN_DESCRIPTION_3=124 p. 20 cm.
+LOAN_SERIES_3=Faith and fact books ; IX Church and the modern world ; 103
+LOAN_LOCATION_3=Hesburgh Library
+#LOAN_ERESOURCE_3=null
+LOAN_MEDIUMTYPE_3=BOOK
+LOAN_CIRC_STATUS_3=A
+LOAN_BARCODE_3=00000005093935
+LOAN_HOLD_ID_3=000614748
+LOAN_AGENCY_3=University of Notre Dame
+	
+LOAN_ADM_ID4=002249689000010
+LOAN_BIB_ID4=002249515
+LOAN_HOLD_ID4=002254290
+LOAN_AUTHOR_4=Conkin, Paul Keith.
+LOAN_ISBN_4=9780813124117 (hardcover : alk. paper) 
+LOAN_TITLE_4=The state of the Earth : environmental challenges on the road to 2100 / Paul K. Conkin.
+LOAN_CALLNUMBER_4=GE 195.7 .C66 2007
+LOAN_PUBLISHER_4=Lexington, Ky. : University Press of Kentucky, c2007.
+LOAN_DESCRIPTION_4=xii, 308 p. : ill. ; 24 cm.
+LOAN_LOCATION_4=Hesburgh Library
+LOAN_ERESOURCE_4=Table of contents only, http://www.loc.gov/catdir/toc/ecip072/2006032085.html, Click for ONLINE ACCESS
+LOAN_MEDIUMTYPE_4=BOOK
+LOAN_CIRC_STATUS_4=A
+LOAN_AGENCY_4=University of Notre Dame
+LOAN_PICKUP_LOCATION_4=Hesburgh Library General Counter
+
+#LOAN_SERIES_4=null
+LOAN_BARCODE_4=00000024427155
+LOAN_DOC_NUMBER_4=002249689
+LOAN_SEQ_NUMBER_4=000010
+
+AVAILABILITY_ITEM_ID_SAME_BIB_ID_1=002464704000010
+AVAILABILITY_ITEM_ID_SAME_BIB_ID_2=002464704000020
+AVAILABILITY_ITEM_ID_SAME_BIB_ID_3=002464704000030
+AVAILABILITY_HOLD_ID=002469992
+AVAILABILITY_HOLD_ID_1=002469991
+AVAILABILITY_HOLD_ID_2=002469994
+AVAILABILITY_HOLD_ID_3=002469992
+AVAILABILITY_DOC_NUM_SAME_BIB_ID_1=002464704
+AVAILABILITY_DOC_NUM_SAME_BIB_ID_2=002464704
+AVAILABILITY_DOC_NUM_SAME_BIB_ID_3=002464704
+AVAILABILITY_SEQ_NUM_SAME_BIB_ID_1=000010
+AVAILABILITY_SEQ_NUM_SAME_BIB_ID_2=000020
+AVAILABILITY_SEQ_NUM_SAME_BIB_ID_3=000030
+AVAILABILITY_BARCODE_SAME_BIB_ID_1=00000027299270
+AVAILABILITY_BARCODE_SAME_BIB_ID_2=00000027299312
+AVAILABILITY_BARCODE_SAME_BIB_ID_3=00000027299353
+AVAILABILITY_BIB_ID=002464704
+AVAILABILITY_EXPECTED_1=POSSIBLY_AVAILABLE
+AVAILABILITY_EXPECTED_2=AVAILABLE
+AVAILABILITY_EXPECTED_3=AVAILABLE

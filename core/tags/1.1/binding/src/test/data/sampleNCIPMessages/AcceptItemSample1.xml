@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:AcceptItem>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">LENDER</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:RequestId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">LENDER</ns1:AgencyId>
+            <ns1:RequestIdentifierValue>VDX1234</ns1:RequestIdentifierValue>
+        </ns1:RequestId>
+        <ns1:RequestedActionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestedactiontype/requestedactiontype.scm">Circulate</ns1:RequestedActionType>
+        <ns1:UserId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:UserIdentifierValue>OCLCTEST</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:ItemId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">LENDER</ns1:AgencyId>
+            <ns1:ItemIdentifierValue>9998</ns1:ItemIdentifierValue>
+        </ns1:ItemId>
+        <ns1:DateForReturn>2010-11-20T00:00:00.329Z</ns1:DateForReturn>
+        <ns1:ItemOptionalFields>
+            <ns1:BibliographicDescription>
+                <ns1:Author>Iam T. Author</ns1:Author>
+                <ns1:BibliographicItemId>
+                    <ns1:BibliographicItemIdentifier>98765432</ns1:BibliographicItemIdentifier>
+                    <ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">ISBN</ns1:BibliographicItemIdentifierCode>
+                </ns1:BibliographicItemId>
+                <ns1:Edition>1st edition</ns1:Edition>
+                <ns1:Pagination>30 pages</ns1:Pagination>
+                <ns1:PlaceOfPublication>Dublin</ns1:PlaceOfPublication>
+                <ns1:PublicationDate>December 2007</ns1:PublicationDate>
+                <ns1:Publisher>Dublin Publishers</ns1:Publisher>
+                <ns1:Title>The title of the book</ns1:Title>
+                <ns1:BibliographicLevel ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographiclevel/bibliographiclevel.scm">Monograph</ns1:BibliographicLevel>
+                <ns1:Language ns1:Scheme="http://lcweb.loc.gov/standards/iso639-2/bibcodes.html">eng</ns1:Language>
+            </ns1:BibliographicDescription>
+        </ns1:ItemOptionalFields>
+    </ns1:AcceptItem>
+</ns1:NCIPMessage>

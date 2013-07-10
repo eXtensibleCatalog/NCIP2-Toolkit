@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2010 eXtensible Catalog.  All rights reserved. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <!-- Initialize the AppContext attribute of the ConfigurationHelper class -->
+    <bean name="ToolkitAppContext" class="org.extensiblecatalog.ncip.v2.common.ToolkitAppContext" scope="singleton"/>
+
+    <!-- If you want to use Spring instead of Property files and web context descriptor, you can add the Spring
+         configuration beans here. For examples see the examples project's src/ain/resources folder.
+
+         Note: As this file is built into the webapp war file, once you've changed this you'll have to re-build
+         the war file and deploy that. Alternatively you could set the ToolkitConfiguration.SpringConfigFile
+         property (via the web context descriptor) to point to a Spring configuration file that is outside
+         of the war.
+    -->
+</beans>

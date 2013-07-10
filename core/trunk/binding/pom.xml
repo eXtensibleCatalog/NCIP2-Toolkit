@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- This is a version 4 POM file. -->
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <!-- The project details. -->
+    <groupId>org.extensiblecatalog.ncip.v2</groupId>
+    <artifactId>binding</artifactId>
+    <packaging>pom</packaging>
+    <version>1.2-SNAPSHOT</version>
+    <name>NCIP V2 Binding</name>
+    <description>NCIP V2 Binding</description>
+
+    <!-- Inherit from the root POM. -->
+    <parent>
+        <groupId>org.extensiblecatalog.ncip.v2</groupId>
+        <artifactId>root</artifactId>
+        <version>1.2-SNAPSHOT</version>
+    </parent>
+
+    <modules>
+      <module>common</module>
+      <module>ncipv2_01</module>
+      <module>ncipv2_02</module>
+      <module>ilsdiv1_0</module>
+      <module>ilsdiv1_0_bc</module>
+      <module>wclv1_0</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxbapiVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>service</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxbVersion}</version>
+        </dependency>
+    </dependencies>
+
+</project>

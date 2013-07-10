@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ........................................... -->
+<!-- NISO Circulation Interchange Protocol ..... -->
+<!--           ILS-DI Extensions                 -->
+<!-- ........................................... -->
+<!--
+Purpose:
+  This file defines the XML Schema for extensions to the NISO Circulation Interchange Protocol adopted by the
+  ILS Discover Interfaces group
+
+Dependencies:
+  ncip_v2_01.xsd.
+
+Change history:
+  Version 0.0a (22nd December 2010)
+  1)	Defined Lookup Item Set and subordinate elements.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.niso.org/2008/ncip"
+           targetNamespace="http://www.niso.org/2008/ncip"
+           elementFormDefault="qualified" attributeFormDefault="qualified">
+
+    <xs:include schemaLocation="ncip_v2_01.xsd"/>
+
+    <xs:element name="LookupItemSet">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="InitiationHeader" minOccurs="0"/>
+                <xs:choice>
+                    <xs:element ref="BibliographicId" maxOccurs="unbounded"/>
+                    <xs:element ref="HoldingsSetId" maxOccurs="unbounded"/>
+                    <xs:element ref="ItemId" maxOccurs="unbounded"/>
+                </xs:choice>
+                <xs:element ref="ItemElementType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="CurrentBorrowerDesired" minOccurs="0"/>
+                <xs:element ref="CurrentRequestersDesired" minOccurs="0"/>
+                <xs:element ref="MaximumItemsCount" minOccurs="0"/>
+                <xs:element ref="NextItemToken" minOccurs="0"/>
+                <xs:element ref="Ext" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="LookupItemSetResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ResponseHeader" minOccurs="0"/>
+                <xs:choice>
+                    <!-- A Problem element here means "the entire service failed." -->
+                    <xs:element ref="Problem" maxOccurs="unbounded"/>
+                    <xs:sequence>
+                        <xs:element ref="BibInformation" maxOccurs="unbounded"/>
+                        <xs:element ref="NextItemToken" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:choice>
+                <xs:element ref="Ext" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="BibInformation">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Required to be present if the initiation message had this BibliographicId.  -->
+                <xs:element ref="BibliographicId" minOccurs="0"/>
+                <xs:choice>
+                    <xs:sequence>
+                        <xs:element ref="BibliographicDescription" minOccurs="0"/>
+                        <!-- This is the length of all holds that are *at* the title level, *not* a total of all item-level holds.  -->
+                        <xs:element ref="TitleHoldQueueLength" minOccurs="0"/>
+                        <!-- These are the requesters for holds *at* the title level, *not* item-level.  -->
+                        <xs:element ref="CurrentRequester" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element ref="HoldingsSet" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:element ref="Problem" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="HoldingsSet">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Required to be present if the initiation message had this HoldingsSetId.  -->
+                <xs:element ref="HoldingsSetId" minOccurs="0"/>
+                <xs:choice>
+                    <xs:sequence>
+                        <xs:element ref="BibliographicDescription" minOccurs="0"/>
+                        <!-- If all of the items in this HoldingsSet share the same Location data, place that
+                             information here; otherwise include it in the ItemInformation. -->
+                        <xs:element ref="Location" minOccurs="0"/>
+                        <!-- This is the call number for the entire holding. -->
+                        <xs:element ref="CallNumber" minOccurs="0"/>
+                        <!-- This is a summary holdings statement covering the entire holding. -->
+                        <xs:element ref="SummaryHoldingsInformation" minOccurs="0"/>
+                        <xs:element ref="ElectronicResource" minOccurs="0"/>
+                        <xs:element ref="ItemInformation" maxOccurs="unbounded"/>
+                        <!-- TODO: Circulation Status Summary? -->
+                        <xs:element ref="Ext" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:element ref="Problem" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ItemInformation">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Required to be present if the initiation message had this ItemId.  -->
+                <xs:element ref="ItemId" minOccurs="0"/>
+                <xs:choice>
+                    <xs:sequence>
+                        <xs:element ref="RequestId" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element ref="CurrentBorrower" minOccurs="0"/>
+                        <xs:element ref="CurrentRequester" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element ref="DateDue" minOccurs="0"/>
+                        <xs:element ref="DateRecalled" minOccurs="0"/>
+                        <xs:element ref="HoldPickupDate" minOccurs="0"/>
+                        <xs:element ref="ItemTransaction" minOccurs="0"/>
+                        <!-- If the Location information for this item differs from others in its containing HoldingsSet, place it in this ItemOptionalFields -->
+                        <xs:element ref="ItemOptionalFields" minOccurs="0"/>
+                        <xs:element ref="ItemNote" minOccurs="0"/>
+                        <xs:element ref="Ext" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:element ref="Problem" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="SummaryHoldingsInformation">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice>
+                    <xs:element ref="StructuredHoldingsData" maxOccurs="unbounded"/>
+                    <xs:element ref="UnstructuredHoldingsData"/>
+                </xs:choice>
+                <xs:element ref="Ext" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="TitleHoldQueueLength" type="xs:nonNegativeInteger"/>
+    <xs:element name="HoldingsSetId" type="xs:string"/>
+    <xs:element name="ItemNote" type="xs:string"/>
+    <xs:element name="MaximumItemsCount" type="xs:positiveInteger"/>
+    <xs:element name="NextItemToken" type="xs:string"/>
+
+</xs:schema>

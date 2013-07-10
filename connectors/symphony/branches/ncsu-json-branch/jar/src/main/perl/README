@@ -1,0 +1,46 @@
+Sirsi-API version 0.01
+======================
+
+Sirsi::API is a pure-Perl module that allows executing Sirsi API commands
+via apiserver and parsing the responses.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Perl >= 5.10
+
+This module requires these other modules and libraries:
+
+Parse::RecDescent
+JSON
+
+SUGGESTED
+
+MARC::Charset 
+	Allows for conversion of MARC8 encoded output from Sirsi to
+	UTF-8
+
+
+Note the source distribution, but not any installable package created
+from it using the usual "perl Makefile.PL; make dist" routine, contains
+a sample-cgi.pl script intended to serve as a basic usage example.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by North Carolina State University
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

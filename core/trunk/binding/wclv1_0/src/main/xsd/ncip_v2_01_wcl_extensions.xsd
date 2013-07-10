@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ........................................... -->
+<!-- NISO Circulation Interchange Protocol ..... -->
+<!--          WorldCat Extensions                -->
+<!-- ........................................... -->
+<!--
+Purpose:
+  This file defines the XML Schema for extensions to the NISO Circulation Interchange Protocol for use with
+  WorldCat.
+
+Dependencies:
+  ncip_v2_01.xsd.
+
+Change history:
+  Version 0.0a (11th August 2011)
+  1) Created.
+  Version 0.1 (12th September 2011)
+  1) Removed UserActivitySummary; LoanedItemsCount and RequestedItemsCount can be returned in their standard positions,
+     and UserFiscalAccountSummary can be returned as an immediate child of the Ext element.
+  2) Changed namespace from NCIP's standard v2 namespace to an OCLC-assigned URI.
+  3) Added SuspensionStartDate and SuspensionEndDate.
+
+  Version 0.2 (25 September 2011)
+  1) Added ncip namespace alias for all elements imported from http://www.niso.org/2008/ncip namespace.
+  2) Changed from using "include" to "import" for standard NCIP schema as it's now in a different namespace
+     than this schema.
+  3) Changed to NCIP v2.01 schema.
+  4) Removed RequestDetails.
+  5) Changed from NextElementToken to StartElement (in the initiation message) and NextElement (in the response message).
+  6) Renamed "SortOrder" to "SortOrderType" to conform to NCIP naming conventions.
+
+  Version 0.3 (02 October 2011)
+  1) Removed LoanedItemsSummaryDesired, RequestedItemsSummaryDesired & UserFiscalAccountSummaryDesired; the summary
+     elements should be returned if LoanedItemsDesired, RequestedItemsDesired and/or UserFiscalAccountDesired
+     respectively are present in the initiation message.
+
+  Version 0.4 (01 December 2012)
+  1) Added ncip_usernote_extension_v1_0.xsd
+
+  Version 0.5 (10 January 2013)
+  1) Added relying party id
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://oclc.org/WCL/ncip/2011/extensions"
+           xmlns:ncip="http://www.niso.org/2008/ncip"
+           targetNamespace="http://oclc.org/WCL/ncip/2011/extensions"
+           elementFormDefault="qualified" attributeFormDefault="qualified">
+
+    <xs:import namespace="http://www.niso.org/2008/ncip" schemaLocation="ncip_v2_01.xsd"/>
+    <xs:import namespace="http://www.oclc.org/ncip/usernote/2012" schemaLocation="ncip_usernote_extension_v1_0.xsd"/>
+
+
+        <!-- Structure to control the overall size of the response message and the order of elements within it.
+             Repeat this for each repeatable top-level element in the response that you wish to control.
+        -->
+	<xs:element name="ResponseElementControl">
+		<xs:complexType>
+			<xs:sequence>
+				<!-- Scheme/Value pair that identifies the wrapper element that this control refers to, e.g.
+				     LoanedItem, RequestedItem, etc..
+				-->
+				<xs:element ref="ElementType"/>
+				<!-- The ordinal number of the first element to be returned. -->
+				<xs:element ref="StartElement" minOccurs="0"/>
+				<!-- Maximum number of elements to be returned in the response. -->
+				<xs:element ref="MaximumCount" minOccurs="0"/>
+				<!-- Sub-field of element to sort the elements by. -->
+				<xs:element ref="SortField" minOccurs="0"/>
+				<!-- Sort order (ascending, descending, any). There'll be an associated Scheme with those three
+				     values.
+				-->
+				<xs:element ref="SortOrderType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+        <!-- Structure used in response messages to carry a token for the *next* set of data of a particular element type.
+             Repeat this for each repeatable top-level element in the response that has further data that can be returned.
+        -->
+	<xs:element name="SubsequentElementControl">
+		<xs:complexType>
+			<xs:sequence>
+				<!-- Scheme/Value pair that identifies the wrapper element that this control refers to, e.g.
+				     LoanedItem, RequestedItem, etc..
+				-->
+				<xs:element ref="ElementType"/>
+				<!-- The ordinal number of the next element to be returned. -->
+				<xs:element ref="NextElement" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+        <!-- Scheme/Value pair that identifies an element in the response message. -->
+	<xs:element name="ElementType" type="ncip:SchemeValuePair"/>
+
+        <!-- The ordinal number of the first element to be returned from the sorted set of elements identified
+             by this service invocation. Identifies to the responder what instance of a repeatable
+             element to return in the next response of a service invocation.
+        -->
+	<xs:element name="StartElement" type="xs:positiveInteger"/>
+
+        <!-- The ordinal number of the next element that can be returned from the sorted set of elements identified
+             by this service invocation. Identifies to the initiator what instance of a repeatable
+             element is available to be returned in the next response of a service invocation.
+             If omitted, this indicates that there are no further elements to be returned.
+        -->
+    <xs:element name="NextElement" type="xs:positiveInteger"/>
+
+        <!-- A count of the maximum number of repeatable elements the responder may return in the response.  -->
+	<xs:element name="MaximumCount" type="xs:positiveInteger"/>
+
+        <!-- Scheme/Value pair that identifies a sub-element of the repeatable element by which the responder should
+             sort the repeatable elements.
+        -->
+	<xs:element name="SortField" type="ncip:SchemeValuePair"/>
+
+        <!-- Scheme/Value pair that identifies the order to sort the elements by; e.g. ascending, descending or any. -->
+	<xs:element name="SortOrderType" type="ncip:SchemeValuePair"/>
+
+        <!-- Summarizes a user's fiscal account. -->
+	<xs:element name="UserFiscalAccountSummary">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ChargesCount"/>
+				<xs:element ref="ncip:AccountBalance"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+        <!-- A count of the number of charges in the User's record.
+             A "charge" is an AccountDetail where the FiscalActionType = "Assess".
+        -->
+	<xs:element name="ChargesCount" type="xs:nonNegativeInteger"/>
+
+    <!-- The date that a user would like to place a request in suspension (i.e., it not be filled after this date).  -->
+    <xs:element name="SuspensionStartDate" type="xs:dateTime"/>
+
+    <!-- The date that a user would like to remove a request from suspension (i.e., it may be filled after
+         this date).
+    -->
+    <xs:element name="SuspensionEndDate" type="xs:dateTime"/>
+
+    <!-- The 'relying party id' in WSKEY 2.5 contexts. Expected to be in an Ext element at the top-level of the
+         element associated with the service, e.g. NCIPMessage/LookupUser/Ext/RelyingPartyId.
+    -->
+    <xs:element name="RelyingPartyId">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ncip:AgencyId"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+

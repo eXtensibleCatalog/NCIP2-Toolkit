@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- This is a version 4 POM file. -->
+  <modelVersion>4.0.0</modelVersion>
+  <!-- The project details. -->
+  <groupId>org.extensiblecatalog.ncip.v2</groupId>
+  <artifactId>symphony-json-connector</artifactId>
+  <version>1.1</version>
+  <packaging>jar</packaging>
+  <name>Sirsi Dynix Symphony JSON Connector</name>
+  <description>NCIP V2 connector for SirsiDynix Symphony</description>
+  <!-- Every component inherits common settings from the "root" POM which defines all system and dependency versions. -->
+  <parent>
+    <groupId>org.extensiblecatalog.ncip.v2</groupId>
+    <artifactId>root</artifactId>
+    <version>1.1</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+      <dependency>
+          <groupId>${project.parent.groupId}</groupId>
+          <artifactId>common</artifactId>
+          <version>${project.version}</version>
+          <scope>compile</scope>
+      </dependency>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>binding</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>service</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>responder</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>initiator</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+
+    <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>1.9.4</version>
+        <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.1.2</version>
+        <scope>compile</scope>
+    </dependency>
+
+
+    <!-- TEST dependencies only below -->
+      <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+          <version>1.8.5</version>
+          <scope>test</scope>
+      </dependency>
+  </dependencies>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>com.mycila.maven-license-plugin</groupId>
+  			<artifactId>maven-license-plugin</artifactId>
+  			<version>1.9.0</version>
+  			<configuration>
+  				<header>${basedir}/LICENSE.txt</header>
+  				<includes>
+  					<include>src/**/*.java</include>
+  				</includes>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+</project>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+  ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd"
+  xmlns:ns1="http://www.niso.org/2008/ncip" xmlns:ns2="http://oclc.org/WCL/ncip/2011/extensions">
+<ns1:LookupUser>
+    <ns1:InitiationHeader>
+        <ns1:FromAgencyId>
+            <ns1:AgencyId ns1:Scheme="http://oclc.org/ncip/schemes/agencyid.scm">9123</ns1:AgencyId>
+        </ns1:FromAgencyId>
+        <ns1:ToAgencyId>
+            <ns1:AgencyId ns1:Scheme="http://oclc.org/ncip/schemes/agencyid.scm">9123</ns1:AgencyId>
+        </ns1:ToAgencyId>
+        <ns1:ApplicationProfileType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/applicationprofiletype.scm">Version 2011</ns1:ApplicationProfileType>
+    </ns1:InitiationHeader>
+    <ns1:UserId>
+      <ns1:UserIdentifierValue>12093123</ns1:UserIdentifierValue>
+    </ns1:UserId>
+<ns1:LoanedItemsDesired/>
+<ns1:RequestedItemsDesired/>
+<ns1:UserFiscalAccountDesired/>
+    <ns1:Ext>
+        <ns2:ResponseElementControl>
+            <ns2:ElementType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/elementtype.scm">Account Details</ns2:ElementType>
+            <ns2:StartElement>1</ns2:StartElement>
+            <ns2:MaximumCount>10</ns2:MaximumCount>
+            <ns2:SortField ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/accountdetailselementtype.scm">Accrual Date</ns2:SortField>
+            <ns2:SortOrderType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/sortordertype.scm">Ascending</ns2:SortOrderType>
+        </ns2:ResponseElementControl>
+        <ns2:ResponseElementControl>
+            <ns2:ElementType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/elementtype.scm">Loaned Item</ns2:ElementType>
+            <ns2:StartElement>1</ns2:StartElement>
+            <ns2:MaximumCount>10</ns2:MaximumCount>
+            <ns2:SortField ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/loaneditemelementtype.scm">Date Due</ns2:SortField>
+            <ns2:SortOrderType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/sortordertype.scm">Ascending</ns2:SortOrderType>
+        </ns2:ResponseElementControl>
+        <ns2:ResponseElementControl>
+            <ns2:ElementType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/elementtype.scm">Requested Item</ns2:ElementType>
+            <ns2:StartElement>1</ns2:StartElement>
+            <ns2:MaximumCount>10</ns2:MaximumCount>
+            <ns2:SortField ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/requesteditemelementtype.scm">Date Placed</ns2:SortField>
+            <ns2:SortOrderType ns1:Scheme="http://worldcat.org/ncip/schemes/v2/extensions/sortordertype.scm">Ascending</ns2:SortOrderType>
+        </ns2:ResponseElementControl>
+    </ns1:Ext>
+</ns1:LookupUser>
+</ns1:NCIPMessage>

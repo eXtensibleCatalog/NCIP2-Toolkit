@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- This is a version 4 POM file. -->
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <!-- The project details. -->
+    <groupId>org.extensiblecatalog.ncip.v2</groupId>
+    <artifactId>binding-ncipv2_01</artifactId>
+    <version>1.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>NCIP V2.01 Binding</name>
+    <description>NCIP V2.01 Binding</description>
+
+    <!-- Inherit from the service-level POM. -->
+    <parent>
+        <groupId>org.extensiblecatalog.ncip.v2</groupId>
+        <artifactId>binding</artifactId>
+        <version>1.2-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>binding-jar</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>binding-jar</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4jVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/xsd</directory>
+                <includes>
+                    <include>**/*.xsd</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <inherited>true</inherited>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${javaSourceVersion}</source>
+                    <target>${javaTargetVersion}</target>
+                </configuration>
+            </plugin>
+            <!-- plugin to compile the schema files: 
+                see https://jaxb.dev.java.net/jaxb-maven2-plugin/ for details -->
+
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.8.1</version>
+                <executions>
+                    <execution>
+                        <id>generate-standard-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${basedir}/src/main/xsd</schemaDirectory>
+                            <schemaIncludes>
+                                <include>ncip_v2_01.xsd</include>
+                            </schemaIncludes>
+                            <bindingIncludes>
+                                <include>ncip_v2_01.xjb</include>
+                            </bindingIncludes>
+                            <extension>true</extension>
+                            <removeOldOutput>false</removeOldOutput> 
+                            <generateDirectory>src/main/java</generateDirectory>
+                            <generatePackage>org.extensiblecatalog.ncip.v2.binding.ncipv2_01.jaxb.elements</generatePackage>
+                            <verbose>true</verbose>
+                            <forceRegenerate>true</forceRegenerate>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-xjc</artifactId>
+                        <version>${jaxbVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-impl</artifactId>
+                        <version>${jaxbVersion}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                  <execution>
+                    <id>add-source</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                      <goal>add-source</goal>
+                    </goals>
+                    <configuration>
+                      <sources>
+                        <source>src/main/java</source>
+                      </sources>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>

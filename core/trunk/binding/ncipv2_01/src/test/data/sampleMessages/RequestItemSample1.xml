@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:RequestItem>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">ENG</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:UserId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:UserIdentifierValue>23008000043915</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:BibliographicId>
+            <ns1:BibliographicRecordId>
+                <ns1:BibliographicRecordIdentifier>2052516</ns1:BibliographicRecordIdentifier>
+                <ns1:BibliographicRecordIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">OCLC</ns1:BibliographicRecordIdentifierCode>
+            </ns1:BibliographicRecordId>
+        </ns1:BibliographicId>
+        <ns1:RequestId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">ENG</ns1:AgencyId>
+            <ns1:RequestIdentifierValue>WCNav1234</ns1:RequestIdentifierValue>
+        </ns1:RequestId>
+        <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Loan</ns1:RequestType>
+        <ns1:RequestScopeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/requestscopetype.scm">Bibliographic Item</ns1:RequestScopeType>
+    </ns1:RequestItem>
+</ns1:NCIPMessage>

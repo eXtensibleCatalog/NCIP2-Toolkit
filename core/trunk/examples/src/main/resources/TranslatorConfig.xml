@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2010 eXtensible Catalog.  All rights reserved. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- How to configure a Translator directly (without use of configuration objects -->
+    <!-- The Translator -->
+    <bean id="dozerMapper" class="org.dozer.DozerBeanMapper">
+        <property name="mappingFiles" value="ncipv2_02_mappings.xml"/>
+    </bean>
+
+    <bean id="marshallerFactory" class="org.extensiblecatalog.ncip.v2.binding.jaxb.MarshallerFactory">
+        <property name="canonicalSchemaURLMap">
+            <map>
+                <entry key="www.niso.org/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" value="ncip_v2_0.xsd"/>
+                <entry key="www.niso.org/ncip/v2_0/imp1/xsd/ncip_v2_01.xsd" value="ncip_v2_01.xsd"/>
+                <entry key="www.niso.org/ncip/v2_0/imp1/xsd/ncip_v2_02.xsd" value="ncip_v2_02.xsd"/>
+            </map>
+        </property>
+        <property name="schemaURLsToPackageMap">
+            <map>
+                <entry key="ncip_v2_0.xsd" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements"/>
+                <entry key="ncip_v2_01.xsd" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements"/>
+                <entry key="ncip_v2_02.xsd" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="statisticsBean" class="org.extensiblecatalog.ncip.v2.common.StatisticsBean"/>
+
+    <bean id="translator" class="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator">
+        <property name="mapper" ref="dozerMapper"/>
+        <property name="marshallerFactory" ref="marshallerFactory"/>
+        <property name="statisticsBean" ref="statisticsBean"/>
+        <property name="logMessages" value="true"/>
+        <property name="messagesLoggingLevel">
+            <util:constant static-field="org.apache.log4j.Level.DEBUG"/>
+        </property>
+
+    </bean>
+
+    <!--
+         An example of how to configure a component (in this case, the Translator) through Spring by constructing
+         a TranslatorConfiguration which the TranslatorConfigurationFactory will supply to the TranslatorFactory
+         for it to use in creating Translators.
+         You might use this approach when you want to change the defaults of some or all properties of the
+         TranslatorConfiguration object that is used to create all Translators.
+         See MessageHandlerConfig.xml for an example of creating a component directly, without use of the
+         Configuration or Factory objects.
+    -->
+
+<!--
+    &lt;!&ndash;
+         Construct an instance of a TranslatorConfiguration sub-class (in this case
+         JAXBDozerNCIP2TranslatorConfiguration) and set its properties.
+    &ndash;&gt;
+    <bean id="translatorConfiguration" class="org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.JAXBDozerNCIP2TranslatorConfiguration">
+        <property name="mappingFiles">
+            <list>
+                <value>ncipv2_02_mappings.xml</value>
+            </list>
+        </property>
+        <property name="schemaURLsToPackageMap">
+            <map>
+                <entry key="ncip_v2_0.xsd" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements"/>
+                <entry key="ncip_v2_01.xsd" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements"/>
+                <entry key="ncip_v2_02.xsd" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements"/>
+            </map>
+        </property>
+        <property name="canonicalSchemaURLMap">
+            <map>
+                <entry key="www.niso.org/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" value="ncip_v2_0.xsd"/>
+                <entry key="www.niso.org/ncip/v2_0/imp1/xsd/ncip_v2_01.xsd" value="ncip_v2_01.xsd"/>
+                <entry key="www.niso.org/ncip/v2_0/imp1/xsd/ncip_v2_02.xsd" value="ncip_v2_02.xsd"/>
+            </map>
+        </property>
+        <property name="translatorClassName" value="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator"/>
+        <property name="logMessages" value="true"/>
+        <property name="messagesLoggingLevel" value="DEBUG"/>
+    </bean>
+
+    &lt;!&ndash;
+         Construct a TranslatorConfigurationFactory that will always return this TranslatorConfiguration object.
+    &ndash;&gt;
+    <bean id="translatorConfigurationFactory" class="org.extensiblecatalog.ncip.v2.common.TranslatorConfigurationFactory">
+      <constructor-arg index="0" ref="translatorConfiguration"/>
+    </bean>
+-->
+
+</beans>

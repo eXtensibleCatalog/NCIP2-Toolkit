@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:CheckOutItem>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">ENG</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:UserId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:UserIdentifierValue>10923123</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:ItemId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:ItemIdentifierValue>19823098123</ns1:ItemIdentifierValue>
+        </ns1:ItemId>
+        <ns1:RequestId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:RequestIdentifierValue>REQ123</ns1:RequestIdentifierValue>
+        </ns1:RequestId>
+    </ns1:CheckOutItem>
+</ns1:NCIPMessage>

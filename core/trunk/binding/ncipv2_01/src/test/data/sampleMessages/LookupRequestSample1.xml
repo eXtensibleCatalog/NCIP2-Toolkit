@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage 
+  ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+  <ns1:LookupRequest>
+	<ns1:InitiationHeader>
+		<ns1:FromSystemId ns1:Scheme="http://www.altova.com">String</ns1:FromSystemId>
+		<ns1:FromSystemAuthentication>String</ns1:FromSystemAuthentication>
+		<ns1:FromAgencyId>
+			<ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+		</ns1:FromAgencyId>
+		<ns1:FromAgencyAuthentication>String</ns1:FromAgencyAuthentication>
+		<ns1:OnBehalfOfAgency>
+			<ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+		</ns1:OnBehalfOfAgency>
+		<ns1:ToSystemId ns1:Scheme="http://www.altova.com">String</ns1:ToSystemId>
+		<ns1:ToAgencyId>
+			<ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+		</ns1:ToAgencyId>
+		<ns1:ApplicationProfileType ns1:Scheme="http://www.altova.com">String</ns1:ApplicationProfileType>
+	</ns1:InitiationHeader>
+	<ns1:RequestId>
+		<ns1:AgencyId ns1:Scheme="http://www.altova.com">String</ns1:AgencyId>
+		<ns1:RequestIdentifierType ns1:Scheme="localhost.edu/ncip/schemes/requestidentifiertype/requestidentifiertype.scm">Sequential Request Id</ns1:RequestIdentifierType>
+		<ns1:RequestIdentifierValue>18923123</ns1:RequestIdentifierValue>
+	</ns1:RequestId>
+	<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Bibliographic Description</ns1:ItemElementType>
+	<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Circulation Status</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Electronic Resource</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Hold Queue Length</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Description</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Use Restriction Type</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Location</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Physical Condition</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Security Marker</ns1:ItemElementType>
+    <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Sensitization Flag</ns1:ItemElementType>
+    <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>
+  </ns1:LookupRequest>
+</ns1:NCIPMessage>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2010 eXtensible Catalog.  All rights reserved. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+
+    <!--
+         An example of how to configure a component (in this case, the MessageHandler) directly as a Spring bean.
+         You might use this approach when you want to directly set all properties of the MessageHandler.
+    -->
+
+    <!-- The NCIP Services handled by our MessageHandler. -->
+    <bean id="acceptItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyAcceptItemService"/>
+    <bean id="cancelRequestItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyCancelRequestItemService"/>
+    <bean id="checkInItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyCheckInItemService"/>
+    <bean id="checkOutItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyCheckOutItemService"/>
+    <bean id="lookupItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyLookupItemService"/>
+    <bean id="lookupItemSetService" class="org.extensiblecatalog.ncip.v2.dummy.DummyLookupItemSetService"/>
+    <bean id="lookupUserService" class="org.extensiblecatalog.ncip.v2.dummy.DummyLookupUserService"/>
+    <bean id="renewItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyRenewItemService"/>
+    <bean id="requestItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyRequestItemService"/>
+    <bean id="updateRequestItemService" class="org.extensiblecatalog.ncip.v2.dummy.DummyUpdateRequestItemService"/>
+
+    <!-- The services supported by our MessageHandler. -->
+    <bean id="supportedServices" class="org.springframework.beans.factory.config.MapFactoryBean">
+      <property name="sourceMap">
+         <map>
+             <entry key="org.extensiblecatalog.ncip.v2.service.AcceptItemInitiationData" value-ref="acceptItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData" value-ref="cancelRequestItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.CheckOutItemInitiationData" value-ref="checkOutItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.CheckInItemInitiationData" value-ref="checkInItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData" value-ref="lookupItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData" value-ref="lookupItemSetService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData" value-ref="lookupUserService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData" value-ref="renewItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData" value-ref="requestItemService"/>
+             <entry key="org.extensiblecatalog.ncip.v2.service.UpdateRequestItemInitiationData" value-ref="updateRequestItemService"/>
+         </map>
+      </property>
+    </bean>
+
+    <!-- NCIP remote services manager  -->
+    <bean id="remoteServiceManager" class="org.extensiblecatalog.ncip.v2.dummy.DummyRemoteServiceManager"/>
+
+    <!-- The MessageHandler. -->
+    <bean id="messageHandler" class="org.extensiblecatalog.ncip.v2.common.MappedMessageHandler">
+      <constructor-arg index="0" ref="supportedServices"/>
+      <constructor-arg index="1" ref="remoteServiceManager"/>
+    </bean>
+
+
+</beans>

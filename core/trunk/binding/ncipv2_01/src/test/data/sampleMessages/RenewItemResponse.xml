@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:RenewItemResponse>
+        <ns1:ItemId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:ItemIdentifierValue>19823098123</ns1:ItemIdentifierValue>
+        </ns1:ItemId>
+        <ns1:UserId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+            <ns1:UserIdentifierValue>10923123</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:DateDue>2010-11-18T16:17:03.291Z</ns1:DateDue>
+    </ns1:RenewItemResponse>
+</ns1:NCIPMessage>

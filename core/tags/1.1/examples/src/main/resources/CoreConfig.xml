@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2010 eXtensible Catalog.  All rights reserved. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <!--
+         An example of how to configure a component (in this case, the Core) through Spring by reading
+         in properties files. While this is redundant to the default (non-Spring) configuration, it serves
+         as a starting-point for altering or extending that default configuration mechanism.
+         See TranslatorConfig.xml for an example of creating a component's Configuration object directly
+         (i.e. not by means of properties).
+
+         The Toolkit will load this configuration file (in non-web server environments) if
+         the property "TranslatorConfiguration.SpringConfigFile" points to this file.
+
+    -->
+
+    <!--
+         Read the properties files. See org.extensiblecatalog.ncip.v2.common.BaseConfigurationFactory's Javadoc
+         for a description of the logic used here.
+    -->
+    <bean id="coreConfigurer" class="org.extensiblecatalog.ncip.v2.common.ToolkitPropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:toolkit.properties</value>
+                <value>classpath:localtoolkit.properties</value>
+                <value>${Toolkit.PropertiesFile}</value>
+                <value>classpath:core.properties</value>
+                <value>classpath:localcore.properties</value>
+                <value>${Core.PropertiesFile}</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Construct a CoreConfiguration object from those properties. -->
+    <bean id="coreConfigurationProperties" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject"><ref local="coreConfigurer"/></property>
+        <property name="targetMethod"><value>getProperties</value></property>
+    </bean>
+
+    <!-- Construct a CoreConfigurationFactory that will use the CoreConfiguration object. -->
+    <bean id="coreConfigurationFactory" class="org.extensiblecatalog.ncip.v2.common.CoreConfigurationFactory">
+      <constructor-arg index="0" ref="coreConfigurationProperties"/>
+    </bean>
+
+</beans>

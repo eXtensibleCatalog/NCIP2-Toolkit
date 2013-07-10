@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:Problem>
+        <ns1:ProblemType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/processingerrortype/generalprocessingerror.scm">Agency Authentication Failed</ns1:ProblemType>
+        <ns1:ProblemDetail>You must supply either FromAgencyAuthentication or a recognized FromAgencyId</ns1:ProblemDetail>
+        <ns1:ProblemElement>InitiationHeader/FromAgencyAuthentication</ns1:ProblemElement>
+    </ns1:Problem>
+    <ns1:Problem>
+        <ns1:ProblemType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/processingerrortype/generalprocessingerror.scm">Needed Data Missing</ns1:ProblemType>
+        <ns1:ProblemDetail>You must supply either FromAgencyAuthentication or a recognized FromAgencyId</ns1:ProblemDetail>
+        <ns1:ProblemElement>InitiationHeader/FromAgencyId</ns1:ProblemElement>
+    </ns1:Problem>
+</ns1:NCIPMessage>

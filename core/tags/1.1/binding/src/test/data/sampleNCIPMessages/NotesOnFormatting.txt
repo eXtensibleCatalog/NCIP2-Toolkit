@@ -1,0 +1,77 @@
+These files are used as input to a JUnit test class (TestJAXBTranslator) which has an option to use the "diff"
+command (like that available in most unixes) to compare the input file to a temporary file containing the marshalled
+output from the translation process used by the Toolkit. When used this helps to guarantee that the Toolkit preserves
+all of the data from every NCIP message - at least those for which we have examples in this directory.
+
+For this to work the input files must be formatted properly. The exact requirements are as follows.
+
+Note: Except where clearly indicated, none of these are requirements of the NCIP standard (although all of
+them are within the bounds of conformance with the standard). These are only the requirements of our automated JUnit
+test process.
+
+1) The files should be pretty-printed, i.e. one element per line with indenting. The diff is done with the "-w" switch,
+which means whitespace isn't significant, and so it doesn't matter how many spaces you indent each line but it does
+matter that each element be on its own line.
+
+2) You must use "ns1" as the namespace alias for the NCIP namespace.
+
+3) The order of attributes is important, where there are more than one. At the time of writing I'm only aware of there
+being multiple attributes on the NCIPMessage element; the proper order is version and then the xmlns:ns1 attribute, like
+this:
+ <ns1:NCIPMessage
+   ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+
+Note that the element and its attributes are on separate lines, which is the format that the JUnit test class will
+always produce and so your input files must match.
+
+4) Per the NCIP Implementation Profile 1 (part 2 of the standard), the XML prolog must indicate version 1.0 of XML
+ and UTF-8 encoding, like this:
+ <?xml version="1.0" encoding="UTF-8"?>
+
+5) You must use double-quotes in the XML prolog and around the values of attributes.
+
+6) While the NCIP Toolkit will accept a broader range of date/time formats than are permitted by the NCIP Standard
+(see Section 5.3 of the NCIP Implementation Profile 1, part 2 of the standard), the output will always be formatted
+as follows: CCYY-MM-DDThh:mm:ss.sssZ where “CC” represents the century, “YY” the year, “MM” the month, and “DD” the day,
+the letter “T” is the date/time separator, and “hh”, “mm” and “ss” represent hour, minute, and second respectively.
+The seconds may be followed by a "." decimal separator and three digits, representing milliseconds. Again, note that
+this is a *subset* of the format allowed by the NCIP standard. Notably it omits the leading '+' (plus) or '-' (minus)
+signs, it does not include portions of a second smaller than a millisecond, and it always includes the trailing 'Z'
+indicating the UTC timezone.
+
+These are examples of dateTime elements produced by the Toolkit:
+2010-11-20T00:00:00.329Z - includes milliseconds.
+2001-12-17T09:30:47Z     - no milliseconds.
+2011-02-17T00:00:47.010Z - includes milliseconds (note the trailing zero; if milliseconds are non-zero, then
+                           three digits will always be produced.
+
+Here is an example of a dateTime format that is valid per the Implementation Profile 1 but will not be handled
+with full precision by the NCIP Toolkit:
+2011-02-17T00:00:47.1234567Z - the sub-millisecond portion (4567) of the seconds will be dropped by tne Toolkit; the
+                               Toolkit will output "2010-11-20T06:00:00.123Z".
+
+Here is an example of a dateTime format that is valid per the Implementation Profile 1 but will truncated
+by the Toolkit:
+2010-11-20T06:32:17.91388Z - with sub-millisecond fractions of a second. The Toolkit will truncate the digits
+past the millisecond (e.g. treat this as 17.913 seconds); if logging is set to DEBUG level this will be reported
+in the log.
+
+Here is an example of a dateTime format that is valid per the Implementation Profile 1 but will not be accepted
+by the Toolkit:
++2010-11-20T06:00:00Z - with the '+' (plus sign) prefix. The Toolkit will throw the following exception:
+Exception 'org.extensiblecatalog.ncip.v2.service.ServiceException': 'JAXBException unmarshalling from InputStream.' in 'createResponseData' converting the sample file LookupItemResponseSample2.xml:
+	javax.xml.bind.UnmarshalException
+	cvc-datatype-valid.1.2.1: '+2010-11-20T06:00:00Z' is not a valid value for 'dateTime'.
+And similarly for the '-' (minus sign) prefix.
+
+At the moment the Toolkit does not correctly handle dates prior to 1582-10-14, which is the year (but not the month
+and day) of the adoption of the Gregorian calendar; as the Toolkit uses Java's GregorianCalendar class for its dateTime
+values, there is likely a connection that is not yet fully understood. As an example, "1582-10-14T00:00:00Z" is
+accepted as input but when output becomes 1582-10-04T00:00:00Z. It is hoped that this is not significant for modern
+circulation applications (i.e., that items won't have been on loan since 1581).
+
+Here is the one known example of a dateTime format that the Toolkit will accept that is NOT valid per the
+Implementation Profile 1. Note that this will not match the output format used by the Toolkit and so should be
+avoided in these test files:
+2010-11-20T00:00:00-06:00 - uses "UTC delta" indicating 6 hours earlier than UTC; the toolkit will output
+                            this as 2010-11-20T06:00:00Z

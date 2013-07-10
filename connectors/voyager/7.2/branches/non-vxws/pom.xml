@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- This is a version 4 POM file. -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- The project details. -->
+    <groupId>org.extensiblecatalog.ncip.v2</groupId>
+    <artifactId>voyager</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>NCIP V2 Voyager</name>
+    <description>NCIP V2 Voyager for new ILS connectors</description>
+    <properties>
+        <javaVersion>1.6</javaVersion>
+        <mavenVersion>2.0.9</mavenVersion>
+        <mavenMaxVersion>2.3</mavenMaxVersion>
+        <highJavaVersion>6.0</highJavaVersion> <!-- The 1.4 = 2.4; 1.5 = 5.0; 1.6 = 6.0 -->
+    </properties>
+    <dependencies>
+
+	<dependency>
+ 		<groupId>xerces</groupId>
+  		<artifactId>xerces</artifactId>
+		<version>2.4.0</version>
+	</dependency>
+
+
+       <!-- jdom xml library -->
+	<dependency>
+		<groupId>jdom</groupId>
+		<artifactId>jdom</artifactId>
+		<version>1.1</version>
+	</dependency>
+
+
+ 		<!-- Log4j-->
+         <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+    		<groupId>org.extensiblecatalog.ncip.v2</groupId>
+    		<artifactId>common</artifactId>
+    		<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+        
+        <dependency>
+    		<groupId>org.extensiblecatalog.ncip.v2</groupId>
+    		<artifactId>service</artifactId>
+    		<version>0.0.1-SNAPSHOT</version>
+		</dependency>        
+
+        <!-- Commons Lang -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.3</version>
+        </dependency>
+        
+       <!-- Commons client -->
+		<dependency>
+		    <groupId>commons-httpclient</groupId>
+		    <artifactId>commons-httpclient</artifactId>
+		    <version>3.0</version>
+		</dependency>
+         
+        <dependency>
+        	<groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>2.5.6</version>
+            <exclusions>
+            	<exclusion>
+                	<groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+             </exclusions>
+		</dependency>
+		
+    </dependencies>
+	<build>
+		<plugins>
+	      <plugin>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <configuration>
+	          <source>${javaVersion}</source>
+	          <target>${javaVersion}</target>
+	        </configuration>
+	      </plugin>
+		
+      		<plugin>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <version>2.2</version>
+		        <configuration>
+		          <descriptors>
+		            <descriptor>assembly.xml</descriptor>
+		          </descriptors>
+		        </configuration>
+		        <executions>
+				    <execution>
+				      <id>make-assembly</id> 
+				      <phase>package</phase> 
+				      <goals>
+				        <goal>single</goal> 
+				      </goals>
+			 		</execution>
+  				</executions>
+ 			</plugin>
+    	</plugins>
+	</build>
+</project>

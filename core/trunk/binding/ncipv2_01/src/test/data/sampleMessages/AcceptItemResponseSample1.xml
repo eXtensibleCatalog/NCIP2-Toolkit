@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage  
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:AcceptItemResponse>
+        <ns1:RequestId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">LENDER</ns1:AgencyId>
+            <ns1:RequestIdentifierValue>VDX1234</ns1:RequestIdentifierValue>
+        </ns1:RequestId>
+    </ns1:AcceptItemResponse>
+</ns1:NCIPMessage>

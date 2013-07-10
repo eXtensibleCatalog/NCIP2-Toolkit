@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script type="text/javascript">
+	function submitForm()
+	{
+		var req = null;
+
+		document.ajax.msgLine.value="Started...";
+		if(window.XMLHttpRequest)
+			req = new XMLHttpRequest();
+		else if (window.ActiveXObject)
+			req  = new ActiveXObject(Microsoft.XMLHTTP);
+
+		req.onreadystatechange = function()
+		{
+			document.ajax.msgLine.value="Waiting for NCIP responder ...";
+			if(req.readyState == 4)
+			{
+                document.ajax.msgLine.value="Got something...";
+				if(req.status == 200)
+				{
+                    var xsltProcessor = new XSLTProcessor();
+                    var myXMLHTTPRequest = new XMLHttpRequest();
+                    myXMLHTTPRequest.open("GET", "./stylesheet.xsl", false);
+                    myXMLHTTPRequest.send(null);
+                    xslStylesheet = myXMLHTTPRequest.responseXML;
+                    var xmlSerializer = new XMLSerializer();
+                    //alert("Stylesheet: " + xmlSerializer.serializeToString(xslStylesheet));
+                    xsltProcessor.importStylesheet(xslStylesheet);
+
+                    var result = xsltProcessor.transformToDocument(req.responseXML);
+                    var xmls = new XMLSerializer();
+                    var styledResult = xmls.serializeToString(result);
+					document.ajax.msgLine.value=styledResult;
+				}
+				else
+				{
+					document.ajax.msgLine.value="Error: returned status code " + req.status + ". " + req.responseText;
+				}
+			}
+		};
+		req.open("POST", "./NCIPResponder", true);
+        req.setRequestHeader("Content-type", "application/xml; \"charset=utf-8\"");
+        req.setRequestHeader("Content-length", document.ajax.ncipDoc.value.length);
+        req.setRequestHeader("Connection", "close");
+		req.send(document.ajax.ncipDoc.value);
+	}
+	</script>
+	</head>
+
+	<body>
+    <img src="logo.jpg"/><br/>
+    This is the NCIP version 2.0 Responder.
+    <br/>To test, enter your NCIP Initiation message in the first text area below and click the 'Submit' button.
+    <br/>Your message will be sent to the NCIP Responder
+    <br/>and the response message will be displayed in the second text area below.
+		<FORM name="ajax" method="POST" action="">
+
+  <p>
+    <INPUT type="BUTTON" value="Submit"  ONCLICK="submitForm()">
+  </p>
+  <p>
+    <textarea rows="10" cols="120" name="ncipDoc">Enter NCIP message here.</textarea>
+  </p>
+    <textarea rows="50" cols="120" name="msgLine">Status:</textarea>
+</FORM>
+	</body>
+</html>
