@@ -8,37 +8,64 @@
     <!-- The project details. -->
     <groupId>org.extensiblecatalog.ncip.v2</groupId>
     <artifactId>common</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>NCIP V2 Common</name>
     <description>NCIP V2 Common for new ILS connectors</description>
 
+    <properties>
+        <javaVersion>1.6.0-25</javaVersion>
+        <javaSourceVersion>1.6</javaSourceVersion>
+        <javaTargetVersion>1.6</javaTargetVersion>
+        <mavenVersion>3.0.4</mavenVersion>
+        <highJavaVersion>6.0</highJavaVersion> <!-- The 1.4 = 2.4; 1.5 = 5.0; 1.6 = 6.0 -->
+        <servletVersion>2.5</servletVersion>
+        <springVersion>2.5.6</springVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <toolkitVersion>1.2-SNAPSHOT</toolkitVersion>
+        <millenniumConnectorVersion>1.2</millenniumConnectorVersion>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>repo1.maven.org</id>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+    </repositories>
+
     <!-- Every component inherits common settings from the "root" POM which defines all system and dependency versions. -->
+    <!--
     <parent>
         <groupId>org.extensiblecatalog.ncip.v2</groupId>
         <artifactId>root</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    -->
 
-	<dependencies>
+    <dependencies>
+       
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
-	</dependencies>
 
-<!--
-    <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
+	    <groupId>org.jconfig</groupId>
+            <artifactId>jconfig</artifactId>
+            <version>2.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.jmx</groupId>
+                    <artifactId>jmxri</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
-            <artifactId>binding</artifactId>
+            <artifactId>binding-jar</artifactId>
             <version>${pom.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -64,6 +91,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
--->
+
 </project>
