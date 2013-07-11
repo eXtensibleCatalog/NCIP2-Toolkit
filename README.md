@@ -1,4 +1,4 @@
 xcnciptoolkit
 =============
 
-Fork of http://code.google.com/p/xcnciptoolkit/
+Fork of http://code.google.com/p/xcncip2toolkit/
