@@ -1,12 +1,5 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.io.IOException;
 import java.math.BigDecimal;
 
@@ -14,16 +7,18 @@ import junit.framework.TestCase;
 
 import org.extensiblecatalog.ncip.v2.aleph.test.TestConfiguration;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+//import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 
 public class AlephLookupItemServiceTest extends TestCase {
 	
 	public AlephLookupItemServiceTest() throws IOException {
+		/*
 		NCIPConfiguration config = new NCIPConfiguration();
 		NCIPConfiguration.getInstance().getProperties().putAll(TestConfiguration.getProperties());
+		*/
 	}
 	
 	public void testPerformService() throws IOException,Exception {
@@ -63,10 +58,10 @@ public class AlephLookupItemServiceTest extends TestCase {
 		initData.setCirculationStatusDesired(true);
 		initData.setCurrentBorrowerDesired(true);
 		initData.setCurrentRequestersDesired(true);
-		initData.setElectronicResourceDesired(true);
+		//initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
 		ItemId itemId = new ItemId();
-		itemId.setAgencyId(new SchemeValuePair(holdingAgencyId));
+		itemId.setAgencyId(new AgencyId(holdingAgencyId));
 		itemId.setItemIdentifierValue(adm_id);
 		initData.setItemId(itemId);
 		

@@ -1,63 +1,35 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.aleph.util.ILSException;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
-import org.extensiblecatalog.ncip.v2.common.Constants;
-import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
-import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
-import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
-import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.Location;
-import org.extensiblecatalog.ncip.v2.service.LocationName;
-import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
-import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
-import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
-import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
-import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
-import org.xml.sax.SAXException;
+import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
+import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 
 public class AlephLookupItemSetService implements LookupItemSetService {
 	
@@ -75,7 +47,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
     public AlephLookupItemSetService() {
     }
 
-	@Override
 	public LookupItemSetResponseData performService(
 			LookupItemSetInitiationData initData,
 			RemoteServiceManager serviceManager) throws ServiceException {
@@ -84,7 +55,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
         AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
         boolean getBibDescription = initData.getBibliographicDescriptionDesired();
         boolean getCircStatus = initData.getCirculationStatusDesired();
-        boolean getElectronicResource = initData.getElectronicResourceDesired();
+        boolean getElectronicResource = true; // initData.getElectronicResourceDesired();
         boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
         boolean getItemDescription = initData.getItemDescriptionDesired();
         boolean getLocation = initData.getLocationDesired();
@@ -107,8 +78,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		AlephItem alephItem = null;
                 // Execute request if agency Id is blank or NRU
 		if (initData.getInitiationHeader().getFromAgencyId() != null 
-		     && !initData.getInitiationHeader().getFromAgencyId().getValue().equalsIgnoreCase("") 
-		     && alephSvcMgr.getAlephAgency(initData.getInitiationHeader().getFromAgencyId().getValue()) == null) {
+		     && !initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue().equalsIgnoreCase("") 
+		     && alephSvcMgr.getAlephAgency(initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue()) == null) {
 		    throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
 					       "This request cannot be processed. Agency ID is invalid or not found.");
 		}
@@ -150,14 +121,14 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	        	BibInformation bibInformation = new BibInformation();
 	        	bibInformation.setBibliographicId(bibId);
 
-			    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, initData.getInitiationHeader().getFromAgencyId().getValue(), true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+			    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(), true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
 			    
 			    bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
 			    if (getBibDescription){
-			    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem,initData.getInitiationHeader().getFromAgencyId());
+			    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem,initData.getInitiationHeader().getFromAgencyId().getAgencyId());
 	        		bibInformation.setBibliographicDescription(bDesc);
 			    }
-	        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, initData.getInitiationHeader().getFromAgencyId().getValue(), 
+	        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(), 
 	        			getBibDescription, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
 
 	        	//first iterate through list of holdings items to get itemIds list so can move pointer if nextitemtoken set for itemids
@@ -218,7 +189,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	        				ItemInformation itemInformation = new ItemInformation();
 	        				ItemId item = new ItemId();
 	        				item.setItemIdentifierValue(alephItem.getItemId());
-	        				item.setAgencyId(initData.getInitiationHeader().getFromAgencyId());
+	        				item.setAgencyId(initData.getInitiationHeader().getFromAgencyId().getAgencyId());
 	    		        
 	        				itemInformation.setItemId(item);
 	        				itemInformation.setItemOptionalFields(AlephUtil.getItemOptionalFields(alephItem));
@@ -257,34 +228,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	        			break;
 	        		}
 	        	}
-	        } catch (AlephException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        } catch (SAXException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        } catch (ParserConfigurationException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        } catch (IOException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
+	        } catch (Exception e) {
+	        	List<Problem> problems = ServiceHelper.generateProblems(Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
+		                "LookupItem", null, e.getMessage());
+			    responseData.setProblems(problems);
 	        }
         }
         
@@ -324,5 +271,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
     	return items.subList(0, numOfitemIdsToProcess);
     	
     }
+
+	@Override
+	public LookupItemSetResponseData performService(
+			LookupItemSetInitiationData initData,
+			ServiceContext serviceContext, RemoteServiceManager serviceManager)
+			throws ServiceException {
+		return this.performService(initData, serviceManager);
+	}
     
 }

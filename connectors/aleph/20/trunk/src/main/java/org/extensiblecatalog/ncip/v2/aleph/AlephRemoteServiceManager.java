@@ -1,8 +1,12 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
+import java.util.Properties;
+
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 
 /**
@@ -16,6 +20,15 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
 	 * 
 	 */
 	private static final long serialVersionUID = 7115174311329481562L;
+	
+	private AlephConfiguration alephConfig;
+	{
+		try {
+			alephConfig = (AlephConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
+		} catch (ToolkitException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+	}
 
 	public AlephRemoteServiceManager(){
     	initializeAgencyMap();
@@ -35,11 +48,10 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
      * 
      */
     protected void initializeAgencyMap(){
-		
-    	String[] agencyIds = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_AGENCY);
-    	String[] admLibraries = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_ADM_LIBRARY);
-    	String[] bibLibraries = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_BIB_LIBRARY);
-    	String[] holdLibraries = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_HOLD_LIBRARY);
+    	String[] agencyIds = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_AGENCY);
+    	String[] admLibraries = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_ADM_LIBRARY);
+    	String[] bibLibraries = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_BIB_LIBRARY);
+    	String[] holdLibraries = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_HOLD_LIBRARY);
 		
     	//check everything same length
     	if (agencyIds==null||admLibraries==null||bibLibraries==null||holdLibraries==null||
@@ -58,9 +70,9 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
      * Initialize the internal availability maps of circ status to availability from NCIPToolkit_config.xml
      */
     protected void initializeAvailabilityMaps(){
-    	String[] availableCircStatus = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_CIRC_STATUS_AVAILABLE);
-    	String[] possiblyAvailableCircStatus = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_CIRC_STATUS_POSSIBLY_AVAILABLE);
-    	String[] notAvailableCircStatus = NCIPConfiguration.getArray(AlephConstants.CONFIG_ALEPH_CIRC_STATUS_NOT_AVAILABLE);
+    	String[] availableCircStatus = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_CIRC_STATUS_AVAILABLE);
+    	String[] possiblyAvailableCircStatus = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_CIRC_STATUS_POSSIBLY_AVAILABLE);
+    	String[] notAvailableCircStatus = alephConfig.getArray(AlephConstants.CONFIG_ALEPH_CIRC_STATUS_NOT_AVAILABLE);
 		
     	if (availableCircStatus!=null){
     		for (int i=0; i<availableCircStatus.length; i++){
@@ -88,7 +100,7 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
      * @return X Server Name
      */
     public String getXServerName(){
-    	return NCIPConfiguration.getProperty(AlephConstants.CONFIG_ALEPH_X_SERVER_NAME);
+    	return alephConfig.getProperty(AlephConstants.CONFIG_ALEPH_X_SERVER_NAME);
     }
     
     /**
@@ -97,10 +109,10 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
      * @return X Server Port
      */
     public String getXServerPort(){
-    	return NCIPConfiguration.getProperty(AlephConstants.CONFIG_ALEPH_X_SERVER_PORT);
+    	return alephConfig.getProperty(AlephConstants.CONFIG_ALEPH_X_SERVER_PORT);
     }
     
     public String getCurrencyCode(){
-    	return NCIPConfiguration.getProperty(AlephConstants.CONFIG_ALEPH_CURRENCY_CODE);
+    	return alephConfig.getProperty(AlephConstants.CONFIG_ALEPH_CURRENCY_CODE);
     }
 }

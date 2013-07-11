@@ -8,14 +8,12 @@
 
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
-import org.extensiblecatalog.ncip.v2.common.Constants;
-
 /**
  * This class defines several constants as public static final variables which
  * may be used throughout the NCIP Toolkit
  * 
  */
-public class AlephConstants extends Constants  {
+public class AlephConstants /*extends Constants*/  {
     // Aleph configuration
 
     /**

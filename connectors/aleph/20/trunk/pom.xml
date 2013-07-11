@@ -17,6 +17,11 @@
         <mavenVersion>2.0.9</mavenVersion>
         <mavenMaxVersion>2.3</mavenMaxVersion>
         <highJavaVersion>6.0</highJavaVersion> <!-- The 1.4 = 2.4; 1.5 = 5.0; 1.6 = 6.0 -->
+        <servletVersion>2.5</servletVersion>
+        <springVersion>2.5.6</springVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <toolkitVersion>1.2-SNAPSHOT</toolkitVersion>
+        <voyagerConnectorVersion>1.2</voyagerConnectorVersion>
     </properties>
     <dependencies>
 
@@ -31,14 +36,13 @@
         <dependency>
     		<groupId>org.extensiblecatalog.ncip.v2</groupId>
     		<artifactId>common</artifactId>
-    		<version>0.0.1-SNAPSHOT</version>
+    		<version>${toolkitVersion}</version>
 		</dependency>
-
         
         <dependency>
     		<groupId>org.extensiblecatalog.ncip.v2</groupId>
     		<artifactId>service</artifactId>
-    		<version>0.0.1-SNAPSHOT</version>
+    		<version>${toolkitVersion}</version>
 		</dependency>        
 
         <!-- Commons Lang -->
@@ -79,6 +83,7 @@
 	        </configuration>
 	      </plugin>
 		
+			<!--
       		<plugin>
 		        <artifactId>maven-assembly-plugin</artifactId>
 		        <version>2.2</version>
@@ -97,6 +102,7 @@
 			 		</execution>
   				</executions>
  			</plugin>
+ 			-->
     	</plugins>
 	</build>
 </project>
