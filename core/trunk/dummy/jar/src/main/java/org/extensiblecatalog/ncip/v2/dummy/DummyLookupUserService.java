@@ -8,6 +8,7 @@
 
 package org.extensiblecatalog.ncip.v2.dummy;
 
+import org.extensiblecatalog.ncip.v2.dummy.DummyDatabase.UserInfo;
 import org.extensiblecatalog.ncip.v2.service.*;
 
 import java.math.BigDecimal;
@@ -35,16 +36,40 @@ public class DummyLookupUserService implements LookupUserService {
                                                  RemoteServiceManager serviceManager) {
 
         final LookupUserResponseData responseData = new LookupUserResponseData();
-
+        List<Problem> listProblems = new ArrayList<Problem>();
+        
         DummyRemoteServiceManager dummySvcMgr = (DummyRemoteServiceManager)serviceManager;
         AgencyId agencyId = new AgencyId(dummySvcMgr.getLibraryName());
+        
+        
+        if (initData.getAuthenticationInputDesired() || initData.getAuthenticationInputs().size() == 2) {
+        	
+			AuthenticationInput userName = initData.getAuthenticationInput(0);
+			AuthenticationInput password = initData.getAuthenticationInput(1);
+			UserInfo userInfo = DummyDatabase.UserInfo.getUserInfo(userName.getAuthenticationInputData());
+			if (userInfo != null && userInfo.checkPassword(password.getAuthenticationInputData())) { 
+			   UserId userId = new UserId();
+			   userId.setAgencyId(agencyId);
+			   userId.setUserIdentifierValue(userName.getAuthenticationInputData());
+			   userId.setUserIdentifierType(new UserIdentifierType("userType"));
+			   responseData.setUserId(userId);
+			}
+        } else if (initData.getUserId() != null) {
+        	responseData.setUserId(initData.getUserId());
+        }
 
-        // Echo back the same item id that came in
-        responseData.setUserId(initData.getUserId());
+
+        if (initData.getUserId() == null) {
+        	UserId id = new UserId();
+        	id.setAgencyId(agencyId);
+        	id.setUserIdentifierValue(initData.getAuthenticationInput(0).getAuthenticationInputData());
+        	id.setUserIdentifierType(new UserIdentifierType("userType"));
+        	responseData.setUserId(id);
+        }
 
         UserOptionalFields userOptionalFields = new UserOptionalFields();
-
-        String userNo = initData.getUserId().getUserIdentifierValue();
+        
+        String userNo = responseData.getUserId().getUserIdentifierValue();;
 
         if ( initData.getLoanedItemsDesired() ) {
 
@@ -309,11 +334,7 @@ public class DummyLookupUserService implements LookupUserService {
 
         }
 
-        if ( initData.getAuthenticationInputDesired() ) {
 
-            // TODO: Auth inputs
-
-        }
 
         if ( initData.getBlockOrTrapDesired() ) {
 

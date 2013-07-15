@@ -126,6 +126,8 @@ public class DummyDatabase {
             insertIntoRequestInfoList(requestedItemsByItemBarcode, this.itemBarcode, this);
             insertIntoRequestInfoList(requestedItemsByUserNo, this.userNo, this);
         }
+        
+      
 
         public static RequestInfo getByRequestNo(String requestNo) {
 
@@ -187,11 +189,25 @@ public class DummyDatabase {
         protected static Map<String, UserInfo> userInfos = new HashMap<String, UserInfo>();
 
         protected String userNo;
+        
+        protected String plainPassword;
 
         public UserInfo(String userNo) {
 
             this.userNo = userNo;
 
+        }
+        
+        public void setPlainPassword(String password) {
+        	this.plainPassword = password;
+        }
+        
+        public static UserInfo getUserInfo(String userNo) {
+        	return userInfos.get(userNo);
+        }
+        
+        public boolean checkPassword(String password) {
+        	return plainPassword == null || password == null ? false : plainPassword.equals(password);
         }
 
     }
@@ -479,13 +495,17 @@ public class DummyDatabase {
             UserInfo userMeganRichards = new UserInfo("760ecd7d-3e17-4433-e040-ae843b716ecd");
             UserInfo userABC = new UserInfo("abc");
             UserInfo userDEF = new UserInfo("def");
-
+            
+            UserInfo dummyVufindUser = new UserInfo("vufind");
+            dummyVufindUser.setPlainPassword("abc");
+            UserInfo.userInfos.put(dummyVufindUser.userNo,dummyVufindUser);
+            
             BibInfo bib123 = new BibInfo("123", "Of Mice and Men", "Steinway", "Odd Books, Old York", "1st", "1967", "eng", "987", MediaTypeEnum.BOOK);
 
             HoldingInfo holdingInfo123_1 = new HoldingInfo("bib123-1", bib123, "Main", "2 copies");
 
             ItemInfo itemInfo123_1_1 = new ItemInfo("25556192919132", holdingInfo123_1, "813.52 St34yV c.1", "copy 1");
-            itemInfo123_1_1.checkout(userABC.userNo, todayPlus20Days);
+            itemInfo123_1_1.checkout(dummyVufindUser.userNo, todayPlus20Days);
 
             ItemInfo itemInfo123_1_2 = new ItemInfo("25556192919198", holdingInfo123_1, "813.52 St34yV c.2", "copy 2");
             itemInfo123_1_2.checkout(userMeganRichards.userNo, todayPlus20Days);
