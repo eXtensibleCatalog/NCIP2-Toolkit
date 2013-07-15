@@ -10,6 +10,7 @@ package org.extensiblecatalog.ncip.v2.dummy;
 
 import org.extensiblecatalog.ncip.v2.dummy.DummyDatabase.UserInfo;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -36,6 +37,8 @@ public class DummyLookupUserService implements LookupUserService {
                                                  RemoteServiceManager serviceManager) {
 
         final LookupUserResponseData responseData = new LookupUserResponseData();
+        boolean passwordChecked = false;
+        boolean passwordConfirmed = false;
         List<Problem> listProblems = new ArrayList<Problem>();
         
         DummyRemoteServiceManager dummySvcMgr = (DummyRemoteServiceManager)serviceManager;
@@ -47,26 +50,45 @@ public class DummyLookupUserService implements LookupUserService {
 			AuthenticationInput userName = initData.getAuthenticationInput(0);
 			AuthenticationInput password = initData.getAuthenticationInput(1);
 			UserInfo userInfo = DummyDatabase.UserInfo.getUserInfo(userName.getAuthenticationInputData());
-			if (userInfo != null && userInfo.checkPassword(password.getAuthenticationInputData())) { 
+			passwordChecked = true;
+			if (userInfo != null) {
+				passwordConfirmed = userInfo.confirmPassword(password.getAuthenticationInputData());
+			}
+			if (userInfo != null && passwordConfirmed) {
+			   //auth user
 			   UserId userId = new UserId();
 			   userId.setAgencyId(agencyId);
 			   userId.setUserIdentifierValue(userName.getAuthenticationInputData());
 			   userId.setUserIdentifierType(new UserIdentifierType("userType"));
 			   responseData.setUserId(userId);
 			}
-        } else if (initData.getUserId() != null) {
+        } else if (initData.getUserId() != null  && !passwordChecked ) {
+        	//requested via test page
         	responseData.setUserId(initData.getUserId());
         }
-
-
-        if (initData.getUserId() == null) {
-        	UserId id = new UserId();
-        	id.setAgencyId(agencyId);
-        	id.setUserIdentifierValue(initData.getAuthenticationInput(0).getAuthenticationInputData());
-        	id.setUserIdentifierType(new UserIdentifierType("userType"));
-        	responseData.setUserId(id);
+        
+        if(responseData.getUserId() == null) {
+        	Problem authProblem = new Problem();
+        	authProblem.setProblemDetail("invalid name or password");
+        	authProblem.setProblemElement("problem");
+        	authProblem.setProblemValue("value");
+        	authProblem.setProblemType(new ProblemType("authProblem"));
+        	listProblems.add(authProblem);
+        	
+        	responseData.setProblems(listProblems);
+        	return responseData;
+        	
         }
-
+        
+//default user
+//        if (initData.getUserId() == null && !passwordChecked) {
+//        	UserId id = new UserId();
+//        	id.setAgencyId(agencyId);
+//        	id.setUserIdentifierValue(initData.getAuthenticationInput(0).getAuthenticationInputData());
+//        	id.setUserIdentifierType(new UserIdentifierType("userType"));
+//        	responseData.setUserId(id);
+//        }
+//----
         UserOptionalFields userOptionalFields = new UserOptionalFields();
         
         String userNo = responseData.getUserId().getUserIdentifierValue();;
@@ -360,7 +382,7 @@ public class DummyLookupUserService implements LookupUserService {
         }
 
         responseData.setUserOptionalFields(userOptionalFields);
-
+        
         return responseData;
     }
 

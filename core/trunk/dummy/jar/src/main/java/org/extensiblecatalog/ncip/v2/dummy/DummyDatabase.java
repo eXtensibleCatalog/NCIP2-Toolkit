@@ -206,7 +206,7 @@ public class DummyDatabase {
         	return userInfos.get(userNo);
         }
         
-        public boolean checkPassword(String password) {
+        public boolean confirmPassword(String password) {
         	return plainPassword == null || password == null ? false : plainPassword.equals(password);
         }
 
