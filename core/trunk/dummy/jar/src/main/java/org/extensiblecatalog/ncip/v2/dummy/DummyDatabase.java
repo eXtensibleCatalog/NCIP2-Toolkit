@@ -8,10 +8,30 @@
 
 package org.extensiblecatalog.ncip.v2.dummy;
 
-import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
-import java.util.*;
+import org.apache.log4j.Logger;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddressType;
+import org.extensiblecatalog.ncip.v2.service.NameInformation;
+import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
+import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.UnstructuredAddressType;
+import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
+import org.extensiblecatalog.ncip.v2.service.UserAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 
 public class DummyDatabase {
 
@@ -191,6 +211,8 @@ public class DummyDatabase {
         protected String userNo;
         
         protected String plainPassword;
+        
+        protected UserOptionalFields optionalFields;
 
         public UserInfo(String userNo) {
 
@@ -210,6 +232,14 @@ public class DummyDatabase {
         	return plainPassword == null || password == null ? false : plainPassword.equals(password);
         }
 
+		public UserOptionalFields getOptionalFields() {
+			return optionalFields;
+		}
+
+		public void setOptionalFields(UserOptionalFields optionalFields) {
+			this.optionalFields = optionalFields;
+		}
+		
     }
 
     protected static class BibInfo {
@@ -494,28 +524,100 @@ public class DummyDatabase {
 
             UserInfo userMeganRichards = new UserInfo("760ecd7d-3e17-4433-e040-ae843b716ecd");
             UserInfo userABC = new UserInfo("abc");
+            userABC.setPlainPassword("abc");
             UserInfo userDEF = new UserInfo("def");
+            
+            
             
             UserInfo dummyVufindUser = new UserInfo("vufind");
             dummyVufindUser.setPlainPassword("abc");
             UserInfo.userInfos.put(dummyVufindUser.userNo,dummyVufindUser);
+            UserInfo.userInfos.put(userABC.userNo, userABC);
             
-            BibInfo bib123 = new BibInfo("123", "Of Mice and Men", "Steinway", "Odd Books, Old York", "1st", "1967", "eng", "987", MediaTypeEnum.BOOK);
+            UserOptionalFields dummyUserOptionalFields = new UserOptionalFields();
+            dummyUserOptionalFields.setDateOfBirth(new GregorianCalendar( 1950,10,11));
+            PersonalNameInformation nameInfo = new PersonalNameInformation();
+            StructuredPersonalUserName structuredPersonalName = new StructuredPersonalUserName();
+            structuredPersonalName.setGivenName("DummyName");
+            structuredPersonalName.setInitials("DD");
+            structuredPersonalName.setSurname("DummySurname");
+            structuredPersonalName.setSuffix("DummySuffix");
+            structuredPersonalName.setPrefix("DummyPrefix");
+            nameInfo.setStructuredPersonalUserName(structuredPersonalName);
+            NameInformation dummyNameInfo = new NameInformation();
+            dummyNameInfo.setPersonalNameInformation(nameInfo);
+            dummyUserOptionalFields.setNameInformation(dummyNameInfo);
+            UserAddressInformation dummyAddress1 = new UserAddressInformation();
+            ElectronicAddress elA1 = new ElectronicAddress();
+            ElectronicAddressType type1 = new ElectronicAddressType("Personal");
+            elA1.setElectronicAddressData("dummy.user@provider.com");
+            elA1.setElectronicAddressType(type1);
+//            dummyAddress1.setElectronicAddress(elA1);
+            PhysicalAddress phA1 = new PhysicalAddress();
+            StructuredAddress sA1 = new StructuredAddress();
+            sA1.setCareOf("CareOf");
+            sA1.setCountry("Neverland");
+            sA1.setDistrict("District");
+//            sA1.setLine1("Line 1");
+//            sA1.setLine2("line 2");
+            sA1.setLocality("Locality");
+            sA1.setPostalCode("12345");
+            sA1.setPostOfficeBox("box");
+            sA1.setRegion("region");
+            sA1.setStreet("street");
+            phA1.setStructuredAddress(sA1);
+            phA1.setPhysicalAddressType(new PhysicalAddressType("scheme","personal"));
+            dummyAddress1.setPhysicalAddress(phA1);
+            dummyAddress1.setUserAddressRoleType(new UserAddressRoleType("AddressRoleType"));
+            UserAddressInformation dummyAddress2 = new UserAddressInformation();
+            PhysicalAddress ph2 = new PhysicalAddress();
+            
+            UnstructuredAddress ua1 = new UnstructuredAddress();
+            ua1.setUnstructuredAddressData("unstructred 51 , address 12123");
+            ua1.setUnstructuredAddressType(new UnstructuredAddressType("schema","personal2"));
+            ph2.setUnstructuredAddress(ua1);
+            ph2.setPhysicalAddressType(new PhysicalAddressType("scheme","personal"));
+            dummyAddress2.setUserAddressRoleType(new UserAddressRoleType("AddressRoleType"));
+            dummyAddress2.setPhysicalAddress(ph2);
+            List<UserAddressInformation> listAddress = new ArrayList<UserAddressInformation>();
+            listAddress.add(dummyAddress1);
+            listAddress.add(dummyAddress2);
+            dummyUserOptionalFields.setUserAddressInformations(listAddress);
+            dummyVufindUser.setOptionalFields(dummyUserOptionalFields);
+            
+            BibInfo dummyBook1 = new BibInfo("bib001", "On the road", "Jack Kerouac","Dummy publisher" , "2nd", "1948", "English", "3dfq435", MediaTypeEnum.BOOK);
+            BibInfo dummyBook2 = new BibInfo("mzk.001168629", "Integrovany zachrany system", "Kerouac","Dummy publisher" , "3rd", "1958", "English", "001238920", MediaTypeEnum.BOOK);
+            BibInfo bib123 = new BibInfo("mzk.001168631", "Almanach ke 100.vyroci zalozeni Gymnazia Moravske Budejovice", "Steinway", "Odd Books, Old York", "1st", "1967", "eng", "987", MediaTypeEnum.BOOK);
 
             HoldingInfo holdingInfo123_1 = new HoldingInfo("bib123-1", bib123, "Main", "2 copies");
+            HoldingInfo holdingInfo123_2 = new HoldingInfo("bib123-2", dummyBook1, "Main", "3 copies");
+            HoldingInfo holdingInfo123_3 = new HoldingInfo("bib123-3", dummyBook2, "Main", "3 copies");
 
-            ItemInfo itemInfo123_1_1 = new ItemInfo("25556192919132", holdingInfo123_1, "813.52 St34yV c.1", "copy 1");
+            ItemInfo itemInfo123_1_1 = new ItemInfo("mzk.0011686311", holdingInfo123_1, "813.52 St34yV c.1", "copy 1");
             itemInfo123_1_1.checkout(dummyVufindUser.userNo, todayPlus20Days);
 
-            ItemInfo itemInfo123_1_2 = new ItemInfo("25556192919198", holdingInfo123_1, "813.52 St34yV c.2", "copy 2");
+            ItemInfo itemInfo123_1_2 = new ItemInfo("mzk.0011686312", holdingInfo123_1, "813.52 St34yV c.2", "copy 2");
             itemInfo123_1_2.checkout(userMeganRichards.userNo, todayPlus20Days);
+            
+            ItemInfo itemInfoDummy1 = new ItemInfo("25556134324132", holdingInfo123_2, "813.52 St34yV c.1", "copy 1");
+            RequestInfo requestDummy2 = itemInfoDummy1.placeOnHold("req0002", userABC.userNo, "Under the carpet");
+            requestDummy2.fill();
+            RequestInfo requestDummy1 = itemInfoDummy1.placeOnHold("req0001", dummyVufindUser.userNo, "Under the carpet");
+            requestDummy1.fill();
+            
+            ItemInfo itemInfoDummy2 = new ItemInfo("mzk.0011686291", holdingInfo123_3, "234.5 Rt34yX", "copy 1");
+            itemInfoDummy2.checkout(dummyVufindUser.userNo, todayPlus40Days);
+            
+            ItemInfo itemInfoDummy3 = new ItemInfo("mzk.0011686292", holdingInfo123_3, "234.5 Rt34yX", "copy 2");
+            itemInfoDummy3.checkin();
 
-            BibInfo bib345 = new BibInfo("345", "The Mouse That Roared",  "Rodent, Rodney", "Dog-eared Press, Chicago", "7th expanded", "1907", "eng", "765", MediaTypeEnum.BOOK);
-
+            BibInfo bib345 = new BibInfo("mzk.001168634", "The Mouse That Roared",  "Rodent, Rodney", "Dog-eared Press, Chicago", "7th expanded", "1907", "eng", "765", MediaTypeEnum.BOOK);
+            
             HoldingInfo holdingInfo345_1 = new HoldingInfo("bib345-1", bib345, "Law", "1 copy");
 
-            ItemInfo itemInfo345_1_1 = new ItemInfo("25556192919171", holdingInfo345_1, "813.52 St34yV c.1", "copy 1");
+            ItemInfo itemInfo345_1_1 = new ItemInfo("mzk.0011686341", holdingInfo345_1, "813.52 St34yV c.1", "copy 1");
             itemInfo345_1_1.checkout(userMeganRichards.userNo, todayPlus40Days);
+            itemInfo345_1_1.checkout(dummyVufindUser.userNo, todayPlus20Days);
             itemInfo345_1_1.renew();
 
             BibInfo bib567 = new BibInfo("567", "Sense and Non-sense",  "Merlot-Pouley", "Hieronymous Bach, Sheffield", "1st", "2012", "eng", "543", MediaTypeEnum.BOOK);
@@ -525,9 +627,10 @@ public class DummyDatabase {
             ItemInfo itemInfo567_1_1 = new ItemInfo("25556119105917", holdingInfo567_1, "113.52 St34yV c.1", "copy 1");
             itemInfo567_1_1.checkout(userABC.userNo, todayPlus40Days);
             itemInfo567_1_1.renew();
-            RequestInfo requestInfo567_1_1 = itemInfo567_1_1.placeOnHold("1239", userDEF.userNo, "Main Circ Desk");
+            RequestInfo requestInfo567_1_1 = itemInfo567_1_1.placeOnHold("1239", dummyVufindUser.userNo, "Main Circ Desk");
             // Backdate the request
             requestInfo567_1_1.createDate.add(Calendar.DAY_OF_YEAR, 10);
+            
             requestInfo567_1_1.fill();
 
             ItemInfo itemInfo567_1_2 = new ItemInfo("25559171261518", holdingInfo567_1, "113.52 St34yV c.2", "copy 2");

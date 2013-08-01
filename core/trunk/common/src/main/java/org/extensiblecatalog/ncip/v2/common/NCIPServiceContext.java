@@ -46,7 +46,7 @@ public class NCIPServiceContext implements ServiceContext {
             this.version = ncipConfig.getVersion();
             this.requireApplicationProfileType = ncipConfig.requireApplicationProfileType();
             this.applicationProfileTypes = ncipConfig.getApplicationProfileTypes();
-            this.namespaceURIs = ncipConfig.getNamespaceURIs();
+            this.namespaceURIs = ncipConfig.getNamespaceURIs();            
             this.defaultNamespace = ncipConfig.getDefaultNamespaceURI();
             this.addDefaultNamespace = ncipConfig.addDefaultNamespaceURI();
             this.schemaURLs = ncipConfig.getSupportedSchemaURLs();

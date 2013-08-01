@@ -8,6 +8,7 @@
 
 package org.extensiblecatalog.ncip.v2.dummy;
 
+import org.extensiblecatalog.ncip.v2.dummy.DummyDatabase.UserInfo;
 import org.extensiblecatalog.ncip.v2.service.*;
 
 import java.math.BigDecimal;
@@ -50,6 +51,21 @@ public class DummyRequestItemService implements RequestItemService {
 
             userNo = userId.getUserIdentifierValue();
 
+        } else if ( initData.getAuthenticationInputs() != null) {
+        	userNo = DummyLookupUserService.getPlaintextValue(initData.getAuthenticationInputs(), "username");
+        	String password = DummyLookupUserService.getPlaintextValue(initData.getAuthenticationInputs(), "password");
+        	
+        	UserInfo info = UserInfo.getUserInfo(userNo);
+        	if ( info == null || info.confirmPassword(password)) {
+        		UserId id = new UserId();
+        		id.setUserIdentifierValue(userNo);
+        		initData.setUserId(id);
+        	} else {
+        		List<Problem> problems = new ArrayList();
+        		problems.add(DummyLookupUserService.generateAuthenticationProblem());
+        		responseData.setProblems(problems);
+        		return responseData;
+        	}
         }
 
         List<DummyDatabase.BibInfo> bibInfos = null;
@@ -67,9 +83,9 @@ public class DummyRequestItemService implements RequestItemService {
                     bibInfos = DummyDatabase.BibInfo.getBibsByOCLCNo(
                         bibliographicRecordId.getBibliographicRecordIdentifier());
 
-                } else if ( bibliographicRecordId.getAgencyId() != null
+                } else /*if ( bibliographicRecordId.getAgencyId() != null
                     && bibliographicRecordId.getAgencyId().equals(
-                    dummySvcMgr.getAgencyId()) ) {
+                    dummySvcMgr.getAgencyId()) ) */{
 
                     DummyDatabase.BibInfo bibInfo = DummyDatabase.BibInfo.getByBibNo(
                         bibliographicRecordId.getBibliographicRecordIdentifier());
@@ -92,16 +108,14 @@ public class DummyRequestItemService implements RequestItemService {
                             DummyDatabase.ItemInfo[] itemInfos = holdingInfo.items;
                             if ( itemInfos != null && itemInfos.length > 0 ) {
 
-                                for ( DummyDatabase.ItemInfo itemInfo : itemInfos ) {
+                            	 for ( int i = 0; i < itemInfos.length; i++) {
 
-                                    if ( itemInfo.circStatus.equals(DummyDatabase.CircStatus.ON_SHELF)) {
+                                 	if ( itemInfos[i].barcode.equals(initData.getItemId(0).getItemIdentifierValue())) {
+                                 		chosenItem = itemInfos[i];
+                                 	}
+                                 	
 
-                                        chosenItem = itemInfos[0];
-                                        break;
-
-                                    }
-
-                                }
+                                  }
 
                             }
 
@@ -144,9 +158,11 @@ public class DummyRequestItemService implements RequestItemService {
                     ? initData.getPickupLocation().getValue() : null;
 
                 DummyDatabase.RequestInfo requestInfo;
+                
                 try {
+                	
                     requestInfo = chosenItem.placeOnHold(incomingRequestNo, userNo, incomingPickupLoc);
-
+                    
                     responseData.setUserId(initData.getUserId());
                     responseData.setRequestScopeType(Version1RequestScopeType.ITEM);
                     responseData.setRequestType(initData.getRequestType());

@@ -2206,6 +2206,18 @@ Change history:
 	<xs:element name="DateShipped" type="xs:dateTime"/>
 	<xs:element name="DateToSend" type="xs:dateTime"/>
 	<xs:element name="DateWillSend" type="xs:dateTime"/>
+	
+	<!-- MZK specific elements -->
+	<xs:element name="MzkOptionalFields">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element name="PublicationYear" type="xs:gYear"/>
+				<xs:element name="Volume" type="xs:unsignedByte"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<!-- end of MZK tags -->
+	
 	<xs:element name="DeleteAgencyFields">
 		<xs:complexType>
 			<xs:sequence>

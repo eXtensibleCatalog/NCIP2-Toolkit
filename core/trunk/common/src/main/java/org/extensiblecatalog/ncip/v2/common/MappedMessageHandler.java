@@ -269,8 +269,16 @@ public class MappedMessageHandler implements MessageHandler {
 
             if (supportedServices != null) {
 
-                service = supportedServices.get(initiationData.getClass().getName());
-
+            	//FIXME MzkLookup... should be handled as LookupItem...
+            		if (initiationData.getClass().getName().equals(MzkLookupItemSetInitiationData.class.getName())) {
+            				service = supportedServices.get(org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData.class.getName());
+            			} else {
+            				service = supportedServices.get(initiationData.getClass().getName());
+            			}
+            	
+                
+                
+//---
                 LOG.debug("service is " + service);
 
             } else {
