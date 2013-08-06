@@ -38,8 +38,6 @@ import org.extensiblecatalog.ncip.v2.common.StatisticsBeanFactory;
 import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorConfiguration;
 import org.extensiblecatalog.ncip.v2.common.TranslatorConfigurationFactory;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
-import org.extensiblecatalog.ncip.v2.service.MzkLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPMessage;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
@@ -64,9 +62,6 @@ public abstract class BaseJAXBDozerTranslator<M> implements Translator {
 
     protected MarshallerFactory marshallerFactory;
 
-    
-    //FIXME delete
-    static int i = 0;
     /**
      * The {@link StatisticsBean} instance used to report performance data.
      */
@@ -198,52 +193,6 @@ public abstract class BaseJAXBDozerTranslator<M> implements Translator {
 
             NCIPInitiationData initiationData = svcMessage.getInitiationData();
             
- //FIXME experimental
-            if ( initiationData instanceof LookupItemSetInitiationData) {
-            	//check manually for unrecognized optional parameters 
-	            String yearParam = null;
-	            String volumeParam = null;
-	            try {
-					inputStream.reset();
-					String requestContent = MzkLookupItemSetInitiationData.slurp(inputStream, 1024);
-					requestContent = requestContent.replaceAll("\\s", "");
-					
-					//search for publication year
-					if (requestContent != null) {
-						int start = requestContent.toLowerCase().indexOf(MzkLookupItemSetInitiationData.MZK_TAG_START_PUBLICATION_YEAR);
-						start = (start > -1 ?  start + MzkLookupItemSetInitiationData.MZK_TAG_START_PUBLICATION_YEAR.length() : start);
-						int end = requestContent.toLowerCase().indexOf(MzkLookupItemSetInitiationData.MZK_TAG_END_PUBLICATION_YEAR);
-					    if (start > -1 && end > start) {
-					    	yearParam = requestContent.substring(start, end);
-					    }
-					}
-					
-					if ( yearParam == null) {
-						//search for volume 
-						int start = requestContent.toLowerCase().indexOf(MzkLookupItemSetInitiationData.MZK_TAG_START_VOLUME);
-						start = (start > -1 ?  start + MzkLookupItemSetInitiationData.MZK_TAG_START_VOLUME.length() : start);
-						int end = requestContent.toLowerCase().indexOf(MzkLookupItemSetInitiationData.MZK_TAG_END_VOLUME);
-						 if (start > -1 && end > start) {
-							 volumeParam = requestContent.substring(start, end);
-						    }
-					}
-					
-				} catch (IOException e) {
-					// process normally if error occurs
-				}
-	            if ( ( yearParam != null || volumeParam != null)  && initiationData instanceof LookupItemSetInitiationData) {
-	        		MzkLookupItemSetInitiationData mzkInitiationData = 
-	        			new MzkLookupItemSetInitiationData( (LookupItemSetInitiationData) initiationData);
-	        	    if ( yearParam != null) {
-	        	    	mzkInitiationData.setPublicationYear(yearParam);
-	        	    }
-	        	    if ( volumeParam != null ) {
-	        	    	mzkInitiationData.setVolume(volumeParam);
-	        	    }
-	        		initiationData = (LookupItemSetInitiationData) mzkInitiationData;
-	            }
-            }
-//------
             statisticsBean.record(initTranslateStartTime, initTranslateEndTime,
                 StatisticsBean.RESPONDER_CREATE_DATA_LABELS, msgName);
 

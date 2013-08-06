@@ -8,7 +8,9 @@
 
 package org.extensiblecatalog.ncip.v2.dummy;
 
+import org.extensiblecatalog.ncip.v2.dummy.DummyDatabase.NewspaperItemInfo;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -213,15 +215,30 @@ public class DummyLookupItemSetService implements LookupItemSetService {
                 BibInformation bibInformation = new BibInformation();
 
                 BibliographicId bibId = new BibliographicId();
+                //params from input used for filtering results
+                int pubYearParam = -1;
+                int volumeParam = -1;
+                MzkOptionalFields mzkOptionalFields = null;
+                
+                for ( BibliographicId id :initData.getBibliographicIds()) {
+                	if (id.getBibliographicRecordId().getBibliographicRecordIdentifier().equals(bibNo)) {
+                		mzkOptionalFields = id.getMzkOptionalFields();
+                	}
+                }
+                
+                if ( mzkOptionalFields != null ) {
+                	pubYearParam = mzkOptionalFields.getPublicationYear() != null ? mzkOptionalFields.getPublicationYear().intValue() : -1;
+                	volumeParam = mzkOptionalFields.getVolume() != null ? mzkOptionalFields.getVolume().intValue() : -1;
+                }
+                
                 BibliographicRecordId bibliographicRecordId = new BibliographicRecordId();
                 bibliographicRecordId.setBibliographicRecordIdentifier(bibNo);
                 bibliographicRecordId.setAgencyId(dummySvcMgr.getAgencyId());
                 bibId.setBibliographicRecordId(bibliographicRecordId);
                 bibInformation.setBibliographicId(bibId);
-
+               
                 BibliographicDescription bibDesc = dummySvcMgr.getBibliographicDescription(
                     DummyDatabase.BibInfo.getByBibNo(bibNo));
-                bibInformation.setBibliographicDescription(bibDesc);
 
                 List<HoldingsSet> holdingsSetList = new ArrayList<HoldingsSet>();
 
@@ -234,23 +251,48 @@ public class DummyLookupItemSetService implements LookupItemSetService {
                     List<ItemInformation> itemInformationList = new ArrayList<ItemInformation>();
                     for ( DummyDatabase.ItemInfo itemInfo : itemInfosByBibNo.get(bibNo) ) {
 
-                        currentItem++;
+                                               
 
+                        ItemInformation itemInformation = null;
+                        //--
+                    	if ( itemInfo instanceof NewspaperItemInfo ) {
+                    		//set visible optional fields
+                    		MzkNewspaperItemInformation mzkInfo = this.getNewspaperItemInformation( (NewspaperItemInfo) itemInfo);
+                    		
+                    		if ( volumeParam + pubYearParam == -2 
+                    				|| ( volumeParam > -1 && mzkInfo.getVolume() == volumeParam ) 
+                    				|| ( pubYearParam > -1 && mzkInfo.getPubYear() == pubYearParam ) ) {
+                    			MzkOptionalFields fields = new MzkOptionalFields();
+                    			fields.setPublicationYear(mzkInfo.getPubYear());
+                    			fields.setVolume(mzkInfo.getVolume());
+                    			fields.setYearTurn(mzkInfo.getYearTurn());
+                    			mzkInfo.getItemOptionalFields().setMzkOptionalFields(fields);
+                    			itemInformation = mzkInfo;
+                    		
+                    		} else {
+                    			continue;
+                    		}
+                    		
+                    		
+                    		
+                    	} else {
+                    		itemInformation = getItemInformation(itemInfo);
+                    	}
+                    	
+                    	++currentItem;
                         if (currentItem < startItem) {
 
                             continue; // Skip this item because it was returned in a previous message (theoretically).
 
                         }
-
-                        if (maximumItemsCount != 0 && currentItem >= (startItem + maximumItemsCount)) {
-
-                            responseData.setNextItemToken(Integer.toString(currentItem));
-                            break;
-
-                        }
-
-                        ItemInformation itemInformation = getItemInformation(itemInfo);
+                    	if (maximumItemsCount != 0 && currentItem >= (startItem + maximumItemsCount)) {
+	
+	                        responseData.setNextItemToken(Integer.toString(currentItem));
+	                        break;
+	
+	                    }
                         itemInformationList.add(itemInformation);
+                        
 
                     }
 
@@ -274,9 +316,20 @@ public class DummyLookupItemSetService implements LookupItemSetService {
 
                 }
 
-                bibInformation.setHoldingsSets(holdingsSetList);
+                
+                if ( holdingsSetList.isEmpty() ) {
+                	Problem problem = new Problem();
+                	problem.setProblemDetail("No Items found for given year");
+                	ProblemType type = new ProblemType("noitems");
+                	problem.setProblemType(type);
+                	List<Problem> problems = new ArrayList<Problem>();
+                	problems.add(problem);
+                	bibInformation.setProblems(problems);
+                } else {
+                	bibInformation.setBibliographicDescription(bibDesc);
+                	bibInformation.setHoldingsSets(holdingsSetList);
+                }
                 bibInformationsList.add(bibInformation);
-
             }
 
             responseData.setBibInformations(bibInformationsList);
@@ -376,9 +429,23 @@ public class DummyLookupItemSetService implements LookupItemSetService {
         itemInformation.setItemId(itemId);
 
         itemInformation.setItemOptionalFields(itemOptionalFields);
+        
+        
 
         return itemInformation;
 
+    }
+    
+    public MzkNewspaperItemInformation getNewspaperItemInformation( DummyDatabase.NewspaperItemInfo itemInfo) {
+    	MzkNewspaperItemInformation mzkInfo = new MzkNewspaperItemInformation(
+    			this.getItemInformation( (DummyDatabase.ItemInfo) itemInfo));
+    	
+    	mzkInfo.setPubYear(itemInfo.getPubYear());
+    	mzkInfo.setVolume(itemInfo.getVolume());
+    	mzkInfo.setYearTurn(itemInfo.getYearTurn());
+    	
+    	return mzkInfo;
+    	
     }
 
 }

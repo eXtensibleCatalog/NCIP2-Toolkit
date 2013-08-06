@@ -1531,6 +1531,26 @@
             <b-hint>org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements.CurrentRequester</b-hint>
         </field>
     </mapping>
+<!-- MZK specific mapping  -->
+    
+    <mapping>
+    	<class-a>org.extensiblecatalog.ncip.v2.service.MzkOptionalFields</class-a>
+    	<class-b>org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements.MzkOptionalFields</class-b>
+    	<field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.MzkIntegerConverter">
+    		<a>Volume</a>
+    		<b>volume</b>
+    	</field>
+    	<field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.MzkIntegerConverter">
+    		<a>PublicationYear</a>
+    		<b>publicationYear</b>
+    	</field>
+    	<field custom-converter="org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.MzkIntegerConverter">
+    		<a>yearTurn</a>
+    		<b>YearTurn</b>
+    	</field>
+    </mapping>
+ <!--  -->
+    
 
     <!-- TODO: Add optional DateDue -->
     <mapping map-null="false">

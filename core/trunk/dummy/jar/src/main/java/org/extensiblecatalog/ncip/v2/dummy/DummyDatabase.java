@@ -501,6 +501,41 @@ public class DummyDatabase {
         }
 
     }
+    
+    protected static class NewspaperItemInfo extends ItemInfo {
+
+		public NewspaperItemInfo(String barcode, HoldingInfo holdingInfo,
+				String callNo, String copyNo) {
+			super(barcode, holdingInfo, callNo, copyNo);
+			// TODO Auto-generated constructor stub
+		}
+		
+		protected int pubYear = -1;
+		protected int volume = -1;
+		protected int yearTurn = -1;
+		
+		public int getPubYear() {
+			return pubYear;
+		}
+		public void setPubYear(int pubYear) {
+			this.pubYear = pubYear;
+		}
+		public int getVolume() {
+			return volume;
+		}
+		public void setVolume(int volume) {
+			this.volume = volume;
+		}
+		public int getYearTurn() {
+			return yearTurn;
+		}
+		public void setYearTurn(int yearTurn) {
+			this.yearTurn = yearTurn;
+		}
+		
+		
+    	
+    }
 
 
     protected static int nextRequestId = 39191;
@@ -649,6 +684,27 @@ public class DummyDatabase {
 
             ItemInfo itemInfo789_1_1 = new ItemInfo("25556819818614", holdingInfo789_1, "918.1 XH c.1", "copy 1");
 
+            
+            //newspaper
+            BibInfo newspaper = new BibInfo("mzk.001191838", "Pravo", "Borgis", "", "", "2011-2013", "cs", "oclno1234", MediaTypeEnum.MAGAZINE);
+            HoldingInfo newspaperHolding = new HoldingInfo("news", newspaper, "somewhere", "summary");
+            
+            NewspaperItemInfo news11 = new NewspaperItemInfo("mzk.0011918381", newspaperHolding, "xxx1", "1");
+            news11.setPubYear(2011);
+            news11.setVolume(21);
+            news11.setYearTurn(1);
+            NewspaperItemInfo news12 = new NewspaperItemInfo("mzk.0011918382", newspaperHolding, "xxx2", "2");
+            news12.setPubYear(2011);
+            news12.setVolume(21);
+            news12.setYearTurn(2);
+            NewspaperItemInfo news21 = new NewspaperItemInfo("mzk.0011918383", newspaperHolding, "xxx3", "1");
+            news21.setPubYear(2012);
+            news21.setVolume(22);
+            news21.setYearTurn(1);
+            
+            
+            
+            
 
         } catch (ToolkitException e) {
 
@@ -663,5 +719,7 @@ public class DummyDatabase {
         return Integer.toString(nextRequestId++);
 
     }
+    
+    
 
 }

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.*;
 
@@ -269,7 +270,10 @@ public class NCIPServlet extends HttpServlet {
         try {
 
             serviceContext = serviceValidator.getInitialServiceContext();
-
+            for (String s: ((NCIPServiceContext)serviceContext).getSchemaURLs()) {
+            	LOG.info("Using URL: "+s);
+            	System.out.println("USING URL: "+s);
+            }
         } catch (ToolkitException e) {
 
             returnException(response, "Exception creating initial service context.", e);
