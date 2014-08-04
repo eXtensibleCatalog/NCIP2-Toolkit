@@ -39,7 +39,7 @@ public class MillenniumRequestItemService implements RequestItemService {
                                                   RemoteServiceManager serviceManager) {
 
         MillenniumRemoteServiceManager millenniumSvcMgr = (MillenniumRemoteServiceManager) serviceManager;
-        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.getConfiguration();
+        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.buildConfiguration();
 
         final RequestItemResponseData responseData = new RequestItemResponseData();
 

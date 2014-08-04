@@ -1,18 +1,35 @@
 package org.extensiblecatalog.ncip.v2.voyager;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
+import org.extensiblecatalog.ncip.v2.service.BibliographicId;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RequestItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.RequestItemService;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupUserProcessingError;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestItemProcessingError;
 import org.extensiblecatalog.ncip.v2.voyager.util.ILSException;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConfiguration;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConstants;
@@ -32,11 +49,22 @@ public class VoyagerRequestItemService implements RequestItemService {
     static Logger log = Logger.getLogger(VoyagerRequestItemService.class);
     VoyagerRemoteServiceManager voyagerSvcMgr;
     List<Problem> problems = new ArrayList<Problem>();
+    
+    private String itemId;
+    private String bibId;
+    private String patronId;
+    private String patronAgencyId;
+    private String patronUbId;
+    private String pickupCode = null;
+    private String itemAgencyId = null;
+    private BibliographicId bibliographicId;
+    private Date lastInterestDate;
 
     private VoyagerConfiguration voyagerConfig;
     {
         try {
-            voyagerConfig = (VoyagerConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
+            voyagerConfig = (VoyagerConfiguration) new ConnectorConfigurationFactory(
+            		new Properties()).getConfiguration();
         } catch (ToolkitException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -57,80 +85,110 @@ public class VoyagerRequestItemService implements RequestItemService {
 
         RequestItemResponseData requestItemResponseData = new RequestItemResponseData();
         voyagerSvcMgr = (VoyagerRemoteServiceManager) serviceManager;
-        String itemId;
-        String patronId;
-        String patronAgencyId;
-        String patronUbId;
         String host;
-
-        BibliographicId bibliographicId = initData.getBibliographicId(0);
-        String bibId = bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+        
+        bibliographicId = initData.getBibliographicId(0);
+        bibId = bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+        
         if (initData.getItemId(0) != null)
             itemId = initData.getItemId(0).getItemIdentifierValue();
         else
             itemId = null;
-        //String itemAgencyId = initData.getItemId(0).getAgencyId().getValue();
-        String itemAgencyId = bibliographicId.getBibliographicRecordId().getAgencyId().getValue();
+
         String requestType = initData.getRequestType().getValue();
         String requestScopeType = initData.getRequestScopeType().getValue();
-        String itemUbId = (String) voyagerConfig.getProperty(itemAgencyId);
-        String pickupLocation = initData.getPickupLocation().getValue();
 
+        if (initData.getPickupLocation() != null) {
+        	pickupCode = initData.getPickupLocation().getValue();
+        } else {
+            List<Problem> problems = new ArrayList<Problem>();
+            problems.addAll(ServiceHelper.generateProblems(
+            		Version1GeneralProcessingError.NEEDED_DATA_MISSING,
+                    "PickupLocation", null, "Pickup Location missing in request"));
+            requestItemResponseData.setProblems(problems);
+            return requestItemResponseData;
+        }
+        
+        if (initData.getPickupExpiryDate() != null) {
+        	lastInterestDate = initData.getPickupExpiryDate().getTime();
+        } else {
+            problems.addAll(ServiceHelper.generateProblems(
+            		Version1GeneralProcessingError.NEEDED_DATA_MISSING,
+                    "PickupExpiryDate", null, "Last Interest Date missing in request"));
+            requestItemResponseData.setProblems(problems);
+            return requestItemResponseData;
+        }
+        
         // UserId is present
         if (initData.getUserId() != null){
             log.info("User id is " + initData.getUserId().getUserIdentifierValue());
             patronId = initData.getUserId().getUserIdentifierValue();
             if (initData.getUserId().getAgencyId() != null) {
                 patronAgencyId = initData.getUserId().getAgencyId().getValue();
-            }
-            else {
+            } else {
                 log.debug("No To Agency ID found in the initiation header");
-                patronAgencyId = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
+                patronAgencyId = (String) voyagerConfig.getProperty(
+                		VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
             }
             // Retrieve the patron's database Id
             patronUbId = (String) voyagerConfig.getProperty(patronAgencyId);
 
-            boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+            boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_CONSORTIUM));
             if (consortialUse) {
                 host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
+                itemAgencyId = bibliographicId.getBibliographicRecordId().getAgencyId().getValue();
             } else {
-                host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+                host = (String) voyagerConfig.getProperty(
+                		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+                itemAgencyId = patronAgencyId;
             }
-
+            
             String url = host + "/vxws/patron/" + patronId + "?patron_homedb=" + patronUbId;
             Document patronInfoDoc = voyagerSvcMgr.getWebServicesDoc(url);
 
             if (!patronInfoDoc.getRootElement().getChildText("reply-text").equalsIgnoreCase("ok")){
-                problems.addAll(ServiceHelper.generateProblems(Version1LookupUserProcessingError.UNKNOWN_USER,
-                        "UserId/UserIdentifierValue", initData.getUserId().getUserIdentifierValue(), "Unknown User"));
+                problems.addAll(ServiceHelper.generateProblems(
+                		Version1LookupUserProcessingError.UNKNOWN_USER,
+                        "UserId/UserIdentifierValue", 
+                        initData.getUserId().getUserIdentifierValue(), "Unknown User"));
                 requestItemResponseData.setProblems(problems);
                 return requestItemResponseData;
             }
         } else {  // User ID not present, assuming Authentication Input
 
-            if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null){
-                patronAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
+            if (initData.getInitiationHeader() != null && 
+            			initData.getInitiationHeader().getFromAgencyId() != null){
+                patronAgencyId = 
+                		initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
                 patronUbId = (String) voyagerConfig.getProperty(patronAgencyId);
             } else {
-                log.error("No To Agency ID found in the initiation header");
-                patronAgencyId = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
+                log.error("No From Agency ID found in the initiation header");
+                patronAgencyId = (String) voyagerConfig.getProperty(
+                		VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
                 patronUbId = (String) voyagerConfig.getProperty(patronAgencyId);
             }
 
-            boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+            boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_CONSORTIUM));
             if (consortialUse) {
                 host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
+                itemAgencyId = bibliographicId.getBibliographicRecordId().getAgencyId().getValue();
             } else {
-                host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+                host = (String) voyagerConfig.getProperty(
+                		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+                itemAgencyId = patronAgencyId;
             }
 
-            String authenticatedUserId = voyagerSvcMgr.authenticateUser(initData.getAuthenticationInputs(), host);
+            String authenticatedUserId = voyagerSvcMgr.authenticateUser(
+            		initData.getAuthenticationInputs(), host);
 
             String username = "";
             for (AuthenticationInput a : initData.getAuthenticationInputs()) {
                 if (a.getAuthenticationInputType().getValue().equalsIgnoreCase("Username")) {
                     username = a.getAuthenticationInputData();
-                }  else if (a.getAuthenticationInputType().getValue().equalsIgnoreCase("LDAPUsername")) {
+                }  else if (
+                		a.getAuthenticationInputType().getValue().equalsIgnoreCase("LDAPUsername")) {
                     username = a.getAuthenticationInputData();
                 }
              }
@@ -138,7 +196,8 @@ public class VoyagerRequestItemService implements RequestItemService {
             patronId = authenticatedUserId;
 
             if (patronId == null) {
-                problems.addAll(ServiceHelper.generateProblems(Version1LookupUserProcessingError.UNKNOWN_USER,
+                problems.addAll(ServiceHelper.generateProblems(
+                		Version1LookupUserProcessingError.UNKNOWN_USER,
                         "UserId/UserIdentifierValue", username, "Unknown User"));
                 requestItemResponseData.setProblems(problems);
                 return requestItemResponseData;
@@ -150,20 +209,44 @@ public class VoyagerRequestItemService implements RequestItemService {
         userId.setUserIdentifierType(new UserIdentifierType("Username"));
         userId.setAgencyId(new AgencyId(patronAgencyId));
 
+        String itemUbId = (String) voyagerConfig.getProperty(itemAgencyId);
+        
         boolean success = false;
+        boolean ubRequest = false;
+        String toAgencyId = null;
+        if (requestType.equalsIgnoreCase("Stack Retrieval")) {
+        	if (initData.getInitiationHeader() != null && 
+        			initData.getInitiationHeader().getToAgencyId() != null) {
+        		toAgencyId = 
+        				initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
+        		if (itemAgencyId == null) {
+        			ubRequest = false;
+        		} else if (itemAgencyId.equalsIgnoreCase(toAgencyId)) {
+        			ubRequest = false;
+        		} else {
+        			ubRequest = true;
+        		} 			
+        	}
+        }
 
+        log.debug("Request Type is " + requestType);
         try {
-            if (requestType.equalsIgnoreCase("Stack Retrieval"))
-                success = processStackRetrieval(patronId, patronUbId, patronAgencyId, bibId, itemId, itemUbId);
-            else if (requestType.equalsIgnoreCase("Hold"))
-                success = processHold(patronId, patronUbId, patronAgencyId, bibId, itemId, itemUbId, pickupLocation);
-            else if (requestType.equalsIgnoreCase("Recall"))
-                success = processRecall(patronId, patronUbId, patronAgencyId, bibId, itemId, itemUbId, pickupLocation);
-            else if (requestType.equalsIgnoreCase("UB"))
-                success = processUBRequest(patronId, patronUbId, patronAgencyId, bibId, itemId, itemUbId, pickupLocation);
+            if (requestType.equalsIgnoreCase("Stack Retrieval") && ubRequest == false) {
+                success = processStackRetrieval(itemUbId);
+            }
+            else if (requestType.equalsIgnoreCase("Stack Retrieval") && ubRequest == true) {
+                success = processUBRequest(toAgencyId);
+            }
+            else if (requestType.equalsIgnoreCase("Hold")) {
+                success = processHold();
+            }
+            else if (requestType.equalsIgnoreCase("Recall")) {
+                success = processRecall();
+            }
         } catch (ILSException e) {
             List<Problem> problems = new ArrayList<Problem>();
-            problems.addAll(ServiceHelper.generateProblems(Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
+            problems.addAll(ServiceHelper.generateProblems(
+            		Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
                     null, null, "Unable to process request"));
             requestItemResponseData.setProblems(problems);
             return requestItemResponseData;
@@ -175,8 +258,8 @@ public class VoyagerRequestItemService implements RequestItemService {
             requestItemResponseData.setRequestType(initData.getRequestType());
             requestItemResponseData.setRequestScopeType(initData.getRequestScopeType());
         } else {
-            List<Problem> problems = new ArrayList<Problem>();
-            problems.addAll(ServiceHelper.generateProblems(Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
+            problems.addAll(ServiceHelper.generateProblems(
+            		Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
                     null, null, "Unable to process request"));
             requestItemResponseData.setProblems(problems);
         }
@@ -184,62 +267,214 @@ public class VoyagerRequestItemService implements RequestItemService {
         return requestItemResponseData;
     }
 
-    private boolean processRecall(String patronId, String patronUbId, String patronAgencyId,
-            String bibId, String itemId, String itemUbId, String pickupLocation) throws ILSException {
+    private boolean processHold() throws ILSException {
+
+    	log.debug("Processing Hold Request");
         String host;
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
         } else {
-            host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+            host = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+        }
+
+        Document doc = new Document();
+        Element root = new Element("hold-request-parameters");
+        Element pickupLocationElement = new Element("pickup-location");
+        pickupLocationElement.setText(pickupCode);
+        Element lastInterestDateElement = new Element("last-interest-date");
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        lastInterestDateElement.setText(df.format(lastInterestDate));
+        Element comment = new Element("comment");
+        comment.setText("Testing hold");
+        Element dbkey = new Element("dbkey");
+        dbkey.setText(patronUbId);
+
+        root.addContent(pickupLocationElement);
+        root.addContent(lastInterestDateElement);
+        root.addContent(comment);
+        root.addContent(dbkey);
+        doc.addContent(root);
+
+        String url = host + "/vxws/record/" + bibId + "/items/" + itemId +
+                    "/hold?patron=" + patronId + "&patron_homedb=" + patronUbId;
+
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        String xmlOutput = xmlOutputter.outputString(doc);
+
+        Document holdResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
+
+        try {
+            XPath xpath = XPath.newInstance("response/create-hold/note");
+            Element message = (Element) xpath.selectSingleNode(holdResponse);
+            log.debug("The hold response is: " + message.getText());
+            if (message.getText().equalsIgnoreCase("Your request was successful."))
+                return true;
+            else
+                return false;
+        } catch (JDOMException e) {
+            log.error("XPath processing error in processHold");
+            throw new ILSException(e);
+        }
+    }
+    
+    private boolean processStackRetrieval(String itemUbId) throws ILSException {
+
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+
+        String host;
+
+        if (consortialUse) {
+            host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
+        } else {
+            host = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+        }
+
+        Document doc = new Document();
+        Element root = new Element("call-slip-parameters");
+        Element comment = new Element("comment");
+        comment.setText("Testing stack retrieval");
+        Element dbkey = new Element("dbkey");
+        dbkey.setText(itemUbId);
+        Element pickupLocation = new Element("pickup-location");
+        pickupLocation.setText(pickupCode);
+        root.addContent(comment);
+        root.addContent(dbkey);
+        root.addContent(pickupLocation);
+        doc.addContent(root);
+
+        String url = host + "/vxws/record/" + bibId + "/items/" +
+                    itemId + "/callslip?patron=" + patronId + "&patron_homedb=" + patronUbId;
+
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        String xmlOutput = xmlOutputter.outputString(doc);
+
+        Document callslipResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
+
+        try {
+            XPath xpath = XPath.newInstance("response/create-call-slip/note");
+            Element message = (Element) xpath.selectSingleNode(callslipResponse);
+            log.debug("The callslip response is: " + message.getText());
+            if (message.getText().equalsIgnoreCase("Your request was successful."))
+                return true;
+            else
+                return false;
+        } catch (JDOMException e) {
+            log.error("XPath processing error in processStackRetrieval");
+            throw new ILSException(e);
+        }
+    }
+    
+    private boolean processUBRequest(String toAgencyId) throws ILSException {
+
+        String host = voyagerSvcMgr.getUrlFromAgencyId(itemAgencyId);
+        String itemUbId = (String) voyagerConfig.getProperty(itemAgencyId);
+        String pickupUbId = (String) voyagerConfig.getProperty(toAgencyId);
+
+        Document doc = new Document();
+        Element root = new Element("ub-request-parameters");
+        
+        Element pickupLibrary = new Element("pickup-library");
+        pickupLibrary.setText(pickupUbId);
+        
+        Element pickupLocation = new Element("pickup-location");
+        pickupLocation.setText(pickupCode);
+        
+        Element lastInterestDate = new Element("last-interest-date");
+        lastInterestDate.setText("20140501");
+        
+        Element comment = new Element("comment");
+        comment.setText("Testing UB Request in NCIP");
+        
+        Element dbkey = new Element("dbkey");
+        dbkey.setText(itemUbId);
+
+        root.addContent(pickupLibrary);
+        root.addContent(pickupLocation);
+        root.addContent(lastInterestDate);
+        root.addContent(comment);
+        root.addContent(dbkey);
+        doc.addContent(root);
+
+        String url = host + "/vxws/record/" + bibId + "/items/" +
+                    itemId + "/ubrequest?patron=" + patronId + "&patron_homedb=" + patronUbId;
+
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        String xmlOutput = xmlOutputter.outputString(doc);
+
+        Document ubResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
+
+        try {
+            XPath xpath = XPath.newInstance("response/create-ubrequest/note");
+            Element message = (Element) xpath.selectSingleNode(ubResponse);
+            log.debug("The UB response is: " + message.getText());
+            if (message.getText().equalsIgnoreCase("Your request was successful."))
+                return true;
+            else
+                return false;
+        } catch (JDOMException e) {
+            log.error("XPath processing error in processStackRetrieval");
+            throw new ILSException(e);
+        }
+    }
+    
+    private boolean processRecall() throws ILSException {
+
+    	log.debug("Processing Recall Request");
+    	
+        String host;
+
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        if (consortialUse) {
+            host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
+        } else {
+            host = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
         }
 
         Document doc = new Document();
         Element root = new Element("recall-parameters");
-        Element comment = new Element("comment");
-        comment.setText("Testing recall");
-        Element dbkey = new Element("dbkey");
-        dbkey.setText(itemUbId);
         Element pickupLocationElement = new Element("pickup-location");
-        pickupLocationElement.setText(pickupLocation);
-        Element lastInterestDate = new Element("last-interest-date");
-        lastInterestDate.setText("20121230");
+        pickupLocationElement.setText(pickupCode);
+        Element lastInterestDateElement = new Element("last-interest-date");
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        lastInterestDateElement.setText(df.format(lastInterestDate));
+        Element comment = new Element("comment");
+        comment.setText("Testing recall request using NCIP");
+        Element dbkey = new Element("dbkey");
+        dbkey.setText(patronUbId);
+
         root.addContent(pickupLocationElement);
-        root.addContent(lastInterestDate);
-
+        root.addContent(lastInterestDateElement);
+        root.addContent(comment);
         root.addContent(dbkey);
-
         doc.addContent(root);
 
         String url = host + "/vxws/record/" + bibId + "/items/" + itemId +
                     "/recall?patron=" + patronId + "&patron_homedb=" + patronUbId;
 
-        XMLOutputter xmlOutPutter = new XMLOutputter();
-        String xmlOutput = xmlOutPutter.outputString(doc);
-        log.info("The input XML to the server: " + xmlOutput);
-        log.info("The url using: " + url);
-        Document recallResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
-        xmlOutput = xmlOutPutter.outputString(recallResponse);
-        log.info("The request from the server: " + xmlOutput);
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        String xmlOutput = xmlOutputter.outputString(doc);
 
+        Document holdResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
+        String holdResponseOutput = xmlOutputter.outputString(holdResponse);
+        log.debug("The recall response is: " + holdResponseOutput);
         try {
             XPath xpath = XPath.newInstance("response/create-recall/note");
-            Element message = (Element) xpath.selectSingleNode(recallResponse);
-            if (message != null) {
-	            if (message.getText().equalsIgnoreCase("Your request was successful.") && verifyRecallWasSuccess(patronId, patronAgencyId, bibId)) {
-	            	log.debug("Recall was successful");
-	                return true;
-	            } else {
-	            	log.debug("Recall was not successful");
-	                return false;
-	            }
-            } else {
-            	log.debug("Message is null.  Recall was not successful.");
-            	return false;
-            }
+            Element message = (Element) xpath.selectSingleNode(holdResponse);
+            log.debug("The recall response is: " + message.getText());
+            if (message.getText().equalsIgnoreCase("Your request was successful."))
+                return true;
+            else
+                return false;
         } catch (JDOMException e) {
-            log.error("XPath processing error in processStackRetrieval");
+            log.error("XPath processing error in processRecall");
             throw new ILSException(e);
         }
     }
@@ -251,12 +486,14 @@ public class VoyagerRequestItemService implements RequestItemService {
         Connection conn = voyagerSvcMgr.openReadDbConnection(patronAgencyId);
 
         try {
-            if (patronAgencyId.equalsIgnoreCase((String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))) {
+            if (patronAgencyId.equalsIgnoreCase(
+            		(String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))) {
                 pstmt = conn.prepareStatement("SELECT bib_id from hold_recall where hold_recall.patron_id = ?");
             }
             else {
                 String dbuser = (String) voyagerConfig.getProperty(patronAgencyId + "dbuser");
-                pstmt = conn.prepareStatement("SELECT bib_id from " + dbuser + ".hold_recall where hold_recall.patron_id = ?");
+                pstmt = conn.prepareStatement("SELECT bib_id from " + dbuser + 
+                		".hold_recall where hold_recall.patron_id = ?");
             }
             pstmt.setString(1, bibId);
             rs = pstmt.executeQuery();
@@ -293,153 +530,5 @@ public class VoyagerRequestItemService implements RequestItemService {
             }
         }
         return false;
-    }
-
-    private boolean processHold(String patronId, String patronUbId, String patronAgencyId,
-            String bibId, String itemId, String itemUbId, String pickupLocation) throws ILSException {
-
-        String host;
-
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
-        if (consortialUse) {
-            host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
-        } else {
-            host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
-        }
-
-        Document doc = new Document();
-        Element root = new Element("hold-title-parameters");
-        Element comment = new Element("comment");
-        comment.setText("Testing hold");
-        Element dbkey = new Element("dbkey");
-        dbkey.setText(itemUbId);
-        Element pickupLocationElement = new Element("pickup-location");
-        pickupLocationElement.setText(pickupLocation);
-        Element lastInterestDate = new Element("last-interest-date");
-        lastInterestDate.setText("20121230");
-        root.addContent(comment);
-        root.addContent(dbkey);
-        root.addContent(pickupLocationElement);
-        root.addContent(lastInterestDate);
-        doc.addContent(root);
-
-        String url = host + "/vxws/record/" + bibId + "/items/" + itemId +
-                    "/hold?patron=" + patronId + "&patron_homedb=" + patronUbId;
-
-        XMLOutputter xmlOutPutter = new XMLOutputter();
-        String xmlOutput = xmlOutPutter.outputString(doc);
-
-        Document holdResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
-
-        try {
-            XPath xpath = XPath.newInstance("response/create-hold/note");
-            Element message = (Element) xpath.selectSingleNode(holdResponse);
-            if (message.getText().equalsIgnoreCase("Your request was successful."))
-                return true;
-            else
-                return false;
-        } catch (JDOMException e) {
-            log.error("XPath processing error in processStackRetrieval");
-            throw new ILSException(e);
-        }
-    }
-
-    private boolean processStackRetrieval(String patronId, String patronUbId, String patronAgencyId,
-            String bibId, String itemId, String itemUbId) throws ILSException {
-
-        String host;
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
-
-        if (consortialUse) {
-            host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
-        } else {
-            host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
-        }
-
-        Document doc = new Document();
-        Element root = new Element("call-slip-parameters");
-        Element comment = new Element("comment");
-        comment.setText("Testing callslip");
-        Element dbkey = new Element("dbkey");
-        dbkey.setText(itemUbId);
-        root.addContent(comment);
-        root.addContent(dbkey);
-        doc.addContent(root);
-
-        String url = host + "/vxws/record/" + bibId + "/items/" +
-                    itemId + "/callslip?patron=" + patronId + "&patron_homedb=" + patronUbId;
-
-        XMLOutputter xmlOutPutter = new XMLOutputter();
-        String xmlOutput = xmlOutPutter.outputString(doc);
-
-        Document callslipResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
-
-        try {
-            XPath xpath = XPath.newInstance("response/create-call-slip/note");
-            Element message = (Element) xpath.selectSingleNode(callslipResponse);
-            if (message.getText().equalsIgnoreCase("Your request was successful."))
-                return true;
-            else
-                return false;
-        } catch (JDOMException e) {
-            log.error("XPath processing error in processStackRetrieval");
-            throw new ILSException(e);
-        }
-
-//        XPath xpath;
-//        try {
-//            xpath = XPath.newInstance("response/create-call-slip/note");
-//            Element message = (Element) xpath.selectSingleNode(callslipResponse);
-//            log.debug("The message is: " + message.getText());
-//            if (message.getText().equalsIgnoreCase("Your request was successful.")) {
-//                ItemId id = new ItemId();
-//                id.setAgencyId(new AgencyId(itemAgencyId));
-//                id.setItemIdentifierValue(itemId);
-//                requestItemResponseData.setItemId(id);
-//                requestItemResponseData.setRequestType(new RequestType(null, requestType));
-//                requestItemResponseData.setRequestScopeType(new RequestScopeType(null, requestScopeType));
-//                requestItemResponseData.setUserId(userId);
-//            } else if (message.getText().equalsIgnoreCase("Could not send request.")) {
-//                problems.addAll(ServiceHelper.generateProblems(Version1RequestItemProcessingError.UNKNOWN_ITEM,
-//                        null, itemId, "Unknown Item"));
-//                requestItemResponseData.setProblems(problems);
-//                return requestItemResponseData;
-//            } else if (message.getText().equalsIgnoreCase("Patron blocked")) {
-//                problems.addAll(ServiceHelper.generateProblems(Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
-//                        null, itemId, "Unable to request this item."));
-//                requestItemResponseData.setProblems(problems);
-//                return requestItemResponseData;
-//            }
-//
-//        } catch (JDOMException e) {
-//            problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
-//                    null, null, e.getMessage()));
-//            requestItemResponseData.setProblems(problems);
-//            return requestItemResponseData;
-//        } catch (NullPointerException npe) {
-//            problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
-//                    null, null, npe.getMessage()));
-//            requestItemResponseData.setProblems(problems);
-//            return requestItemResponseData;
-//        }
-//
-//        return requestItemResponseData;
-//    }
-    }
-    // patronId, patronUbId, patronAgencyId, bibId, itemId, itemUbId, pickupLocation
-    private boolean processUBRequest(String patronId, String patronUbId, String patronAgencyId,
-            String bibId, String itemId, String itemUbId, String pickupLocation) throws ILSException {
-
-        String host;
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
-
-        if (consortialUse) {
-            host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
-        } else {
-            host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
-        }
-
-
-        return true;
     }
 }

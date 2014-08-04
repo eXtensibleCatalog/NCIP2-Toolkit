@@ -60,8 +60,7 @@ public class MillenniumRemoteServiceManager implements RemoteServiceManager {
 
   public MillenniumRemoteServiceManager(Properties properties) throws ToolkitException {
 
-     /* this(ConnectorConfigurationFactory.getConfiguration(properties)); */
-	   this(new ConnectorConfigurationFactory(properties).getConfiguration());
+	   this(new ConnectorConfigurationFactory(properties).buildConfiguration());
 
   }
 
@@ -74,7 +73,7 @@ public class MillenniumRemoteServiceManager implements RemoteServiceManager {
 
   }
 
-    public MillenniumConfiguration getConfiguration() {
+    public MillenniumConfiguration buildConfiguration() {
         return MillenniumConfig;
     }
 

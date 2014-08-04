@@ -11,7 +11,7 @@
     <version>1.2</version>
     <packaging>jar</packaging>
     <name>NCIP V2 Voyager</name>
-    <description>NCIP V2 Voyager for new ILS connectors</description>
+    <description>NCIP V2 Voyager ILS connector</description>
 
     <parent>
         <groupId>org.extensiblecatalog.ncip.v2</groupId>

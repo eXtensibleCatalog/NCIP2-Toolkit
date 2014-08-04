@@ -52,7 +52,7 @@ public class MillenniumLookupUserService implements LookupUserService {
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) {
 
 		MillenniumRemoteServiceManager millenniumSvcMgr = (MillenniumRemoteServiceManager) serviceManager;
-        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.getConfiguration();
+        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.buildConfiguration();
 
         String IIIClassicBaseUrl = MillenniumConfig.getURL();
 		String baseUrl = "https://" + IIIClassicBaseUrl + "/patroninfo"; //.html~S0";

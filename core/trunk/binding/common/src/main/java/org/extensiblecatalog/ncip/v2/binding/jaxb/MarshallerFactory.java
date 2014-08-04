@@ -347,9 +347,7 @@ public class MarshallerFactory {
         public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
 
             // This approach per http://java.net/projects/jaxb/lists/users/archive/2009-08/message/31
-//            if((defaultNamespace != null) && (!requirePrefix) && (namespaceUri != null))
-            // TODO: Testing whether not considering requirePrefix will cause the defaultNamespace to actually be set as teh default (i.e. no alias)
-            if((defaultNamespace != null) && (namespaceUri != null))
+            if((defaultNamespace != null) && (!requirePrefix) && (namespaceUri != null))
             {
                     if(defaultNamespace.equals(namespaceUri))
                             return ""; // this is our targetNamespace

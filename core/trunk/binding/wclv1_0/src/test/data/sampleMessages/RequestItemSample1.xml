@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+    ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd"
+    xmlns:ns1="http://www.niso.org/2008/ncip"
+    xmlns:ns2="http://oclc.org/WCL/ncip/2011/extensions" xmlns:ns3="http://www.oclc.org/ncip/usernote/2012">
+    <ns1:RequestItem>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId>91475</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId>91475</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:UserId>
+            <ns1:AgencyId>91475</ns1:AgencyId>
+            <ns1:UserIdentifierValue>760ecd7d-3d8a-4433-e040-ae843b716ecd</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:BibliographicId>
+            <ns1:BibliographicRecordId>
+                <ns1:BibliographicRecordIdentifier>548642111</ns1:BibliographicRecordIdentifier>
+                <ns1:BibliographicRecordIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">OCLC</ns1:BibliographicRecordIdentifierCode>
+            </ns1:BibliographicRecordId>
+        </ns1:BibliographicId>
+        <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Loan</ns1:RequestType>
+        <ns1:RequestScopeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/requestscopetype.scm">Bibliographic Item</ns1:RequestScopeType>
+    </ns1:RequestItem>
+</ns1:NCIPMessage>

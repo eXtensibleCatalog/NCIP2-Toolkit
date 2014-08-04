@@ -64,88 +64,110 @@ public interface CoreConfiguration extends ToolkitConfiguration {
 
     final String CORE_SCHEME_VALUE_PAIR_CLASSES_LIST_KEY = "CoreConfiguration.SVPClasses";
     final String CORE_SCHEME_VALUE_PAIR_CLASSES_LIST_DEFAULT = Version1AcceptItemProcessingError.class.getName() + ","
-        + Version1AuthenticationDataFormatType.class.getName() + ","
-        + Version1AuthenticationInputType.class.getName() + ","
-        + Version1BibliographicItemIdentifierCode.class.getName() + ","
-        + Version1BibliographicLevel.class.getName() + ","
-        + Version1BibliographicRecordIdentifierCode.class.getName() + ","
-        + Version1CheckInItemProcessingError.class.getName() + ","
-        + Version1CheckOutItemProcessingError.class.getName() + ","
-        + Version1CirculationStatus.class.getName() + ","
-        + Version1ComponentIdentifierType.class.getName() + ","
-        + Version1CurrencyCode.class.getName() + ","
-        + Version1ElectronicDataFormatType.class.getName() + ","
-        + Version1FiscalActionType.class.getName() + ","
-        + Version1FiscalTransactionType.class.getName() + ","
-        + Version1GeneralProcessingError.class.getName() + ","
-        + Version1ItemDescriptionLevel.class.getName() + ","
-        + Version1ItemElementType.class.getName() + ","
-        + Version1ItemIdentifierType.class.getName() + ","
-        + Version1ItemUseRestrictionType.class.getName() + ","
-        + Version1Language.class.getName() + ","
-        + Version1LocationType.class.getName() + ","
-        + Version1LookupItemProcessingError.class.getName() + ","
-        + Version1LookupUserProcessingError.class.getName() + ","
-        + Version1MediumType.class.getName() + ","
-        + Version1OrganizationNameType.class.getName() + ","
-        + Version1PaymentMethodType.class.getName() + ","
-        + Version1PhysicalAddressType.class.getName() + ","
-        + Version1PhysicalConditionType.class.getName() + ","
-        + Version1RenewItemProcessingError.class.getName() + ","
-        + Version1RequestedActionType.class.getName() + ","
-        + Version1RequestElementType.class.getName() + ","
-        + Version1RequestItemProcessingError.class.getName() + ","
-        + Version1RequestScopeType.class.getName() + ","
-        + Version1RequestStatusType.class.getName() + ","
-        + Version1RequestType.class.getName() + ","
-        + Version1SecurityMarker.class.getName() + ","
-        + Version1UnstructuredAddressType.class.getName() + ","
-        + Version1UserElementType.class.getName();
+            + Version1AgencyAddressRoleType.class.getName() + ","
+            + Version1AgencyElementType.class.getName() + ","
+            + Version1AuthenticationDataFormatType.class.getName() + ","
+            + Version1AuthenticationInputType.class.getName() + ","
+            + Version1BibliographicItemIdentifierCode.class.getName() + ","
+            + Version1BibliographicLevel.class.getName() + ","
+            + Version1BibliographicRecordIdentifierCode.class.getName() + ","
+            + Version1CancelRequestItemProcessingError.class.getName() + ","
+            + Version1CheckInItemProcessingError.class.getName() + ","
+            + Version1CheckOutItemProcessingError.class.getName() + ","
+            + Version1CirculationStatus.class.getName() + ","
+            + Version1ComponentIdentifierType.class.getName() + ","
+            + Version1CurrencyCode.class.getName() + ","
+            + Version1ElectronicAddressType.class.getName() + ","
+            + Version1ElectronicDataFormatType.class.getName() + ","
+            + Version1FiscalActionType.class.getName() + ","
+            + Version1FiscalTransactionType.class.getName() + ","
+            + Version1GeneralProcessingError.class.getName() + ","
+            + Version1ItemDescriptionLevel.class.getName() + ","
+            + Version1ItemElementType.class.getName() + ","
+            + Version1ItemIdentifierType.class.getName() + ","
+            + Version1ItemUseRestrictionType.class.getName() + ","
+            + Version1Language.class.getName() + ","
+            + Version1LocationType.class.getName() + ","
+            + Version1LookupItemProcessingError.class.getName() + ","
+            + Version1LookupRequestProcessingError.class.getName() + ","
+            + Version1LookupUserProcessingError.class.getName() + ","
+            + Version1MediumType.class.getName() + ","
+            + Version1MessagingError.class.getName() + ","
+            + Version1OrganizationNameType.class.getName() + ","
+            + Version1PaymentMethodType.class.getName() + ","
+            + Version1PhysicalAddressType.class.getName() + ","
+            + Version1PhysicalConditionType.class.getName() + ","
+            + Version1RenewItemProcessingError.class.getName() + ","
+            + Version1RequestedActionType.class.getName() + ","
+            + Version1RequestElementType.class.getName() + ","
+            + Version1RequestItemProcessingError.class.getName() + ","
+            + Version1RequestScopeType.class.getName() + ","
+            + Version1RequestStatusType.class.getName() + ","
+            + Version1RequestType.class.getName() + ","
+            + Version1SecurityMarker.class.getName() + ","
+            + Version1UnstructuredAddressType.class.getName() + ","
+            + Version1UserAddressRoleType.class.getName() + ","
+            + Version1UpdateRequestItemProcessingError.class.getName() + ","
+            + Version1UserElementType.class.getName() + ","
+            + Version1UserIdentifierType.class.getName();
 
     final String CORE_SCHEME_VALUE_PAIR_ADDED_CLASSES_LIST_KEY = "CoreConfiguration.AddedSVPClasses";
     final String CORE_SCHEME_VALUE_PAIR_ADDED_CLASSES_LIST_DEFAULT = null;
 
     final String CORE_SCHEME_VALUE_PAIR_ALLOW_ANY_CLASSES_LIST_KEY = "CoreConfiguration.SVPClassesAllowAny";
     final String CORE_SCHEME_VALUE_PAIR_ALLOW_ANY_CLASSES_LIST_DEFAULT = AgencyId.class.getName() + ","
-        + AuthenticationDataFormatType.class.getName() + ","
-        + AuthenticationInputType.class.getName() + ","
-        + ApplicationProfileType.class.getName() + ","
-        + FromSystemId.class.getName() + ","
-        + PickupLocation.class.getName() + ","
-        + RequestIdentifierType.class.getName() + ","
-        + ToSystemId.class.getName();
+            + AuthenticationDataFormatType.class.getName() + ","
+            + AuthenticationInputType.class.getName() + ","
+            + ApplicationProfileType.class.getName() + ","
+            + FromSystemId.class.getName() + ","
+            + PickupLocation.class.getName() + ","
+            + RequestIdentifierType.class.getName() + ","
+            + ToSystemId.class.getName();
 
     final String CORE_SCHEME_VALUE_PAIR_ADDED_ALLOW_ANY_CLASSES_LIST_KEY = "CoreConfiguration.AddedSVPClassesAllowAny";
     final String CORE_SCHEME_VALUE_PAIR_ADDED_ALLOW_ANY_CLASSES_LIST_DEFAULT = null;
 
     final String CORE_SCHEME_VALUE_PAIR_ALLOW_NULL_SCHEME_CLASSES_LIST_KEY = "CoreConfiguration.SVPClassesAllowNullScheme";
     final String CORE_SCHEME_VALUE_PAIR_ALLOW_NULL_SCHEME_CLASSES_LIST_DEFAULT = AgencyElementType.class.getName() + ","
-        + ItemElementType.class.getName() + ","
-        + RequestElementType.class.getName() + ","
-        + UserElementType.class.getName();
+            + ItemElementType.class.getName() + ","
+            + RequestElementType.class.getName() + ","
+            + UserElementType.class.getName();
 
     final String CORE_SCHEME_VALUE_PAIR_ADDED_ALLOW_NULL_SCHEME_CLASSES_LIST_KEY = "CoreConfiguration.AddedSVPClassesAllowNullScheme";
     final String CORE_SCHEME_VALUE_PAIR_ADDED_ALLOW_NULL_SCHEME_CLASSES_LIST_DEFAULT = null;
 
-    /** Returns the ConnectorConfiguration. */
+    /**
+     * Returns the ConnectorConfiguration.
+     */
     ConnectorConfiguration getConnectorConfiguration() throws ToolkitException;
 
-    /** Returns the MessageHandlerConfiguration. */
+    /**
+     * Returns the MessageHandlerConfiguration.
+     */
     MessageHandlerConfiguration getMessageHandlerConfiguration() throws ToolkitException;
 
-    /** Returns the ServiceValidatorConfiguration. */
+    /**
+     * Returns the ServiceValidatorConfiguration.
+     */
     ServiceValidatorConfiguration getServiceValidatorConfiguration() throws ToolkitException;
 
-    /** Returns the TranslatorConfiguration. */
+    /**
+     * Returns the TranslatorConfiguration.
+     */
     TranslatorConfiguration getTranslatorConfiguration() throws ToolkitException;
 
-    /** Returns the StatisticsBeanConfiguration. */
+    /**
+     * Returns the StatisticsBeanConfiguration.
+     */
     StatisticsBeanConfiguration getStatisticsBeanConfiguration() throws ToolkitException;
 
-    /** Returns the ProtocolVersionConfiguration. */
+    /**
+     * Returns the ProtocolVersionConfiguration.
+     */
     ProtocolVersionConfiguration getProtocolVersionConfiguration() throws ToolkitException;
 
-    /** Tests whether this component's configuration property has been set (so that BaseConfigurationFactory
+    /**
+     * Tests whether this component's configuration property has been set (so that BaseConfigurationFactory
      * can avoid calling it and creating an infinite loop if the {@link #getConfiguration(String)} method performs
      * lazy initialization of it).
      */
@@ -159,6 +181,7 @@ public interface CoreConfiguration extends ToolkitConfiguration {
      * want to do.
      */
     boolean getIncludeStackTracesInProblemResponses();
+
     void setIncludeStackTracesInProblemResponses(boolean setting);
 
 

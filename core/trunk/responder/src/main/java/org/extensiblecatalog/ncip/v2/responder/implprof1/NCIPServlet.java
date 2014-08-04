@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.*;
 
@@ -249,167 +248,174 @@ public class NCIPServlet extends HttpServlet {
         throws ServletException {
 
         long respTotalStartTime = System.currentTimeMillis();
-
-        response.setContentType("application/xml; charset=\"utf-8\"");
-
-        // Note: Statements that might throw exceptions are wrapped in individual try/catch blocks, allowing us
-        // to provide very specific error messages.
-
-        ServletInputStream inputStream = null;
-        try {
-
-            inputStream = request.getInputStream();
-
-        } catch (IOException e) {
-
-            returnException(response, "Exception getting ServletInputStream from the HttpServletRequest.", e);
-
-        }
-
-        ServiceContext serviceContext = null;
-        try {
-
-            serviceContext = serviceValidator.getInitialServiceContext();
-            for (String s: ((NCIPServiceContext)serviceContext).getSchemaURLs()) {
-            	LOG.info("Using URL: "+s);
-            	System.out.println("USING URL: "+s);
-            }
-        } catch (ToolkitException e) {
-
-            returnException(response, "Exception creating initial service context.", e);
-
-        }
-
-        NCIPInitiationData initiationData = null;
+        String serviceName = "Unknown";
 
         try {
 
-            initiationData = translator.createInitiationData(serviceContext, inputStream);
+            response.setContentType("application/xml; charset=\"utf-8\"");
 
-        } catch (ServiceException e) {
+            // Note: Statements that might throw exceptions are wrapped in individual try/catch blocks, allowing us
+            // to provide very specific error messages.
 
-            returnException(response,
-                "Exception creating the NCIPInitiationData object from the servlet's input stream.", e);
-
-        } catch (ValidationException e) {
-
-            returnValidationProblem(response, e);
-
-        }
-
-        long initPerfSvcStartTime = System.currentTimeMillis();
-
-        NCIPResponseData responseData = messageHandler.performService(initiationData, serviceContext);
-
-        long initPerfSvcEndTime = System.currentTimeMillis();
-
-        String serviceName = ServiceHelper.getServiceName(initiationData);
-
-        statisticsBean.record(initPerfSvcStartTime, initPerfSvcEndTime,
-            StatisticsBean.RESPONDER_PERFORM_SERVICE_LABELS, serviceName);
-
-        InputStream responseMsgInputStream = null;
-        try {
-
-            responseMsgInputStream = translator.createResponseMessageStream(serviceContext, responseData);
-
-        } catch (ServiceException e) {
-
-            returnException(response,
-                "Exception creating the InputStream from the NCIPResponseData object.", e);
-
-        } catch (ValidationException e) {
-
-            returnException(response,
-                "Exception creating the InputStream from the NCIPResponseData object.", e);
-
-        }
-
-        int bytesAvailable = 0;
-        if ( responseMsgInputStream != null ) {
-
+            ServletInputStream inputStream = null;
             try {
 
-                bytesAvailable = responseMsgInputStream.available();
+                inputStream = request.getInputStream();
 
             } catch (IOException e) {
 
-                returnException(response,
-                    "Exception getting the count of available bytes from the response message's InputStream.", e);
+                returnException(response, "Exception getting ServletInputStream from the HttpServletRequest.", e);
 
             }
 
-        }
+            ServiceContext serviceContext = null;
+            try {
 
-        int bytesRead = 0;
-        if ( bytesAvailable != 0 ) {
+                serviceContext = serviceValidator.getInitialServiceContext();
 
-            byte[] responseMsgBytes = new byte[bytesAvailable];
+            } catch (ToolkitException e) {
+
+                returnException(response, "Exception creating initial service context.", e);
+
+            }
+
+            NCIPInitiationData initiationData = null;
 
             try {
 
-                bytesRead = responseMsgInputStream.read(responseMsgBytes, 0, bytesAvailable);
+                initiationData = translator.createInitiationData(serviceContext, inputStream);
 
-            } catch (IOException e) {
+            } catch (ServiceException e) {
 
                 returnException(response,
-                    "Exception reading bytes from the response message's InputStream.", e);
+                    "Exception creating the NCIPInitiationData object from the servlet's input stream.", e);
+
+            } catch (ValidationException e) {
+
+                returnValidationProblem(response, e);
 
             }
 
-            if (bytesRead != bytesAvailable) {
+            long initPerfSvcStartTime = System.currentTimeMillis();
 
-                returnProblem(response, "Bytes read from the response message's InputStream (" + bytesRead
-                    + ") are not the same as the number available (" + bytesAvailable + ").");
+            NCIPResponseData responseData = messageHandler.performService(initiationData, serviceContext);
 
-            } else {
+            long initPerfSvcEndTime = System.currentTimeMillis();
 
-                response.setContentLength(responseMsgBytes.length);
+            serviceName = ServiceHelper.getServiceName(initiationData);
 
-                // TODO: What about a try/finally that closes the output stream - is that needed?
+            statisticsBean.record(initPerfSvcStartTime, initPerfSvcEndTime,
+                StatisticsBean.RESPONDER_PERFORM_SERVICE_LABELS, serviceName);
 
-                ServletOutputStream outputStream = null;
+            InputStream responseMsgInputStream = null;
+            try {
+
+                responseMsgInputStream = translator.createResponseMessageStream(serviceContext, responseData);
+
+            } catch (ServiceException e) {
+
+                returnException(response,
+                    "Exception creating the InputStream from the NCIPResponseData object.", e);
+
+            } catch (ValidationException e) {
+
+                returnException(response,
+                    "Exception creating the InputStream from the NCIPResponseData object.", e);
+
+            }
+
+            int bytesAvailable = 0;
+            if ( responseMsgInputStream != null ) {
+
                 try {
 
-                    outputStream = response.getOutputStream();
-
-                } catch (IOException e) {
-
-                    returnException(response, "Exception getting the HttpServletResponse's OutputStream.", e);
-
-                }
-
-                try {
-
-                    outputStream.write(responseMsgBytes);
+                    bytesAvailable = responseMsgInputStream.available();
 
                 } catch (IOException e) {
 
                     returnException(response,
-                        "Exception writing the NCIP response message to the HttpServletResponse's OutputStream.", e);
-
-                }
-
-                try {
-
-                    outputStream.flush();
-
-                } catch (IOException e) {
-
-                    returnException(response,
-                        "Exception flushing the HttpServletResponse's OutputStream.", e);
+                        "Exception getting the count of available bytes from the response message's InputStream.", e);
 
                 }
 
             }
 
-        }
+            int bytesRead = 0;
+            if ( bytesAvailable != 0 ) {
 
+                byte[] responseMsgBytes = new byte[bytesAvailable];
+
+                try {
+
+                    bytesRead = responseMsgInputStream.read(responseMsgBytes, 0, bytesAvailable);
+
+                } catch (IOException e) {
+
+                    returnException(response,
+                        "Exception reading bytes from the response message's InputStream.", e);
+
+                }
+
+                if (bytesRead != bytesAvailable) {
+
+                    returnProblem(response, "Bytes read from the response message's InputStream (" + bytesRead
+                        + ") are not the same as the number available (" + bytesAvailable + ").");
+
+                } else {
+
+                    response.setContentLength(responseMsgBytes.length);
+
+                    // TODO: What about a try/finally that closes the output stream - is that needed?
+
+                    ServletOutputStream outputStream = null;
+                    try {
+
+                        outputStream = response.getOutputStream();
+
+                    } catch (IOException e) {
+
+                        returnException(response, "Exception getting the HttpServletResponse's OutputStream.", e);
+
+                    }
+
+                    try {
+
+                        outputStream.write(responseMsgBytes);
+
+                    } catch (IOException e) {
+
+                        returnException(response,
+                            "Exception writing the NCIP response message to the HttpServletResponse's OutputStream.", e);
+
+                    }
+
+                    try {
+
+                        outputStream.flush();
+
+                    } catch (IOException e) {
+
+                        returnException(response,
+                            "Exception flushing the HttpServletResponse's OutputStream.", e);
+
+                    }
+
+                }
+
+            }
+
+
+        } catch (Exception e) {
+
+            returnException(response, "Uncaught exception.", e);
+
+        }
 
         long respTotalEndTime = System.currentTimeMillis();
 
         statisticsBean.record(respTotalStartTime, respTotalEndTime,
             StatisticsBean.RESPONDER_TOTAL_LABELS, serviceName);
+
     }
 
     protected void returnException(HttpServletResponse response, String msg, Throwable e) throws ServletException {

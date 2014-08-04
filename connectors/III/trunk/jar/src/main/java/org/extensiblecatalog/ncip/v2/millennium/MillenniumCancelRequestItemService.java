@@ -52,7 +52,7 @@ public class MillenniumCancelRequestItemService implements CancelRequestItemServ
 	public CancelRequestItemResponseData performService(CancelRequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) {
 
 		MillenniumRemoteServiceManager millenniumSvcMgr = (MillenniumRemoteServiceManager) serviceManager;
-        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.getConfiguration();
+        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.buildConfiguration();
 		
         String IIIClassicBaseUrl = MillenniumConfig.getURL();
 

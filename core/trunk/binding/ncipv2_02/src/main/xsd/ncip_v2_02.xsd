@@ -2086,7 +2086,6 @@ Change history:
 					<xs:element ref="BibliographicItemId"/>
 					<xs:element ref="BibliographicRecordId"/>
 				</xs:choice>
-				<xs:element ref="MzkOptionalFields" minOccurs="0" maxOccurs="1"/>
 				<xs:element ref="Ext" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -2207,54 +2206,6 @@ Change history:
 	<xs:element name="DateShipped" type="xs:dateTime"/>
 	<xs:element name="DateToSend" type="xs:dateTime"/>
 	<xs:element name="DateWillSend" type="xs:dateTime"/>
-	
-	<!-- MZK specific elements -->
-	<xs:element name="MzkOptionalFields">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="PublicationYear" minOccurs="0" maxOccurs="1"/>
-				<xs:element ref="Volume" minOccurs="0" maxOccurs="1"/>
-				<xs:element ref="YearTurn" minOccurs="0" maxOccurs="1"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	
-	<xs:element name="MzkNewspaperItemInformation">
-		<xs:complexType>
-			<xs:sequence>
-				<!-- Required to be present if the initiation message had this ItemId.  -->
-				<xs:element ref="ItemId" minOccurs="0"/>
-				<xs:choice>
-					<xs:sequence>
-						<xs:element ref="RequestId" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="CurrentBorrower" minOccurs="0"/>
-						<xs:element ref="CurrentRequester" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="DateDue" minOccurs="0"/>
-						<xs:element ref="DateRecalled" minOccurs="0"/>
-						<xs:element ref="HoldPickupDate" minOccurs="0"/>
-						<xs:element ref="ItemTransaction" minOccurs="0"/>
-						<!-- If the Location information for this item differs from others in its containing HoldingsSet, place it in this ItemOptionalFields -->
-						<xs:element ref="ItemOptionalFields" minOccurs="0"/>
-						<xs:element ref="ItemNote" minOccurs="0"/>
-						<xs:element ref="Ext" minOccurs="0"/>
-						<xs:element ref="PublicationYear" minOccurs="0" maxOccurs="1"/>
-						<xs:element ref="Volume" minOccurs="0" maxOccurs="1"/>
-						<xs:element ref="YearTurn" minOccurs="0" maxOccurs="1"/>
-					</xs:sequence>
-					<xs:element ref="Problem" maxOccurs="unbounded"/>
-				</xs:choice>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	
-	
-	
-	<xs:element name="PublicationYear" type="xs:positiveInteger"/>
-	<xs:element name="Volume" type="xs:unsignedByte"/>
-	<xs:element name="YearTurn" type="xs:positiveInteger"/>
-	
-	<!--  -->
-	
 	<xs:element name="DeleteAgencyFields">
 		<xs:complexType>
 			<xs:sequence>
@@ -2477,11 +2428,7 @@ Change history:
 						<!-- This is a summary holdings statement covering the entire holding. -->
 						<xs:element ref="SummaryHoldingsInformation" minOccurs="0"/>
 						<xs:element ref="ElectronicResource" minOccurs="0"/>
-						<!--  ADDED -->       
-						<xs:choice>  
-							<xs:element ref="MzkNewspaperItemInformation" minOccurs="0" maxOccurs="unbounded"/>
-							<xs:element ref="ItemInformation"  minOccurs="0" maxOccurs="unbounded"/>
-						</xs:choice>
+						<xs:element ref="ItemInformation" maxOccurs="unbounded"/>
 						<!-- TODO: Circulation Status Summary? -->
 						<xs:element ref="Ext" minOccurs="0"/>
 					</xs:sequence>
@@ -2581,7 +2528,6 @@ Change history:
 				<xs:element ref="SecurityMarker" minOccurs="0"/>
 				<xs:element ref="SensitizationFlag" minOccurs="0"/>
 				<xs:element ref="DateDue" minOccurs="0"/>
-				<xs:element ref="MzkOptionalFields" minOccurs="0"/>
 				<xs:element ref="Ext" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>

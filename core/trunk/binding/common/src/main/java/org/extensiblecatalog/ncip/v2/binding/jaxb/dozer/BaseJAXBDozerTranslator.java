@@ -8,13 +8,18 @@
 
 package org.extensiblecatalog.ncip.v2.binding.jaxb.dozer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Properties;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.dozer.DozerBeanMapper;
+import org.extensiblecatalog.ncip.v2.binding.jaxb.JAXBHelper;
+import org.extensiblecatalog.ncip.v2.binding.jaxb.MarshallerFactory;
+import org.extensiblecatalog.ncip.v2.binding.jaxb.NamespaceFilter;
+import org.extensiblecatalog.ncip.v2.common.*;
+import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -24,34 +29,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.dozer.DozerBeanMapper;
-import org.extensiblecatalog.ncip.v2.binding.jaxb.JAXBHelper;
-import org.extensiblecatalog.ncip.v2.binding.jaxb.MarshallerFactory;
-import org.extensiblecatalog.ncip.v2.binding.jaxb.NamespaceFilter;
-import org.extensiblecatalog.ncip.v2.common.LoggingHelper;
-import org.extensiblecatalog.ncip.v2.common.NCIPServiceContext;
-import org.extensiblecatalog.ncip.v2.common.StatisticsBean;
-import org.extensiblecatalog.ncip.v2.common.StatisticsBeanFactory;
-import org.extensiblecatalog.ncip.v2.common.Translator;
-import org.extensiblecatalog.ncip.v2.common.TranslatorConfiguration;
-import org.extensiblecatalog.ncip.v2.common.TranslatorConfigurationFactory;
-import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
-import org.extensiblecatalog.ncip.v2.service.NCIPMessage;
-import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
-import org.extensiblecatalog.ncip.v2.service.ReflectionHelper;
-import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
-import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
-import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.extensiblecatalog.ncip.v2.service.ValidationException;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.Properties;
 
 // TODO: Provide a  BaseTranslator that this extends, so that ctors illustrate what's expected (e.g. not initializing in default ctor).
 public abstract class BaseJAXBDozerTranslator<M> implements Translator {
@@ -165,7 +149,6 @@ public abstract class BaseJAXBDozerTranslator<M> implements Translator {
 
         try {
 
-        	inputStream.mark(9999);
             if (logMessages) {
 
                 inputStream = LoggingHelper.copyAndLogStream(LOG, messagesLoggingLevel, inputStream);
@@ -192,7 +175,7 @@ public abstract class BaseJAXBDozerTranslator<M> implements Translator {
             serviceContext.validateAfterUnmarshalling(svcMessage);
 
             NCIPInitiationData initiationData = svcMessage.getInitiationData();
-            
+
             statisticsBean.record(initTranslateStartTime, initTranslateEndTime,
                 StatisticsBean.RESPONDER_CREATE_DATA_LABELS, msgName);
 

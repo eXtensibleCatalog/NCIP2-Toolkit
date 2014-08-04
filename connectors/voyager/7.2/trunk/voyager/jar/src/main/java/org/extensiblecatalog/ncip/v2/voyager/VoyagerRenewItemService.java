@@ -14,11 +14,28 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RenewItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.RenewItemService;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupUserProcessingError;
+import org.extensiblecatalog.ncip.v2.service.Version1RenewItemProcessingError;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConfiguration;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConstants;
 import org.jdom.Document;
-import org.jdom.Namespace;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 
 /**
  * This class implements the Renew Item service for the Voyager connector.
@@ -26,11 +43,22 @@ import org.jdom.Namespace;
 public class VoyagerRenewItemService implements RenewItemService {
 
     static Logger log = Logger.getLogger(VoyagerRenewItemService.class);
-
+    RenewItemResponseData renewItemResponseData;
+    VoyagerRemoteServiceManager voyagerSvcMgr;
+    List<Problem> problems = new ArrayList<Problem>();
+    String patronId;
+    String patronAgencyId;
+    String patronUbId;
+    String itemAgencyId;
+    String itemUbId;
+    String host;
+    String itemId;
+    
     private VoyagerConfiguration voyagerConfig;
     {
         try {
-            voyagerConfig = (VoyagerConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
+            voyagerConfig = (VoyagerConfiguration) 
+            		new ConnectorConfigurationFactory(new Properties()).getConfiguration();
         } catch (ToolkitException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -49,18 +77,10 @@ public class VoyagerRenewItemService implements RenewItemService {
                                                  RemoteServiceManager serviceManager)
         throws ServiceException {
 
-        RenewItemResponseData renewItemResponseData = new RenewItemResponseData();
-        VoyagerRemoteServiceManager voyagerSvcMgr = (VoyagerRemoteServiceManager) serviceManager;
+        renewItemResponseData = new RenewItemResponseData();
+        voyagerSvcMgr = (VoyagerRemoteServiceManager) serviceManager;
 
-        List<Problem> problems = new ArrayList<Problem>();
-        String patronId;
-        String patronAgencyId;
-        String patronUbId;
-        String itemAgencyId;
-        String itemUbId;
-        String host;
-
-        String itemId = initData.getItemId().getItemIdentifierValue();
+        itemId = initData.getItemId().getItemIdentifierValue();
 
         // Get the ubid of the patron
         if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null){
@@ -112,6 +132,14 @@ public class VoyagerRenewItemService implements RenewItemService {
         id.setItemIdentifierValue(itemId);
         id.setAgencyId(new AgencyId(itemAgencyId));
 
+        // Check if we can renew the item using the circulationActions service
+        if (!canRenew()) {
+        	problems.addAll(ServiceHelper.generateProblems(Version1RenewItemProcessingError.ITEM_NOT_RENEWABLE,
+                    "ItemId", itemId, "Item is not renewable."));
+        	renewItemResponseData.setProblems(problems);
+        	return renewItemResponseData;
+        }
+        
         log.debug("Using patron id: " + patronId + " in URL");
 
         // %7C is the escape sequence for | (pipe)
@@ -149,6 +177,36 @@ public class VoyagerRenewItemService implements RenewItemService {
         renewItemResponseData.setProblems(problems);
         return renewItemResponseData;
     }
+
+	private boolean canRenew() {
+		List<Element> loanElements;
+		
+		String url = host + "/vxws/patron/" + patronId + "/circulationActions/loans" +
+                "?patron_homedb=" + patronUbId;
+
+        Document doc = voyagerSvcMgr.getWebServicesDoc(url);
+        
+        try {
+            XPath xpath = XPath.newInstance("//loan");
+            loanElements = xpath.selectNodes(doc);
+        } catch (JDOMException e) {
+            log.error("XPath processing error");
+            return false;
+        }
+        
+        for (Element loan : loanElements) {
+        	String href = loan.getAttributeValue("href");
+        	String canRenew = loan.getAttributeValue("canRenew");
+        	if (href.contains("|" + itemId + "?patron_homedb")  && canRenew.equals("Y")) {
+        		return true;
+        	} else {
+        		log.debug("Did not find match for itemId: " + itemId + " in " + href);
+        		continue;
+        	}
+        }
+        
+		return false;
+	}
 }
 
 

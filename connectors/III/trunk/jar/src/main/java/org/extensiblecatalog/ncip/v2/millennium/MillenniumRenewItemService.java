@@ -56,7 +56,7 @@ public class MillenniumRenewItemService implements RenewItemService {
 	public RenewItemResponseData performService(RenewItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) {
 
 		MillenniumRemoteServiceManager millenniumSvcMgr = (MillenniumRemoteServiceManager) serviceManager;
-        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.getConfiguration();
+        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.buildConfiguration();
 
         String IIIClassicBaseUrl = MillenniumConfig.getURL();
 		String baseUrl = "https://" + IIIClassicBaseUrl + "/patroninfo"; //.html~S0";

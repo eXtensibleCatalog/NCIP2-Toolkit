@@ -1,3 +1,84 @@
+* NCIP Meeting 3/04/2014
+
+Present: Bach,Patrick, John, Prem, Maheshwaran
+
+ * 1.2 release - due to a check in from John, need to do another round of testing.
+ * Group decided that John will check in a fix for 168 and it will be part of the 1.2 release.  From his email "I have a change that should address most of NCIP-168, but I held off checking it in for the group to decide whether to include or not. It is to wrap the performService call in NCIPServlet with a try/catch block that catches any Exception and returns a valid NCIP message (that would contain a Problem element describing the exception). Without that change the client would likely get the server’s default page for an ‘Internal Server Error’ (HTTP status code 500). I think the change is isolated but we’d have to test not only that the connectors still work (which we have to do anyway) but we’d have to set up a test where a connector fails in a way that would be caught by that change. I.e. we’d have to establish a test case before we apply that change and then re-run the test after the change and confirm it now returns a proper NCIP response."
+ * Patrick will execute the testing for this referenced above.  Test and get a 500 response now.  Then get new changes from John and test that get a toolkit message.   After Patrick tests ,Michelle, Bach, Patrick build and test.
+ * Defer for future release - NCIP-104: Log file missing in Linux openSUSE 12.1
+ * Patrick will determine after looking at 168 fix.  NCIP-171: Improve NCIP Response when Voyager webservice is down
+ * Patrick will determine after looking at 168 fix.  NCIP-144: Improve error message response when toolkit is unable to contact the vxws service
+ * John to do meeting minutes
+
+OLE
+
+ * Adam had asked some questions and John respond with options for how to configure the Toolkit to use the values that are needed.   John offered to do follow up vis skype or email.  Ball is in OLE developers hands for now and they will reach out when they need to.
+
+
+* NCIP Meeting 2/18/2014
+
+Present: Bach,Patrick, John, Brandon
+
+ * CARLI is making great progress with bringing up hte infrastructure needed for the XC community.  Jira is done and website and mailing lists are being worked on.
+ * 1.2 release - John to review open issues and clean up.  We will try to wrap up and get the 1.2 release out soon, as it includes important functionality that is already complete, so we will minimize the delay.
+ * future of the group for now we will continue to have schedule meeting every two weeks.
+ * Randy to contact Michele and Adam to inquire about status with OLE.
+ * Discussed 1.3 release and will need to define the work that should be in it as a group.
+
+
+
+* NCIP Meeting 9/17/2013
+
+Present: Bach,Patrick, John, Adam, Michelle, Prem
+
+ * Bach's issue moved forward but now is in John's court.   Bach to continue touching base with John every couple of days.  John thinks has figured out the problem with the config loading.
+ * Then John has another code check in, and all the developers to give blessing.
+ * OLE project - Once 1.2 is released and tagged, then OLE project will pull code from the tagged 1.2 code base, and create needed jars that are embedded into OLE.  This will occur when the OLE project is ready, probably for the first release after OLE 1.0.
+ * OLE looking at checkout options, whether they need SIP connector in addition to NCIP.  John to review the topic and decide on appropriate action, if any is needed.
+
+ * Next meeting on 10/1/2013 and John Bodfish will facilitate in Randy's absence. 
+
+
+
+* NCIP Meeting 8/27/2013
+
+Present: Bach,Patrick, John, Adam
+
+ * Update from Michelle via email to correct a statement made last meeting - The vufind connector (that Chicago, Villanova and Lehigh are collaborating on) ...will not be an NCIP connector as I thought -- it will communicate directly with the OLE api and NOT through NCIP.
+ * Adam reports still planning to use NCIP with OLE.  We suspect there is a goal to add extension elements without having to impact the core.  E.g. should be able to be done by just the connector developer.  But, need to do some chunk of work in the core in order to make it happen.
+ * Bach's issue moved forward but now is in John's court.   Bach to continue touching base with John every couple of days.
+ * OLE - Use different operator id for each library sending message, but use the same item type.  John to write up use cases that may be of help as some of the coding has not been done is starting.
+ * Patrick - nothing to add
+ * move the next meeting from 9/3 to 9/10
+
+
+
+
+* NCIP Meeting 8/6/2013
+
+Present: Bach, Michelle, Prem, Patrick, John
+
+ * Release 1.2 update - Bach still needs to connect with John.   Bach be proactive.   John has done no further work with 1.2.  Will try to commit some hours this week.   One more build and deploy after John's next check in.
+ * OLE press/announcement timing - Project Manager for OLE?  Michelle to ask the question.
+ * HTC update - identifier needed to identify "who" is calling.   1. Initiation Header, From Agency ID, (as replacement/surrogate OLE operator id for 2.  look at Application Profile Type. 3. IP address.  John says there is also a "from system id" to consider.
+ * OLE - Use different operator id for each library sending message, but use the same item type.  John to write up use cases that may be of help as some of the coding has not been done is starting.
+ * use of "to agency" - any use case? - too early to tell, but it is being discussed (consortia).  Many libraries sharing one OLE, but also possible separate OLEs, but needing to interact as of they were one.
+ * Villanova, University of Chicago and Lehigh - work on the VuFind side.  Good luck.
+ * Next meeting  8/27 (moved from 8/20 due to vacations) - will stay at every two weeks until 1.2 is released, and will move to 10am Eastern and via a Skype call initiated by Randy.
+
+
+
+
+* NCIP Meeting 7/23/2013
+
+Present: Bach, Michelle, Prem
+
+ * Release 1.2 update
+ * Introductions - Spec all services needed for Self Service (VuFind) and for ILL that Lehigh is using.  The 4 NCIP services that Lehigh currently uses.  Priority is on the ILL, and VUfind connector is next.  Incorporating code now.  
+ * Bach still having errors with the III connector.  Bach needs John to get back to him.
+ * HTC developers (OLE) access to Jira - set Prem up and Randy create two issues 
+ * Next meeting  - will stay at every two weeks until 1.2 is released, and will move to 10am Eastern and via a Skype call initiated by Randy.
+
 * NCIP Meeting 7/9/2013
 
 Present: John, Bach, Michelle

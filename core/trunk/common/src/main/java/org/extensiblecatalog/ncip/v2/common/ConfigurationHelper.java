@@ -452,6 +452,11 @@ public class ConfigurationHelper {
          * This approach follows that suggested here:
          * http://stackoverflow.com/questions/41659/is-there-a-way-to-access-web-xml-properties-from-a-java-bean
          */
+        if ( appName == null ) {
+            LOG.debug("appName parameter is null; getting appName from properties.");
+            appName = properties.getProperty(ToolkitConfiguration.TOOLKIT_APP_NAME_KEY, ToolkitConfiguration.TOOLKIT_APP_NAME_DEFAULT);
+        }
+
         Properties serverContextProperties = ConfigurationHelper.getServerContextProperties(appName);
         if ( serverContextProperties != null ) {
 

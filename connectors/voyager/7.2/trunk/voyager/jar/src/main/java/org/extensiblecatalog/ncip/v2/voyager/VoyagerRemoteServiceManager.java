@@ -17,20 +17,22 @@ import javax.naming.directory.DirContext;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.extensiblecatalog.ncip.v2.voyager.util.ILSException;
 import org.extensiblecatalog.ncip.v2.voyager.util.LDAPUtils;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConfiguration;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConstants;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -54,8 +56,8 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     private VoyagerConfiguration voyagerConfig;
     {
         try {
-            voyagerConfig = (VoyagerConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
-            //voyagerConfig = (VoyagerConfiguration)ConnectorConfigurationFactory.getConfiguration();
+            voyagerConfig = (VoyagerConfiguration) 
+            		new ConnectorConfigurationFactory(new Properties()).getConfiguration();
         } catch (ToolkitException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -76,10 +78,13 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         String username;
         String password;
         log.debug("Entering openReadDbConnection() with patronAgencyId: " + patronAgencyId);
-        if (patronAgencyId.equalsIgnoreCase(voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))){
+        if (patronAgencyId.equalsIgnoreCase(
+        		voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))){
             url = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_DB_URL);
-            username = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_USERNAME);
-            password = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_PASSWORD);
+            username = voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_USERNAME);
+            password = voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_PASSWORD);
         } else {
             url = voyagerConfig.getProperty(patronAgencyId + "database");
             username = voyagerConfig.getProperty(patronAgencyId + "username");
@@ -94,8 +99,9 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
             log.error("An error occurred loading the jdbc driver.", ce);
             return null;
         } catch (SQLException se) {
-            log.error("An error occurred while interacting with the Voyager database.  This may have been " +
-                    "caused if the VoyagerDatabaseName was set incorrectly in the NCIP Toolkit configuration file.", se);
+            log.error("An error occurred while interacting with the Voyager database. " + 
+            		"This may have been caused if the VoyagerDatabaseName was set incorrectly " +
+            		"in the NCIP Toolkit configuration file.", se);
             return null;
         }
         return conn;
@@ -109,10 +115,13 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         String url;
         String username;
         String password;
-        if (patronAgencyId.equalsIgnoreCase(voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))){
+        if (patronAgencyId.equalsIgnoreCase(
+        		voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))){
             url = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_DB_URL);
-            username = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_USERNAME);
-            password = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_PASSWORD);
+            username = voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_USERNAME);
+            password = voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_DB_READ_ONLY_PASSWORD);
         } else {
             url = voyagerConfig.getProperty(patronAgencyId + "database");
             username = voyagerConfig.getProperty(patronAgencyId + "username");
@@ -127,8 +136,10 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         }
 
         String sql;
-        if (patronAgencyId.equalsIgnoreCase(voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))) {
-            sql = "SELECT bib_id FROM bib_item WHERE bib_item.item_id = ?";
+        if (patronAgencyId.equalsIgnoreCase(
+        		voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY))) {
+            String dbuser = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_ORACLE_USER);
+            sql = "SELECT bib_id FROM " + dbuser + ".bib_item WHERE bib_item.item_id = ?";
         }
         else {
             String dbuser = voyagerConfig.getProperty(patronAgencyId + "dbuser");
@@ -153,7 +164,8 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
                 }
             }
         } catch(SQLException e) {
-            log.error("An SQL Exception error occurred while getting the bibliographic Id from the database.", e);
+            log.error("An SQL Exception error occurred while getting " +
+            			"the bibliographic Id from the database.", e);
             return null;
         }
         log.info("Returning bib Id: " + bibId);
@@ -210,7 +222,8 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         log.debug("Entering authenticateUser for user: " + username + ".");
 
         // The institution ID returned by the web service assuming username was an institution ID
-        String institutionId = getPatronIdFromInstitutionIdAuthData(username, password.toLowerCase(), host);
+        String institutionId = 
+        		getPatronIdFromInstitutionIdAuthData(username, password.toLowerCase(), host);
 
         if (institutionId != null) {
             log.info("Found institution ID " + institutionId + " from vxws with institution id");
@@ -245,19 +258,22 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
 
             // Get the username attribute and start location on the LDAP server
             // from the configuration file
-            String usernameAttribute = voyagerConfig.getProperty(VoyagerConstants.CONFIG_EXTERNAL_LDAP_USERNAME_ATTRIBUTE);
-            String startLocation = voyagerConfig.getProperty(VoyagerConstants.CONFIG_EXTERNAL_LDAP_START);
+            String usernameAttribute = voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_EXTERNAL_LDAP_USERNAME_ATTRIBUTE);
+            String startLocation = voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_EXTERNAL_LDAP_START);
 
             // Get the attributes associated with the user
-            Attributes attributes = ldapConnection
-                .getAttributes(usernameAttribute + "=" + username + ", "
-                    + startLocation);
+            Attributes attributes = ldapConnection.getAttributes(
+            		usernameAttribute + "=" + username + ", " + startLocation);
 
             // Get the attribute containing the patron key which Voyager needs
-            String urid = (String) attributes.get(voyagerConfig.getProperty(VoyagerConstants.CONFIG_EXTERNAL_LDAP_UR_ID)).get();
+            String urid = (String) attributes.get(
+            		voyagerConfig.getProperty(VoyagerConstants.CONFIG_EXTERNAL_LDAP_UR_ID)).get();
 
             // Get the attribute containing the last name which Voyager needs
-            String lastName = (String)  attributes.get(voyagerConfig.getProperty(VoyagerConstants.CONFIG_EXTERNAL_LDAP_LAST_NAME)).get();
+            String lastName = (String)  attributes.get(
+            		voyagerConfig.getProperty(VoyagerConstants.CONFIG_EXTERNAL_LDAP_LAST_NAME)).get();
 
             log.info("Retrieved urid: " + urid + " and last name: " + lastName);
 
@@ -274,8 +290,8 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
                     log.debug("Closing the LDAP connection.");
                     ldapConnection.close();
                 } catch (NamingException e) {
-                    log.warn("An error occurred while closing the connection to the LDAP server defined in the "
-                                + "configuration file.", e);
+                    log.warn("An error occurred while closing the connection to the LDAP " +
+                    		"server defined in the configuration file.", e);
                 }
             }
         }
@@ -296,7 +312,8 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
 
         // Construct the xml to send to the web service
         // Using B for barcode id
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Document authUserXML = new Document();
 
         Element root = new Element("serviceParameters", serNs);
@@ -318,10 +335,14 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         Document doc = postWebServicesDoc(url, xmlOutP.outputString(authUserXML));
 
         try {
-            Namespace patNs = Namespace.getNamespace("pat", "http://www.endinfosys.com/Voyager/patronAuthentication");
-            // If there is a serviceData element then the user was authenticated.  Otherwise an error response was returned
-            if (doc.getRootElement().getChild("serviceData", serNs).getChild("patronIdentifier", patNs) != null) {
-                String patronId = doc.getRootElement().getChild("serviceData", serNs).getChild("patronIdentifier", patNs).getAttributeValue("patronId");
+            Namespace patNs = Namespace.getNamespace(
+            		"pat", "http://www.endinfosys.com/Voyager/patronAuthentication");
+            // If there is a serviceData element then the user was authenticated.  
+            // Otherwise an error response was returned
+            if (doc.getRootElement().getChild("serviceData", serNs).
+            		getChild("patronIdentifier", patNs) != null) {
+                String patronId = doc.getRootElement().getChild("serviceData", serNs).
+                		getChild("patronIdentifier", patNs).getAttributeValue("patronId");
                 return patronId;
             }
             else
@@ -341,13 +362,15 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
      * @param host The hostname of the vxws server
      * @return The user's patron ID if the username and password were correct, or null otherwise
      */
-    public String getPatronIdFromInstitutionIdAuthData(String username, String password, String host)
+    public String getPatronIdFromInstitutionIdAuthData(String username, 
+    		String password, String host)
     {
         log.info("Retrieving patron id from institution auth data");
 
         // Construct the xml to send to the web service
         // Using I for institution id
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Document authUserXML = new Document();
 
         Element root = new Element("serviceParameters", serNs);
@@ -368,11 +391,15 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
 
         Document doc = postWebServicesDoc(url, xmlOutP.outputString(authUserXML));
 
-        Namespace patNs = Namespace.getNamespace("pat", "http://www.endinfosys.com/Voyager/patronAuthentication");
-        // If there is a serviceData element then the user was authenticated.  Otherwise an error response was returned
+        Namespace patNs = Namespace.getNamespace(
+        		"pat", "http://www.endinfosys.com/Voyager/patronAuthentication");
+        // If there is a serviceData element then the user was authenticated.  
+        // Otherwise an error response was returned
         try {
-            if (doc.getRootElement().getChild("serviceData", serNs).getChild("patronIdentifier", patNs) != null) {
-                String patronId = doc.getRootElement().getChild("serviceData", serNs).getChild("patronIdentifier", patNs).getAttributeValue("patronId");
+            if (doc.getRootElement().getChild("serviceData", serNs).
+            		getChild("patronIdentifier", patNs) != null) {
+                String patronId = doc.getRootElement().getChild("serviceData", serNs).
+                		getChild("patronIdentifier", patNs).getAttributeValue("patronId");
                 return patronId;
             }
             else {
@@ -407,10 +434,12 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
             if (statusCode == 200) {
                 response = putMethod.getResponseBodyAsStream();
             } else {
-                log.error("Could not contact the vxws service.  Received HTTP status code: " + statusCode);
+                log.error("Could not contact the vxws service. " + 
+                		"Received HTTP status code: " + statusCode);
             }
         }  catch (IOException e) {
-            log.error("IOException caught while contacting the vxws service.  An internal error occurred in the NCIP Toolkit.", e);
+            log.error("IOException caught while contacting the vxws service. " +
+            		"An internal error occurred in the NCIP Toolkit.", e);
         }
 
         SAXBuilder builder = new SAXBuilder();
@@ -454,11 +483,13 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
             if (statusCode == 200) {
                 response = getMethod.getResponseBodyAsStream();
             } else {
-                log.error("Could not contact the vxws service.  Received HTTP status code: " + statusCode);
+                log.error("Could not contact the vxws service. " + 
+                		"Received HTTP status code: " + statusCode);
                 return null;
             }
         } catch (IOException e) {
-            log.error("IOException caught while contacting the vxws service.  An internal error occurred in the NCIP Toolkit.", e);
+            log.error("IOException caught while contacting the vxws service. " +
+            		"An internal error occurred in the NCIP Toolkit.", e);
             return null;
         }
 
@@ -481,6 +512,46 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         return doc;
     }
 
+    public Document deleteWebServicesDoc(String url) {
+    	
+    	int statusCode;
+    	DeleteMethod deleteMethod = null;
+    	
+    	InputStream response = null;
+    	
+    	try {
+    		synchronized(client) {
+    			deleteMethod = new DeleteMethod(url);
+    			statusCode = client.executeMethod(deleteMethod);
+    		}
+    		if (statusCode == 200) {
+    			response = deleteMethod.getResponseBodyAsStream();
+    		} else {
+    			log.error("Cound not contact the vxws service with URL: " + url +
+    					"  Received HTTP status code: " + statusCode);
+    		}
+    	} catch (IOException e) {
+            log.error("IOException caught while contacting the vxws service. " +
+            		"An internal error occurred in the NCIP Toolkit.", e);
+        }
+
+    	SAXBuilder builder = new SAXBuilder();
+        Document doc = null;
+        try {
+            // Build a JDOM Document from the response
+            doc = builder.build(response);
+        } catch (JDOMException e) {
+            log.error("JDOMException parsing xml response");
+        } catch (IOException e) {
+            log.error("IOException parsing xml response");
+        } finally {
+            // Release the connection.
+            deleteMethod.releaseConnection();
+        }
+
+        return doc;
+    }
+    
     /**
      * Given a URL to a vxws service, POST
      * the given XML to the service, returning the response Document
@@ -503,10 +574,12 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
             if (statusCode == 200) {
                 response = postMethod.getResponseBodyAsStream();
             } else {
-                log.error("Cound not contact the vxws service with URL: " + url + ".  Recieved HTTP status code: " + statusCode);
+                log.error("Cound not contact the vxws service with URL: " + url + 
+                		"  Recieved HTTP status code: " + statusCode);
             }
-        }  catch (IOException e) {
-            log.error("IOException caught while contacting the vxws service.  An internal error occurred in the NCIP Toolkit.", e);
+        } catch (IOException e) {
+            log.error("IOException caught while contacting the vxws service. " +
+            		"An internal error occurred in the NCIP Toolkit.", e);
         }
 
         SAXBuilder builder = new SAXBuilder();
@@ -550,10 +623,12 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
             if (statusCode == 200) {
                 response = postMethod.getResponseBodyAsStream();
             } else {
-                log.error("Could not contact the vxws service with URL: " + url + ".  Received HTTP status code: " + statusCode);
+                log.error("Could not contact the vxws service with URL: " + url + "." +
+                		"Received HTTP status code: " + statusCode);
             }
         }  catch (IOException e) {
-            log.error("IOException caught while contacting the vxws service.  An internal error occurred in the NCIP Toolkit.", e);
+            log.error("IOException caught while contacting the vxws service. " +
+            		"An internal error occurred in the NCIP Toolkit.", e);
         }
 
         SAXBuilder builder = new SAXBuilder();

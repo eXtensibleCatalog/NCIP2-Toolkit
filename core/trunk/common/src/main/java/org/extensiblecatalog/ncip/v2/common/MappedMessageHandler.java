@@ -269,8 +269,7 @@ public class MappedMessageHandler implements MessageHandler {
 
             if (supportedServices != null) {
 
-            
-            	service = supportedServices.get(initiationData.getClass().getName());
+                service = supportedServices.get(initiationData.getClass().getName());
 
                 LOG.debug("service is " + service);
 

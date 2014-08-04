@@ -108,11 +108,11 @@ public class VoyagerLookupUserService implements LookupUserService {
                 }
             } else {  // User ID not present, assuming Authentication Input
 
-                if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null){
-                    patronAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
+                if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getFromAgencyId() != null){
+                    patronAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
                     patronUbId = voyagerConfig.getProperty(patronAgencyId);
                 } else {
-                    log.error("No To Agency ID found in the initiation header");
+                    log.error("No From Agency ID found in the initiation header");
                     patronAgencyId =voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
                     if (patronAgencyId == null) {
                         problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.NEEDED_DATA_MISSING,
@@ -157,21 +157,26 @@ public class VoyagerLookupUserService implements LookupUserService {
             userId.setAgencyId(new AgencyId(patronAgencyId));
             lookupUserResponseData.setUserId(userId);
 
-            if (initData.getUserAddressInformationDesired() || initData.getNameInformationDesired()) {
+            if (initData.getUserAddressInformationDesired() || 
+            		initData.getNameInformationDesired()) {
                 UserOptionalFields userOptionalFields = new UserOptionalFields();
 
-                boolean consortialUse = Boolean.parseBoolean(voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+                boolean consortialUse = Boolean.parseBoolean(
+                		voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
                 if (consortialUse) {
                     host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
                 } else {
-                    host = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+                    host = voyagerConfig.getProperty(
+                    		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
                 }
                 // Retrieve data from the patronInformation/address service
-                String url = host + "/vxws/patron/" + patronId + "/patronInformation/address?patron_homedb=" + patronUbId;
+                String url = host + "/vxws/patron/" + patronId + 
+                		"/patronInformation/address?patron_homedb=" + patronUbId;
                 Document patronInfoDoc = voyagerSvcMgr.getWebServicesDoc(url);
 
                 if (initData.getUserAddressInformationDesired()) {
-                    List<UserAddressInformation> userAddressInformations = getAddress(patronInfoDoc);
+                    List<UserAddressInformation> userAddressInformations = 
+                    		getAddress(patronInfoDoc);
                     if (userAddressInformations != null) {
                         log.debug("Setting useraddressinformations in useroptionalfields");
                         userOptionalFields.setUserAddressInformations(userAddressInformations);
@@ -208,9 +213,12 @@ public class VoyagerLookupUserService implements LookupUserService {
                 List<RequestedItem> callslipItems = new ArrayList<RequestedItem>();
                 List<RequestedItem> recallItems = new ArrayList<RequestedItem>();
 
-                callslipItems.addAll(getRequestedItemsForCallslipRequests(patronId, patronUbId, patronAgencyId));
-                holdItems.addAll(getRequestedItemsForHoldRequests(patronId, patronUbId, patronAgencyId));
-                recallItems.addAll(getRequestedItemsForRecallRequests(patronId, patronUbId, patronAgencyId));
+                callslipItems.addAll(
+                		getRequestedItemsForCallslipRequests(patronId, patronUbId, patronAgencyId));
+                holdItems.addAll(
+                		getRequestedItemsForHoldRequests(patronId, patronUbId, patronAgencyId));
+                recallItems.addAll(
+                		getRequestedItemsForRecallRequests(patronId, patronUbId, patronAgencyId));
 
                 requestedItems.addAll(callslipItems);
                 requestedItems.addAll(holdItems);
@@ -218,7 +226,8 @@ public class VoyagerLookupUserService implements LookupUserService {
                 lookupUserResponseData.setRequestedItems(requestedItems);
 
                 // Populate RequestedItemsCount
-                List<RequestedItemsCount> requestedItemsCounts = new ArrayList<RequestedItemsCount>();
+                List<RequestedItemsCount> requestedItemsCounts = 
+                		new ArrayList<RequestedItemsCount>();
 
                 if (holdItems.size() > 0) {
                     RequestedItemsCount itemsHoldCount = new RequestedItemsCount();
@@ -229,13 +238,15 @@ public class VoyagerLookupUserService implements LookupUserService {
                 if (callslipItems.size() > 0) {
                     RequestedItemsCount itemsCallslipCount = new RequestedItemsCount();
                     itemsCallslipCount.setRequestType(XcRequestType.CALL_SLIP);
-                    itemsCallslipCount.setRequestedItemCountValue(BigDecimal.valueOf(callslipItems.size()));
+                    itemsCallslipCount.setRequestedItemCountValue(
+                    		BigDecimal.valueOf(callslipItems.size()));
                     requestedItemsCounts.add(itemsCallslipCount);
                 }
                 if (recallItems.size() > 0) {
                     RequestedItemsCount itemsRecallCount = new RequestedItemsCount();
                     itemsRecallCount.setRequestType(XcRequestType.RECALL);
-                    itemsRecallCount.setRequestedItemCountValue(BigDecimal.valueOf(recallItems.size()));
+                    itemsRecallCount.setRequestedItemCountValue(
+                    		BigDecimal.valueOf(recallItems.size()));
                     requestedItemsCounts.add(itemsRecallCount);
                 }
 
@@ -246,13 +257,16 @@ public class VoyagerLookupUserService implements LookupUserService {
 
             // Get the loaned items information if necessary
             if (initData.getLoanedItemsDesired() ) {
-                boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+                boolean consortialUse = Boolean.parseBoolean(
+                		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
                 if (consortialUse) {
                     host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
                 } else {
-                    host =voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+                    host = voyagerConfig.getProperty(
+                    		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
                 }
-                String url = host + "/vxws/patron/" + patronId + "/circulationActions/loans?patron_homedb=" + patronUbId + "&view=brief";
+                String url = host + "/vxws/patron/" + patronId + 
+                		"/circulationActions/loans?patron_homedb=" + patronUbId + "&view=brief";
                 Document loanedItemsDoc = voyagerSvcMgr.getWebServicesDoc(url);
 
                 List<LoanedItem> items = getLoanedItems(loanedItemsDoc, patronAgencyId);
@@ -260,7 +274,8 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 // Populate LoanedItemsCount
                 if (items != null && items.size() > 0) {
-                    lookupUserResponseData.setLoanedItemsCounts(getLoanedItemsCount(loanedItemsDoc));
+                    lookupUserResponseData.setLoanedItemsCounts(
+                    		getLoanedItemsCount(loanedItemsDoc));
                 }
             }
         } catch (ILSException e) {
@@ -284,7 +299,8 @@ public class VoyagerLookupUserService implements LookupUserService {
         List<RequestedItem> requestedItems = new ArrayList<RequestedItem>();
         List<Element> institutionElements;
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
         } else {
@@ -327,12 +343,15 @@ public class VoyagerLookupUserService implements LookupUserService {
                 itemId.setItemIdentifierValue(requestItem.getChildText("itemId"));
                 requestedItem.setItemId(itemId);
 
-                List<BibliographicRecordId> bibRecordIdList = new ArrayList<BibliographicRecordId>();
+                List<BibliographicRecordId> bibRecordIdList = 
+                		new ArrayList<BibliographicRecordId>();
                 BibliographicRecordId bibRecordId = new BibliographicRecordId();
                 BibliographicDescription bibDesc = new BibliographicDescription();
-                String bibId = voyagerSvcMgr.getBibIdForItemId(requestItem.getChildText("itemId"), institutionAgencyId);
-                if (bibId == null)
+                String bibId = voyagerSvcMgr.getBibIdForItemId(
+                		requestItem.getChildText("itemId"), institutionAgencyId);
+                if (bibId == null) {
                     throw new ILSException("Could not retrieve Bib Id from Item Id");
+                }
                 bibRecordId.setAgencyId(new AgencyId(institutionAgencyId));
                 bibRecordId.setBibliographicRecordIdentifier(bibId);
                 bibRecordIdList.add(bibRecordId);
@@ -347,19 +366,30 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 requestedItem.setPickupExpiryDate(expireDate);
 
-                if (!requestItem.getChildText("queuePosition").equalsIgnoreCase(""))
-                    requestedItem.setHoldQueuePosition(new BigDecimal(requestItem.getChildText("queuePosition")));
+                RequestId requestId = new RequestId();
+                requestId.setRequestIdentifierValue(requestItem.getChildText("holdRecallId"));
+                requestedItem.setRequestId(requestId);
+                
+                if (!requestItem.getChildText("queuePosition").equalsIgnoreCase("")) {
+                    requestedItem.setHoldQueuePosition(
+                    		new BigDecimal(requestItem.getChildText("queuePosition")));
+                } else {
+                	requestedItem.setHoldQueuePosition(new BigDecimal("0"));
+                }
 
                 log.info("Pickup location: " + requestItem.getChildText("pickupLocation"));
 
-                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase(""))
-                    requestedItem.setPickupLocation(new PickupLocation(requestItem.getChildText("pickupLocation")));
+                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase("")) {
+                    requestedItem.setPickupLocation(
+                    		new PickupLocation(requestItem.getChildText("pickupLocation")));
+                }
 
                 GregorianCalendar nullDate = new GregorianCalendar(0, 0, 0);
                 requestedItem.setDatePlaced(nullDate);
 
                 requestedItem.setRequestType(XcRequestType.RECALL);
-                requestedItem.setRequestStatusType(new RequestStatusType(requestItem.getChildText("statusText")));
+                requestedItem.setRequestStatusType(
+                		new RequestStatusType(requestItem.getChildText("statusText")));
                 requestedItem.setTitle(requestItem.getChildText("itemTitle"));
                 requestedItems.add(requestedItem);
             }
@@ -372,15 +402,19 @@ public class VoyagerLookupUserService implements LookupUserService {
 
         List<LoanedItemsCount> loans = new ArrayList<LoanedItemsCount>();
 
-           if (loanedItemsDoc.getRootElement().getChild("loans").getChildren("institution") != null){
-            List<Element> institutions = loanedItemsDoc.getRootElement().getChild("loans").getChildren("institution");
+           if (loanedItemsDoc.getRootElement().getChild("loans").getChildren("institution")!=null){
+            List<Element> institutions = 
+            		loanedItemsDoc.getRootElement().getChild("loans").getChildren("institution");
             for (Element institution : institutions) {
-                if (institution.getChildren("loan") != null){
+                if (institution.getChildren("loan") != null) {
                     List<Element> loansList = institution.getChildren("loan");
                     for (Element loan : loansList) {
                         LoanedItemsCount loanedItemsCount = new LoanedItemsCount();
                         try {
-                            loanedItemsCount.setCirculationStatus(XcCirculationStatus.find(XcCirculationStatus.XC_CIRCULATION_STATUS, loan.getChildTextTrim("statusText")));
+                            loanedItemsCount.setCirculationStatus(
+                            		XcCirculationStatus.find(
+                            				XcCirculationStatus.XC_CIRCULATION_STATUS, 
+                            				loan.getChildTextTrim("statusText")));
                         } catch (ServiceException e) {
                             log.debug("Service exception getting circ status");
                             return null;
@@ -394,14 +428,16 @@ public class VoyagerLookupUserService implements LookupUserService {
         return loans;
     }
 
-    private UserFiscalAccount getFiscalAccount(String patronId, String patronUbId) throws ILSException {
+    private UserFiscalAccount getFiscalAccount(String patronId, String patronUbId) 
+    		throws ILSException {
 
         UserFiscalAccount userFiscalAccount = new UserFiscalAccount();
         List<AccountDetails> accountDetails = new ArrayList<AccountDetails>();
         List<Element> institutionElements;
         String host;
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
         } else {
@@ -435,12 +471,14 @@ public class VoyagerLookupUserService implements LookupUserService {
         for (Element institution : institutionElements) {
             List<Element> fines = institution.getChildren("fine");
             for (Element fine : fines) {
+                log.debug("Getting here in fines");
                 String fineAmount = fine.getChildText("amount").split(" ")[1];
 
                 minorUnit = fineAmount.split("\\.")[1].length();
 
                 fineAmount = fineAmount.split("\\.")[0];
-                totalFines = totalFines.add(new BigDecimal(fineAmount).multiply(new BigDecimal(100)));
+                totalFines = totalFines.add(
+                		new BigDecimal(fineAmount).multiply(new BigDecimal(100)));
 
                 AccountDetails details = new AccountDetails();
 
@@ -452,7 +490,8 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 details.setAccrualDate(fineDate);
 
-                FiscalTransactionInformation fiscalTransactionInformation = new FiscalTransactionInformation();
+                FiscalTransactionInformation fiscalTransactionInformation = 
+                		new FiscalTransactionInformation();
                 Amount amount = new Amount();
                 amount.setCurrencyCode(new CurrencyCode(currencyCode, minorUnit));
                 amount.setMonetaryValue(new BigDecimal(fineAmount).multiply(new BigDecimal(100)));
@@ -473,7 +512,8 @@ public class VoyagerLookupUserService implements LookupUserService {
                 }
 
                 if (!fine.getChildText("fineType").equalsIgnoreCase("")){
-                    fiscalTransactionInformation.setFiscalTransactionType(new FiscalTransactionType(fine.getChildText("fineType")));
+                    fiscalTransactionInformation.setFiscalTransactionType(
+                    		new FiscalTransactionType(fine.getChildText("fineType")));
                 }
 
                 details.setFiscalTransactionInformation(fiscalTransactionInformation);
@@ -499,13 +539,15 @@ public class VoyagerLookupUserService implements LookupUserService {
         return userFiscalAccount;
     }
 
-    private List<RequestedItem> getRequestedItemsForHoldRequests(String patronId, String patronUbId, String patronAgencyId) throws ILSException {
+    private List<RequestedItem> getRequestedItemsForHoldRequests(String patronId, String patronUbId,
+    		String patronAgencyId) throws ILSException {
 
         List<RequestedItem> requestedItems = new ArrayList<RequestedItem>();
         List<Element> institutionElements;
         String host;
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
         } else {
@@ -534,27 +576,28 @@ public class VoyagerLookupUserService implements LookupUserService {
                     continue;
 
                 RequestedItem requestedItem = new RequestedItem();
-                //requestedItem.setDatePlaced(VoyagerUtil.convertDateToGregorianCalendar(rs.getDate(1)));
-                //requestedItem.setPickupDate(VoyagerUtil.convertDateToGregorianCalendar(rs.getDate(2)));
-
                 ItemId itemId = new ItemId();
 
                 String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL"))
+                if (institutionAgencyId.equalsIgnoreCase("LOCAL")) {
                     institutionAgencyId = patronAgencyId;
-                else
+                } else {
                     institutionAgencyId = institutionAgencyId.substring(1);
+                }
 
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(requestItem.getChildText("itemId"));
                 requestedItem.setItemId(itemId);
 
-                List<BibliographicRecordId> bibRecordIdList = new ArrayList<BibliographicRecordId>();
+                List<BibliographicRecordId> bibRecordIdList = 
+                		new ArrayList<BibliographicRecordId>();
                 BibliographicRecordId bibRecordId = new BibliographicRecordId();
                 BibliographicDescription bibDesc = new BibliographicDescription();
-                String bibId = voyagerSvcMgr.getBibIdForItemId(requestItem.getChildText("itemId"), institutionAgencyId);
-                if (bibId == null)
+                String bibId = voyagerSvcMgr.getBibIdForItemId(
+                		requestItem.getChildText("itemId"), institutionAgencyId);
+                if (bibId == null) {
                     throw new ILSException("Could not retrieve Bib Id from Item Id");
+                }
                 bibRecordId.setAgencyId(new AgencyId(institutionAgencyId));
                 bibRecordId.setBibliographicRecordIdentifier(bibId);
                 bibRecordIdList.add(bibRecordId);
@@ -569,19 +612,30 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 requestedItem.setPickupExpiryDate(expireDate);
 
-                if (!requestItem.getChildText("queuePosition").equalsIgnoreCase(""))
-                    requestedItem.setHoldQueuePosition(new BigDecimal(requestItem.getChildText("queuePosition")));
+                RequestId requestId = new RequestId();
+                requestId.setRequestIdentifierValue(requestItem.getChildText("holdRecallId"));
+                requestedItem.setRequestId(requestId);
+                
+                if (!requestItem.getChildText("queuePosition").equalsIgnoreCase("")) {
+                    requestedItem.setHoldQueuePosition(
+                    		new BigDecimal(requestItem.getChildText("queuePosition")));
+                } else {
+                	requestedItem.setHoldQueuePosition(new BigDecimal("0"));
+                }
 
                 log.info("Pickup location: " + requestItem.getChildText("pickupLocation"));
 
-                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase(""))
-                    requestedItem.setPickupLocation(new PickupLocation(requestItem.getChildText("pickupLocation")));
+                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase("")) {
+                    requestedItem.setPickupLocation(
+                    		new PickupLocation(requestItem.getChildText("pickupLocation")));
+                }
 
                 GregorianCalendar nullDate = new GregorianCalendar(0, 0, 0);
                 requestedItem.setDatePlaced(nullDate);
 
                 requestedItem.setRequestType(XcRequestType.HOLD);
-                requestedItem.setRequestStatusType(new RequestStatusType(requestItem.getChildText("statusText")));
+                requestedItem.setRequestStatusType(
+                		new RequestStatusType(requestItem.getChildText("statusText")));
                 requestedItem.setTitle(requestItem.getChildText("itemTitle"));
                 requestedItems.add(requestedItem);
             }
@@ -590,13 +644,15 @@ public class VoyagerLookupUserService implements LookupUserService {
         return requestedItems;
     }
 
-    private List<RequestedItem> getRequestedItemsForCallslipRequests(String patronId, String patronUbId, String patronAgencyId) throws ILSException {
+    private List<RequestedItem> getRequestedItemsForCallslipRequests(String patronId, 
+    		String patronUbId, String patronAgencyId) throws ILSException {
 
         List<RequestedItem> requestedItems = new ArrayList<RequestedItem>();
         List<Element> institutionElements;
         String host;
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(patronAgencyId);
         } else {
@@ -626,21 +682,25 @@ public class VoyagerLookupUserService implements LookupUserService {
                 ItemId itemId = new ItemId();
 
                 String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL"))
+                if (institutionAgencyId.equalsIgnoreCase("LOCAL")) {
                     institutionAgencyId = patronAgencyId;
-                else
+                } else {
                     institutionAgencyId = institutionAgencyId.substring(1);
+                }
 
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(requestItem.getChildText("itemId"));
                 requestedItem.setItemId(itemId);
 
-                List<BibliographicRecordId> bibRecordIdList = new ArrayList<BibliographicRecordId>();
+                List<BibliographicRecordId> bibRecordIdList = 
+                		new ArrayList<BibliographicRecordId>();
                 BibliographicRecordId bibRecordId = new BibliographicRecordId();
                 BibliographicDescription bibDesc = new BibliographicDescription();
-                String bibId = voyagerSvcMgr.getBibIdForItemId(requestItem.getChildText("itemId"), institutionAgencyId);
-                if (bibId == null)
-                    throw new ILSException("Could not retrieve Bib Id from Item Id");
+                String bibId = voyagerSvcMgr.getBibIdForItemId(
+                		requestItem.getChildText("itemId"), institutionAgencyId);
+                if (bibId == null) {
+                    throw new ILSException("Could not retrieve Bib Id from Item Id"); 
+                }
                 bibRecordId.setAgencyId(new AgencyId(institutionAgencyId));
                 bibRecordId.setBibliographicRecordIdentifier(bibId);
                 bibRecordIdList.add(bibRecordId);
@@ -655,19 +715,30 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 requestedItem.setPickupExpiryDate(expireDate);
 
-                if (!requestItem.getChildText("queuePosition").equalsIgnoreCase(""))
-                    requestedItem.setHoldQueuePosition(new BigDecimal(requestItem.getChildText("queuePosition")));
-
+                RequestId requestId = new RequestId();
+                requestId.setRequestIdentifierValue(requestItem.getChildText("holdRecallId"));
+                requestedItem.setRequestId(requestId);
+                
+                if (!requestItem.getChildText("queuePosition").equalsIgnoreCase("")) {
+                    requestedItem.setHoldQueuePosition(
+                    		new BigDecimal(requestItem.getChildText("queuePosition")));
+                } else {
+                	requestedItem.setHoldQueuePosition(new BigDecimal("0"));
+                }
+                
                 log.info("Pickup location: " + requestItem.getChildText("pickupLocation"));
 
-                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase(""))
-                    requestedItem.setPickupLocation(new PickupLocation(requestItem.getChildText("pickupLocation")));
+                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase("")) {
+                    requestedItem.setPickupLocation(
+                    		new PickupLocation(requestItem.getChildText("pickupLocation")));
+                }
 
                 GregorianCalendar nullDate = new GregorianCalendar(0, 0, 0);
                 requestedItem.setDatePlaced(nullDate);
 
                 requestedItem.setRequestType(XcRequestType.CALL_SLIP);
-                requestedItem.setRequestStatusType(new RequestStatusType(requestItem.getChildText("statusText")));
+                requestedItem.setRequestStatusType(
+                		new RequestStatusType(requestItem.getChildText("statusText")));
                 requestedItem.setTitle(requestItem.getChildText("itemTitle"));
                 requestedItems.add(requestedItem);
             }
@@ -676,7 +747,8 @@ public class VoyagerLookupUserService implements LookupUserService {
         return requestedItems;
     }
 
-    private List<LoanedItem> getLoanedItems(Document doc, String patronAgencyId) throws ILSException {
+    private List<LoanedItem> getLoanedItems(Document doc, String patronAgencyId) 
+    		throws ILSException {
         List<Element> institutionElements;
         List<LoanedItem> loanedItems = new ArrayList<LoanedItem>();
 
@@ -707,10 +779,11 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 ItemId itemId = new ItemId();
                 String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL"))
+                if (institutionAgencyId.equalsIgnoreCase("LOCAL")) {
                     institutionAgencyId = patronAgencyId;
-                else
+                } else {
                     institutionAgencyId = institutionAgencyId.substring(1);
+                }
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(loan.getChildText("itemId"));
 
@@ -718,13 +791,16 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 loanedItem.setTitle(loan.getChildText("title"));
 
-                String bibId = voyagerSvcMgr.getBibIdForItemId(loan.getChildText("itemId"), patronAgencyId);
-                if (bibId == null)
+                String bibId = voyagerSvcMgr.getBibIdForItemId(
+                		loan.getChildText("itemId"), patronAgencyId);
+                if (bibId == null) {
                     throw new ILSException("Could not retrieve Bib Id from Item Id");
+                }
 
                 BibliographicDescription bibliographicDescription = new BibliographicDescription();
 
-                List<BibliographicRecordId> bibliographicRecordIds = new ArrayList<BibliographicRecordId>();
+                List<BibliographicRecordId> bibliographicRecordIds = 
+                		new ArrayList<BibliographicRecordId>();
                 BibliographicRecordId bibRecordId = new BibliographicRecordId();
                 bibRecordId.setBibliographicRecordIdentifier(bibId);
                 bibRecordId.setAgencyId(new AgencyId(institutionAgencyId));
@@ -786,7 +862,8 @@ public class VoyagerLookupUserService implements LookupUserService {
 
     private List<UserAddressInformation> getAddress(Document doc) throws ILSException {
         UserAddressInformation userAddressInformation = null;
-        List<UserAddressInformation> userAddressInformations = new ArrayList<UserAddressInformation>();
+        List<UserAddressInformation> userAddressInformations =
+        		new ArrayList<UserAddressInformation>();
         try {
             XPath xpath = XPath.newInstance("/response/address/permanentAddress");
             Element addressElement = (Element) xpath.selectSingleNode(doc);
@@ -814,10 +891,12 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 PhysicalAddress physicalAddress = new PhysicalAddress();
                 physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
-                userAddressInformation.setUserAddressRoleType(new UserAddressRoleType(VoyagerConstants.LOCATION_TYPE_PERMANENT));
+                userAddressInformation.setUserAddressRoleType(
+                		new UserAddressRoleType(VoyagerConstants.LOCATION_TYPE_PERMANENT));
                 UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
                 unstructuredAddress.setUnstructuredAddressData(address.toString());
-                unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
+                unstructuredAddress.setUnstructuredAddressType(
+                		Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
                 physicalAddress.setUnstructuredAddress(unstructuredAddress);
                 userAddressInformation.setPhysicalAddress(physicalAddress);
                 userAddressInformations.add(userAddressInformation);
@@ -831,9 +910,11 @@ public class VoyagerLookupUserService implements LookupUserService {
                 log.debug("Found email address: " + emailAddress);
                 ElectronicAddress electronicAddress = new ElectronicAddress();
                 electronicAddress.setElectronicAddressData(emailAddress);
-                electronicAddress.setElectronicAddressType(new ElectronicAddressType (VoyagerConstants.ADDRESS_EMAIL));
+                electronicAddress.setElectronicAddressType(
+                		new ElectronicAddressType(VoyagerConstants.ADDRESS_EMAIL));
                 userAddressInformation.setElectronicAddress(electronicAddress);
-                userAddressInformation.setUserAddressRoleType(new UserAddressRoleType(VoyagerConstants.ADDRESS_EMAIL));
+                userAddressInformation.setUserAddressRoleType(
+                		new UserAddressRoleType(VoyagerConstants.ADDRESS_EMAIL));
                 userAddressInformations.add(userAddressInformation);
             }
         } catch (NullPointerException e) {

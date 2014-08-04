@@ -97,8 +97,6 @@ public class CancelRequestItemInitiationData implements NCIPInitiationData {
 
     /**
      * MandatedAction
-     *
-     * @param
      */
     protected MandatedAction mandatedAction;
 
@@ -351,6 +349,10 @@ public class CancelRequestItemInitiationData implements NCIPInitiationData {
      */
     protected boolean circulationStatusDesired;
     /**
+     * Whether the electronicResource is desired in the response.
+     */
+    protected boolean electronicResourceDesired;
+    /**
      * Whether the holdQueueLength is desired in the response.
      */
     protected boolean holdQueueLengthDesired;
@@ -414,6 +416,24 @@ public class CancelRequestItemInitiationData implements NCIPInitiationData {
      */
     public void setCirculationStatusDesired(boolean circulationStatusDesired) {
         this.circulationStatusDesired = circulationStatusDesired;
+    }
+
+    /**
+     * Whether the ElectronicResource is desired in the response.
+     *
+     * @return the ElectronicResourceDesired
+     */
+    public boolean getElectronicResourceDesired() {
+        return electronicResourceDesired;
+    }
+
+    /**
+     * Set whether the ElectronicResource is desired in the response.
+     *
+     * @param electronicResourceDesired the ElectronicResourceDesired
+     */
+    public void setElectronicResourceDesired(boolean electronicResourceDesired) {
+        this.electronicResourceDesired = electronicResourceDesired;
     }
 
     /**

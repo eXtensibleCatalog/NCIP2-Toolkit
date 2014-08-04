@@ -47,14 +47,15 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     private VoyagerConfiguration voyagerConfig;
     {
         try {
-            voyagerConfig = (VoyagerConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
-            //voyagerConfig = (VoyagerConfiguration)ConnectorConfigurationFactory.getConfiguration();
+            voyagerConfig = (VoyagerConfiguration) new ConnectorConfigurationFactory(
+            		new Properties()).getConfiguration();
         } catch (ToolkitException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
-    final int MAX_ITEMS_TO_RETURN = Integer.parseInt((String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_MAX_LUIS_ITEMS));
+    final int MAX_ITEMS_TO_RETURN = Integer.parseInt(
+    		(String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_MAX_LUIS_ITEMS));
 
     static Random random = new Random();
 
@@ -63,7 +64,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     VoyagerRemoteServiceManager voyagerSvcMgr;
 
     /**
-     * Construct a VoyagerRemoteServiceManager; this class is not configurable so there are no parameters.
+     * Construct a VoyagerRemoteServiceManager; 
+     * this class is not configurable so there are no parameters.
      */
     public VoyagerLookupItemSetService() {
     }
@@ -90,7 +92,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
         List<BibliographicId> bibIds = initData.getBibliographicIds();
         if (bibIds == null) {
-            problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.NEEDED_DATA_MISSING,
+            problems.addAll(ServiceHelper.generateProblems(
+            		Version1GeneralProcessingError.NEEDED_DATA_MISSING,
                     null, null, "Missing Bib IDs"));
             luisResponseData.setProblems(problems);
             return luisResponseData;
@@ -117,7 +120,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                 // Remove token from memory hashmap
                 tokens.remove(token);
             } else {
-                problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
+                problems.addAll(ServiceHelper.generateProblems(
+                		Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
                         null, token, "Invalid nextItemToken"));
                 luisResponseData.setProblems(problems);
                 return luisResponseData;
@@ -142,7 +146,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                 if (!checkValidAgencyId(itemAgencyId)) {
                     log.error("Unrecognized Bibliographic Record Agency Id: " + itemAgencyId);
-                    problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.NEEDED_DATA_MISSING,
+                    problems.addAll(ServiceHelper.generateProblems(
+                    		Version1GeneralProcessingError.NEEDED_DATA_MISSING,
                             null, null, "Unrecognized Bibliographic Record Agency Id"));
                     bibInformation.setProblems(problems);
                     bibInformations.add(bibInformation);
@@ -152,7 +157,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                 // Is the bib field empty?
                 if (id.equals("") || itemAgencyId.equals("")) {
                     log.error("Missing Bib Id or Agency Id");
-                    problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.NEEDED_DATA_MISSING,
+                    problems.addAll(ServiceHelper.generateProblems(
+                    		Version1GeneralProcessingError.NEEDED_DATA_MISSING,
                             null, null, "Missing Bib ID or item Agency Id"));
                     bibInformation.setProblems(problems);
                     bibInformations.add(bibInformation);
@@ -164,7 +170,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                 holdingsDocFromXml = getHoldingRecordsFromXml(bibId);
 
                 if (holdingsDocFromXml == null) {
-                    problems.addAll(ServiceHelper.generateProblems(Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
+                    problems.addAll(ServiceHelper.generateProblems(
+                    		Version1GeneralProcessingError.TEMPORARY_PROCESSING_FAILURE,
                             null, id, "Problem contacting the vxws service"));
                     luisResponseData.setProblems(problems);
                     return luisResponseData;
@@ -172,7 +179,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                 if (!doesRecordExist(holdingsDocFromXml)) {
                     log.error("Record does not exist");
-                    problems.addAll(ServiceHelper.generateProblems(Version1LookupItemProcessingError.UNKNOWN_ITEM,
+                    problems.addAll(ServiceHelper.generateProblems(
+                    		Version1LookupItemProcessingError.UNKNOWN_ITEM,
                             null, id, "Record does not exist"));
                     bibInformation.setProblems(problems);
                     bibInformations.add(bibInformation);
@@ -191,7 +199,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                 if (holdingIds == null) {
                     log.error("Bib does not have a holding record associated with it");
-                    problems.addAll(ServiceHelper.generateProblems(Version1LookupItemProcessingError.UNKNOWN_ITEM,
+                    problems.addAll(ServiceHelper.generateProblems(
+                    		Version1LookupItemProcessingError.UNKNOWN_ITEM,
                             null, id, "Record does not have a holding record associated with it"));
                     bibInformation.setProblems(problems);
                     bibInformations.add(bibInformation);
@@ -233,15 +242,18 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                     holdingSet.setHoldingsSetId(holdingId);
 
 //                    if (initData.getElectronicResourceDesired()) {
-                        ElectronicResource eResource = getElectronicResourceForHoldingId(holdingId, holdingsDocFromXml);
-                        if (eResource != null)
+                        ElectronicResource eResource = getElectronicResourceForHoldingId(
+                        		holdingId, holdingsDocFromXml);
+                        if (eResource != null) {
                             holdingSet.setElectronicResource(eResource);
+                        }
 //                    }
 
                     // Get Bib desc, holding set info only if items exist for that holdings
                     if (itemIds != null && itemIds.size() > 0) {
 
-                        holdingSet.setCallNumber(getCallNumberForHoldingDoc(holdingId, holdingsDocFromRestful));
+                        holdingSet.setCallNumber(
+                        		getCallNumberForHoldingDoc(holdingId, holdingsDocFromRestful));
 
                         // Set location
                         // Decision made to omit Location at the Holding Set level this release
@@ -255,14 +267,13 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                         int newItemCount = itemCount + itemIds.size();
 
-                        log.debug("Item count is " + itemCount + " and itemIds.size is " + itemIds.size());
-
                         if (newItemCount > MAX_ITEMS_TO_RETURN) {
                             itemIds = getItemIdSubset(itemIds, itemCount);
-                            log.debug("Subset itemIds:"+itemIds);
+                            log.debug("Subset itemIds: " + itemIds);
                         }
 
-                        Map<String, ItemInformation> itemInformations = new HashMap<String, ItemInformation>();
+                        Map<String, ItemInformation> itemInformations = 
+                        		new HashMap<String, ItemInformation>();
 
                         for (String itemId:itemIds) {
                             ItemInformation itemInformation = new ItemInformation();
@@ -275,7 +286,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                         Map<String, String> statuses = null;
                         if (initData.getCirculationStatusDesired()) {
-                            statuses = getCirculationStatusForItemIds(itemIds, holdingsDocFromRestful);
+                            statuses = getCirculationStatusForItemIds(itemIds, 
+                            		holdingsDocFromRestful);
                         }
 
                         // TODO: Double check that this really isn't available through GetHoldings
@@ -288,10 +300,11 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                         Map<String, ItemDescription> itemDescriptions = null;
                         if (initData.getItemDescriptionDesired()) {
-                            itemDescriptions = getItemDescriptionForItemIds(itemIds, holdingsDocFromRestful);
+                            itemDescriptions = getItemDescriptionForItemIds(
+                            		itemIds, holdingsDocFromRestful);
                         }
 
-                        // TODO: Refactor this because we no longer want to return a list of locations.
+                        // TODO: Refactor this because we no longer want to return a list of locs.
                         Map<String, Location> locations = null;
                         if (initData.getLocationDesired()) {
                             locations = getLocationForItemIds(itemIds, holdingsDocFromRestful);
@@ -300,7 +313,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         Map<String, String> copyNumbers = new HashMap<String, String>();
                         Map<String, GregorianCalendar> dueDates = null;
                         if (itemDescriptions == null) {
-                            itemDescriptions = getItemDescriptionForItemIds(itemIds, holdingsDocFromRestful);
+                            itemDescriptions = getItemDescriptionForItemIds(
+                            		itemIds, holdingsDocFromRestful);
                         }
 
                         Iterator<String> itrId = itemDescriptions.keySet().iterator();
@@ -309,17 +323,28 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                             copyNumbers.put(itemDescriptions.get(key).getCopyNumber(), key);
                         }
 
-                        dueDates = getDueDateForItemIds(itemIds, holdingsDocFromXml, copyNumbers, holdingId);
+                        dueDates = getDueDateForItemIds(itemIds, holdingsDocFromXml,
+                        		copyNumbers, holdingId);
 
                         Iterator<String> itr = itemInformations.keySet().iterator();
                         while (itr.hasNext()) {
                             ItemOptionalFields iof = new ItemOptionalFields();
                             String key = itr.next();
                             if (statuses != null) {
-                                log.debug("Status for key " + statuses.get(key));
-                                if (statuses.get(key) != null) {
-                                    iof.setCirculationStatus(XcCirculationStatus.find(XcCirculationStatus.XC_CIRCULATION_STATUS, statuses.get(key)));
-                                }
+                            	String status = statuses.get(key);
+                            	if (status.equalsIgnoreCase("Hold")) {
+                            		status = "On Hold";
+                            	}
+                            	log.debug("Status for key " + status);
+                            	try {
+	                                if (statuses.get(key) != null) {
+	                                	iof.setCirculationStatus(XcCirculationStatus.find(
+	                                					XcCirculationStatus.XC_CIRCULATION_STATUS, 
+	                                					status));
+	                                }
+                            	} catch (ServiceException se) {
+                            		log.error("Unrecognized item status");
+                            	}
                             }
 
                             /*  Ignoring for vxws release
@@ -332,24 +357,27 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                             }
 
                             if (locations != null) {
-
                                 //List<Location> tempLocations = locations.get(key);
                                 List<Location> tempLocations = new ArrayList<Location>();
                                 tempLocations.add(locations.get(key));
                                 if (tempLocations != null) {
-                                    LocationNameInstance lni = tempLocations.get(0).getLocationName().getLocationNameInstances().get(0);
+                                    LocationNameInstance lni = 
+                                    		tempLocations.get(0).getLocationName().
+                                    		getLocationNameInstances().get(0);
                                     iof.setLocations(tempLocations);
                                 }
                             }
 
                             ItemInformation itemInformation = itemInformations.get(key);
                             itemInformation.setItemOptionalFields(iof);
-                            if (dueDates != null)
+                            if (dueDates != null) {
                                 itemInformation.setDateDue(dueDates.get(key));
+                            }
                             itemInformations.put(key, itemInformation);
                         }
 
-                        holdingSet.setItemInformations(new ArrayList<ItemInformation>(itemInformations.values()));
+                        holdingSet.setItemInformations(
+                        		new ArrayList<ItemInformation>(itemInformations.values()));
 
                         itemCount = itemCount + itemIds.size();
 
@@ -392,7 +420,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                             reachedMaxItemCount = true;
                         }
 
-                        Map<String, ItemInformation> itemInformations = new HashMap<String, ItemInformation>();
+                        Map<String, ItemInformation> itemInformations = 
+                        		new HashMap<String, ItemInformation>();
                         ItemInformation itemInformation = new ItemInformation();
                         ItemId item = new ItemId();
                         item.setItemIdentifierValue("");
@@ -400,7 +429,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                         //itemInformation.setItemId(item);
                         itemInformations.put("", itemInformation);
-                        holdingSet.setItemInformations(new ArrayList<ItemInformation>(itemInformations.values()));
+                        holdingSet.setItemInformations(
+                        		new ArrayList<ItemInformation>(itemInformations.values()));
                     }
 
                     log.info("Adding new holding set");
@@ -427,7 +457,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         }
 
         Date eService = new Date();
-        log.debug("Service time log : " + (eService.getTime() - sService.getTime()) + "  " + ((eService.getTime() - sService.getTime())/1000) + " sec");
+        log.debug("LUIS Service time log : " + (eService.getTime() - sService.getTime()) + "  " + 
+        		((eService.getTime() - sService.getTime())/1000) + " sec");
 
         luisResponseData.setBibInformations(bibInformations);
 
@@ -436,15 +467,19 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
     private boolean checkValidAgencyId(String itemAgencyId) {
         String ubid = (String) voyagerConfig.getProperty(itemAgencyId);
-        if (ubid != null)
+        if (ubid != null) {
             return true;
-        else
+        }
+        else {
             return false;
+        }
     }
 
     private ElectronicResource getElectronicResource(Document doc) throws ILSException {
-        Namespace holNs = Namespace.getNamespace("hol", "http://www.endinfosys.com/Voyager/holdings");
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+        		"hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Namespace slimNs = Namespace.getNamespace("slim", "http://www.loc.gov/MARC21/slim");
         XPath xpath;
         try {
@@ -457,7 +492,7 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                 log.debug("Found url " + url.getTextTrim());
                 ElectronicResource electronicResource = new ElectronicResource();
                 electronicResource.setReferenceToResource(url.getTextTrim());
-              return electronicResource;
+                return electronicResource;
             } else {
                 log.debug("Did not find url");
             }
@@ -469,17 +504,20 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     }
 
     private boolean doesRecordExist(Document holdingsDocFromXml) throws ILSException {
-        Namespace ns = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace ns = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         XPath xpath;
         try {
             xpath = XPath.newInstance("/ser:voyagerServiceData/ser:messages/ser:message");
             xpath.addNamespace(ns);
             Element message = (Element) xpath.selectSingleNode(holdingsDocFromXml);
             if (message != null && message.getText().startsWith("Could not retrieve bib record")) {
+            	log.debug("The message text is: " + message.getText());
                 log.debug("Could not retrieve bib record");
                 return false;
-            } else
+            } else {
                 return true;
+            }
         } catch (JDOMException e) {
             throw new ILSException(e);
         }
@@ -487,7 +525,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
     private int getIndexOfBibId(List<BibliographicId> bibIds, String bibId) {
         for (int i = 0; i < bibIds.size() ; i++) {
-            if (bibIds.get(i).getBibliographicItemId().getBibliographicItemIdentifier().equalsIgnoreCase(bibId)) {
+            if (bibIds.get(i).getBibliographicItemId().
+            		getBibliographicItemIdentifier().equalsIgnoreCase(bibId)) {
                 return i;
             }
         }
@@ -504,18 +543,24 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     private Document getHoldingRecordsFromRestful(BibliographicId bibliographicId) {
         String itemAgencyId;
         String host;
-        String bibId = bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+        String bibId = bibliographicId.getBibliographicRecordId().
+        		getBibliographicRecordIdentifier();
 
-        if (bibliographicId.getBibliographicRecordId().getAgencyId() != null)
+        if (bibliographicId.getBibliographicRecordId().getAgencyId() != null) {
             itemAgencyId = bibliographicId.getBibliographicRecordId().getAgencyId().getValue();
-        else
-            itemAgencyId = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
+        }
+        else {
+            itemAgencyId = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
+        }
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean(
+        		(String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(itemAgencyId);
         } else {
-            host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+            host = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
         }
 
         String webServicesUrl =  host + "/vxws/record/" + bibId + "/holdings?view=items";
@@ -527,8 +572,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     private List<String> getHoldingIdsFromHoldingDoc(Document doc) throws ILSException {
         List<String> holdingIds = new ArrayList<String>();
 
-        Namespace holNs = Namespace.getNamespace("hol", "http://www.endinfosys.com/Voyager/holdings");
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+        		"hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Namespace mfhdNs = Namespace.getNamespace("mfhd", "http://www.endinfosys.com/Voyager/mfhd");
         try {
             XPath xpath = XPath.newInstance("//mfhd:mfhdRecord");
@@ -546,10 +593,13 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         return holdingIds;
     }
 
-    private Map<String, GregorianCalendar> getDueDateForItemIds(List<String> itemIds, Document doc, Map<String, String> copyNumbers, String mfhdId) {
+    private Map<String, GregorianCalendar> getDueDateForItemIds(List<String> itemIds, Document doc, 
+    		Map<String, String> copyNumbers, String mfhdId) {
 
-        Namespace holNs = Namespace.getNamespace("hol", "http://www.endinfosys.com/Voyager/holdings");
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+        		"hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Namespace mfhdNs = Namespace.getNamespace("mfhd", "http://www.endinfosys.com/Voyager/mfhd");
         Namespace itemNs = Namespace.getNamespace("item", "http://www.endinfosys.com/Voyager/item");
 
@@ -565,8 +615,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         Map<String, GregorianCalendar> dueDates = new HashMap<String, GregorianCalendar>();
 
         try {
-            List<Element> list = doc.getRootElement().getChild("serviceData", serNs).getChild("holdingsRecord", holNs).getChildren();
-            mfhdCollection = doc.getRootElement().getChild("serviceData", serNs).getChild("holdingsRecord", holNs).getChild("mfhdCollection", holNs);
+            List<Element> list = doc.getRootElement().getChild("serviceData", serNs).
+            		getChild("holdingsRecord", holNs).getChildren();
+            mfhdCollection = doc.getRootElement().getChild("serviceData", serNs).
+            		getChild("holdingsRecord", holNs).getChild("mfhdCollection", holNs);
             mfhdElements = mfhdCollection.getChildren("mfhdRecord", mfhdNs);
 
             for (Element mfhdRecord : mfhdElements) {
@@ -592,18 +644,26 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                             }
                         }
                         if (foundCopy) {
-                            String[] dateComponents = statusDate.substring(0, 10).split("-");
-                            String[] timeComponents = statusDate.substring(11).split(":");
+                            if (statusDate != null && !"".equals(statusDate)) {
+                                log.debug("Found statusDate: " + statusDate);
+                                String[] dateComponents = statusDate.substring(0, 10).split("-");
+                                String[] timeComponents = statusDate.substring(11).split(":");
 
-                            GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(dateComponents[0]),
-                                    Integer.parseInt(dateComponents[1]) - 1, //GC months start at 0
-                                    Integer.parseInt(dateComponents[2]),
-                                    Integer.parseInt(timeComponents[0]),
-                                    Integer.parseInt(timeComponents[1]),
-                                    Integer.parseInt(timeComponents[2]));
+                                GregorianCalendar gc = new GregorianCalendar(
+                                		Integer.parseInt(dateComponents[0]),
+                                		//GC months start at 0 so subtract 1
+                                        Integer.parseInt(dateComponents[1]) - 1, 
+                                        Integer.parseInt(dateComponents[2]),
+                                        Integer.parseInt(timeComponents[0]),
+                                        Integer.parseInt(timeComponents[1]),
+                                        Integer.parseInt(timeComponents[2]));
 
-                            dueDates.put(copyNumbers.get(copyNumber), gc);
-                            foundCopy = false;
+                                dueDates.put(copyNumbers.get(copyNumber), gc);
+                                foundCopy = false;
+                            } else {
+                                log.debug("Warning: statusDate is null");
+                                foundCopy = false;
+                            }
                         }
                     }
                 }
@@ -615,15 +675,19 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         return dueDates;
     }
 
-    private ElectronicResource getElectronicResourceForHoldingId(String mfhdId, Document doc) throws ILSException {
+    private ElectronicResource getElectronicResourceForHoldingId(String mfhdId, Document doc) 
+    		throws ILSException {
 
-        Namespace holNs = Namespace.getNamespace("hol", "http://www.endinfosys.com/Voyager/holdings");
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+        		"hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Namespace slimNs = Namespace.getNamespace("slim", "http://www.loc.gov/MARC21/slim");
         ElectronicResource electronicResource = new ElectronicResource();
 
         try {
-            XPath xpath = XPath.newInstance("//slim:datafield[@tag='856']/slim:subfield[@code='u']");
+            XPath xpath = XPath.newInstance(
+            		"//slim:datafield[@tag='856']/slim:subfield[@code='u']");
             xpath.addNamespace(holNs);
             xpath.addNamespace(serNs);
             xpath.addNamespace(slimNs);
@@ -642,7 +706,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         return electronicResource;
     }
 
-    private List<String> getItemIdsFromHoldingDoc(String holdingId, Document doc) throws ILSException {
+    private List<String> getItemIdsFromHoldingDoc(String holdingId, Document doc)
+    		throws ILSException {
         List<Element> items, holdings = null;
         List<String> itemIds = new ArrayList<String>();
         String itemId, holdingIdFound;
@@ -686,7 +751,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                 index = href.lastIndexOf("/");
                 holdingIdFound = href.substring(index).substring(1);
                 if (holdingIdFound.equalsIgnoreCase(holdingId)){
-                    xpath = XPath.newInstance("/response/holdings/institution/holding[@href='" + href + "']/item/itemData[@name='callNumber']");
+                    xpath = XPath.newInstance("/response/holdings/institution/holding[@href='" + 
+                    		href + "']/item/itemData[@name='callNumber']");
                     itemData = (Element) xpath.selectSingleNode(doc);
                     callNumber = itemData.getTextTrim();
                 }
@@ -705,8 +771,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         Location location = null;
         int index;
 
-        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null){
-            holdings = doc.getRootElement().getChild("holdings").getChild("institution").getChildren("holding");
+        if (doc.getRootElement().getChild("holdings").
+        		getChild("institution").getChildren() != null) {
+            holdings = doc.getRootElement().getChild("holdings").
+            		getChild("institution").getChildren("holding");
             for (Element holding : holdings) {
                 href = holding.getAttributeValue("href");
                 index = href.lastIndexOf("/");
@@ -714,25 +782,27 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                 if (holdingIdFound.equalsIgnoreCase(holdingId)){
                     items = holding.getChild("item").getChildren("itemData");
                     for (Element itemData : items) {
-                        if (itemData.getAttribute("name") != null){
-                            if (itemData.getAttributeValue("name").equalsIgnoreCase("permLocation")){
-                                permLocation = itemData.getTextTrim();
-                                LocationNameInstance locationNameInstance = new LocationNameInstance();
+                        if (itemData.getAttribute("name") != null && 
+                        		itemData.getAttributeValue("name").equalsIgnoreCase("permLocation"))
+                        {
+                            permLocation = itemData.getTextTrim();
+                            LocationNameInstance locationNameInstance = new LocationNameInstance();
 
-                                locationNameInstance.setLocationNameValue(permLocation);
-                                //TODO: more to come from requirement for level
-                                locationNameInstance.setLocationNameLevel(new BigDecimal("1"));//temporarily set to 1.
+                            locationNameInstance.setLocationNameValue(permLocation);
+                            //TODO: more to come from requirement for level
+                            //temporarily set to 1.
+                            locationNameInstance.setLocationNameLevel(new BigDecimal("1"));
 
-                                List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
-                                locationNameInstances.add(locationNameInstance);
+                            List<LocationNameInstance> locationNameInstances = 
+                            		new ArrayList<LocationNameInstance>();
+                            locationNameInstances.add(locationNameInstance);
 
-                                LocationName locationName = new LocationName();
-                                locationName.setLocationNameInstances(locationNameInstances);
+                            LocationName locationName = new LocationName();
+                            locationName.setLocationNameInstances(locationNameInstances);
 
-                                location = new Location();
-                                location.setLocationName(locationName);
-                                location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
-                            }
+                            location = new Location();
+                            location.setLocationName(locationName);
+                            location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
                         }
                     }
                 }
@@ -748,8 +818,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         Map<String, Location> tempLocations = new HashMap<String, Location>();
 
         int index;
-        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null){
-            holdings = doc.getRootElement().getChild("holdings").getChild("institution").getChildren("holding");
+        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null)
+        {
+            holdings = doc.getRootElement().getChild("holdings").
+            		getChild("institution").getChildren("holding");
             for (Element holding : holdings) {
                 items = holding.getChildren("item");
                 for (Element item : items) {
@@ -770,12 +842,15 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                                         log.info("Found empty temp location");
                                         continue;
                                     }
-                                    LocationNameInstance locationNameInstance = new LocationNameInstance();
+                                    LocationNameInstance locationNameInstance = 
+                                    		new LocationNameInstance();
 
-                                    locationNameInstance.setLocationNameValue(StringUtils.trim(tempLocation));
+                                    locationNameInstance.setLocationNameValue(
+                                    		StringUtils.trim(tempLocation));
                                     locationNameInstance.setLocationNameLevel(new BigDecimal("1"));
 
-                                    List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+                                    List<LocationNameInstance> locationNameInstances = 
+                                    		new ArrayList<LocationNameInstance>();
                                     locationNameInstances.add(locationNameInstance);
 
                                     LocationName locationName = new LocationName();
@@ -783,7 +858,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                                     location = new Location();
                                     location.setLocationName(locationName);
-                                    location.setLocationType(Version1LocationType.TEMPORARY_LOCATION);
+                                    location.setLocationType(
+                                    		Version1LocationType.TEMPORARY_LOCATION);
                                 }
                                 if (id.getAttributeValue("name").equalsIgnoreCase("permLocation")){
                                     tempLocation = id.getTextTrim();
@@ -791,12 +867,15 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                                         log.info("Found empty perm location");
                                         continue;
                                     }
-                                    LocationNameInstance locationNameInstance = new LocationNameInstance();
+                                    LocationNameInstance locationNameInstance = 
+                                    		new LocationNameInstance();
 
-                                    locationNameInstance.setLocationNameValue(StringUtils.trim(tempLocation));
+                                    locationNameInstance.setLocationNameValue(
+                                    		StringUtils.trim(tempLocation));
                                     locationNameInstance.setLocationNameLevel(new BigDecimal("1"));
 
-                                    List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+                                    List<LocationNameInstance> locationNameInstances = 
+                                    		new ArrayList<LocationNameInstance>();
                                     locationNameInstances.add(locationNameInstance);
 
                                     LocationName locationName = new LocationName();
@@ -804,7 +883,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                                     if (location == null) {
                                         location = new Location();
                                         location.setLocationName(locationName);
-                                        location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+                                        location.setLocationType(
+                                        		Version1LocationType.PERMANENT_LOCATION);
                                     }
                                 }
 
@@ -830,8 +910,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         String itemId, href, status;
 
         int index;
-        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null){
-            holdings = doc.getRootElement().getChild("holdings").getChild("institution").getChildren("holding");
+        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null)
+        {
+            holdings = doc.getRootElement().getChild("holdings").
+            		getChild("institution").getChildren("holding");
             for (Element holding : holdings) {
                 items = holding.getChildren("item");
                 for (Element item : items) {
@@ -845,20 +927,21 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                                 if (id.getAttributeValue("name").equalsIgnoreCase("itemStatus")){
                                     status = id.getTextTrim();
                                     log.debug("Found status: " + status);
-                                    if (status.endsWith("+"))
+                                    if (status.endsWith("+")) {
                                         status = status.substring(0, status.length() - 1);
-                                    if (status.contains("Not Charged"))
+                                    }
+                                    if (status.contains("Not Charged")) {
                                         status = "Not Charged";
-                                    else if (status.contains("Charged"))
+                                    } else if (status.contains("Charged")) {
                                         status = "Charged";
-                                    else if (status.contains("Missing"))
+                                    } else if (status.contains("Missing")) {
                                         status = "Missing";
-                                    else if (status.contains("Lost"))
+                                    } else if (status.contains("Lost")) {
                                         status = "Missing";
-                                    else {
+                                    } /*else {
                                         String arr[] = status.split(" ", 2);
                                         status = arr[0];
-                                    }
+                                    } */
                                     statuses.put(itemId, status);
                                 }
                             }
@@ -873,7 +956,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         }
     }
 
-    private Map<String, ItemDescription> getItemDescriptionForItemIds(List<String> itemIds, Document doc){
+    private Map<String, ItemDescription> getItemDescriptionForItemIds(List<String> itemIds, 
+    		Document doc){
 
         Map<String, ItemDescription> itemDescriptions = new HashMap<String, ItemDescription>();
 
@@ -881,8 +965,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         String itemId, href, status;
 
         int index;
-        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null){
-            holdings = doc.getRootElement().getChild("holdings").getChild("institution").getChildren("holding");
+        if (doc.getRootElement().getChild("holdings").getChild("institution").getChildren() != null)
+        {
+            holdings = doc.getRootElement().getChild("holdings").
+            		getChild("institution").getChildren("holding");
             for (Element holding : holdings) {
                 items = holding.getChildren("item");
                 for (Element item : items) {
@@ -904,7 +990,8 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                                     infoString += id.getTextTrim();
                                 } else if (id.getAttributeValue("name").equalsIgnoreCase("year")){
                                     infoString += id.getTextTrim();
-                                } else if (id.getAttributeValue("name").equalsIgnoreCase("callNumber")){
+                                } else if (id.getAttributeValue("name").
+                                		equalsIgnoreCase("callNumber")){
                                     callNumber = id.getTextTrim();
                                 } else if (id.getAttributeValue("name").equalsIgnoreCase("copy")){
                                     copy = id.getTextTrim();
@@ -937,20 +1024,26 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
     private Document getHoldingRecordsFromXml(BibliographicId bibliographicId) {
 
-        String bibId = bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+        String bibId = bibliographicId.getBibliographicRecordId().
+        		getBibliographicRecordIdentifier();
         String itemAgencyId;
         String host;
 
-        if (bibliographicId.getBibliographicRecordId().getAgencyId() != null)
+        if (bibliographicId.getBibliographicRecordId().getAgencyId() != null) {
             itemAgencyId = bibliographicId.getBibliographicRecordId().getAgencyId().getValue();
-        else
-            itemAgencyId = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
+        }
+        else {
+            itemAgencyId = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_ILS_DEFAULT_AGENCY);
+        }
 
-        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(VoyagerConstants.CONFIG_CONSORTIUM));
+        boolean consortialUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(
+        		VoyagerConstants.CONFIG_CONSORTIUM));
         if (consortialUse) {
             host = voyagerSvcMgr.getUrlFromAgencyId(itemAgencyId);
         } else {
-            host = (String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
+            host = (String) voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
         }
 
         String url = host + "/vxws/GetHoldingsService?bibId=" + bibId;
@@ -963,8 +1056,10 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     private BibliographicDescription getBibliographicDescriptionForBibId(Document doc) {
 
         Namespace slimNs = Namespace.getNamespace("slim", "http://www.loc.gov/MARC21/slim");
-        Namespace holNs = Namespace.getNamespace("hol", "http://www.endinfosys.com/Voyager/holdings");
-        Namespace serNs = Namespace.getNamespace("ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+        		"hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace serNs = Namespace.getNamespace(
+        		"ser", "http://www.endinfosys.com/Voyager/serviceParameters");
         Element marcElement;
         List<Element> dataFieldElements = null;
         List<Element> subFieldElements = null;
@@ -973,40 +1068,57 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
         String titleA = "", titleB = "", titleC = "", titleF = "", titleG = "";
         String titleH = "", titleK = "", titleN = "", titleP = "", titleS = "";
 
-        if (doc.getRootElement().getChild("serviceData", serNs).getChild("holdingsRecord", holNs).getChild("bibRecord", holNs).getChild("marcRecord", holNs) != null){
-            marcElement = doc.getRootElement().getChild("serviceData", serNs).getChild("holdingsRecord", holNs).getChild("bibRecord", holNs).getChild("marcRecord", holNs);
+        if (doc.getRootElement().getChild("serviceData", serNs).getChild("holdingsRecord", holNs).
+        		getChild("bibRecord", holNs).getChild("marcRecord", holNs) != null){
+            marcElement = doc.getRootElement().getChild("serviceData", serNs).
+            		getChild("holdingsRecord", holNs).
+            		getChild("bibRecord", holNs).getChild("marcRecord", holNs);
             dataFieldElements = marcElement.getChildren("datafield", slimNs);
             for (Element eDf : dataFieldElements) {
-                if (eDf.getAttributeValue("tag") != null && eDf.getAttributeValue("tag").equalsIgnoreCase("245")){
+                if (eDf.getAttributeValue("tag") != null && 
+                		eDf.getAttributeValue("tag").equalsIgnoreCase("245")){
                     subFieldElements = eDf.getChildren("subfield", slimNs);
                     for (Element eSf : subFieldElements) {
-                        if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("a"))
+                        if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("a"))
                             titleA = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("b"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("b"))
                             titleB = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("c"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("c"))
                             titleC = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("f"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("f"))
                             titleF = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("g"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("g"))
                             titleG = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("h"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("h"))
                             titleH = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("k"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("k"))
                             titleK = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("n"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("n"))
                             titleN = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("p"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("p"))
                             titleP = eSf.getTextTrim();
-                        else if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("s"))
+                        else if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("s"))
                             titleS = eSf.getTextTrim();
                     }
-                    title = titleA + titleB + titleC + titleF + titleG + titleH + titleK + titleN + titleP + titleS;
+                    title = titleA + titleB + titleC + titleF + titleG +
+                    		titleH + titleK + titleN + titleP + titleS;
                 }
-                if (eDf.getAttributeValue("tag") != null && eDf.getAttributeValue("tag").equalsIgnoreCase("020")){
+                if (eDf.getAttributeValue("tag") != null && 
+                		eDf.getAttributeValue("tag").equalsIgnoreCase("020")){
                     subFieldElements = eDf.getChildren("subfield", slimNs);
                     for (Element eSf : subFieldElements) {
-                        if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("a")){
+                        if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("a")){
                             isbn = eSf.getTextTrim();
                             log.info("Found ISBN: " + isbn);
                         } else {
@@ -1014,10 +1126,12 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         }
                     }
                 }
-                if (eDf.getAttributeValue("tag") != null && eDf.getAttributeValue("tag").equalsIgnoreCase("022")){
+                if (eDf.getAttributeValue("tag") != null && 
+                		eDf.getAttributeValue("tag").equalsIgnoreCase("022")){
                     subFieldElements = eDf.getChildren("subfield", slimNs);
                     for (Element eSf : subFieldElements) {
-                        if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("a")){
+                        if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("a")){
                             issn = eSf.getTextTrim();
                             log.info("Found ISSN: " + issn);
                         } else {
@@ -1025,10 +1139,12 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         }
                     }
                 }
-                if (eDf.getAttributeValue("tag") != null && eDf.getAttributeValue("tag").equalsIgnoreCase("100")){
+                if (eDf.getAttributeValue("tag") != null && 
+                		eDf.getAttributeValue("tag").equalsIgnoreCase("100")){
                     subFieldElements = eDf.getChildren("subfield", slimNs);
                     for (Element eSf : subFieldElements) {
-                        if (eSf.getAttributeValue("code") != null && eSf.getAttributeValue("code").equalsIgnoreCase("a")){
+                        if (eSf.getAttributeValue("code") != null && 
+                        		eSf.getAttributeValue("code").equalsIgnoreCase("a")){
                             author = eSf.getTextTrim();
                             log.info("Found author: " + author);
                         } else {
@@ -1046,41 +1162,41 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
         List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
 
-        if(author != null && author.length()>0){
+        if(author != null && author.length()>0) {
             bibliographicDescription.setAuthor(author);
             hasBibDesc = true;
         }
 
         // Set bib item id
-        if(isbn != null && isbn.length() > 0 ){
+        if(isbn != null && isbn.length() > 0 ) {
             BibliographicItemId bibliographicItemId = new BibliographicItemId();
             bibliographicItemId.setBibliographicItemIdentifier(isbn);
             BibliographicItemIdentifierCode code = new BibliographicItemIdentifierCode(
-                    Version1BibliographicItemIdentifierCode.VERSION_1_BIBLIOGRAPHIC_ITEM_IDENTIFIER_CODE,
-                    "ISBN");
+            	Version1BibliographicItemIdentifierCode.VERSION_1_BIBLIOGRAPHIC_ITEM_IDENTIFIER_CODE,
+                "ISBN");
             bibliographicItemId.setBibliographicItemIdentifierCode(code);
             bibliographicItemIds.add(bibliographicItemId);
             bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
             hasBibDesc = true;
         }
-        else if(issn != null && issn.length() > 0){
+        else if(issn != null && issn.length() > 0) {
             BibliographicItemId bibliographicItemId = new BibliographicItemId();
             bibliographicItemId.setBibliographicItemIdentifier(issn);
             BibliographicItemIdentifierCode code = new BibliographicItemIdentifierCode(
-                    Version1BibliographicItemIdentifierCode.VERSION_1_BIBLIOGRAPHIC_ITEM_IDENTIFIER_CODE,
-                    "ISSN");
+                Version1BibliographicItemIdentifierCode.VERSION_1_BIBLIOGRAPHIC_ITEM_IDENTIFIER_CODE,
+                "ISSN");
             bibliographicItemId.setBibliographicItemIdentifierCode(code);
             bibliographicItemIds.add(bibliographicItemId);
             bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
             hasBibDesc = true;
         }
 
-        if(title != null && title.length()>0){
+        if(title != null && title.length()>0) {
             bibliographicDescription.setTitle(title);
             hasBibDesc = true;
         }
 
-        if(!hasBibDesc){
+        if(!hasBibDesc) {
             return null;
         }
 

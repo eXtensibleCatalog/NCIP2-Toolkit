@@ -23,21 +23,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>binding-ncipv2_01</artifactId>
-            <version>${toolkitVersion}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>binding-ilsdiv1_0</artifactId>
-            <version>${toolkitVersion}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>binding-wclv1_0</artifactId>
+            <artifactId>binding-ncipv2_02</artifactId>
             <version>${toolkitVersion}</version>
             <scope>compile</scope>
         </dependency>
@@ -49,6 +35,13 @@
             <scope>compile</scope>
         </dependency>
         
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4jVersion}</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

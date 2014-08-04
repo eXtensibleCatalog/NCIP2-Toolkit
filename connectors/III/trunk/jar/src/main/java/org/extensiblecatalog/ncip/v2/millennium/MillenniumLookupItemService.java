@@ -46,7 +46,7 @@ public class MillenniumLookupItemService implements LookupItemService {
 			throws ServiceException {
 
         MillenniumRemoteServiceManager millenniumSvcMgr = (MillenniumRemoteServiceManager) serviceManager;
-        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.getConfiguration();
+        MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.buildConfiguration();
 
 		String getAgencyId = MillenniumConfig.getDefaultAgency();
 		String[] getAgencyIdList = getAgencyId.split(",");

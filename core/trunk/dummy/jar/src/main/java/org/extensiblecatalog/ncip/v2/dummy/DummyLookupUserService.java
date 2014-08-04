@@ -8,9 +8,7 @@
 
 package org.extensiblecatalog.ncip.v2.dummy;
 
-import org.extensiblecatalog.ncip.v2.dummy.DummyDatabase.UserInfo;
 import org.extensiblecatalog.ncip.v2.service.*;
-
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -37,63 +35,16 @@ public class DummyLookupUserService implements LookupUserService {
                                                  RemoteServiceManager serviceManager) {
 
         final LookupUserResponseData responseData = new LookupUserResponseData();
-        boolean passwordChecked = false;
-        boolean passwordConfirmed = false;
-        List<Problem> listProblems = new ArrayList<Problem>();
-        
+
         DummyRemoteServiceManager dummySvcMgr = (DummyRemoteServiceManager)serviceManager;
         AgencyId agencyId = new AgencyId(dummySvcMgr.getLibraryName());
-        
-        
-        if (initData.getAuthenticationInputDesired() || initData.getAuthenticationInputs().size() == 2) {
-        	
-			String userName = getPlaintextValue(initData.getAuthenticationInputs(), "username");
-			String password = getPlaintextValue(initData.getAuthenticationInputs(), "password");
-			
-			if (userName == null || password == null) {
-				listProblems.add(this.generateAuthenticationProblem());
-				responseData.setProblems(listProblems);
-				return responseData;
-			}
-			
-			UserInfo userInfo = DummyDatabase.UserInfo.getUserInfo(userName);
-			passwordChecked = true;
-			if (userInfo != null) {
-				passwordConfirmed = userInfo.confirmPassword(password);
-			}
-			if (userInfo != null && passwordConfirmed) {
-			   //auth user
-			   UserId userId = new UserId();
-			   userId.setAgencyId(agencyId);
-			   userId.setUserIdentifierValue(userName);
-			   userId.setUserIdentifierType(new UserIdentifierType("userType"));
-			   responseData.setUserId(userId);
-			   initData.setUserId(userId);
-			}
-        } else if (initData.getUserId() != null  && !passwordChecked ) {
-        	//requested via test page
-        	responseData.setUserId(initData.getUserId());
-        }
-        
-        if(responseData.getUserId() == null) {
-        	listProblems.add(generateAuthenticationProblem());
-        	responseData.setProblems(listProblems);
-        	return responseData;
-        	
-        }
-        
-//default user
-//        if (initData.getUserId() == null && !passwordChecked) {
-//        	UserId id = new UserId();
-//        	id.setAgencyId(agencyId);
-//        	id.setUserIdentifierValue(initData.getAuthenticationInput(0).getAuthenticationInputData());
-//        	id.setUserIdentifierType(new UserIdentifierType("userType"));
-//        	responseData.setUserId(id);
-//        }
-//----
+
+        // Echo back the same item id that came in
+        responseData.setUserId(initData.getUserId());
+
         UserOptionalFields userOptionalFields = new UserOptionalFields();
-        
-        String userNo = responseData.getUserId().getUserIdentifierValue();;
+
+        String userNo = initData.getUserId().getUserIdentifierValue();
 
         if ( initData.getLoanedItemsDesired() ) {
 
@@ -190,7 +141,7 @@ public class DummyLookupUserService implements LookupUserService {
             lateFeeFiscalTransactionInformation.setFiscalTransactionType(Version1FiscalTransactionType.FINE);
             ItemDetails lateFeeItemDetails = new ItemDetails();
             BibliographicDescription lateFeeBibDescription = dummySvcMgr.getBibliographicDescription(
-                DummyDatabase.BibInfo.getByBibNo("mzk.001168631"));
+                DummyDatabase.BibInfo.getByBibNo("123"));
             lateFeeItemDetails.setBibliographicDescription(lateFeeBibDescription);
             GregorianCalendar lateFeeCheckoutDate = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
             lateFeeCheckoutDate.add(Calendar.DAY_OF_YEAR, -75);
@@ -266,7 +217,7 @@ public class DummyLookupUserService implements LookupUserService {
                     = new HashMap<CirculationStatus, BigDecimal>();
 
                 for ( DummyDatabase.RequestInfo requestInfo : requestInfos ) {
-                	
+
                     RequestedItem requestedItem = new RequestedItem();
                     ItemId itemId = new ItemId();
                     itemId.setItemIdentifierValue(requestInfo.itemBarcode);
@@ -358,7 +309,11 @@ public class DummyLookupUserService implements LookupUserService {
 
         }
 
-        UserOptionalFields loadedOptionalFields = null;
+        if ( initData.getAuthenticationInputDesired() ) {
+
+            // TODO: Auth inputs
+
+        }
 
         if ( initData.getBlockOrTrapDesired() ) {
 
@@ -368,70 +323,24 @@ public class DummyLookupUserService implements LookupUserService {
 
         if ( initData.getDateOfBirthDesired() ) {
 
-        	if ( loadedOptionalFields == null ) {
-        		DummyDatabase.UserInfo userInfo = DummyDatabase.UserInfo.getUserInfo(initData.getUserId().getUserIdentifierValue());
-        		if ( userInfo != null) {
-        			loadedOptionalFields = userInfo.getOptionalFields();
-        		}
-        	}
-           
-        	if ( loadedOptionalFields != null ) {
-        		userOptionalFields.setDateOfBirth(loadedOptionalFields.getDateOfBirth());
-        	}
+            // TODO: Date of birth
 
         }
 
         if ( initData.getNameInformationDesired() ) {
 
-        	if ( loadedOptionalFields == null ) {
-        		DummyDatabase.UserInfo userInfo = DummyDatabase.UserInfo.getUserInfo(initData.getUserId().getUserIdentifierValue());
-        		if ( userInfo != null) {
-        			loadedOptionalFields = userInfo.getOptionalFields();
-        		}
-        	}
-           
-        	if ( loadedOptionalFields != null ) {
-        		userOptionalFields.setNameInformation(loadedOptionalFields.getNameInformation());
-        	}
+            PersonalNameInformation pni = new PersonalNameInformation();
+            pni.setUnstructuredPersonalUserName("Jane Doer");
+
+            NameInformation ni = new NameInformation();
+            ni.setPersonalNameInformation(pni);
+            userOptionalFields.setNameInformation(ni);
             
-        }
-        
-        if ( initData.getUserAddressInformationDesired() ) {
-        	if ( loadedOptionalFields == null ) {
-        		DummyDatabase.UserInfo userInfo = DummyDatabase.UserInfo.getUserInfo(initData.getUserId().getUserIdentifierValue());
-        		if ( userInfo != null) {
-        			loadedOptionalFields = userInfo.getOptionalFields();
-        		}
-        	}
-        	
-        	if ( loadedOptionalFields != null ) {
-        		userOptionalFields.setUserAddressInformations(loadedOptionalFields.getUserAddressInformations());
-        	}
         }
 
         responseData.setUserOptionalFields(userOptionalFields);
-        
+
         return responseData;
     }
-    
-    static Problem generateAuthenticationProblem() {
-    	Problem authProblem = new Problem();
-    	authProblem.setProblemDetail("invalid name or password");
-    	authProblem.setProblemElement("problem");
-    	authProblem.setProblemValue("value");
-    	authProblem.setProblemType(new ProblemType("authProblem"));
-    	return authProblem;
-    }
-    
-    static String getPlaintextValue (List<AuthenticationInput> inputs, String value) {
-    	for (AuthenticationInput current : inputs) {
-    		if (current.getAuthenticationInputType().getValue().equalsIgnoreCase(value) 
-    				&& current.getAuthenticationDataFormatType().getValue().equalsIgnoreCase("text")) {
-    			return current.getAuthenticationInputData();
-    		}
-    	}
-    	return null;
-    }
-    
 
 }

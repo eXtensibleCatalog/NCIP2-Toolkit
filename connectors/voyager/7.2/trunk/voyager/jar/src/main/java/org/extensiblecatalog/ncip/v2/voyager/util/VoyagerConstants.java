@@ -45,7 +45,7 @@ public class VoyagerConstants {
      */
     public static final String CONFIG_VOYAGER_DB_READ_ONLY_PASSWORD = "VoyagerDatabaseReadOnlyPassword";
 
-
+    public static final String CONFIG_VOYAGER_ORACLE_USER = "VoyagerOracleUser";
     /**
      * Parameter for looking up the message returned by Voyager to indicate a
      * successful request

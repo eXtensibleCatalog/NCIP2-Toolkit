@@ -65,7 +65,7 @@ public class MillenniumCheckOutItemService implements CheckOutItemService {
         final CheckOutItemResponseData responseData = new CheckOutItemResponseData();
 
 		MillenniumRemoteServiceManager millenniumSvcMgr = (MillenniumRemoteServiceManager) serviceManager;
-		MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.getConfiguration();
+		MillenniumConfiguration MillenniumConfig = millenniumSvcMgr.buildConfiguration();
         String IIIClassicBaseUrl = MillenniumConfig.getURL();
         String SNo = MillenniumConfig.getSearchScope();
 		String baseUrl = "https://" + IIIClassicBaseUrl + "/patroninfo"; //.html~S0";
