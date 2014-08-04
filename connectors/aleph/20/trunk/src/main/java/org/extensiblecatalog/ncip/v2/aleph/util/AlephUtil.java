@@ -9,15 +9,18 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
+import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
+import org.extensiblecatalog.ncip.v2.service.LocationType;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
@@ -27,7 +30,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 
 public class AlephUtil {
-	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, SchemeValuePair agencyId) throws ServiceException{
+	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) throws ServiceException{
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 		
 		if (alephItem.getAuthor() != null) {
@@ -95,7 +98,7 @@ public class AlephUtil {
 
 		location = new Location();
 		location.setLocationName(locationName);
-		location.setLocationType(new SchemeValuePair(AlephConstants.LOCATION_TYPE_PERMANENT));
+		location.setLocationType(new LocationType("" /* FIXME */, AlephConstants.LOCATION_TYPE_PERMANENT));
 		return location;
 	}
 	
@@ -143,7 +146,7 @@ public class AlephUtil {
 
 			Location location = new Location();
 			location.setLocationName(locationName);
-			location.setLocationType(new SchemeValuePair(AlephConstants.LOCATION_TYPE_PERMANENT));
+			location.setLocationType(new LocationType("" /* FIXME */, AlephConstants.LOCATION_TYPE_PERMANENT));
 			List<Location> locations = new ArrayList<Location>();
         	locations.add(location);
         	iof.setLocations(locations);
@@ -151,7 +154,7 @@ public class AlephUtil {
 		
 		if (alephItem.getDescription()!=null){
 			if (description == null) description = new ItemDescription();
-			description.setItemDescriptionLevel(new SchemeValuePair(Version1ItemDescriptionLevel.VERSION_1_ITEM_DESCRIPTION_LEVEL,alephItem.getDescription()));
+			description.setItemDescriptionLevel(new ItemDescriptionLevel(""/* FIXME */ /*, (Version1ItemDescriptionLevel.VERSION_1_ITEM_DESCRIPTION_LEVEL,*/, alephItem.getDescription()));
 			iof.setItemDescription(description);
 		}
 		return iof;

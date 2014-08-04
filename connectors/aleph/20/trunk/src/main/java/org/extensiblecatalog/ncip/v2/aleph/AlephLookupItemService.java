@@ -10,7 +10,9 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.util.List;
 import java.math.BigDecimal;
+
 import org.apache.log4j.Logger;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
@@ -22,11 +24,14 @@ import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemService;
 import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
@@ -45,10 +50,10 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.common.*;
-
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,6 +61,7 @@ import java.util.GregorianCalendar;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -82,9 +88,8 @@ public class AlephLookupItemService implements LookupItemService {
      * @param serviceManager provides access to remote services
      * @return LookupItemResponseData
      */
-     @Override
-	public LookupItemResponseData performService(
-			LookupItemInitiationData initData,
+    @Override
+	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext,
 			RemoteServiceManager serviceManager) throws ServiceException {
 		LookupItemResponseData responseData = new LookupItemResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
@@ -133,35 +138,35 @@ public class AlephLookupItemService implements LookupItemService {
 		    updateResponseData(initData, responseData, alephItem);
 		} catch (IOException ie) {
 		    Problem p = new Problem();
-		    p.setProblemType(new SchemeValuePair("Procesing error"));
+		    p.setProblemType(new ProblemType("Procesing error"));
 		    p.setProblemDetail(ie.getMessage());
 		    List<Problem> problems = new ArrayList<Problem>();
 		    problems.add(p);
 		    responseData.setProblems(problems);
 		} catch (ParserConfigurationException pce) {
 		    Problem p = new Problem();
-		    p.setProblemType(new SchemeValuePair("Procesing error"));
+		    p.setProblemType(new ProblemType("Procesing error"));
 		    p.setProblemDetail(pce.getMessage());
 		    List<Problem> problems = new ArrayList<Problem>();
 		    problems.add(p);
 		    responseData.setProblems(problems);
 		} catch (SAXException se) {
 		    Problem p = new Problem();
-		    p.setProblemType(new SchemeValuePair("Procesing error"));
+		    p.setProblemType(new ProblemType("Procesing error"));
 		    p.setProblemDetail(se.getMessage());
 		    List<Problem> problems = new ArrayList<Problem>();
 		    problems.add(p);
 		    responseData.setProblems(problems);
 		} catch (AlephException ae) {
 		    Problem p = new Problem();
-		    p.setProblemType(new SchemeValuePair("Procesing error"));
+		    p.setProblemType(new ProblemType("Procesing error"));
 		    p.setProblemDetail(ae.getMessage());
 		    List<Problem> problems = new ArrayList<Problem>();
 		    problems.add(p);
 		    responseData.setProblems(problems);
 		} catch (Exception e) {
 		    Problem p = new Problem();
-		    p.setProblemType(new SchemeValuePair("Procesing error"));
+		    p.setProblemType(new ProblemType("Procesing error"));
 		    p.setProblemDetail(e.getMessage());
 		    List<Problem> problems = new ArrayList<Problem>();
 		    problems.add(p);
@@ -170,7 +175,7 @@ public class AlephLookupItemService implements LookupItemService {
 
 		if (alephItem == null) {
 		    Problem p = new Problem();
-		    p.setProblemType(new SchemeValuePair("Procesing error"));
+		    p.setProblemType(new ProblemType("Procesing error"));
 		    p.setProblemDetail("Unknown item for Item Id: "+initData.getItemId());
 		    List<Problem> problems = new ArrayList<Problem>();
 		    problems.add(p);
@@ -204,8 +209,8 @@ public class AlephLookupItemService implements LookupItemService {
     			UserId userId = new UserId();
     			AlephUser alephUser = alephItem.getBorrowingUsers().get(0);
     	        userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-    	        userId.setUserIdentifierType(new SchemeValuePair("Username"));
-    	        userId.setAgencyId(new SchemeValuePair(alephUser.getAgency().getAgencyId()));
+    	        userId.setUserIdentifierType(new UserIdentifierType("Username"));
+    	        userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
     			borrower.setUserId(userId);
     			itemTransaction.setCurrentBorrower(borrower);
     		}
@@ -218,8 +223,8 @@ public class AlephLookupItemService implements LookupItemService {
     				CurrentRequester requester = new CurrentRequester();
     				UserId userId = new UserId();
         	        userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-        	        userId.setUserIdentifierType(new SchemeValuePair("Username"));
-        	        userId.setAgencyId(new SchemeValuePair(alephUser.getAgency().getAgencyId()));
+        	        userId.setUserIdentifierType(new UserIdentifierType("Username"));
+        	        userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
         			requester.setUserId(userId);
         			List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
         			if (requesters == null) requesters = new ArrayList<CurrentRequester>();

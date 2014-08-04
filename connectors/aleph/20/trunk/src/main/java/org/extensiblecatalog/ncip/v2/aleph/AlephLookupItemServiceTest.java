@@ -14,7 +14,8 @@ import junit.framework.TestCase;
 
 import org.extensiblecatalog.ncip.v2.aleph.test.TestConfiguration;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
+//import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
@@ -22,8 +23,8 @@ import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 public class AlephLookupItemServiceTest extends TestCase {
 	
 	public AlephLookupItemServiceTest() throws IOException {
-		NCIPConfiguration config = new NCIPConfiguration();
-		NCIPConfiguration.getInstance().getProperties().putAll(TestConfiguration.getProperties());
+	//	NCIPConfiguration config = new NCIPConfiguration();
+	//	NCIPConfiguration.getInstance().getProperties().putAll(TestConfiguration.getProperties());
 	}
 	
 	public void testPerformService() throws IOException,Exception {
@@ -66,11 +67,11 @@ public class AlephLookupItemServiceTest extends TestCase {
 		initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
 		ItemId itemId = new ItemId();
-		itemId.setAgencyId(new SchemeValuePair(holdingAgencyId));
+		itemId.setAgencyId(new AgencyId(holdingAgencyId));
 		itemId.setItemIdentifierValue(adm_id);
 		initData.setItemId(itemId);
 		
-		LookupItemResponseData responseData = service.performService(initData, serviceManager);
+		LookupItemResponseData responseData = service.performService(initData, null, serviceManager);
 		
 		assertEquals("Item ID Incorrect",adm_id,responseData.getItemId().getItemIdentifierValue());
 		assertEquals("Author incorrect",author,responseData.getItemOptionalFields().getBibliographicDescription().getAuthor());

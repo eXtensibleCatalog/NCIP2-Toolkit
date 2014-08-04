@@ -21,8 +21,10 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.ILSException;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
+/*
 import org.extensiblecatalog.ncip.v2.common.Constants;
 import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
+*/
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
@@ -47,9 +49,11 @@ import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.UserId;
@@ -77,7 +81,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 	@Override
 	public LookupItemSetResponseData performService(
-			LookupItemSetInitiationData initData,
+			LookupItemSetInitiationData initData, ServiceContext serviceContext,
 			RemoteServiceManager serviceManager) throws ServiceException {
 		Date sService = new Date();
         LookupItemSetResponseData responseData = new LookupItemSetResponseData();
@@ -107,8 +111,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		AlephItem alephItem = null;
                 // Execute request if agency Id is blank or NRU
 		if (initData.getInitiationHeader().getFromAgencyId() != null 
-		     && !initData.getInitiationHeader().getFromAgencyId().getValue().equalsIgnoreCase("") 
-		     && alephSvcMgr.getAlephAgency(initData.getInitiationHeader().getFromAgencyId().getValue()) == null) {
+		     && !initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue().equalsIgnoreCase("") 
+		     && alephSvcMgr.getAlephAgency(initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue()) == null) {
 		    throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
 					       "This request cannot be processed. Agency ID is invalid or not found.");
 		}
@@ -150,14 +154,14 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	        	BibInformation bibInformation = new BibInformation();
 	        	bibInformation.setBibliographicId(bibId);
 
-			    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, initData.getInitiationHeader().getFromAgencyId().getValue(), true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+			    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(), true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
 			    
 			    bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
 			    if (getBibDescription){
-			    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem,initData.getInitiationHeader().getFromAgencyId());
+			    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem,initData.getInitiationHeader().getFromAgencyId().getAgencyId());
 	        		bibInformation.setBibliographicDescription(bDesc);
 			    }
-	        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, initData.getInitiationHeader().getFromAgencyId().getValue(), 
+	        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(), 
 	        			getBibDescription, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
 
 	        	//first iterate through list of holdings items to get itemIds list so can move pointer if nextitemtoken set for itemids
@@ -218,7 +222,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	        				ItemInformation itemInformation = new ItemInformation();
 	        				ItemId item = new ItemId();
 	        				item.setItemIdentifierValue(alephItem.getItemId());
-	        				item.setAgencyId(initData.getInitiationHeader().getFromAgencyId());
+	        				item.setAgencyId(initData.getInitiationHeader().getFromAgencyId().getAgencyId());
 	    		        
 	        				itemInformation.setItemId(item);
 	        				itemInformation.setItemOptionalFields(AlephUtil.getItemOptionalFields(alephItem));
@@ -259,28 +263,28 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	        	}
 	        } catch (AlephException e) {
 	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
+				p.setProblemType(new ProblemType("Processing error"));
 				p.setProblemDetail(e.getMessage());
 				List<Problem> problems = new ArrayList<Problem>();
 				problems.add(p);
 				responseData.setProblems(problems);
 	        } catch (SAXException e) {
 	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
+				p.setProblemType(new ProblemType("Processing error"));
 				p.setProblemDetail(e.getMessage());
 				List<Problem> problems = new ArrayList<Problem>();
 				problems.add(p);
 				responseData.setProblems(problems);
 	        } catch (ParserConfigurationException e) {
 	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
+				p.setProblemType(new ProblemType("Processing error"));
 				p.setProblemDetail(e.getMessage());
 				List<Problem> problems = new ArrayList<Problem>();
 				problems.add(p);
 				responseData.setProblems(problems);
 	        } catch (IOException e) {
 	        	Problem p = new Problem();
-				p.setProblemType(new SchemeValuePair("Processing error"));
+				p.setProblemType(new ProblemType("Processing error"));
 				p.setProblemDetail(e.getMessage());
 				List<Problem> problems = new ArrayList<Problem>();
 				problems.add(p);
