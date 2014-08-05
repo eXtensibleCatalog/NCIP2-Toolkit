@@ -8,7 +8,15 @@
 
 package org.extensiblecatalog.ncip.v2.aleph;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 /**
  * This class implements the Lookup User service for the Dummy back-end connector. Basically this just
@@ -18,6 +26,8 @@ import org.extensiblecatalog.ncip.v2.service.*;
  * use this class as an example. See the NCIP toolkit Connector developer's documentation for guidance.
  */
 public class AlephLookupUserService implements LookupUserService {
+	
+	static Logger log = Logger.getLogger(AlephLookupUserService.class);
 
     /**
      * Handles a NCIP LookupUser service by returning hard-coded data.
@@ -32,23 +42,43 @@ public class AlephLookupUserService implements LookupUserService {
                                                  RemoteServiceManager serviceManager) {
 
         final LookupUserResponseData responseData = new LookupUserResponseData();
+        AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+        
+        String patronId = null;
+        String password = null;
+        
+        for (AuthenticationInput authInput : initData.getAuthenticationInputs()) {
+        	if (authInput.getAuthenticationInputType().getValue().equals("Username")) {
+        		patronId = authInput.getAuthenticationInputData();
+        	}
+        	if (authInput.getAuthenticationInputType().getValue().equals("Password")) {
+        		password = authInput.getAuthenticationInputData();
+        	}
+        }
+        
+        AlephUser user = null;
+        
+        try {
+        	String agencyId = "MZK"; // FIXME
+        	user = alephRemoteServiceManager.authenticateUser(agencyId, patronId, password);
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
 
         //AgencyId agencyId = new AgencyId(dummySvcMgr.getLibraryName());
 
         // Echo back the same item id that came in
         responseData.setUserId(initData.getUserId());
+        
 
         UserOptionalFields userOptionalFields = new UserOptionalFields();
 
-        if ( initData.getNameInformationDesired() ) {
-
+        if (user != null && initData.getNameInformationDesired()) {
             PersonalNameInformation pni = new PersonalNameInformation();
-            pni.setUnstructuredPersonalUserName("Jane Doer");
-
+            pni.setUnstructuredPersonalUserName(user.getFullName());
             NameInformation ni = new NameInformation();
             ni.setPersonalNameInformation(pni);
             userOptionalFields.setNameInformation(ni);
-            
         }
 
         responseData.setUserOptionalFields(userOptionalFields);

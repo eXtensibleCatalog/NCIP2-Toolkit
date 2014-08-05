@@ -37,12 +37,13 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
         }
 	}
 
-	public AlephRemoteServiceManager(){
+	public AlephRemoteServiceManager() {
     	initializeAgencyMap();
     	initializeAvailabilityMaps();
     }
 	
 	public AlephRemoteServiceManager(Properties properties) {
+		this();
 		log.info("AlephRemoteServiceManager constructor called");
 	}
 	

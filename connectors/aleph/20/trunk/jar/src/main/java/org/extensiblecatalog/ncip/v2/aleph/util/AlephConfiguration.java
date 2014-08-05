@@ -15,7 +15,11 @@ public class AlephConfiguration implements ConnectorConfiguration {
 
 	public String[] getArray(String key) {
 		String value = delegate.getProperty(key);
-		return value.split(",");
+		if (value != null) {
+			return value.split(",");
+		} else {
+			return null;
+		}
 	}
 
 	@Override
