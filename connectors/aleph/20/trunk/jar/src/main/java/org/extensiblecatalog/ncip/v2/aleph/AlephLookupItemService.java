@@ -9,47 +9,26 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.util.List;
-import java.math.BigDecimal;
-
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
-import org.extensiblecatalog.ncip.v2.service.Location;
-import org.extensiblecatalog.ncip.v2.service.LocationName;
-import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemService;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
-import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
-import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
-import org.extensiblecatalog.ncip.v2.service.MediumType;
-import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.aleph.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
@@ -58,8 +37,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.GregorianCalendar;
-import java.util.Set;
-
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
@@ -91,6 +68,7 @@ public class AlephLookupItemService implements LookupItemService {
     @Override
 	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext,
 			RemoteServiceManager serviceManager) throws ServiceException {
+    	log.info("AlephLookupItemService.performService called");
 		LookupItemResponseData responseData = new LookupItemResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 

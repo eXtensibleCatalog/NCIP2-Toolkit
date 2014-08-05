@@ -2,9 +2,11 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
+import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
@@ -15,18 +17,21 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
  * @author Rick Johnson
  * @organization University of Notre Dame
  */
-public class AlephRemoteServiceManager extends AlephMediator implements RemoteServiceManager{
+public class AlephRemoteServiceManager extends AlephMediator implements RemoteServiceManager {
+	
+	static Logger log = Logger.getLogger(AlephLookupItemService.class);
+	
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 7115174311329481562L;
 
-	/* FIXME: is it OK? */
 	private AlephConfiguration alephConfig = null; 
 	{
 		try {
-			alephConfig = (AlephConfiguration) new ConnectorConfigurationFactory(
+			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(
             		new Properties()).getConfiguration();
+			alephConfig = new AlephConfiguration(config);
         } catch (ToolkitException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -36,6 +41,10 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
     	initializeAgencyMap();
     	initializeAvailabilityMaps();
     }
+	
+	public AlephRemoteServiceManager(Properties properties) {
+		log.info("AlephRemoteServiceManager constructor called");
+	}
 	
     /**
      * Initialize the internal agency map to values from NCIPToolkit_config.xml
