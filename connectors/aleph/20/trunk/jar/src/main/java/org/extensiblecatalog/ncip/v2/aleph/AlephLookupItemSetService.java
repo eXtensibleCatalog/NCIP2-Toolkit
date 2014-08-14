@@ -23,13 +23,16 @@ import org.extensiblecatalog.ncip.v2.aleph.util.ILSException;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
 /*
 import org.extensiblecatalog.ncip.v2.common.Constants;
+
 import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
 */
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
@@ -56,9 +59,13 @@ import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 import org.xml.sax.SAXException;
@@ -107,15 +114,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
         if (alephSvcMgr.getXServerName() == null || alephSvcMgr.getXServerPort() == null) {
 		    throw new ServiceException(ServiceError.CONFIGURATION_ERROR,"Aleph X-Server name and/or port not set");
 		}
-	
-		AlephItem alephItem = null;
-                // Execute request if agency Id is blank or NRU
-		if (initData.getInitiationHeader().getFromAgencyId() != null 
-		     && !initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue().equalsIgnoreCase("") 
-		     && alephSvcMgr.getAlephAgency(initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue()) == null) {
-		    throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
-					       "This request cannot be processed. Agency ID is invalid or not found.");
-		}
         
         String token = initData.getNextItemToken();
         ItemToken nextItemToken = null;
@@ -146,152 +144,370 @@ public class AlephLookupItemSetService implements LookupItemSetService {
         }
         List<BibInformation> bibInformations = new ArrayList<BibInformation>();
         
-        // Loop through Bib Ids in request
-        for (BibliographicId bibId : bibIds) {
-        	log.debug("Processing Bib id = "+bibId.getBibliographicItemId().getBibliographicItemIdentifier());
-	        try {
-	        	String id = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
-	        	BibInformation bibInformation = new BibInformation();
-	        	bibInformation.setBibliographicId(bibId);
+	
+		AlephItem alephItem = null;
+		
+		if ( initData.getBibliographicIds() != null && initData.getBibliographicIds().size() > 0 ) {
 
-			    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(), true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
-			    
-			    bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
-			    if (getBibDescription){
-			    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem,initData.getInitiationHeader().getFromAgencyId().getAgencyId());
-	        		bibInformation.setBibliographicDescription(bDesc);
-			    }
-	        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(), 
-	        			getBibDescription, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+            for (BibliographicId bibId : bibIds) {
 
-	        	//first iterate through list of holdings items to get itemIds list so can move pointer if nextitemtoken set for itemids
-	        	itemIds = new ArrayList<String>();
-	        	for (AlephItem holdingsItem : holdingsItems){
-	        		itemIds.add(holdingsItem.getItemId()); 
-	        	}
-	        	
-	        	if (nextItemToken != null) {
-	        		int index = itemIds.indexOf(nextItemToken.getItemId());
-	        		if (index != -1) {
-	        			//also modify holdingsItems list since that is what we use and will be in same sequential order as itemIds list
-	        			if (index != holdingsItems.size() -1) {
-	        				holdingsItems.subList(0, index + 1).clear();
-	        				itemIds.subList(0, index + 1).clear();
-	        			} else {
-	        				holdingsItems.clear();
-	        				itemIds.clear();
-	        			}
-				    
-	        		} 
+                if (bibId.getBibliographicRecordId() != null ) {
 
-	        		log.debug("after removing already processed item ids ="+itemIds);
-	        	
-	        	}
+					if (bibId.getBibliographicRecordId().getAgencyId() != null) {
+						
+		                // Execute request if agency Id is blank or NRU
+						if (!bibId.getBibliographicRecordId().getAgencyId()
+								.getValue().equalsIgnoreCase("")
+								&& alephSvcMgr.getAlephAgency(bibId
+										.getBibliographicRecordId()
+										.getAgencyId().getValue()) == null) {
+							throw new ServiceException(
+									ServiceError.UNSUPPORTED_REQUEST,
+									"This request cannot be processed. Agency ID is invalid or not found.");
+						}
 
-	        	if (holdingsItems!=null){
-	        		for (AlephItem holdingsItem : holdingsItems){
-	        			if (holdingsItem.getHoldingsId()!=null&&holdingsItem.getHoldingsId().length()>0){
-	        				HoldingsSet holdingsSet = holdingIdHoldingSets.get(holdingsItem.getHoldingsId());
-	        				if (holdingsSet == null){
-	        					holdingsSet = new HoldingsSet();
-	        					// Set Bib Id and holdings set id
-	        					holdingsSet.setHoldingsSetId(holdingsItem.getHoldingsId());
-	        					holdingsSet.setCallNumber(holdingsItem.getCallNumber());
-			        		
-	        					// Set location
-	        					Location location = null;
-	        					if (getLocation) {
-	        						location = AlephUtil.getLocation(alephItem);
-	        						if (location != null) {
-	        							holdingsSet.setLocation(location);
-	        						}
-	        					}
-			        		
-	        					int newItemCount = itemCount + holdingsItems.size();
-			        		
-	        					if (newItemCount > MAX_ITEMS_TO_RETURN) {
-	        						holdingsItems = getHoldingsItemsSubset(holdingsItems, itemCount);
-	        						itemIds = getItemIdSubset(itemIds, itemCount);
-	        						log.debug("Subset holdingItems:"+holdingsItems);
-	        					}
-	        				}
-	        			
-	        				List<ItemInformation> itemInformations = holdingsSet.getItemInformations();
-	        				if (itemInformations==null) itemInformations = new ArrayList<ItemInformation>();
-	        				
-	        				ItemInformation itemInformation = new ItemInformation();
-	        				ItemId item = new ItemId();
-	        				item.setItemIdentifierValue(alephItem.getItemId());
-	        				item.setAgencyId(initData.getInitiationHeader().getFromAgencyId().getAgencyId());
-	    		        
-	        				itemInformation.setItemId(item);
-	        				itemInformation.setItemOptionalFields(AlephUtil.getItemOptionalFields(alephItem));
-	        				if (alephItem.getDueDate()!=null){
-	        					GregorianCalendar cal = new GregorianCalendar();
-	        					cal.setTime(alephItem.getDueDate());
-	        					itemInformation.setDateDue(cal);
-	        				}
-	        				itemInformations.add(itemInformation);
-	        				holdingsSet.setItemInformations(itemInformations);
-	        				holdingIdHoldingSets.put(holdingsItem.getHoldingsId(), holdingsSet);
-	        				itemCount = itemCount + itemIds.size();
-	        				log.debug("Item count: " + itemCount);
-	        				if (itemCount == MAX_ITEMS_TO_RETURN) {
-	        					// Set next item token
-	        					ItemToken itemToken = new ItemToken();
-	        					itemToken.setBibliographicId(id);
-	        					itemToken.setHoldingsId(holdingsItem.getHoldingsId());
-	        					itemToken.setItemId(itemIds.get(itemIds.size() - 1));
-	        					int newToken = random.nextInt();
-	        					itemToken.setNextToken(Integer.toString(newToken));
-	        					tokens.put(Integer.toString(newToken), itemToken);
-				    
-	        					responseData.setNextItemToken(Integer.toString(newToken));
-	    		        	
-	        					reachedMaxItemCount = true;
-	        					break;
-	        				}
-	        			}	
-	        		}
-	        	
-	        		holdingSets.addAll(holdingIdHoldingSets.values());
-	        		bibInformation.setHoldingsSets(holdingSets);
-	        		bibInformations.add(bibInformation);
-	        		if (reachedMaxItemCount) {
-	        			break;
-	        		}
-	        	}
-	        } catch (AlephException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new ProblemType("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        } catch (SAXException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new ProblemType("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        } catch (ParserConfigurationException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new ProblemType("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        } catch (IOException e) {
-	        	Problem p = new Problem();
-				p.setProblemType(new ProblemType("Processing error"));
-				p.setProblemDetail(e.getMessage());
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-	        }
-        }
-        
+					} else {
+
+                        BibliographicRecordIdentifierCode code
+                            = bibId.getBibliographicRecordId().getBibliographicRecordIdentifierCode();
+                        if ( code.equals(Version1BibliographicRecordIdentifierCode.OCLC) ) {
+
+                            String oclcNum = bibId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+
+                        } else {
+
+                            BibInformation bibInformation = new BibInformation();
+                            bibInformation.setProblems(ServiceHelper.generateProblems(
+                                Version1GeneralProcessingError.UNAUTHORIZED_COMBINATION_OF_ELEMENT_VALUES_FOR_SYSTEM,
+                                "//BibliographicRecordId/BibliographicRecordIdentifierCode",
+                                code.getScheme() + ": " + code.getValue(), "Bib Id type '" + code.getScheme() + ": "
+                                    + code.getValue() + "' not supported."));
+                            bibInformations.add(bibInformation);
+
+                        }
+                    }
+					log.debug("Processing Bib id = "+bibId.getBibliographicItemId().getBibliographicItemIdentifier());
+			        try {
+			        	String id = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
+			        	BibInformation bibInformation = new BibInformation();
+			        	bibInformation.setBibliographicId(bibId);
+
+					    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, bibId.getBibliographicRecordId().getAgencyId().getValue(), true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+					    
+					    bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
+					    if (getBibDescription){
+					    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem,bibId.getBibliographicRecordId().getAgencyId());
+			        		bibInformation.setBibliographicDescription(bDesc);
+					    }
+			        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, bibId.getBibliographicRecordId().getAgencyId().getValue(), 
+			        			getBibDescription, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+
+			        	//first iterate through list of holdings items to get itemIds list so can move pointer if nextitemtoken set for itemids
+			        	itemIds = new ArrayList<String>();
+			        	for (AlephItem holdingsItem : holdingsItems){
+			        		itemIds.add(holdingsItem.getItemId()); 
+			        	}
+			        	
+			        	if (nextItemToken != null) {
+			        		int index = itemIds.indexOf(nextItemToken.getItemId());
+			        		if (index != -1) {
+			        			//also modify holdingsItems list since that is what we use and will be in same sequential order as itemIds list
+			        			if (index != holdingsItems.size() -1) {
+			        				holdingsItems.subList(0, index + 1).clear();
+			        				itemIds.subList(0, index + 1).clear();
+			        			} else {
+			        				holdingsItems.clear();
+			        				itemIds.clear();
+			        			}
+						    
+			        		} 
+
+			        		log.debug("after removing already processed item ids ="+itemIds);
+			        	
+			        	}
+
+			        	if (holdingsItems!=null){
+			        		for (AlephItem holdingsItem : holdingsItems){
+			        			if (holdingsItem.getHoldingsId()!=null&&holdingsItem.getHoldingsId().length()>0){
+			        				HoldingsSet holdingsSet = holdingIdHoldingSets.get(holdingsItem.getHoldingsId());
+			        				if (holdingsSet == null){
+			        					holdingsSet = new HoldingsSet();
+			        					// Set Bib Id and holdings set id
+			        					holdingsSet.setHoldingsSetId(holdingsItem.getHoldingsId());
+			        					holdingsSet.setCallNumber(holdingsItem.getCallNumber());
+					        		
+			        					// Set location
+			        					Location location = null;
+			        					if (getLocation) {
+			        						location = AlephUtil.getLocation(alephItem);
+			        						if (location != null) {
+			        							holdingsSet.setLocation(location);
+			        						}
+			        					}
+					        		
+			        					int newItemCount = itemCount + holdingsItems.size();
+					        		
+			        					if (newItemCount > MAX_ITEMS_TO_RETURN) {
+			        						holdingsItems = getHoldingsItemsSubset(holdingsItems, itemCount);
+			        						itemIds = getItemIdSubset(itemIds, itemCount);
+			        						log.debug("Subset holdingItems:"+holdingsItems);
+			        					}
+			        				}
+			        			
+			        				List<ItemInformation> itemInformations = holdingsSet.getItemInformations();
+			        				if (itemInformations==null) itemInformations = new ArrayList<ItemInformation>();
+			        				
+			        				ItemInformation itemInformation = new ItemInformation();
+			        				ItemId item = new ItemId();
+			        				item.setItemIdentifierValue(alephItem.getItemId());
+			        				item.setAgencyId(bibId.getBibliographicRecordId().getAgencyId());
+			    		        
+			        				itemInformation.setItemId(item);
+			        				itemInformation.setItemOptionalFields(AlephUtil.getItemOptionalFields(alephItem));
+			        				if (alephItem.getDueDate()!=null){
+			        					GregorianCalendar cal = new GregorianCalendar();
+			        					cal.setTime(alephItem.getDueDate());
+			        					itemInformation.setDateDue(cal);
+			        				}
+			        				itemInformations.add(itemInformation);
+			        				holdingsSet.setItemInformations(itemInformations);
+			        				holdingIdHoldingSets.put(holdingsItem.getHoldingsId(), holdingsSet);
+			        				itemCount = itemCount + itemIds.size();
+			        				log.debug("Item count: " + itemCount);
+			        				if (itemCount == MAX_ITEMS_TO_RETURN) {
+			        					// Set next item token
+			        					ItemToken itemToken = new ItemToken();
+			        					itemToken.setBibliographicId(id);
+			        					itemToken.setHoldingsId(holdingsItem.getHoldingsId());
+			        					itemToken.setItemId(itemIds.get(itemIds.size() - 1));
+			        					int newToken = random.nextInt();
+			        					itemToken.setNextToken(Integer.toString(newToken));
+			        					tokens.put(Integer.toString(newToken), itemToken);
+						    
+			        					responseData.setNextItemToken(Integer.toString(newToken));
+			    		        	
+			        					reachedMaxItemCount = true;
+			        					break;
+			        				}
+			        			}	
+			        		}
+			        	
+			        		holdingSets.addAll(holdingIdHoldingSets.values());
+			        		bibInformation.setHoldingsSets(holdingSets);
+			        		bibInformations.add(bibInformation);
+			        		if (reachedMaxItemCount) {
+			        			break;
+			        		}
+			        	}
+			        } catch (AlephException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        } catch (SAXException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        } catch (ParserConfigurationException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        } catch (IOException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        }
+
+                } else if (bibId.getBibliographicItemId() != null) {
+                	try {
+				    	log.info("AgencyId choosed MZK by default");
+			        	String id = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
+			        	BibInformation bibInformation = new BibInformation();
+			        	bibInformation.setBibliographicId(bibId);
+
+					    AlephItem bibItem = alephSvcMgr.lookupItemByBibId(id, "MZK", true, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+					    
+					    bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
+					    if (getBibDescription){
+					    	//TODO Handle exception if agencyId not supplied - by default use local agencyId
+					    	BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem, new AgencyId("MZK"));
+			        		bibInformation.setBibliographicDescription(bDesc);
+					    }
+			        	List<AlephItem> holdingsItems = alephSvcMgr.lookupHoldingsItemsByBibId(id, "MZK", 
+			        			getBibDescription, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+
+			        	//first iterate through list of holdings items to get itemIds list so can move pointer if nextitemtoken set for itemids
+			        	itemIds = new ArrayList<String>();
+			        	for (AlephItem holdingsItem : holdingsItems){
+			        		itemIds.add(holdingsItem.getItemId()); 
+			        	}
+			        	
+			        	if (nextItemToken != null) {
+			        		int index = itemIds.indexOf(nextItemToken.getItemId());
+			        		if (index != -1) {
+			        			//also modify holdingsItems list since that is what we use and will be in same sequential order as itemIds list
+			        			if (index != holdingsItems.size() -1) {
+			        				holdingsItems.subList(0, index + 1).clear();
+			        				itemIds.subList(0, index + 1).clear();
+			        			} else {
+			        				holdingsItems.clear();
+			        				itemIds.clear();
+			        			}
+						    
+			        		} 
+
+			        		log.debug("after removing already processed item ids ="+itemIds);
+			        	
+			        	}
+
+			        	if (holdingsItems!=null){
+			        		for (AlephItem holdingsItem : holdingsItems){
+			        			if (holdingsItem.getHoldingsId()!=null&&holdingsItem.getHoldingsId().length()>0){
+			        				HoldingsSet holdingsSet = holdingIdHoldingSets.get(holdingsItem.getHoldingsId());
+			        				if (holdingsSet == null){
+			        					holdingsSet = new HoldingsSet();
+			        					// Set Bib Id and holdings set id
+			        					holdingsSet.setHoldingsSetId(holdingsItem.getHoldingsId());
+			        					holdingsSet.setCallNumber(holdingsItem.getCallNumber());
+					        		
+			        					// Set location
+			        					Location location = null;
+			        					if (getLocation) {
+			        						location = AlephUtil.getLocation(alephItem);
+			        						if (location != null) {
+			        							holdingsSet.setLocation(location);
+			        						}
+			        					}
+					        		
+			        					int newItemCount = itemCount + holdingsItems.size();
+					        		
+			        					if (newItemCount > MAX_ITEMS_TO_RETURN) {
+			        						holdingsItems = getHoldingsItemsSubset(holdingsItems, itemCount);
+			        						itemIds = getItemIdSubset(itemIds, itemCount);
+			        						log.debug("Subset holdingItems:"+holdingsItems);
+			        					}
+			        				}
+			        			
+			        				List<ItemInformation> itemInformations = holdingsSet.getItemInformations();
+			        				if (itemInformations==null) itemInformations = new ArrayList<ItemInformation>();
+			        				
+			        				ItemInformation itemInformation = new ItemInformation();
+			        				ItemId item = new ItemId();
+			        				item.setItemIdentifierValue(alephItem.getItemId());
+			        				item.setAgencyId(new AgencyId("MZK"));
+			    		        
+			        				itemInformation.setItemId(item);
+			        				itemInformation.setItemOptionalFields(AlephUtil.getItemOptionalFields(alephItem));
+			        				if (alephItem.getDueDate()!=null){
+			        					GregorianCalendar cal = new GregorianCalendar();
+			        					cal.setTime(alephItem.getDueDate());
+			        					itemInformation.setDateDue(cal);
+			        				}
+			        				itemInformations.add(itemInformation);
+			        				holdingsSet.setItemInformations(itemInformations);
+			        				holdingIdHoldingSets.put(holdingsItem.getHoldingsId(), holdingsSet);
+			        				itemCount = itemCount + itemIds.size();
+			        				log.debug("Item count: " + itemCount);
+			        				if (itemCount == MAX_ITEMS_TO_RETURN) {
+			        					// Set next item token
+			        					ItemToken itemToken = new ItemToken();
+			        					itemToken.setBibliographicId(id);
+			        					itemToken.setHoldingsId(holdingsItem.getHoldingsId());
+			        					itemToken.setItemId(itemIds.get(itemIds.size() - 1));
+			        					int newToken = random.nextInt();
+			        					itemToken.setNextToken(Integer.toString(newToken));
+			        					tokens.put(Integer.toString(newToken), itemToken);
+						    
+			        					responseData.setNextItemToken(Integer.toString(newToken));
+			    		        	
+			        					reachedMaxItemCount = true;
+			        					break;
+			        				}
+			        			}	
+			        		}
+			        	
+			        		holdingSets.addAll(holdingIdHoldingSets.values());
+			        		bibInformation.setHoldingsSets(holdingSets);
+			        		bibInformations.add(bibInformation);
+			        		if (reachedMaxItemCount) {
+			        			break;
+			        		}
+			        	}
+			        } catch (AlephException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        } catch (SAXException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        } catch (ParserConfigurationException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        } catch (IOException e) {
+			        	Problem p = new Problem();
+						p.setProblemType(new ProblemType("Processing error"));
+						p.setProblemDetail(e.getMessage());
+						List<Problem> problems = new ArrayList<Problem>();
+						problems.add(p);
+						responseData.setProblems(problems);
+			        }
+                	
+                } else {
+
+                    BibInformation bibInformation = new BibInformation();
+                    bibInformation.setProblems(ServiceHelper.generateProblems(
+                        Version1GeneralProcessingError.NEEDED_DATA_MISSING,
+                        "BibliographicItemId/RecordId", null,
+                        "BibliographicItemId/RecordId was not properly set."));
+                    bibInformations.add(bibInformation);
+
+                }
+
+            }
+
+        } else if (initData.getItemIds() != null && initData.getItemIds().size() > 0 ) {
+
+            for ( ItemId itemId : initData.getItemIds()) {
+
+                    ItemInformation itemInformation = new ItemInformation();
+                    itemInformation.setProblems(ServiceHelper.generateProblems(
+                        Version1LookupItemProcessingError.UNKNOWN_ITEM, "//BibliographicRecordId",
+                        itemId.getItemIdentifierValue(), "Item # '" + itemId.getItemIdentifierValue() + "' not found."));
+                    List<ItemInformation> itemInformationList = new ArrayList<ItemInformation>();
+                    itemInformationList.add(itemInformation);
+                    HoldingsSet holdingsSet = new HoldingsSet();
+                    holdingsSet.setItemInformations(itemInformationList);
+                    List<HoldingsSet> holdingsSetList = new ArrayList<HoldingsSet>();
+                    BibInformation bibInformation = new BibInformation();
+                    bibInformation.setHoldingsSets(holdingsSetList);
+                    bibInformations.add(bibInformation);
+
+            }
+
+        } ///else - Do nothing, the fact that the bibInformationsList is empty will cause a Problem to be created below
+		
         responseData.setBibInformations(bibInformations);
     	Date eService = new Date();
     	
