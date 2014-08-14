@@ -99,7 +99,7 @@ public class AlephLookupItemService implements LookupItemService {
 		}
 		
 		try {
-		    // to do, get adm and bib from agency id...adm id translates to item
+		    // TODO, get adm and bib from agency id...adm id translates to item
 		    // id in ncip item
 		    alephItem = null;
 		    // get bib library and adm library...just set to ND for now
