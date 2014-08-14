@@ -5,16 +5,15 @@
     <ns1:LookupUser>
 
         <ns1:AuthenticationInput>
-            <ns1:AuthenticationInputData>98765432</ns1:AuthenticationInputData>
+            <ns1:AuthenticationInputData></ns1:AuthenticationInputData>
             <ns1:AuthenticationDataFormatType>text</ns1:AuthenticationDataFormatType>
             <ns1:AuthenticationInputType>Username</ns1:AuthenticationInputType>
         </ns1:AuthenticationInput>
         <ns1:AuthenticationInput>
-            <ns1:AuthenticationInputData>Cook</ns1:AuthenticationInputData>
+            <ns1:AuthenticationInputData></ns1:AuthenticationInputData>
             <ns1:AuthenticationDataFormatType>text</ns1:AuthenticationDataFormatType>
             <ns1:AuthenticationInputType>Password</ns1:AuthenticationInputType>
         </ns1:AuthenticationInput>
-        
         <ns1:LoanedItemsDesired/>
         <ns1:RequestedItemsDesired/>
         <ns1:UserFiscalAccountDesired/>
