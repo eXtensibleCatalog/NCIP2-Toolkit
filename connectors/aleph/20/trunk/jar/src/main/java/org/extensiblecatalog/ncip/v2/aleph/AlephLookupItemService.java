@@ -108,7 +108,7 @@ public class AlephLookupItemService implements LookupItemService {
 			|| getElectronicResource || getItemDescription
 			|| getLocation;
 		    alephItem = alephRemoteServiceManager.lookupItemByItemId(initData.getItemId().getItemIdentifierValue(), 
-									     initData.getItemId().getAgencyId().getValue(), 
+									     "MZK", 
 									     getBibInformation, getHoldQueueLength, getCurrentBorrowers,
 									     getCurrentRequesters, getCircStatus);
 		    
@@ -164,7 +164,7 @@ public class AlephLookupItemService implements LookupItemService {
     }
 
     protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
-    	if (responseData!=null&&alephItem!=null&&initData.getItemId().getItemIdentifierValue().equals(alephItem.getItemId())){
+    	if (responseData!=null&&alephItem!=null&&alephItem.getItemId().indexOf(initData.getItemId().getItemIdentifierValue()) != -1){
     		
     		if (alephItem.getDateAvailablePickup()!=null){
     			GregorianCalendar gc = new GregorianCalendar();
