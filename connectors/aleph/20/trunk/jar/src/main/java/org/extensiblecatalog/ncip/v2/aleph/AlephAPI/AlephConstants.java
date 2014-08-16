@@ -1,5 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph.AlephAPI;
 
+//TODO: remove unused RESTful APIs constants (migrated from X-Service)
 public class AlephConstants {
 
 	//node and xml response parsing constants
@@ -197,6 +198,7 @@ public class AlephConstants {
 	public static final String ERROR_HOLD_LIBRARY_NOT_SET = "Hold library not set for agency";
 	
 	//AlephAPI
+	//TODO: edit those constants into valid format, which Aleph RESTful APIs uses
 	public static final String ALEPHAPI_BOR_AUTH = "bor-auth";
 	public static final String ALEPHAPI_BOR_INFO = "bor-info";
 	public static final String ALEPHAPI_CIRC_STATUS = "circ-status";
@@ -210,6 +212,7 @@ public class AlephConstants {
 	public static final String ALEPHAPI_PUBLISH_AVAILABILITY = "publish_avail";
 	
 	//AlephAPI params
+	//TODO: edit those constants into valid format, which Aleph RESTful APIs uses
 	public static final String PARAM_ALEPHAPI_NAME = "op";
 	public static final String PARAM_LIBRARY = "library";
 	public static final String PARAM_SUB_LIBRARY = "sub_library";

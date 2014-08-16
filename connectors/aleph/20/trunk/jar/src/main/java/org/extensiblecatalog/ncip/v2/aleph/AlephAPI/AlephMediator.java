@@ -33,6 +33,8 @@ import org.xml.sax.SAXException;
  * @author Rick Johnson (NDU) & Jiří Kozlovský (MZK)
  *
  */
+
+//TODO: After all imported classes are fixed, debug this and delete dead code
 public class AlephMediator implements Serializable {
 	
 	private static final long serialVersionUID = 65003L;

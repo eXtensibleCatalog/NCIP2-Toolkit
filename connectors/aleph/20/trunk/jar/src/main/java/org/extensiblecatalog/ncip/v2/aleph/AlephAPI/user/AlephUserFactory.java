@@ -18,6 +18,8 @@ import org.w3c.dom.Document;
  * @author Rick Johnson (NDU)
  *
  */
+
+//TODO: Debug with Aleph RESTful APIs
 public class AlephUserFactory implements Serializable {
 	
 	/**

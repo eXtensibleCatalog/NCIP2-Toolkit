@@ -26,6 +26,8 @@ public class AlephAPIFactory implements Serializable {
 	 * @param password
 	 * @return AlephAPI object initialized with values passed in
 	 */
+	
+	//TODO: Sensibly rename this method after AlephConstants refactored 
 	public static AlephAPI createBorAuthAlephAPI(String library, String sub_library, 
 			String patron_id, String password){
 		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_BOR_AUTH);
@@ -69,6 +71,8 @@ public class AlephAPIFactory implements Serializable {
 	 * 
 	 * @return AlephAPI object configured with the supplied values
 	 */
+	
+	//TODO: Sensibly rename this method after AlephConstants refactored 
 	public static AlephAPI createBorInfoAlephAPI(String library, String patron_id, String password,
 			String cashDataType, String cashFilter, String holdDataType, String loanDataType){
 		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_BOR_INFO);

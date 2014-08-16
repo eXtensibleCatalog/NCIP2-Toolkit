@@ -21,6 +21,8 @@ import org.w3c.dom.NodeList;
  * @author Rick Johnson (NDU)
  *
  */
+
+//TODO: Debug with Aleph RESTful APIs
 public class AlephItemFactory implements Serializable {
 	
 	private static final long serialVersionUID = 65006L;	

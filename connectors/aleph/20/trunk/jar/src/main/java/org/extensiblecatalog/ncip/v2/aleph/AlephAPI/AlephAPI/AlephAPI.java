@@ -128,6 +128,7 @@ public class AlephAPI implements Serializable {
 						for (String value : values){
 							if (value!=null){
 								if (!first){
+									//TODO: format HTTP request into Aleph API
 									data.append("&");
 								}
 								data.append(URLEncoder.encode(paramName,"UTF-8"));
@@ -158,7 +159,7 @@ public class AlephAPI implements Serializable {
 	 */
 	public Document execute(String AlephName, String AlephPort, 
 			boolean sslEnabled) throws AlephException, IOException, ParserConfigurationException, SAXException{
-		if (AlephName==null||AlephPort==null) throw new AlephException ("X-Server Name and/or port undefined");
+		if (AlephName==null||AlephPort==null) throw new AlephException ("Aleph RESTful APIs Name and/or port undefined");
 		URL url = new URL(getUrlString(AlephName,AlephPort,sslEnabled));
 		
 		return postHttpRequest(url);
@@ -166,7 +167,7 @@ public class AlephAPI implements Serializable {
 	
 	public String getUrlString(String AlephName, String AlephPort, boolean sslEnabled){
 		String urlString = sslEnabled?"https://":"http://";
-		urlString += AlephName+":"+AlephPort+"/X";
+		urlString += AlephName+":"+AlephPort+"/rest-dlf";
 		return urlString;
 	}
 	
