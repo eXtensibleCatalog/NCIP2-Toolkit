@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph;
+package org.extensiblecatalog.ncip.v2.aleph.AlephXServices;
 
 import java.util.Properties;
 
@@ -7,7 +7,7 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
+import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemService;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 

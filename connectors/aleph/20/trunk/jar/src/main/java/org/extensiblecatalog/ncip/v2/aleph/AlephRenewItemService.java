@@ -9,6 +9,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.SAXException;
 

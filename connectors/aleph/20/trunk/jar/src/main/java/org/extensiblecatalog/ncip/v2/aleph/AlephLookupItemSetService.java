@@ -15,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;

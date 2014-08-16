@@ -27,6 +27,16 @@ public class AlephConstants {
     public static final String CONFIG_ALEPH_X_SERVER_PORT = "AlephXServerPort";
 
     /**
+     * X-Server address for making Aleph RESTful APIs calls
+     */
+    public static final String CONFIG_ALEPH_API_NAME = "AlephAPIName";
+
+    /**
+     * X-Server port for making Aleph RESTful APIs calls
+     */
+    public static final String CONFIG_ALEPH_API_PORT = "AlephAPIPort";
+
+    /**
      * Currency code used for fines for aleph
      */
     public static final String CONFIG_ALEPH_CURRENCY_CODE = "AlephCurrencyCode";

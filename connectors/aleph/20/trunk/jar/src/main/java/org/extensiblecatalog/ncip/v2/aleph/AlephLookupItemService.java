@@ -9,6 +9,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
@@ -26,17 +27,18 @@ import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.aleph.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.GregorianCalendar;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
@@ -64,7 +66,7 @@ public class AlephLookupItemService implements LookupItemService {
      * @param initData       the LookupItemInitiationData
      * @param serviceManager provides access to remote services
      * @return LookupItemResponseData
-     */
+     */ 
     @Override
 	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext,
 			RemoteServiceManager serviceManager) throws ServiceException {
