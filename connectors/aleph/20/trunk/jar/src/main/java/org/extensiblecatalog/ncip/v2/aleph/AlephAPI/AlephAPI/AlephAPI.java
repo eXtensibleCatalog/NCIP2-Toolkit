@@ -133,7 +133,8 @@ public class AlephAPI implements Serializable {
 	 * @throws IOException
 	 */
 	protected String encodeParameters(Map<String,List<String>> parameters) throws IOException{
-		StringBuffer data = new StringBuffer();
+		String data = new String();
+		data+=(this.parameters.get("patron").equals("Y")?"patron/":"record/");
 		String doc_num = "";
 		if (parameters!=null){
 			for (String paramName : parameters.keySet()){
@@ -144,7 +145,7 @@ public class AlephAPI implements Serializable {
 							if (value!=null){
 								//Done for RECORD - patron'll need separate method
 								if(paramName=="base") {
-									data.append(URLEncoder.encode(value,"UTF-8"));
+									data+=value;
 								} else if(paramName=="doc_number") {
 									while(doc_num.length()+value.length()<AlephConstants.DOC_NUMBER_LENGTH) {
 										doc_num+="0";
@@ -156,9 +157,9 @@ public class AlephAPI implements Serializable {
 					}
 				}
 			}
-			data.append(URLEncoder.encode(doc_num+"/items?view=full","UTF-8"));
+			data+=doc_num+"/items?view=full";
 		}
-		return data.toString();
+		return data;
 	}
 	
 	/**
@@ -181,9 +182,10 @@ public class AlephAPI implements Serializable {
 		return postHttpRequest(url);
 	}
 	
-	public String getUrlString(String AlephName, String AlephPort, boolean sslEnabled){
+	public String getUrlString(String AlephName, String AlephPort, boolean sslEnabled) throws IOException{
 		String urlString = sslEnabled?"https://":"http://";
-		urlString += AlephName+":"+AlephPort+"/rest-dlf/"+(this.parameters.get("patron").equals("Y")?"patron/":"record/");
+		String data = encodeParameters(getParameters());
+		urlString += AlephName+":"+AlephPort+"/rest-dlf/"+data;
 		return urlString;
 	}
 	
@@ -206,18 +208,18 @@ public class AlephAPI implements Serializable {
 		Document doc = docBuilder.newDocument();
 		if(url!=null){
 	        // Construct data
-			String data = encodeParameters(getParameters());
+			//String data = encodeParameters(getParameters());
 	    
 	        // Send data
 	        URLConnection conn = url.openConnection();
 	        conn.setDoOutput(true);
-	        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-	        wr.write(data.toString());
-	        wr.flush();
+	        //OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+	        //wr.write(data.toString());
+	        //wr.flush();
 	    
 	        // Get the response
 			doc = docBuilder.parse(conn.getInputStream());
-	        wr.close();
+	        //wr.close();
 		}
 		return doc;
 	}

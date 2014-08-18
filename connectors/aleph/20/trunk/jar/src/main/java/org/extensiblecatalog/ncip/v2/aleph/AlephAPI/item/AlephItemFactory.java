@@ -477,32 +477,20 @@ public class AlephItemFactory implements Serializable {
 				}
 			}
 			
-			NodeList sessionIdNodes = doc.getElementsByTagName(AlephConstants.SESSION_ID_NODE);
-			if (sessionIdNodes.getLength()<=0){
-				throw new AlephException(AlephConstants.ERROR_FIND_DOC_FAILED_SESSION_ID_MISSING);
-			}
-			Node sessionId = sessionIdNodes.item(0);
-			if (sessionId.hasChildNodes()){
-				Node value = sessionId.getFirstChild();
-				item.setSessionId(value.getNodeValue());
-			} else {
-				throw new AlephException(AlephConstants.ERROR_FIND_DOC_FAILED_SESSION_ID_MISSING);
-			}
-			
 			NodeList itemDataNodes = doc.getElementsByTagName(AlephConstants.ITEM_DATA_NODE);
-			NodeList findDocNodes = doc.getElementsByTagName(AlephConstants.FIND_DOC_NODE);
-			if (findDocNodes.getLength()<=0&&itemDataNodes.getLength()<=0){
+			NodeList getItemListNode = doc.getElementsByTagName(AlephConstants.GET_ITEM_LIST_NODE);
+			if (getItemListNode.getLength()<=0&&itemDataNodes.getLength()<=0){
 				throw new AlephException(AlephConstants.ERROR_FIND_DOC_MISSING);
 			}
 			
 			//check for record or item data node
-			NodeList recordNodes = doc.getElementsByTagName(AlephConstants.RECORD_NODE);
-			if (recordNodes.getLength()<=0&&itemDataNodes.getLength()<=0){
+			NodeList items = doc.getElementsByTagName(AlephConstants.ITEMS_NODE);
+			if (items.getLength()<=0&&itemDataNodes.getLength()<=0){
 				throw new AlephException(AlephConstants.ERROR_RECORD_MISSING);
 			}
 			
 			//get varfield nodes
-			NodeList varfields = doc.getElementsByTagName(AlephConstants.VARFIELD_NODE);
+			NodeList varfields = doc.getElementsByTagName(AlephConstants.ITEM_NODE);
 			if (varfields.getLength()>0){
 				for (int i=0; i< varfields.getLength(); i++){
 					//assume only one item returned so get first item

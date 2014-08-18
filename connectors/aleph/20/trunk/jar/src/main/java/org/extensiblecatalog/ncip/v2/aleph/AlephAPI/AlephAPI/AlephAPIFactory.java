@@ -188,7 +188,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createFindDocAlephAPI(String base, String document_number){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_FIND_DOC, false);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_GET_ITEM_LIST, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER,document_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_BASE, base);
 		return AlephAPI;

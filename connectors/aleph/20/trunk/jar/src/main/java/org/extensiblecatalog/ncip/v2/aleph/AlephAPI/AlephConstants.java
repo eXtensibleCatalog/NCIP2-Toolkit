@@ -10,7 +10,6 @@ public class AlephConstants {
 	public static final String REPLY_NODE = "reply";
 	
 	public static final String DUE_DATE_NODE = "due-date";
-	public static final String VARFIELD_NODE = "varfield";
 	public static final String Z30_BARCODE = "z30-barcode";
 	public static final String Z30_CALL_NUMBER_NODE = "z30-call-no";
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
@@ -59,8 +58,8 @@ public class AlephConstants {
 	public static final String ITEM_DATA_NODE = "item-data";
 	public static final String READ_ITEM_NODE = "read-item";
 	public static final String ITEM_NODE = "item";
-	public static final String FIND_DOC_NODE = "find-doc";
-	public static final String RECORD_NODE = "record";
+	public static final String GET_ITEM_LIST_NODE = "get-item-list";
+	public static final String ITEMS_NODE = "items";
 	public static final String SUBFIELD_NODE = "subfield";
 	public static final String LOAN_STATUS_NODE = "loan-status";
 	public static final String ITEM_STATUS_NODE = "item-status";
@@ -204,7 +203,7 @@ public class AlephConstants {
 	public static final String ALEPHAPI_CIRC_STATUS = "circ-status";
 	public static final String ALEPHAPI_ITEM_DATA = "item-data";
 	public static final String ALEPHAPI_READ_ITEM = "read-item";
-	public static final String ALEPHAPI_FIND_DOC = "find-doc";
+	public static final String ALEPHAPI_GET_ITEM_LIST = "get-item-list";
 	public static final String ALEPHAPI_GET_HOLDING = "get-holding";
 	public static final String ALEPHAPI_HOLD_REQUEST = "hold-req";
 	public static final String ALEPHAPI_CANCEL_HOLD_REQUEST = "hold-req-cancel";
