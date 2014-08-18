@@ -18,7 +18,7 @@ public class AlephAPIFactory implements Serializable {
 	/**
 	 * createBorAuthAlephAPI
 	 * 
-	 * Create an X-Service that will make a bor-auth X-Service call
+	 * Create an Aleph RESTful APIs request that will make a bor-auth Aleph RESTful APIs request call
 	 * 
 	 * @param library
 	 * @param sub_library
@@ -40,7 +40,7 @@ public class AlephAPIFactory implements Serializable {
 	}
 	
 	/**
-	 * Create an AlephAPI object that will query the X-Server for bor-info (patron
+	 * Create an AlephAPI object that will query the Aleph API for bor-info (patron
 	 * info). The library and patron_id values are mandatory.  If password is null,
 	 * it will be ignored.  If getCashData is false, all other cash parameters will
 	 * be ignored.  If cashFilter is not null, cashBalanceOnly and openFinesOnly will
@@ -124,7 +124,7 @@ public class AlephAPIFactory implements Serializable {
 	 * 
 	 * createCircStatusAlephAPI
 	 * 
-	 * Create an X-Service that will make a circ-status X-Service call
+	 * Create an Aleph RESTful APIs request that will make a circ-status Aleph RESTful APIs request call
 	 * 
 	 * @param library
 	 * @param system_number
