@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
- * This class is used to communicate with Aleph API.
+ * This class is used to communicate with Aleph RESTful APIs.
  * 
  * @author Jiří Kozlovský - Moravian Library in Brno (Moravská zemská knihovna v Brně)
  */
@@ -31,8 +31,23 @@ public class AlephAPI implements Serializable {
 	
 	private Map<String,List<String>> parameters;
 	
-	public AlephAPI(String AlephAPIName){
+	
+	/**
+	 * AlephAPI
+	 * 
+	 * Initializes AlephAPI object with supplied parameters.
+	 * 
+	 * Boolean says whether will be "patron" needed. In other words, false given means
+	 * "records" will be sufficient. 
+	 * 
+	 * See {@link https://developers.exlibrisgroup.com/aleph/apis/Aleph-RESTful-APIs}
+	 * 
+	 * @param String AlephAPIName
+	 * @param Boolean patron needed
+	 */
+	public AlephAPI(String AlephAPIName, boolean patronNeeded){
 		addParameter(AlephConstants.PARAM_ALEPHAPI_NAME,AlephAPIName);
+		addParameter("patron",(patronNeeded?"Y":"N"));
 	}
 	
 	/**
@@ -118,8 +133,8 @@ public class AlephAPI implements Serializable {
 	 * @throws IOException
 	 */
 	protected String encodeParameters(Map<String,List<String>> parameters) throws IOException{
-		boolean first = true;
 		StringBuffer data = new StringBuffer();
+		String doc_num = "";
 		if (parameters!=null){
 			for (String paramName : parameters.keySet()){
 				if (paramName!=null){
@@ -127,20 +142,21 @@ public class AlephAPI implements Serializable {
 					if (values!=null){
 						for (String value : values){
 							if (value!=null){
-								if (!first){
-									//TODO: format HTTP request into Aleph API
-									data.append("&");
+								//Done for RECORD - patron'll need separate method
+								if(paramName=="base") {
+									data.append(URLEncoder.encode(value,"UTF-8"));
+								} else if(paramName=="doc_number") {
+									while(doc_num.length()+value.length()<AlephConstants.DOC_NUMBER_LENGTH) {
+										doc_num+="0";
+									}
+									doc_num+=value;
 								}
-								data.append(URLEncoder.encode(paramName,"UTF-8"));
-								data.append("=");
-								data.append(URLEncoder.encode(value,"UTF-8"));
-								
-								first = false;
 							}
 						}
 					}
 				}
 			}
+			data.append(URLEncoder.encode(doc_num+"/items?view=full","UTF-8"));
 		}
 		return data.toString();
 	}
@@ -167,7 +183,7 @@ public class AlephAPI implements Serializable {
 	
 	public String getUrlString(String AlephName, String AlephPort, boolean sslEnabled){
 		String urlString = sslEnabled?"https://":"http://";
-		urlString += AlephName+":"+AlephPort+"/rest-dlf";
+		urlString += AlephName+":"+AlephPort+"/rest-dlf/"+(this.parameters.get("patron").equals("Y")?"patron/":"record/");
 		return urlString;
 	}
 	

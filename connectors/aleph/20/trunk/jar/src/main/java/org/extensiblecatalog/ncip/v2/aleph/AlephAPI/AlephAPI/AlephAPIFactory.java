@@ -30,7 +30,7 @@ public class AlephAPIFactory implements Serializable {
 	//TODO: Sensibly rename this method after AlephConstants refactored 
 	public static AlephAPI createBorAuthAlephAPI(String library, String sub_library, 
 			String patron_id, String password){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_BOR_AUTH);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_BOR_AUTH, true);
 		if (library!=null) AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		if (patron_id!=null) AlephAPI.addParameter(AlephConstants.PARAM_PATRON_ID,patron_id);
 		if (password!=null) AlephAPI.addParameter(AlephConstants.PARAM_PASSWORD,password);
@@ -75,7 +75,7 @@ public class AlephAPIFactory implements Serializable {
 	//TODO: Sensibly rename this method after AlephConstants refactored 
 	public static AlephAPI createBorInfoAlephAPI(String library, String patron_id, String password,
 			String cashDataType, String cashFilter, String holdDataType, String loanDataType){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_BOR_INFO);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_BOR_INFO, true);
 		if (library!=null) AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		if (patron_id!=null) AlephAPI.addParameter(AlephConstants.PARAM_PATRON_ID,patron_id);
 		if (password!=null) AlephAPI.addParameter(AlephConstants.PARAM_PASSWORD,password);
@@ -131,7 +131,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object initialized with values passed in
 	 */
 	public static AlephAPI createCircStatusAlephAPI(String library, String system_number){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_CIRC_STATUS);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_CIRC_STATUS, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		AlephAPI.addParameter(AlephConstants.PARAM_SYSTEM_NUMBER,system_number);
 		return AlephAPI;
@@ -145,7 +145,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createItemDataAlephAPI(String base, String document_number){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_ITEM_DATA);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_ITEM_DATA, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER,document_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_BASE, base);
 		return AlephAPI;
@@ -158,7 +158,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createReadItemAlephAPI(String library, String barcode){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_READ_ITEM);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_READ_ITEM, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		AlephAPI.addParameter(AlephConstants.PARAM_BARCODE, barcode);
 		return AlephAPI;
@@ -173,7 +173,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createReadItemAlephAPI(String library, String document_number, String item_sequence){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_READ_ITEM);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_READ_ITEM, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER, document_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_SEQ_NUMBER, item_sequence);
@@ -188,7 +188,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createFindDocAlephAPI(String base, String document_number){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_FIND_DOC);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_FIND_DOC, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER,document_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_BASE, base);
 		return AlephAPI;
@@ -202,7 +202,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createGetHoldingAlephAPI(String base, String document_number){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_GET_HOLDING);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_GET_HOLDING, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER,document_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_BASE, base);
 		return AlephAPI;
@@ -218,7 +218,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createHoldRequestAlephAPI(String library, String doc_number, String seq_number, String bor_id){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_HOLD_REQUEST);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_HOLD_REQUEST, true);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY,library);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER, doc_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_SEQ_NUMBER, seq_number);
@@ -235,7 +235,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createHoldRequestAlephAPI(String library, String barcode, String bor_id){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_HOLD_REQUEST);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_HOLD_REQUEST, true);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY,library);
 		AlephAPI.addParameter(AlephConstants.PARAM_BARCODE, barcode);
 		AlephAPI.addParameter(AlephConstants.PARAM_PATRON_ID, bor_id);
@@ -251,7 +251,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createCancelHoldRequestAlephAPI(String library, String item_id, String hold_id){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_CANCEL_HOLD_REQUEST);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_CANCEL_HOLD_REQUEST, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		AlephAPI.addParameter(AlephConstants.PARAM_REC_KEY,item_id+hold_id);
 		return AlephAPI;
@@ -267,7 +267,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createCancelHoldRequestAlephAPI(String library, String doc_number, String seq_number, String hold_id){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_CANCEL_HOLD_REQUEST);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_CANCEL_HOLD_REQUEST, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, library);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER,doc_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_SEQ_NUMBER,seq_number);
@@ -285,7 +285,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createRenewAlephAPI(String library, String doc_number, String seq_number, String bor_id){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_RENEW);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_RENEW, true);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY,library);
 		AlephAPI.addParameter(AlephConstants.PARAM_DOC_NUMBER, doc_number);
 		AlephAPI.addParameter(AlephConstants.PARAM_SEQ_NUMBER, seq_number);
@@ -302,7 +302,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @return AlephAPI object
 	 */
 	public static AlephAPI createRenewAlephAPI(String library, String barcode, String bor_id){
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_RENEW);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_RENEW, true);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY,library);
 		AlephAPI.addParameter(AlephConstants.PARAM_BARCODE, barcode);
 		AlephAPI.addParameter(AlephConstants.PARAM_PATRON_ID, bor_id);
@@ -319,7 +319,7 @@ public class AlephAPIFactory implements Serializable {
 	 * @throws AlephException 
 	 */
 	public static AlephAPI createPublishAvailabilityAlephAPI(String bib_library, List<String> bibIds) throws AlephException{
-		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_PUBLISH_AVAILABILITY);
+		AlephAPI AlephAPI = new AlephAPI(AlephConstants.ALEPHAPI_PUBLISH_AVAILABILITY, false);
 		AlephAPI.addParameter(AlephConstants.PARAM_LIBRARY, bib_library);
 		//create string separated by commas
 		String ids = "";

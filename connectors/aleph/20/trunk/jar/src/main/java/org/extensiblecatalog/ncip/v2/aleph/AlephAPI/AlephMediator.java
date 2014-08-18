@@ -189,11 +189,11 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
-		AlephAPI AlephAPI = AlephAPIFactory.createBorAuthAlephAPI(agency.getAdmLibrary(), null, patron_id, password);
+		AlephAPI AlephAPI = AlephAPIFactory.createBorAuthAlephAPI(agency.getBibLibrary(), null, patron_id, password);
 		Document doc = AlephAPI.execute(getAlephName(), getAlephPort(), false);
 		//generate new aleph user
 		AlephUser user =  AlephUserFactory.createAlephUser(agency,doc);
@@ -219,7 +219,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
@@ -238,7 +238,7 @@ public class AlephMediator implements Serializable {
 			loans = AlephConstants.USER_LOANS_NO_DATA;
 		}
 		
-		AlephAPI AlephAPI = AlephAPIFactory.createBorInfoAlephAPI(agency.getAdmLibrary(), patron_id, password, cash, null, holds, loans);
+		AlephAPI AlephAPI = AlephAPIFactory.createBorInfoAlephAPI(agency.getBibLibrary(), patron_id, password, cash, null, holds, loans);
 		Document doc = AlephAPI.execute(getAlephName(), getAlephPort(), false);
 		//generate new aleph user
 		return AlephUserFactory.createAlephUser(agency,doc);
@@ -342,7 +342,7 @@ public class AlephMediator implements Serializable {
 		for (AlephItem bibItem : items){
 			//call read item and only keep items with correct hold id
 			if (bibItem.getBarcode()!=null){
-				AlephAPI AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getAdmLibrary(), bibItem.getBarcode());
+				AlephAPI AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getBibLibrary(), bibItem.getBarcode());
 				Document doc = AlephAPI.execute(getAlephName(), getAlephPort(),false);
 				XMLParserUtil.outputNode(doc);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
@@ -351,7 +351,7 @@ public class AlephMediator implements Serializable {
 				holdingsItems.add(bibItem);
 				//}
 			} else if (bibItem.getDocNumber()!=null&&bibItem.getSeqNumber()!=null){
-				AlephAPI AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getAdmLibrary(), bibItem.getDocNumber(),bibItem.getSeqNumber());
+				AlephAPI AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getBibLibrary(), bibItem.getDocNumber(),bibItem.getSeqNumber());
 				Document doc = AlephAPI.execute(getAlephName(), getAlephPort(),false);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
 				//if ((readItem.getHoldingsId()!=null&&readItem.getHoldingsId().endsWith(holdingsId))||(holdingsId!=null&&holdingsId.endsWith(readItem.getHoldingsId()))){
@@ -416,7 +416,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
@@ -425,7 +425,7 @@ public class AlephMediator implements Serializable {
 		AlephItem item = AlephItemFactory.createAlephItem(agency);
 		item.setItemId(itemId);
 		//get bib id
-		AlephAPI AlephAPI = AlephAPIFactory.createFindDocAlephAPI(agency.getAdmLibrary(), itemId);
+		AlephAPI AlephAPI = AlephAPIFactory.createFindDocAlephAPI(agency.getBibLibrary(), itemId);
 		Document doc = AlephAPI.execute(getAlephName(), getAlephPort(), false);
 
 		item = AlephItemFactory.updateAlephItemParseFindDocResponse(item, doc);
@@ -542,7 +542,7 @@ public class AlephMediator implements Serializable {
 		for (AlephItem bibItem : items){
 			//call read item and only keep items with correct hold id
 			if (bibItem.getBarcode()!=null){
-				AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getAdmLibrary(), bibItem.getBarcode());
+				AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getBibLibrary(), bibItem.getBarcode());
 				doc = AlephAPI.execute(getAlephName(), getAlephPort(),false);
 				XMLParserUtil.outputNode(doc);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
@@ -551,7 +551,7 @@ public class AlephMediator implements Serializable {
 					keepItems.add(bibItem);
 				}
 			} else if (bibItem.getDocNumber()!=null&&bibItem.getSeqNumber()!=null){
-				AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getAdmLibrary(), bibItem.getDocNumber(),item.getSeqNumber());
+				AlephAPI = AlephAPIFactory.createReadItemAlephAPI(agency.getBibLibrary(), bibItem.getDocNumber(),item.getSeqNumber());
 				doc = AlephAPI.execute(getAlephName(), getAlephPort(),false);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
 				if ((readItem.getHoldingsId()!=null&&readItem.getHoldingsId().endsWith(holdingsId))||(holdingsId!=null&&holdingsId.endsWith(readItem.getHoldingsId()))){
@@ -588,7 +588,7 @@ public class AlephMediator implements Serializable {
 			throw new AlephException(AlephConstants.ERROR_HOLD_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
@@ -636,7 +636,7 @@ public class AlephMediator implements Serializable {
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
@@ -680,7 +680,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
@@ -695,7 +695,7 @@ public class AlephMediator implements Serializable {
 		if (user!=null&&user.getRequestedItems()!=null&&user.getRequestedItems().size()>0){
 			for (AlephItem eachItem : user.getRequestedItems()){
 				if (eachItem!=null&&item_id.equals(eachItem.getItemId())&&eachItem.getHoldRequestId()!=null){
-					AlephAPI AlephAPI = AlephAPIFactory.createCancelHoldRequestAlephAPI(agency.getAdmLibrary(), eachItem.getItemId(), eachItem.getHoldRequestId());
+					AlephAPI AlephAPI = AlephAPIFactory.createCancelHoldRequestAlephAPI(agency.getBibLibrary(), eachItem.getItemId(), eachItem.getHoldRequestId());
 					Document doc = AlephAPI.execute(getAlephName(), getAlephPort(), false);
 					String error = XMLParserUtil.getError(doc);
 					if (error!=null){
@@ -739,7 +739,7 @@ public class AlephMediator implements Serializable {
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getHoldingsLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_HOLD_LIBRARY_NOT_SET+agencyId);
@@ -770,7 +770,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
@@ -800,7 +800,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
@@ -826,7 +826,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		}
 		
@@ -841,7 +841,7 @@ public class AlephMediator implements Serializable {
 		} else if (user.hasRequestedItem(item)){
 			throw new AlephException("Item is already requested");
 		} else if (item!=null&&item.getBarcode()!=null){
-			AlephAPI AlephAPI = AlephAPIFactory.createHoldRequestAlephAPI(agency.getAdmLibrary(), item.getBarcode(), request_user_bor_id);
+			AlephAPI AlephAPI = AlephAPIFactory.createHoldRequestAlephAPI(agency.getBibLibrary(), item.getBarcode(), request_user_bor_id);
 			Document doc = AlephAPI.execute(getAlephName(), getAlephPort(), false);
 			String error = XMLParserUtil.getError(doc);
 			if (error!=null){
@@ -890,7 +890,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
@@ -900,7 +900,7 @@ public class AlephMediator implements Serializable {
 		
 		//get item by hold id
 		AlephItem item = lookupItemByHoldingsIdItemId(holdingsId, null, agencyId, false, false, false, false);
-		return renewItem(request_user_bor_id, agency.getAdmLibrary(), item);
+		return renewItem(request_user_bor_id, agency.getBibLibrary(), item);
 	}
 	
 	/**
@@ -924,7 +924,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
@@ -932,7 +932,7 @@ public class AlephMediator implements Serializable {
 		
 		//get item data to get barcode, just call lookupItemByItemId
 		AlephItem item = lookupItemByBibId(bibId, agencyId, false, false, false, false);
-		return renewItem(request_user_bor_id, agency.getAdmLibrary(), item);
+		return renewItem(request_user_bor_id, agency.getBibLibrary(), item);
 	}
 	
 	/**
@@ -954,7 +954,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
@@ -962,7 +962,7 @@ public class AlephMediator implements Serializable {
 		
 		//get item data to get barcode, just call lookupItemByItemId
 		AlephItem item = lookupItemByItemId(itemId, agencyId, true, false, false, false, false);
-		return renewItem(request_user_bor_id, agency.getAdmLibrary(), item);
+		return renewItem(request_user_bor_id, agency.getBibLibrary(), item);
 	}
 	
 	/**
@@ -1022,7 +1022,7 @@ public class AlephMediator implements Serializable {
 		if (agency == null) {
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY + " "
 					+ agencyId);
-		} else if (agency.getAdmLibrary() == null) {
+		} else if (agency.getBibLibrary() == null) {
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET
 					+ agencyId);
 		} else if (agency.getBibLibrary() == null) {
@@ -1086,7 +1086,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
@@ -1145,7 +1145,7 @@ public class AlephMediator implements Serializable {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency==null){
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY+" "+agencyId);
-		} else if (agency.getAdmLibrary()==null){
+		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_ADM_LIBRARY_NOT_SET+agencyId);
 		} else if (agency.getBibLibrary()==null){
 			throw new AlephException(AlephConstants.ERROR_BIB_LIBRARY_NOT_SET+agencyId);
