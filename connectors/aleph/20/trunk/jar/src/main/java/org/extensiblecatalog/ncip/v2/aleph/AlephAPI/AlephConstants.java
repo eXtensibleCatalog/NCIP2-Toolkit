@@ -81,6 +81,7 @@ public class AlephConstants {
 	public static final String LOCATION_LABEL_ATTR_VALUE = "A";
 	public static final String MEDIUM_LABEL_ATTR_VALUE = "m";
 	public static final String ID_NODE_ATTR = "id";
+	public static final String HREF_NODE_ATTR = "href";
 	public static final String AUTHOR_NODE_ID = "100";
 	public static final String ISBN_NODE_ID = "020";
 	public static final String TITLE_NODE_ID = "245";

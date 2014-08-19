@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;

@@ -52,8 +52,7 @@ public class AlephItem implements Serializable {
 	
 	private Date dueDate;
 	
-	//initialize to -1
-	private int holdQueueLength = -1;
+	private int holdQueueLength = 0;
 	
 	private BigDecimal fineAmount;
 	private Date fineAccrualDate;

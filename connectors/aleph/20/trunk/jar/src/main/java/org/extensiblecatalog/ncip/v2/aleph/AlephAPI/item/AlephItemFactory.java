@@ -266,54 +266,54 @@ public class AlephItemFactory implements Serializable {
 	}
 	
 	/**
-	 * Get all loan items in the xml response doc (item-l)
+	 * Get all loan itemsNodes in the xml response doc (item-l)
 	 * 
 	 * @param doc
 	 * @return
 	 * @throws AlephException
 	 */
 	public static List<AlephItem> getLoanAlephItems(AlephAgency agency, Document doc) throws AlephException{
-		List<AlephItem> items = new ArrayList<AlephItem>();
+		List<AlephItem> itemsNodes = new ArrayList<AlephItem>();
 		NodeList loanItemNodes = doc.getElementsByTagName(AlephConstants.LOAN_ITEM_NODE);
 		for (int i=0; i<loanItemNodes.getLength(); i++){
 			AlephItem alephItem = createAlephItem(agency);
 			alephItem = updateAlephItemByNode(alephItem,loanItemNodes.item(i));
 			if (alephItem.getItemId()!=null){
-				items.add(alephItem);
+				itemsNodes.add(alephItem);
 			}
 		}
-		return items;
+		return itemsNodes;
 	}
 	
 	/**
-	 * Get all fine items in the xml response doc (fine)
+	 * Get all fine itemsNodes in the xml response doc (fine)
 	 * 
 	 * @param doc
 	 * @return
 	 * @throws AlephException
 	 */
 	public static List<AlephItem> getFineAlephItems(AlephAgency agency, Document doc) throws AlephException{
-		List<AlephItem> items = new ArrayList<AlephItem>();
+		List<AlephItem> itemsNodes = new ArrayList<AlephItem>();
 		NodeList fineItemNodes = doc.getElementsByTagName(AlephConstants.FINE_ITEM_NODE);
 		for (int i=0; i<fineItemNodes.getLength(); i++){
 			AlephItem alephItem = createAlephItem(agency);
 			alephItem = updateAlephItemByNode(alephItem,fineItemNodes.item(i));
 			if (alephItem.getItemId()!=null){
-				items.add(alephItem);
+				itemsNodes.add(alephItem);
 			}
 		}
-		return items;
+		return itemsNodes;
 	}
 	
 	/**
-	 * Get all hold items in the xml response doc (item-h or hold-req)
+	 * Get all hold itemsNodes in the xml response doc (item-h or hold-req)
 	 * 
 	 * @param doc
 	 * @return
 	 * @throws AlephException
 	 */
 	public static List<AlephItem> getHoldAlephItems(AlephAgency agency, Document doc ) throws AlephException{
-		List<AlephItem> items = new ArrayList<AlephItem>();
+		List<AlephItem> itemsNodes = new ArrayList<AlephItem>();
 		NodeList holdItemNodes = doc.getElementsByTagName(AlephConstants.HOLD_ITEM_NODE);
 		if (holdItemNodes==null||holdItemNodes.getLength()<=0){
 			//check for hold-req node
@@ -323,14 +323,14 @@ public class AlephItemFactory implements Serializable {
 			AlephItem alephItem = createAlephItem(agency);
 			alephItem = updateAlephItemByNode(alephItem,holdItemNodes.item(i));
 			if (alephItem.getItemId()!=null){
-				items.add(alephItem);
+				itemsNodes.add(alephItem);
 			}
 		}
-		return items;
+		return itemsNodes;
 	}
 	
 	/**
-	 * Get all read items in the xml response doc (read-item)
+	 * Get all read itemsNodes in the xml response doc (read-item)
 	 * 
 	 * @param doc
 	 * @return
@@ -346,8 +346,8 @@ public class AlephItemFactory implements Serializable {
 	}
 	
 	/**
-	 * Update an aleph item based on node data contained. Will process hold items,
-	 * loan items, and fine items.
+	 * Update an aleph item based on node data contained. Will process hold itemsNodes,
+	 * loan itemsNodes, and fine itemsNodes.
 	 * 
 	 * @param item
 	 * @param node
@@ -396,11 +396,11 @@ public class AlephItemFactory implements Serializable {
 	 * @return
 	 * @throws AlephException
 	 */
-	public static List<AlephItem> updateAlephItemsParseFindDocResponse(List<AlephItem> items, Document doc ) throws AlephException{
-		for (AlephItem item : items){
+	public static List<AlephItem> updateAlephItemsParseFindDocResponse(List<AlephItem> itemsNodes, Document doc ) throws AlephException{
+		for (AlephItem item : itemsNodes){
 			updateAlephItem(item,doc);
 		}
-		return items;
+		return itemsNodes;
 	}
 	
 	/**
@@ -439,17 +439,17 @@ public class AlephItemFactory implements Serializable {
 	 */
 	public static List<AlephItem> parseItemDataResponse(AlephAgency agency, Document doc ) throws AlephException{
 		//change to return a list
-		List<AlephItem> items = new ArrayList<AlephItem>();
+		List<AlephItem> itemsNodes = new ArrayList<AlephItem>();
 		NodeList itemNodes = doc.getElementsByTagName(AlephConstants.ITEM_NODE);
 		if (itemNodes.getLength()>0){
 			for (int i=0; i< itemNodes.getLength(); i++){
 				Node node = itemNodes.item(i);
 				AlephItem item = AlephItemFactory.createAlephItem(agency);
 				item = updateAlephItemByNode(item,node);
-				items.add(item);
+				itemsNodes.add(item);
 			}
 		}
-		return items; 
+		return itemsNodes; 
 	}
 	
     
@@ -484,33 +484,33 @@ public class AlephItemFactory implements Serializable {
 			}
 			
 			//check for record or item data node
-			NodeList items = doc.getElementsByTagName(AlephConstants.ITEMS_NODE);
-			if (items.getLength()<=0&&itemDataNodes.getLength()<=0){
+			NodeList itemsNodes = doc.getElementsByTagName(AlephConstants.ITEMS_NODE);
+			if (itemsNodes.getLength()<=0&&itemDataNodes.getLength()<=0){
 				throw new AlephException(AlephConstants.ERROR_RECORD_MISSING);
 			}
 			
-			//get varfield nodes
-			NodeList varfields = doc.getElementsByTagName(AlephConstants.ITEM_NODE);
-			if (varfields.getLength()>0){
-				for (int i=0; i< varfields.getLength(); i++){
+			//get itemNode nodes
+			NodeList itemNodes = doc.getElementsByTagName(AlephConstants.ITEM_NODE);
+			if (itemNodes.getLength()>0){
+				for (int i=0; i< itemNodes.getLength(); i++){
 					//assume only one item returned so get first item
-					Node varfield = varfields.item(i);
-					if (varfield!=null&&varfield.hasAttributes()){
-						NamedNodeMap varAtt = varfield.getAttributes();
-						Node id = varAtt.getNamedItem(AlephConstants.ID_NODE_ATTR);
-						if (id!=null){
-							if (AlephConstants.AUTHOR_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String author = XMLParserUtil.getValueFromMarcField(varfield);
+					Node itemNode = itemNodes.item(i);
+					if (itemNode!=null&&itemNode.hasAttributes()){
+						NamedNodeMap varAtt = itemNode.getAttributes();
+						Node href = varAtt.getNamedItem(AlephConstants.HREF_NODE_ATTR);
+						if (href!=null){
+							if (AlephConstants.AUTHOR_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String author = XMLParserUtil.getValueFromMarcField(itemNode);
 								if (author!=null) item.setAuthor(author);
-							} else if (AlephConstants.ISBN_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String isbn = XMLParserUtil.getValueFromMarcField(varfield); 
+							} else if (AlephConstants.ISBN_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String isbn = XMLParserUtil.getValueFromMarcField(itemNode); 
 								if (isbn!=null) item.setIsbn(isbn);
-							} else if (AlephConstants.TITLE_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String title = XMLParserUtil.getValueFromMarcField(varfield);
+							} else if (AlephConstants.TITLE_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String title = XMLParserUtil.getValueFromMarcField(itemNode);
 								if (title!=null) item.setTitle(title);
-							} else if (AlephConstants.CALL_NUMBER_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String callNumber1 = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL1_ATTR_VALUE);
-								String callNumber2 = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL2_ATTR_VALUE);
+							} else if (AlephConstants.CALL_NUMBER_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String callNumber1 = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL1_ATTR_VALUE);
+								String callNumber2 = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL2_ATTR_VALUE);
 								if (callNumber1!=null&&callNumber2==null){
 									item.setCallNumber(callNumber1);
 								} else if (callNumber1==null&&callNumber2!=null){
@@ -518,12 +518,12 @@ public class AlephItemFactory implements Serializable {
 								} else if (callNumber1!=null&&callNumber2!=null){
 									item.setCallNumber(callNumber1+" "+callNumber2);
 								}
-							} else if (AlephConstants.PUBLISHER_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String publisher = XMLParserUtil.getValueFromMarcField(varfield);
+							} else if (AlephConstants.PUBLISHER_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String publisher = XMLParserUtil.getValueFromMarcField(itemNode);
 								if (publisher!=null) item.setPublisher(publisher);
-							} else if (AlephConstants.DESCRIPTION1_NODE_ID.equalsIgnoreCase(id.getNodeValue())||
-									AlephConstants.DESCRIPTION2_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String description = XMLParserUtil.getValueFromMarcField(varfield);
+							} else if (AlephConstants.DESCRIPTION1_NODE_ID.equalsIgnoreCase(href.getNodeValue())||
+									AlephConstants.DESCRIPTION2_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String description = XMLParserUtil.getValueFromMarcField(itemNode);
 								if (description!=null){
 									if (item.getDescription()!=null){
 										//concat value
@@ -532,20 +532,20 @@ public class AlephItemFactory implements Serializable {
 										item.setDescription(description);
 									}
 								}
-							} else if (AlephConstants.Z30_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String location = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.LOCATION_LABEL_ATTR_VALUE);
+							} else if (AlephConstants.Z30_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String location = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.LOCATION_LABEL_ATTR_VALUE);
 								if (location!=null) item.setLocation(location);
 								//set medium type
-								String medium = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.MEDIUM_LABEL_ATTR_VALUE);
+								String medium = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.MEDIUM_LABEL_ATTR_VALUE);
 								if (medium!=null) item.setMediumType(medium);
-							} else if (AlephConstants.SERIES_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String series = XMLParserUtil.getValueFromMarcField(varfield);
+							} else if (AlephConstants.SERIES_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String series = XMLParserUtil.getValueFromMarcField(itemNode);
 								if (series!=null) item.setSeries(series);
-							} else if (AlephConstants.ELECTRONIC_RESOURCE_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String eresource = XMLParserUtil.getValueFromMarcField(varfield, ',');
+							} else if (AlephConstants.ELECTRONIC_RESOURCE_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String eresource = XMLParserUtil.getValueFromMarcField(itemNode, ',');
 								if (eresource!=null) item.setElectronicResource(eresource);
-							} else if (AlephConstants.BIB_ID_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String bib_id = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.BIB_ID_NODE_ATTR_VALUE);
+							} else if (AlephConstants.BIB_ID_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
+								String bib_id = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.BIB_ID_NODE_ATTR_VALUE);
 								if (bib_id!=null) item.setBibId(bib_id);
 							}
 						}
@@ -570,7 +570,7 @@ public class AlephItemFactory implements Serializable {
 	}
 	
 	/**
-	 * Return a list of alephitems with circ status set to a value in AlephItem's
+	 * Return a list of alephitemsNodes with circ status set to a value in AlephItem's
 	 * Availability enumeration.  If a barcode is not found for a record that is being parsed
 	 * it will be omitted in the results.  If availability is not present, it will be set to 
 	 * unknown. If there is a value but unrecognized, it will be set to possibly available.
@@ -580,13 +580,13 @@ public class AlephItemFactory implements Serializable {
 	 * @throws AlephException
 	 */
 	public static List<AlephItem> getAlephItemsCircStatus(AlephAgency agency, Document doc ) throws AlephException{
-		List<AlephItem> items = new ArrayList<AlephItem>();
+		List<AlephItem> itemsNodes = new ArrayList<AlephItem>();
 		NodeList itemDataNodes = doc.getElementsByTagName(AlephConstants.ITEM_DATA_NODE);
 		for (int i=0; i<itemDataNodes.getLength(); i++){
 			AlephItem alephItem = createAlephItem(agency);
 			alephItem = updateAlephItemByNode(alephItem,itemDataNodes.item(i));
-			items.add(alephItem);
+			itemsNodes.add(alephItem);
 		}
-		return items;
+		return itemsNodes;
 	}
 }

@@ -29,10 +29,10 @@ import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephRemoteServiceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class AlephLookupItemService implements LookupItemService {
 		boolean getCurrentBorrowers = initData.getCurrentBorrowerDesired();
 		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
 
-		if (alephRemoteServiceManager.getXServerName() == null || alephRemoteServiceManager.getXServerPort() == null) {
+		if (alephRemoteServiceManager.getAlephName() == null || alephRemoteServiceManager.getAlephPort() == null) {
 		    throw new ServiceException(ServiceError.CONFIGURATION_ERROR,"Aleph X-Server name and/or port not set");
 		}
 		
