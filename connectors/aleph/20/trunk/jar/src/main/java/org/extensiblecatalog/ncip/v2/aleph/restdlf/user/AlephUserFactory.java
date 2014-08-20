@@ -1,10 +1,10 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.user;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.XMLParserUtil;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item.AlephItemFactory;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.XMLParserUtil;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItemFactory;
 
 import java.io.Serializable;
 

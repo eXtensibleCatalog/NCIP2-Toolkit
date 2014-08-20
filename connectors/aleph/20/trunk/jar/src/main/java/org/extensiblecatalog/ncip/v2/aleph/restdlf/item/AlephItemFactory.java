@@ -1,14 +1,16 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.item;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.XMLParserUtil;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.XMLParserUtil;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -22,7 +24,7 @@ import org.w3c.dom.NodeList;
  *
  */
 
-//TODO: Debug with Aleph RESTful APIs
+//TODO: Use more sofisticated XML parser!
 public class AlephItemFactory implements Serializable {
 	
 	private static final long serialVersionUID = 65006L;	
@@ -395,8 +397,9 @@ public class AlephItemFactory implements Serializable {
 	 * @param doc
 	 * @return
 	 * @throws AlephException
+	 * @throws ParserConfigurationException 
 	 */
-	public static List<AlephItem> updateAlephItemsParseFindDocResponse(List<AlephItem> itemsNodes, Document doc ) throws AlephException{
+	public static List<AlephItem> updateAlephItemsParseFindDocResponse(List<AlephItem> itemsNodes, Document doc ) throws AlephException, ParserConfigurationException{
 		for (AlephItem item : itemsNodes){
 			updateAlephItem(item,doc);
 		}
@@ -410,8 +413,9 @@ public class AlephItemFactory implements Serializable {
 	 * @param doc
 	 * @return
 	 * @throws AlephException
+	 * @throws ParserConfigurationException 
 	 */
-	public static AlephItem updateAlephItemParseFindDocResponse(AlephItem item, Document doc ) throws AlephException{
+	public static AlephItem updateAlephItemParseFindDocResponse(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
 		return updateAlephItem(item,doc);
 	}
 	
@@ -422,8 +426,9 @@ public class AlephItemFactory implements Serializable {
 	 * @param doc
 	 * @return
 	 * @throws AlephException
+	 * @throws ParserConfigurationException 
 	 */
-	public static AlephItem updateAlephItemParseItemDataResponse(AlephItem item, Document doc ) throws AlephException{
+	public static AlephItem updateAlephItemParseItemDataResponse(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
 		//change to return a list
 		
 		return updateAlephItem(item,doc);
@@ -460,8 +465,9 @@ public class AlephItemFactory implements Serializable {
 	 * @param doc
 	 * @return
 	 * @throws AlephException
+	 * @throws ParserConfigurationException 
 	 */
-	private static AlephItem updateAlephItem(AlephItem item, Document doc ) throws AlephException{
+	private static AlephItem updateAlephItem(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
 		if (item!=null&&doc!=null){
 			if (!doc.hasChildNodes()){
 				throw new AlephException(AlephConstants.ERROR_FIND_DOC_MISSING);
@@ -499,54 +505,17 @@ public class AlephItemFactory implements Serializable {
 						NamedNodeMap varAtt = itemNode.getAttributes();
 						Node href = varAtt.getNamedItem(AlephConstants.HREF_NODE_ATTR);
 						if (href!=null){
-							if (AlephConstants.AUTHOR_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String author = XMLParserUtil.getValueFromMarcField(itemNode);
-								if (author!=null) item.setAuthor(author);
-							} else if (AlephConstants.ISBN_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String isbn = XMLParserUtil.getValueFromMarcField(itemNode); 
-								if (isbn!=null) item.setIsbn(isbn);
-							} else if (AlephConstants.TITLE_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String title = XMLParserUtil.getValueFromMarcField(itemNode);
-								if (title!=null) item.setTitle(title);
-							} else if (AlephConstants.CALL_NUMBER_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String callNumber1 = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL1_ATTR_VALUE);
-								String callNumber2 = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL2_ATTR_VALUE);
-								if (callNumber1!=null&&callNumber2==null){
-									item.setCallNumber(callNumber1);
-								} else if (callNumber1==null&&callNumber2!=null){
-									item.setCallNumber(callNumber2);
-								} else if (callNumber1!=null&&callNumber2!=null){
-									item.setCallNumber(callNumber1+" "+callNumber2);
+							item.setLink(href.getNodeValue());
+							
+							int itemNodeChildsLength = itemNode.getChildNodes().getLength();
+							if(itemNodeChildsLength>0) {
+								NodeList itemNodeChilds = itemNode.getChildNodes();
+								while (itemNodeChildsLength > 0) {
+									itemNodeChildsLength--;
+									Node currentNode = itemNodeChilds.item(itemNodeChildsLength);
+									parseAlephItemChildNode(currentNode, item);
+									itemNode.removeChild(currentNode);									
 								}
-							} else if (AlephConstants.PUBLISHER_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String publisher = XMLParserUtil.getValueFromMarcField(itemNode);
-								if (publisher!=null) item.setPublisher(publisher);
-							} else if (AlephConstants.DESCRIPTION1_NODE_ID.equalsIgnoreCase(href.getNodeValue())||
-									AlephConstants.DESCRIPTION2_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String description = XMLParserUtil.getValueFromMarcField(itemNode);
-								if (description!=null){
-									if (item.getDescription()!=null){
-										//concat value
-										item.setDescription(item.getDescription()+"; "+description);
-									} else {
-										item.setDescription(description);
-									}
-								}
-							} else if (AlephConstants.Z30_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String location = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.LOCATION_LABEL_ATTR_VALUE);
-								if (location!=null) item.setLocation(location);
-								//set medium type
-								String medium = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.MEDIUM_LABEL_ATTR_VALUE);
-								if (medium!=null) item.setMediumType(medium);
-							} else if (AlephConstants.SERIES_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String series = XMLParserUtil.getValueFromMarcField(itemNode);
-								if (series!=null) item.setSeries(series);
-							} else if (AlephConstants.ELECTRONIC_RESOURCE_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String eresource = XMLParserUtil.getValueFromMarcField(itemNode, ',');
-								if (eresource!=null) item.setElectronicResource(eresource);
-							} else if (AlephConstants.BIB_ID_NODE_ID.equalsIgnoreCase(href.getNodeValue())){
-								String bib_id = XMLParserUtil.getValueFromMarcField(itemNode,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.BIB_ID_NODE_ATTR_VALUE);
-								if (bib_id!=null) item.setBibId(bib_id);
 							}
 						}
 					}
@@ -569,6 +538,78 @@ public class AlephItemFactory implements Serializable {
 		return item;
 	}
 	
+	private static void parseAlephItemChildNode(Node itemChildNode, AlephItem alephItem) throws ParserConfigurationException {
+		String nodeName = itemChildNode.getNodeName();
+		if(itemChildNode.hasChildNodes()) {
+			String nodeVal = itemChildNode.getTextContent();
+			if (nodeName == AlephConstants.STATUS_NODE) {
+				if (nodeVal == AlephConstants.ON_SHELF) {
+					alephItem.setAvailability(AlephConstants.Availability.AVAILABLE);
+				} else {
+					alephItem.setAvailability(AlephConstants.Availability.NOT_AVAILABLE);
+				}			
+			} else if(nodeName == AlephConstants.Z13_NODE) {
+				parseAlephZ13ChildNodes(itemChildNode, alephItem);
+			} else if(nodeName == AlephConstants.Z30_NODE) {
+				parseAlephZ30ChildNodes(itemChildNode, alephItem);
+			} else if(nodeName == AlephConstants.QUEUE_NODE) {
+			//	TODO: does Aleph really post integer?
+			//	Remove try/catch block if yes else fix this code and remove it anyway
+				try {
+					alephItem.setHoldQueueLength(Integer.parseInt(nodeVal));
+				} catch(NumberFormatException e) {
+					throw new ParserConfigurationException("Error parsing hold queue value");
+				}
+			}
+//			The rest of the code listed here is not necessary for now:
+//			<z30-sub-library-code>SK0</z30-sub-library-code>
+//			<z30-item-process-status-code/>
+//			<z30-item-status-code>96</z30-item-status-code>
+//			<z30-collection-code>SKL</z30-collection-code>
+		} else {
+			//TODO: throw processing exception
+		}
+	}
+
+	private static void parseAlephZ13ChildNodes(Node Z13Node, AlephItem alephItem) {
+		NodeList Z13ChildNodes = Z13Node.getChildNodes();
+		int nodesLength = Z13ChildNodes.getLength();
+		if (nodesLength > 0) {
+			while(nodesLength > 0) {
+				nodesLength--;
+				Node currentNode = Z13ChildNodes.item(nodesLength);
+				parseAlephZ13ChildNode(currentNode, alephItem);
+				Z13Node.removeChild(currentNode);
+			}
+		}
+	}
+
+	private static void parseAlephZ13ChildNode(Node Z13ChildNode, AlephItem alephItem) {
+		//Note that previous method removes processed nodes! So try to respect Aleph nodes order.
+		if (Z13ChildNode.getNodeName() == AlephConstants.Z13_ISBN_NODE) {
+			
+			
+		}
+	}
+
+	private static void parseAlephZ30ChildNodes(Node Z30Node, AlephItem alephItem) {
+		NodeList Z30ChildNodes = Z30Node.getChildNodes();
+		int nodesLength = Z30ChildNodes.getLength();
+		if (nodesLength > 0) {
+			while(nodesLength > 0) {
+				nodesLength--;
+				Node currentNode = Z30ChildNodes.item(nodesLength);
+				parseAlephZ30ChildNode(currentNode, alephItem);
+				Z30Node.removeChild(currentNode);
+			}
+		}
+	}
+
+	private static void parseAlephZ30ChildNode(Node Z30ChildNode, AlephItem alephItem) {
+		//Note that previous method removes processed nodes! So try to respect Aleph nodes order.
+		
+	}
+
 	/**
 	 * Return a list of alephitemsNodes with circ status set to a value in AlephItem's
 	 * Availability enumeration.  If a barcode is not found for a record that is being parsed

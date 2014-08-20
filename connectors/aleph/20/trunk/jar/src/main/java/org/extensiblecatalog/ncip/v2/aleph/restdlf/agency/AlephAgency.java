@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.agency;
 
 /**
  * Class that holds Agency settings for current user

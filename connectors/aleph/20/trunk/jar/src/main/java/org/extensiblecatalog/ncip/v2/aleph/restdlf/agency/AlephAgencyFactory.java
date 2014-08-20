@@ -1,6 +1,6 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.agency;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 
 /**
  * Factory class to create a new AlephAgency object

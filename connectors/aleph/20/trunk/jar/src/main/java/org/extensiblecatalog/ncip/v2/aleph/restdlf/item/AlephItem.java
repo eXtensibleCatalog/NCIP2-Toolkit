@@ -1,9 +1,9 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.item;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephConstants.Availability;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants.Availability;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -30,11 +30,14 @@ public class AlephItem implements Serializable {
 	private String holdingsId;
 	private String description;
 	private String location;
+	private String link;
 	private String callNumber;
 	private String author;
 	private String isbn;
 	private String mediumType;
-	
+	private String subLibrary;
+	private String collection;
+
 	private String docNumber;
 	private String seqNumber;
 	
@@ -141,6 +144,20 @@ public class AlephItem implements Serializable {
 	}
 	
 	/**
+	 * @return the link
+	 */
+	public String getLink() {
+		return link;
+	}
+	
+	/**
+	 * @param link the link to set
+	 */
+	public void setLink(String link) {
+		this.link = link;
+	}
+	
+	/**
 	 * @return the callNumber
 	 */
 	public String getCallNumber() {
@@ -198,6 +215,20 @@ public class AlephItem implements Serializable {
 	 */
 	public void setMediumType(String mediumType) {
 		this.mediumType = mediumType;
+	}
+
+	public String getSubLibrary() {
+		return subLibrary;
+	}
+	public void setSubLibrary(String subLibrary) {
+		this.subLibrary = subLibrary;
+	}
+
+	public String getCollection() {
+		return collection;
+	}
+	public void setCollection(String collection) {
+		this.collection = collection;
 	}
 	
 	/**

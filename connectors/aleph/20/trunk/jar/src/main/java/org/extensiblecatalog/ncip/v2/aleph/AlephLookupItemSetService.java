@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -14,61 +13,33 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.aleph.util.ILSException;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
-/*
-import org.extensiblecatalog.ncip.v2.common.Constants;
-
-import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
-*/
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
-import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
-import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.Location;
-import org.extensiblecatalog.ncip.v2.service.LocationName;
-import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
-import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
-import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
-import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
-import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
-import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 import org.xml.sax.SAXException;
 
 public class AlephLookupItemSetService implements LookupItemSetService {
@@ -112,7 +83,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
         int itemCount = 0;
         boolean reachedMaxItemCount = false;
         
-        if (alephSvcMgr.getXServerName() == null || alephSvcMgr.getXServerPort() == null) {
+        if (alephSvcMgr.getAlephName() == null || alephSvcMgr.getAlephPort() == null) {
 		    throw new ServiceException(ServiceError.CONFIGURATION_ERROR,"Aleph X-Server name and/or port not set");
 		}
         

@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
 import java.io.Serializable;
 

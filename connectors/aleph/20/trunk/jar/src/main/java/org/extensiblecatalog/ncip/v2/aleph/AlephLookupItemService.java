@@ -27,12 +27,12 @@ import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephRemoteServiceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;

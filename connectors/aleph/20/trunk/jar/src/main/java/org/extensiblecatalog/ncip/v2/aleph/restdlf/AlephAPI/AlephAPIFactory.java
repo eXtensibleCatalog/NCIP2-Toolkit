@@ -1,7 +1,7 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephAPI;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephAPI;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 
 import java.io.Serializable;
 import java.util.List;

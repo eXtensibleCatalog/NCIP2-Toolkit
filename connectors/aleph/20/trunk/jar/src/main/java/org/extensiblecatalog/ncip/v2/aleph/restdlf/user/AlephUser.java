@@ -1,7 +1,7 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI.user;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephAPI.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;

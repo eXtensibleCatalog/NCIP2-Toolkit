@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephAPI;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
 //TODO: remove unused RESTful APIs constants (migrated from X-Service)
 public class AlephConstants {
@@ -8,6 +8,7 @@ public class AlephConstants {
 	public static final String CODE_ATTRIBUTE = "code";
 	public static final String ERROR_NODE = "error";
 	public static final String REPLY_NODE = "reply";
+	public static final String STATUS_NODE = "status";
 	
 	public static final String DUE_DATE_NODE = "due-date";
 	public static final String Z30_BARCODE = "z30-barcode";
@@ -144,6 +145,7 @@ public class AlephConstants {
 	public static final String UNAVAILABLE_STATUS = "unavailable";
 	public static final String AVAILABLE_STATUS = "available";
 	public static final String BLOCK_NONE_CODE = "00";
+	public static final String ON_SHELF = "On Shelf";
 	
 	public static final String YES = "Y";
 	public static final String NO = "N";
@@ -244,6 +246,7 @@ public class AlephConstants {
 	public static final String USER_HOLDS_ALL_DATA = "Y";
 	public static final String USER_HOLDS_NO_DATA = "N";
 	public static final String USER_HOLDS_PARTIAL_DATA = "P";
+	public static final String QUEUE_NODE = "queue";
 	
 }
 
