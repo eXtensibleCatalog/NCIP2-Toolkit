@@ -151,6 +151,7 @@ public class AlephConstants {
 	public static final String NO = "N";
 	
 	public static enum Availability { UNKNOWN, NOT_AVAILABLE, POSSIBLY_AVAILABLE, AVAILABLE, DOESNT_EXIST }
+	public static enum MessageTypes { LOOKUP, UPDATE, NOTIFICATION }
 
 	public static final String CIRC_STATUS_CHECKED_OUT = "A";
 	
@@ -248,6 +249,22 @@ public class AlephConstants {
 	public static final String USER_HOLDS_PARTIAL_DATA = "P";
 	public static final String QUEUE_NODE = "queue";
 	
+	//Toolkit.properties key values
+	public static final String REST_DLF_SERVER = "RestDlfServer";
+	public static final String REST_DLF_PORT = "RestDlfPort";
+	public static final String REST_DLF_SUFFIX = "RestDlfSuffix";
+	
+	//RESTful APIs http requests values
+	public static final String ITEM_PATH_ELEMENT = "record";
+	public static final String USER_PATH_ELEMENT = "patron";
+	public static final String ITEMS_ELEMENT = "items";
+	
+	//TODO: make Xservices & rest dlf switchable
+	public static final String XSERVER_NAME = "AlephXServerName";
+	public static final String XSERVER_PORT = "AlephXServerPort";
+	public static final String XSERVER_SUFFIX = "AlephXServerSuffix";
+	
+	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
 }
 
 

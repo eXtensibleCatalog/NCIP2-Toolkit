@@ -16,7 +16,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
  * @author Rick Johnson
  * @organization University of Notre Dame
  */
-public class AlephRemoteServiceManager extends AlephMediator implements RemoteServiceManager {
+public class AlephRemoteServiceManager extends AlephConnector implements RemoteServiceManager {
 	
 	
     /**
@@ -24,16 +24,6 @@ public class AlephRemoteServiceManager extends AlephMediator implements RemoteSe
 	 */
 	private static final long serialVersionUID = 65011L;
 
-	private AlephConfiguration alephConfig = null; 
-	{
-		try {
-			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(
-            		new Properties()).getConfiguration();
-			alephConfig = new AlephConfiguration(config);
-        } catch (ToolkitException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-	}
 
 	public AlephRemoteServiceManager() {
     	initializeAgencyMap();

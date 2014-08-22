@@ -2,35 +2,67 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.Properties;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.*;
+import org.extensiblecatalog.ncip.v2.common.*;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+public class AlephConnector extends AlephMediator {
+	// TODO: Generate URL to be built based on type of action to be performed. Then use that URL to get XML response. Then parse the response & send back ncip formatted response.
+	// FIXME: Lookup User service can't be handled by RESTful APIs. Need to provide XServices.
+		
+	private static final long serialVersionUID = -4425639616999642735L;
+	protected AlephConfiguration alephConfig = null;
+	private String serverName;
+	private String serverPort;
+	private String serverSuffix;
+	private String bibLibrary;
+	private String itemPathElement;
+	private String userPathElement;
+	private String itemsElement;
+	private int bibIdLength;
 
-public class AlephConnector {
-	
-	public AlephConnector(URL httpRequest) {
-		url = httpRequest;
-	}
-	
-	public static URL url;
-	
-	protected Document getXMLResponse() throws ParserConfigurationException, IOException, SAXException {
-		DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = docBuilder.newDocument();
-		if(url!=null){
-			
-	        // Send data
-	        URLConnection conn = url.openConnection();
-	        conn.setDoOutput(true);
-	    
-	        // Get the response
-			doc = docBuilder.parse(conn.getInputStream());
+	public AlephConnector() {
+		try {
+			// Get configuration from toolkit.properties file
+			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
+			alephConfig = new AlephConfiguration(config);
+			serverName = alephConfig.getProperty(AlephConstants.REST_DLF_SERVER);
+			serverPort = alephConfig.getProperty(AlephConstants.REST_DLF_PORT);	
+			serverSuffix = alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX);
+			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
+
+			bibIdLength = AlephConstants.BIB_ID_LENGTH;
+			itemPathElement = AlephConstants.ITEM_PATH_ELEMENT;
+			userPathElement = AlephConstants.USER_PATH_ELEMENT;
+			itemsElement = AlephConstants.ITEMS_ELEMENT;
+
+		} catch (ToolkitException e) {
+			throw new ExceptionInInitializerError(e);
 		}
-		return doc;
+
 	}
+
+	private String normalizeItem(String item) {
+		while (item.length() < bibIdLength) {
+			item = "0" + item;
+		}
+		return item;
+	}
+
+	public AlephItem lookupItem(String itemId) throws ParserConfigurationException, IOException, SAXException {
+		itemId = normalizeItem(itemId);
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary+itemId, itemsElement).addRequest("view", "full").toURL();
+		Document xml = new AlephResponder(url).getXMLResponse();
+		AlephItem item = new AlephParser(xml).toAlephItem();
+
+		return item;
+	}
+
 }
