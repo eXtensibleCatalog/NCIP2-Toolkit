@@ -83,7 +83,14 @@ public class AlephLookupItemService implements LookupItemService {
 		boolean getLocation = initData.getLocationDesired();
 		boolean getCurrentBorrowers = initData.getCurrentBorrowerDesired();
 		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
-
+		/*Another possibilities (highly customizable):
+		
+		Item Use Restriction Type  
+		Physical Condition 
+		Security Marker 
+		Sensitization Flag 
+		
+		 */
 		if (alephRemoteServiceManager.getAlephName() == null || alephRemoteServiceManager.getAlephPort() == null) {
 		    throw new ServiceException(ServiceError.CONFIGURATION_ERROR,"Aleph X-Server name and/or port not set");
 		}
@@ -109,10 +116,8 @@ public class AlephLookupItemService implements LookupItemService {
 		    boolean getBibInformation = getBibDescription || getCircStatus
 			|| getElectronicResource || getItemDescription
 			|| getLocation;
-		    alephItem = alephRemoteServiceManager.lookupItemByItemId(initData.getItemId().getItemIdentifierValue(), 
-									     "MZK", 
-									     getBibInformation, getHoldQueueLength, getCurrentBorrowers,
-									     getCurrentRequesters, getCircStatus);
+		    alephItem = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), 
+									     getBibInformation, getCircStatus, getHoldQueueLength, getItemDescription);
 		    
 		    // update NCIP response data with aleph item data
 		    updateResponseData(initData, responseData, alephItem);

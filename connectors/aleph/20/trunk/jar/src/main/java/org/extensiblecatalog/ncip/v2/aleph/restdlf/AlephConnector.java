@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,11 +57,11 @@ public class AlephConnector extends AlephMediator {
 		return item;
 	}
 
-	public AlephItem lookupItem(String itemId) throws ParserConfigurationException, IOException, SAXException {
+	public AlephItem lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLnegth, boolean itemDesrciption) throws ParserConfigurationException, IOException, SAXException, AlephException {
 		itemId = normalizeItem(itemId);
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary+itemId, itemsElement).addRequest("view", "full").toURL();
 		Document xml = new AlephResponder(url).getXMLResponse();
-		AlephItem item = new AlephParser(xml).toAlephItem();
+		AlephItem item = new AlephParser(xml).toAlephItem(bibliographicDescription, circulationStatus, holdQueueLnegth, itemDesrciption);
 
 		return item;
 	}
