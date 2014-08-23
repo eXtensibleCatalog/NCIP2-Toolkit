@@ -5,16 +5,18 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 public class AlephConnector extends AlephMediator {
 	// TODO: Generate URL to be built based on type of action to be performed. Then use that URL to get XML response. Then parse the response & send back ncip formatted response.
@@ -30,6 +32,7 @@ public class AlephConnector extends AlephMediator {
 	private String userPathElement;
 	private String itemsElement;
 	private int bibIdLength;
+	private SAXParser parser;
 
 	public AlephConnector() throws ServiceException {
 		try {
@@ -50,8 +53,14 @@ public class AlephConnector extends AlephMediator {
 			userPathElement = AlephConstants.USER_PATH_ELEMENT;
 			itemsElement = AlephConstants.ITEMS_ELEMENT;
 
+			parser = SAXParserFactory.newInstance().newSAXParser();
+
 		} catch (ToolkitException e) {
 			throw new ExceptionInInitializerError(e);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -75,16 +84,21 @@ public class AlephConnector extends AlephMediator {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public AlephItem lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLnegth, boolean itemDesrciption) throws ParserConfigurationException, IOException, SAXException, AlephException {
+	public List<AlephItem> lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLnegth, boolean itemDesrciption) throws ParserConfigurationException, IOException, SAXException,
+			AlephException {
+		
 		itemId = normalizeItem(itemId);
+		
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + itemId, itemsElement).addRequest("view", "full").toURL();
-		Document xml = new AlephResponder(url).getXMLResponse();
-		if (xml.hasChildNodes()) {
-			AlephItem item = new AlephParser(xml).toAlephItem(bibliographicDescription, circulationStatus, holdQueueLnegth, itemDesrciption);
-			return item;
-		} else {
-			throw new AlephException("Server XML response has no child nodes.");
-		}
+		
+		InputSource streamSource = new InputSource(url.openStream());
+
+		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLnegth, itemDesrciption);
+
+		parser.parse(streamSource, itemHandler);
+
+		return itemHandler.getListOfItems();
+
 	}
 
 }

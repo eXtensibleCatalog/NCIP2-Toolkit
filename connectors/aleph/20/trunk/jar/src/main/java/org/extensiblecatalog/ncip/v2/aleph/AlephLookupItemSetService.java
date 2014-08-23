@@ -81,10 +81,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		int itemCount = 0;
 		boolean reachedMaxItemCount = false;
 
-		if (alephSvcMgr.getAlephName() == null || alephSvcMgr.getAlephPort() == null) {
-			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Aleph X-Server name and/or port not set");
-		}
-
 		String token = initData.getNextItemToken();
 		ItemToken nextItemToken = null;
 		// remove any bib ids from bibIds list that may have already been processed
@@ -151,7 +147,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						BibInformation bibInformation = new BibInformation();
 						bibInformation.setBibliographicId(bibId);
 
-						AlephItem bibItem = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+						AlephItem bibItem = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription).get(0);
 
 						bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
 						if (getBibDescription) {
@@ -194,7 +190,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						BibInformation bibInformation = new BibInformation();
 						bibInformation.setBibliographicId(bibId);
 
-						AlephItem bibItem = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+						AlephItem bibItem = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription).get(0);
 
 						bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
 						if (getBibDescription) {

@@ -44,38 +44,36 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 /**
- * This class implements the Lookup Item service for the Aleph back-end connector. Basically this just
- * calls the AlephRemoteServiceManager to get hard-coded data (e.g. title, call #, etc.).
+ * This class implements the Lookup Item service for the Aleph back-end connector. Basically this just calls the AlephRemoteServiceManager to get hard-coded data (e.g. title, call #, etc.).
  * <p/>
- * Note: If you're looking for a model of how to code your own ILS's NCIPService classes, do not
- * use this class as an example. See the NCIP toolkit Connector developer's documentation for guidance.
+ * Note: If you're looking for a model of how to code your own ILS's NCIPService classes, do not use this class as an example. See the NCIP toolkit Connector developer's documentation for guidance.
  */
 public class AlephLookupItemService implements LookupItemService {
 
-    static Logger log = Logger.getLogger(AlephLookupItemService.class);
+	static Logger log = Logger.getLogger(AlephLookupItemService.class);
 
-    /**
-     * Construct a AlephRemoteServiceManager; this class is not configurable so there are no parameters.
-     */
-    public AlephLookupItemService() {
-    }
+	/**
+	 * Construct a AlephRemoteServiceManager; this class is not configurable so there are no parameters.
+	 */
+	public AlephLookupItemService() {
+	}
 
-    /**
-     * Handles a NCIP LookupItem service by returning data from Aleph.
-     *
-     * @param initData       the LookupItemInitiationData
-     * @param serviceManager provides access to remote services
-     * @return LookupItemResponseData
-     */ 
-    @Override
-	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext,
-			RemoteServiceManager serviceManager) throws ServiceException {
-    	log.info("AlephLookupItemService.performService called");
+	/**
+	 * Handles a NCIP LookupItem service by returning data from Aleph.
+	 *
+	 * @param initData
+	 *            the LookupItemInitiationData
+	 * @param serviceManager
+	 *            provides access to remote services
+	 * @return LookupItemResponseData
+	 */
+	@Override
+	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
+		log.info("AlephLookupItemService.performService called");
 		LookupItemResponseData responseData = new LookupItemResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		boolean getBibDescription = initData
-				.getBibliographicDescriptionDesired();
+		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 		boolean getCircStatus = initData.getCirculationStatusDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
@@ -83,145 +81,141 @@ public class AlephLookupItemService implements LookupItemService {
 		boolean getLocation = initData.getLocationDesired();
 		boolean getCurrentBorrowers = initData.getCurrentBorrowerDesired();
 		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
-		/*Another possibilities (highly customizable):
-		
-		Item Use Restriction Type  
-		Physical Condition 
-		Security Marker 
-		Sensitization Flag 
-		
+		/*
+		 * Another possibilities (highly customizable):
+		 * 
+		 * Item Use Restriction Type Physical Condition Security Marker Sensitization Flag
 		 */
-		
+
 		if (initData.getItemId() == null) {
-		    throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,"Item id is undefined.");
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item id is undefined.");
 		}
 		AlephItem alephItem = null;
-                // Execute request if agency Id is blank or NRU
-		if (initData.getItemId().getAgencyId() != null 
-		     && !initData.getItemId().getAgencyId().getValue().equalsIgnoreCase("") 
-		     && alephRemoteServiceManager.getAlephAgency(initData.getItemId().getAgencyId().getValue()) == null) {
-		    throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
-					       "This request cannot be processed. Agency ID is invalid or not found.");
+		// Execute request if agency Id is blank or NRU
+		if (initData.getItemId().getAgencyId() != null && !initData.getItemId().getAgencyId().getValue().equalsIgnoreCase("") && alephRemoteServiceManager.getAlephAgency(initData.getItemId().getAgencyId().getValue()) == null) {
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "This request cannot be processed. Agency ID is invalid or not found.");
 		}
-		
+
 		try {
-		    // TODO, get adm and bib from agency id...adm id translates to item
-		    // id in ncip item
-		    alephItem = null;
-		    // get bib library and adm library...just set to ND for now
-		    
-		    boolean getBibInformation = getBibDescription || getCircStatus
-			|| getElectronicResource || getItemDescription
-			|| getLocation;
-		    alephItem = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), 
-									     getBibInformation, getCircStatus, getHoldQueueLength, getItemDescription);
-		    
-		    // update NCIP response data with aleph item data
-		    updateResponseData(initData, responseData, alephItem);
+			// TODO, get adm and bib from agency id...adm id translates to item
+			// id in ncip item
+			alephItem = null;
+			// get bib library and adm library...just set to ND for now
+
+			boolean getBibInformation = getBibDescription || getCircStatus || getElectronicResource || getItemDescription || getLocation;
+			
+			alephItem = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), getBibInformation, getCircStatus, getHoldQueueLength, getItemDescription).get(0);
+
+			// update NCIP response data with aleph item data
+			updateResponseData(initData, responseData, alephItem);
 		} catch (IOException ie) {
-		    Problem p = new Problem();
-		    p.setProblemType(new ProblemType("Procesing error"));
-		    p.setProblemDetail(ie.getMessage());
-		    List<Problem> problems = new ArrayList<Problem>();
-		    problems.add(p);
-		    responseData.setProblems(problems);
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemDetail(ie.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
 		} catch (ParserConfigurationException pce) {
-		    Problem p = new Problem();
-		    p.setProblemType(new ProblemType("Procesing error"));
-		    p.setProblemDetail(pce.getMessage());
-		    List<Problem> problems = new ArrayList<Problem>();
-		    problems.add(p);
-		    responseData.setProblems(problems);
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemDetail(pce.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
 		} catch (SAXException se) {
-		    Problem p = new Problem();
-		    p.setProblemType(new ProblemType("Procesing error"));
-		    p.setProblemDetail(se.getMessage());
-		    List<Problem> problems = new ArrayList<Problem>();
-		    problems.add(p);
-		    responseData.setProblems(problems);
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemDetail(se.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
 		} catch (AlephException ae) {
-		    Problem p = new Problem();
-		    p.setProblemType(new ProblemType("Procesing error"));
-		    p.setProblemDetail(ae.getMessage());
-		    List<Problem> problems = new ArrayList<Problem>();
-		    problems.add(p);
-		    responseData.setProblems(problems);
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemDetail(ae.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
 		} catch (Exception e) {
-		    Problem p = new Problem();
-		    p.setProblemType(new ProblemType("Procesing error"));
-		    p.setProblemDetail(e.getMessage());
-		    List<Problem> problems = new ArrayList<Problem>();
-		    problems.add(p);
-		    responseData.setProblems(problems);
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemDetail(e.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
 		}
 
 		if (alephItem == null) {
-		    Problem p = new Problem();
-		    p.setProblemType(new ProblemType("Procesing error"));
-		    p.setProblemDetail("Unknown item for Item Id: "+initData.getItemId());
-		    List<Problem> problems = new ArrayList<Problem>();
-		    problems.add(p);
-		    responseData.setProblems(problems);
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemDetail("Unknown item for Item Id: " + initData.getItemId());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
 		}
 
 		return responseData;
-    }
+	}
 
-    protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
-    	if (responseData!=null&&alephItem!=null&&alephItem.getItemId().indexOf(initData.getItemId().getItemIdentifierValue()) != -1){
-    		
-    		if (alephItem.getDateAvailablePickup()!=null){
-    			GregorianCalendar gc = new GregorianCalendar();
-    			gc.setTime(alephItem.getDateAvailablePickup());
-    			responseData.setHoldPickupDate(gc);
-    		}
-    		responseData.setItemId(initData.getItemId());
-    		ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
-    		if (initData.getBibliographicDescriptionDesired()){
-    			if (iof == null) iof = new ItemOptionalFields();
-    			iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem,initData.getItemId().getAgencyId()));
-    		}
+	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
+		if (responseData != null && alephItem != null && alephItem.getItemId().indexOf(initData.getItemId().getItemIdentifierValue()) != -1) {
 
-    		
-    		if (iof != null) responseData.setItemOptionalFields(iof);
-    		ItemTransaction itemTransaction = null;
-    		if (alephItem.getBorrowingUsers()!=null&&alephItem.getBorrowingUsers().size()>0){
-    			if (itemTransaction==null) itemTransaction = new ItemTransaction();
-    			CurrentBorrower borrower = new CurrentBorrower();
-    			UserId userId = new UserId();
-    			AlephUser alephUser = alephItem.getBorrowingUsers().get(0);
-    	        userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-    	        userId.setUserIdentifierType(new UserIdentifierType("Username"));
-    	        userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
-    			borrower.setUserId(userId);
-    			itemTransaction.setCurrentBorrower(borrower);
-    		}
-    		
-    		if (alephItem.getRequestingUsers()!=null&&alephItem.getRequestingUsers().size()>0){
-    			if (itemTransaction==null) itemTransaction = new ItemTransaction();
-    			Iterator<AlephUser> i = alephItem.getRequestingUsers().iterator();
-    			while (i.hasNext()){
-    				AlephUser alephUser = i.next();
-    				CurrentRequester requester = new CurrentRequester();
-    				UserId userId = new UserId();
-        	        userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-        	        userId.setUserIdentifierType(new UserIdentifierType("Username"));
-        	        userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
-        			requester.setUserId(userId);
-        			List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
-        			if (requesters == null) requesters = new ArrayList<CurrentRequester>();
-        			requesters.add(requester);
-        			itemTransaction.setCurrentRequesters(requesters);
-    			}
-    			
-    		}
+			if (alephItem.getDateAvailablePickup() != null) {
+				GregorianCalendar gc = new GregorianCalendar();
+				gc.setTime(alephItem.getDateAvailablePickup());
+				responseData.setHoldPickupDate(gc);
+			}
+			responseData.setItemId(initData.getItemId());
+			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
+			if (initData.getBibliographicDescriptionDesired()) {
+				if (iof == null)
+					iof = new ItemOptionalFields();
+				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
+			}
 
-    		if (alephItem.getHoldRequestId()!=null){
-    			RequestId requestId = new RequestId();
-    			requestId.setRequestIdentifierValue(alephItem.getHoldRequestId());
-    			responseData.setRequestId(requestId);
-    		}
-    	}
-    }
+			if (iof != null)
+				responseData.setItemOptionalFields(iof);
+			ItemTransaction itemTransaction = null;
+			if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
+				if (itemTransaction == null)
+					itemTransaction = new ItemTransaction();
+				CurrentBorrower borrower = new CurrentBorrower();
+				UserId userId = new UserId();
+				AlephUser alephUser = alephItem.getBorrowingUsers().get(0);
+				userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
+				userId.setUserIdentifierType(new UserIdentifierType("Username"));
+				userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
+				borrower.setUserId(userId);
+				itemTransaction.setCurrentBorrower(borrower);
+			}
+
+			if (alephItem.getRequestingUsers() != null && alephItem.getRequestingUsers().size() > 0) {
+				if (itemTransaction == null)
+					itemTransaction = new ItemTransaction();
+				Iterator<AlephUser> i = alephItem.getRequestingUsers().iterator();
+				while (i.hasNext()) {
+					AlephUser alephUser = i.next();
+					CurrentRequester requester = new CurrentRequester();
+					UserId userId = new UserId();
+					userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
+					userId.setUserIdentifierType(new UserIdentifierType("Username"));
+					userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
+					requester.setUserId(userId);
+					List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
+					if (requesters == null)
+						requesters = new ArrayList<CurrentRequester>();
+					requesters.add(requester);
+					itemTransaction.setCurrentRequesters(requesters);
+				}
+
+			}
+
+			if (alephItem.getHoldRequestId() != null) {
+				RequestId requestId = new RequestId();
+				requestId.setRequestIdentifierValue(alephItem.getHoldRequestId());
+				responseData.setRequestId(requestId);
+			}
+		}
+	}
 
 }
