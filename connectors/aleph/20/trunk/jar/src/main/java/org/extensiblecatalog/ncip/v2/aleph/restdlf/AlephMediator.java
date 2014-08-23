@@ -22,8 +22,6 @@ public class AlephMediator implements Serializable {
 	
 	private static final long serialVersionUID = 65003L;
 	
-	private String AlephName;
-	private String AlephPort;
 	private Map<String,AlephAgency> agencies;
 	private Map<String,AlephConstants.Availability> availabilityCircStatusMap;
 	private String defaultAgencyId;
@@ -32,42 +30,6 @@ public class AlephMediator implements Serializable {
 	 * Protected constructor to limit construction to the factory
 	 */
 	protected AlephMediator(){}
-
-	/**
-	 * Set the Aleph Name called with requests
-	 * 
-	 * @param AlephName
-	 */
-	public void setAlephName(String AlephName) {
-		this.AlephName = AlephName;
-	}
-
-	/**
-	 * Set the Aleph Name called with requests
-	 * 
-	 * @return Aleph name
-	 */
-	public String getAlephName() {
-		return AlephName;
-	}
-	
-	/**
-	 * Set the Aleph Port used with requests
-	 * 
-	 * @param AlephPort
-	 */
-	public void setAlephPort(String AlephPort) {
-		this.AlephPort = AlephPort;
-	}
-
-	/**
-	 * Get the Aleph Port used with requests
-	 * 
-	 * @return Aleph port
-	 */
-	public String getAlephPort() {
-		return AlephPort;
-	}
 	
 	/**
 	 * @param agencies the agencies to set

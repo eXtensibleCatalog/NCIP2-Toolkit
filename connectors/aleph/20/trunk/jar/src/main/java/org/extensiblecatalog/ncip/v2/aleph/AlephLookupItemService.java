@@ -91,9 +91,6 @@ public class AlephLookupItemService implements LookupItemService {
 		Sensitization Flag 
 		
 		 */
-		if (alephRemoteServiceManager.getAlephName() == null || alephRemoteServiceManager.getAlephPort() == null) {
-		    throw new ServiceException(ServiceError.CONFIGURATION_ERROR,"Aleph X-Server name and/or port not set");
-		}
 		
 		if (initData.getItemId() == null) {
 		    throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,"Item id is undefined.");

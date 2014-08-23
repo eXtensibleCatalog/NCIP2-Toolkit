@@ -14,6 +14,26 @@ public class AlephParser {
 	public AlephParser(Document xmlResponse) {
 		xmlToParse = xmlResponse;
 	}
+	
+	private void checkDocumentIntegrity() throws AlephException {
+		if (!xmlToParse.hasChildNodes()) {
+			throw new AlephException(AlephConstants.ERROR_FIND_DOC_MISSING);
+		}
+//		NodeList errorNodes = xmlToParse.getElementsByTagName(AlephConstants.ERROR_NODE);
+//		if (errorNodes.getLength() > 0) {
+//			Node error = errorNodes.item(0);
+//			if (error.hasChildNodes()) {
+//				Node detail = error.getFirstChild();
+//				throw new AlephException(detail.getNodeValue());
+//			} else {
+//				throw new AlephException(AlephConstants.ERROR_FIND_DOC_MISSING);
+//			}
+//		}
+		
+		//Error handled here:
+		NodeList replyVerification = xmlToParse.getChildNodes();
+		//if(replyVerification != "0000") throw new AlephException("Server returned invalid XML respone (reply-code != 0000)");
+	}
 
 	/*
 	 * getBibDescription = initData .getBibliographicDescriptionDesired(); boolean getCircStatus = initData.getCirculationStatusDesired(); boolean getElectronicResource = initData.getElectronicResourceDesired(); boolean getHoldQueueLength =
@@ -22,26 +42,18 @@ public class AlephParser {
 	 */
 
 	public AlephItem toAlephItem(boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLnegth, boolean itemDesrciption) throws AlephException {
-		if (!xmlToParse.hasChildNodes()) {
-			throw new AlephException(AlephConstants.ERROR_FIND_DOC_MISSING);
+		
+		try {
+			checkDocumentIntegrity();
+		} catch (AlephException e1) {
+			throw new AlephException("Checking document integrity returned an error: "+e1.getMessage());
 		}
-		NodeList errorNodes = xmlToParse.getElementsByTagName(AlephConstants.ERROR_NODE);
-		if (errorNodes.getLength() > 0) {
-			Node error = errorNodes.item(0);
-			if (error.hasChildNodes()) {
-				Node detail = error.getFirstChild();
-				throw new AlephException(detail.getNodeValue());
-			} else {
-				throw new AlephException(AlephConstants.ERROR_FIND_DOC_MISSING);
-			}
-		}
-		Node replyVerification = xmlToParse.getElementsByTagName("reply-code").item(0);
-		if(replyVerification.getNodeValue() != "0000") throw new AlephException("Server returned invalid XML respone (reply-code != 0000)");
 		
 		// Start parsing data from XML to AlephItem
 		AlephItem item = new AlephItem();
 		if (bibliographicDescription) {
 			//TODO: What is bibDescription??
+			//ANSWER: AlephUtil.java -> getBibliographicDescription()
 			item.setBibId(xmlToParse.getElementsByTagName("z30-doc-number").item(0).getNodeValue());
 		}
 		if (circulationStatus) {
@@ -60,13 +72,9 @@ public class AlephParser {
 		return item;
 	}
 
-	private void updateItem(AlephItem item, String service) {
-
-	}
-
 	public AlephUser toAlephUser() {
 		AlephUser user = new AlephUser();
-
+		
 		return user;
 	}
 }

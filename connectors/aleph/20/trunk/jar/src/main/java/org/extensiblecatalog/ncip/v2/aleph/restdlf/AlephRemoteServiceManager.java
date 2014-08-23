@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 import java.util.Properties;
 
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
@@ -25,12 +26,12 @@ public class AlephRemoteServiceManager extends AlephConnector implements RemoteS
 	private static final long serialVersionUID = 65011L;
 
 
-	public AlephRemoteServiceManager() {
+	public AlephRemoteServiceManager() throws ServiceException {
     	initializeAgencyMap();
     	initializeAvailabilityMaps();
     }
 	
-	public AlephRemoteServiceManager(Properties properties) {
+	public AlephRemoteServiceManager(Properties properties) throws ServiceException {
 		this();
 	}
 	
@@ -92,24 +93,6 @@ public class AlephRemoteServiceManager extends AlephConnector implements RemoteS
     			addNotAvailableCircStatus(notAvailableCircStatus[i]);
     		}
     	}
-    }
-
-    /**
-     * Get the X Server Name that this AlephInterface will use in call to Aleph X-Service Requests
-     * 
-     * @return X Server Name
-     */
-    public String getAlephName(){
-    	return alephConfig.getProperty(AlephConstants.CONFIG_ALEPH_API_NAME);
-    }
-    
-    /**
-     * Get the X Server Port that this AlephInterface will use in call to Aleph X-Service Requests
-     * 
-     * @return X Server Port
-     */
-    public String getAlephPort(){
-    	return alephConfig.getProperty(AlephConstants.CONFIG_ALEPH_API_PORT);
     }
     
     public String getCurrencyCode(){

@@ -18,16 +18,14 @@ public class AlephResponder {
 
 	public static URL url;
 
-	protected Document getXMLResponse() throws ParserConfigurationException,
-			IOException, SAXException {
-		DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
+	protected Document getXMLResponse() throws ParserConfigurationException, IOException, SAXException {
+		DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document doc = docBuilder.newDocument();
 		if (url != null) {
 
 			// Send data
 			URLConnection conn = url.openConnection();
-			conn.setDoOutput(true);
+			//conn.setDoOutput(true);
 
 			// Get the response
 			doc = docBuilder.parse(conn.getInputStream());
