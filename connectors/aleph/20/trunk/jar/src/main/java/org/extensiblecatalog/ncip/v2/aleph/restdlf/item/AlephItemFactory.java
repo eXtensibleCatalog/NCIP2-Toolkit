@@ -399,12 +399,12 @@ public class AlephItemFactory implements Serializable {
 	 * @throws AlephException
 	 * @throws ParserConfigurationException 
 	 */
-	public static List<AlephItem> updateAlephItemsParseFindDocResponse(List<AlephItem> itemsNodes, Document doc ) throws AlephException, ParserConfigurationException{
+	/*public static List<AlephItem> updateAlephItemsParseFindDocResponse(List<AlephItem> itemsNodes, Document doc ) throws AlephException, ParserConfigurationException{
 		for (AlephItem item : itemsNodes){
 			updateAlephItem(item,doc);
 		}
 		return itemsNodes;
-	}
+	}*/
 	
 	/**
 	 * Get alephItem data from a findDocResponse
@@ -415,9 +415,9 @@ public class AlephItemFactory implements Serializable {
 	 * @throws AlephException
 	 * @throws ParserConfigurationException 
 	 */
-	public static AlephItem updateAlephItemParseFindDocResponse(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
+	/*public static AlephItem updateAlephItemParseFindDocResponse(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
 		return updateAlephItem(item,doc);
-	}
+	}*/
 	
 	/**
 	 * Get alephItem data from an itemDataResponse
@@ -428,11 +428,11 @@ public class AlephItemFactory implements Serializable {
 	 * @throws AlephException
 	 * @throws ParserConfigurationException 
 	 */
-	public static AlephItem updateAlephItemParseItemDataResponse(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
+/*	public static AlephItem updateAlephItemParseItemDataResponse(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
 		//change to return a list
 		
 		return updateAlephItem(item,doc);
-	}
+	}*/
 	
 	/**
 	 * Get alephItem data from an itemDataResponse
@@ -467,6 +467,7 @@ public class AlephItemFactory implements Serializable {
 	 * @throws AlephException
 	 * @throws ParserConfigurationException 
 	 */
+	/*
 	private static AlephItem updateAlephItem(AlephItem item, Document doc ) throws AlephException, ParserConfigurationException{
 		if (item!=null&&doc!=null){
 			if (!doc.hasChildNodes()){
@@ -513,7 +514,7 @@ public class AlephItemFactory implements Serializable {
 								while (itemNodeChildsLength > 0) {
 									itemNodeChildsLength--;
 									Node currentNode = itemNodeChilds.item(itemNodeChildsLength);
-									parseAlephItemChildNode(currentNode, item);
+									//parseAlephItemChildNode(currentNode, item);
 									itemNode.removeChild(currentNode);									
 								}
 							}
@@ -533,82 +534,12 @@ public class AlephItemFactory implements Serializable {
 			String barcode = XMLParserUtil.getNodeTextValue(doc, AlephConstants.BARCODE_NODE);
 			if (barcode!=null) item.setBarcode(barcode);
 		}
-		/*
-	    item.setHoldQueueLength(holdQueueLength);*/
-		return item;
-	}
-	
-	private static void parseAlephItemChildNode(Node itemChildNode, AlephItem alephItem) throws ParserConfigurationException {
-		String nodeName = itemChildNode.getNodeName();
-		if(itemChildNode.hasChildNodes()) {
-			String nodeVal = itemChildNode.getTextContent();
-			if (nodeName == AlephConstants.STATUS_NODE) {
-				if (nodeVal == AlephConstants.ON_SHELF) {
-					alephItem.setAvailability(AlephConstants.Availability.AVAILABLE);
-				} else {
-					alephItem.setAvailability(AlephConstants.Availability.NOT_AVAILABLE);
-				}			
-			} else if(nodeName == AlephConstants.Z13_NODE) {
-				parseAlephZ13ChildNodes(itemChildNode, alephItem);
-			} else if(nodeName == AlephConstants.Z30_NODE) {
-				parseAlephZ30ChildNodes(itemChildNode, alephItem);
-			} else if(nodeName == AlephConstants.QUEUE_NODE) {
-			//	TODO: does Aleph really post integer?
-			//	Remove try/catch block if yes else fix this code and remove it anyway
-				try {
-					alephItem.setHoldQueueLength(Integer.parseInt(nodeVal));
-				} catch(NumberFormatException e) {
-					throw new ParserConfigurationException("Error parsing hold queue value");
-				}
-			}
-//			The rest of the code listed here is not necessary for now:
-//			<z30-sub-library-code>SK0</z30-sub-library-code>
-//			<z30-item-process-status-code/>
-//			<z30-item-status-code>96</z30-item-status-code>
-//			<z30-collection-code>SKL</z30-collection-code>
-		} else {
-			//TODO: throw processing exception
-		}
-	}
-
-	private static void parseAlephZ13ChildNodes(Node Z13Node, AlephItem alephItem) {
-		NodeList Z13ChildNodes = Z13Node.getChildNodes();
-		int nodesLength = Z13ChildNodes.getLength();
-		if (nodesLength > 0) {
-			while(nodesLength > 0) {
-				nodesLength--;
-				Node currentNode = Z13ChildNodes.item(nodesLength);
-				parseAlephZ13ChildNode(currentNode, alephItem);
-				Z13Node.removeChild(currentNode);
-			}
-		}
-	}
-
-	private static void parseAlephZ13ChildNode(Node Z13ChildNode, AlephItem alephItem) {
-		//Note that previous method removes processed nodes! So try to respect Aleph nodes order.
-		if (Z13ChildNode.getNodeName() == AlephConstants.Z13_ISBN_NODE) {
-			
-			
-		}
-	}
-
-	private static void parseAlephZ30ChildNodes(Node Z30Node, AlephItem alephItem) {
-		NodeList Z30ChildNodes = Z30Node.getChildNodes();
-		int nodesLength = Z30ChildNodes.getLength();
-		if (nodesLength > 0) {
-			while(nodesLength > 0) {
-				nodesLength--;
-				Node currentNode = Z30ChildNodes.item(nodesLength);
-				parseAlephZ30ChildNode(currentNode, alephItem);
-				Z30Node.removeChild(currentNode);
-			}
-		}
-	}
-
-	private static void parseAlephZ30ChildNode(Node Z30ChildNode, AlephItem alephItem) {
-		//Note that previous method removes processed nodes! So try to respect Aleph nodes order.
 		
-	}
+	    //item.setHoldQueueLength(holdQueueLength);
+		return item;
+	}*/
+	
+	
 
 	/**
 	 * Return a list of alephitemsNodes with circ status set to a value in AlephItem's

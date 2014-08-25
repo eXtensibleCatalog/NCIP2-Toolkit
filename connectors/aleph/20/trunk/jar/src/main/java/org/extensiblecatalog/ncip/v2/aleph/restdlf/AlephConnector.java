@@ -33,6 +33,7 @@ public class AlephConnector extends AlephMediator {
 	private String itemsElement;
 	private int bibIdLength;
 	private SAXParser parser;
+	public boolean echoParticularProblemsToLUIS = false;
 
 	public AlephConnector() throws ServiceException {
 		try {
@@ -43,6 +44,8 @@ public class AlephConnector extends AlephMediator {
 			serverPort = alephConfig.getProperty(AlephConstants.REST_DLF_PORT);
 			serverSuffix = alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX);
 			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
+			
+			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
 
 			if (serverName == null || serverPort == null) {
 				throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Aleph server or port not set");

@@ -8,6 +8,7 @@ public class AlephConstants {
 	public static final String CODE_ATTRIBUTE = "code";
 	public static final String ERROR_NODE = "error";
 	public static final String REPLY_NODE = "reply";
+	public static final String REPLY_CODE_NODE = "reply-code";
 	public static final String STATUS_NODE = "status";
 	
 	public static final String DUE_DATE_NODE = "due-date";
@@ -150,7 +151,7 @@ public class AlephConstants {
 	public static final String YES = "Y";
 	public static final String NO = "N";
 	
-	public static enum Availability { UNKNOWN, NOT_AVAILABLE, POSSIBLY_AVAILABLE, AVAILABLE, DOESNT_EXIST }
+	public static enum Availability { UNKNOWN, NOT_AVAILABLE, POSSIBLY_AVAILABLE, AVAILABLE, DOESNT_EXIST, DOESNT_EXIST_REMOVED_MANUALLY }
 	public static enum MessageTypes { LOOKUP, UPDATE, NOTIFICATION }
 
 	public static final String CIRC_STATUS_CHECKED_OUT = "A";
@@ -276,6 +277,7 @@ public class AlephConstants {
 	public static final String XSERVER_SUFFIX = "AlephXServerSuffix";
 	
 	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
+	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
 }
 
 

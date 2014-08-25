@@ -77,6 +77,16 @@ public class AlephItem implements Serializable {
 		borrowingUsers = new ArrayList<AlephUser>();
 		requestingUsers = new ArrayList<AlephUser>();
 	}
+	
+	public AlephItem(String replyCode) {
+		this();
+		if (replyCode == "0019") {
+			this.setAvailability(AlephConstants.Availability.DOESNT_EXIST);
+		} else if (replyCode == "0000") {
+			this.setAvailability(AlephConstants.Availability.DOESNT_EXIST_REMOVED_MANUALLY);
+		}
+	}
+	
 	/**
 	 * @return the bibId
 	 */

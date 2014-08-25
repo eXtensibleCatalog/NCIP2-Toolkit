@@ -15,6 +15,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class AlephItemHandler extends DefaultHandler {
 	private List<AlephItem> listOfItems;
 	private AlephItem item;
+	private String responseCode;
 	private boolean bibDescriptionDesired;
 	private boolean circulationStatusDesired;
 	private boolean holdQueueLnegthDesired;
@@ -28,6 +29,8 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean publisherReached = false;
 	private boolean bibIdReached = false;
 	private boolean itemIdReached = false;
+	private boolean responseReached = false;
+	private boolean itemFound = false;
 
 	/**
 	 * @return the listOfItems
@@ -58,7 +61,10 @@ public class AlephItemHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
+		if (qName.equalsIgnoreCase(AlephConstants.GET_ITEM_LIST_NODE) && itemFound) {
+			itemFound = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
+			itemFound = true;
 			item = new AlephItem();
 			item.setLink(attributes.getValue(AlephConstants.HREF_NODE_ATTR));
 			if (listOfItems == null)
@@ -83,6 +89,8 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
 				bibIdReached = true;
 			}
+		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
+			responseReached = true;
 		}
 	}
 
@@ -119,6 +127,12 @@ public class AlephItemHandler extends DefaultHandler {
 				item.setDescription(AlephConstants.ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND);
 				bibIdReached = false;
 			}
+		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
+			if (responseCode == "0019") {
+				listOfItems.add(new AlephItem(responseCode));
+			}
+		} else if (qName.equalsIgnoreCase(AlephConstants.GET_ITEM_LIST_NODE) && !itemFound) {
+			listOfItems.add(new AlephItem(responseCode));
 		}
 	}
 
@@ -153,6 +167,9 @@ public class AlephItemHandler extends DefaultHandler {
 				item.setBibId(new String(ch, start, length));
 				bibIdReached = false;
 			}
+		} else if (responseReached) {
+			responseCode = new String(ch, start, length);
+			responseReached = false;
 		}
 	}
 }
