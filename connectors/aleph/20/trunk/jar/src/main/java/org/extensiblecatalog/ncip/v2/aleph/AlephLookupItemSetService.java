@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -26,7 +23,6 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
-import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
@@ -46,10 +42,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 	static Logger log = Logger.getLogger(AlephLookupItemSetService.class);
 
-	private static final int MAX_ITEMS_TO_RETURN = 10;
-
-	private static Random random = new Random();
-
 	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
 	/**
@@ -65,15 +57,9 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-		boolean getElectronicResource = initData.getElectronicResourceDesired();
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-		boolean getLocation = initData.getLocationDesired();
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
-		List<String> itemIds = null;
-
-		int itemCount = 0;
-		boolean reachedMaxItemCount = false;
 
 		String token = initData.getNextItemToken();
 		ItemToken nextItemToken = null;
@@ -127,6 +113,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							if (getBibDescription) {
 								// TODO Handle exception if agencyId not supplied - by default use local agencyId
 								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, new AgencyId("MZK"));
+								
 								bibInformation.setBibliographicDescription(bDesc);
 							}
 							bibInformations.add(bibInformation);
@@ -189,12 +176,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					} else {
 
 						BibliographicRecordIdentifierCode code = bibId.getBibliographicRecordId().getBibliographicRecordIdentifierCode();
-						if (code.equals(Version1BibliographicRecordIdentifierCode.OCLC)) {
-
-							String oclcNum = bibId.getBibliographicRecordId().getBibliographicRecordIdentifier();
-
-						} else {
-
+						if (! code.equals(Version1BibliographicRecordIdentifierCode.OCLC)) {
+							
 							BibInformation bibInformation = new BibInformation();
 							bibInformation.setProblems(ServiceHelper.generateProblems(Version1GeneralProcessingError.UNAUTHORIZED_COMBINATION_OF_ELEMENT_VALUES_FOR_SYSTEM,
 									"//BibliographicRecordId/BibliographicRecordIdentifierCode", code.getScheme() + ": " + code.getValue(), "Bib Id type '" + code.getScheme()
@@ -314,22 +297,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		}
 
 		return -1;
-	}
-
-	private List<String> getItemIdSubset(List<String> itemIds, int itemCount) {
-
-		int numOfitemIdsToProcess = MAX_ITEMS_TO_RETURN - itemCount;
-
-		return itemIds.subList(0, numOfitemIdsToProcess);
-
-	}
-
-	private List<AlephItem> getHoldingsItemsSubset(List<AlephItem> items, int itemCount) {
-
-		int numOfitemIdsToProcess = MAX_ITEMS_TO_RETURN - itemCount;
-
-		return items.subList(0, numOfitemIdsToProcess);
-
 	}
 
 }
