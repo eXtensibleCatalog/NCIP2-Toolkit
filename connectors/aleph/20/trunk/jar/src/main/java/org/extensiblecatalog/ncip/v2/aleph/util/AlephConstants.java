@@ -58,6 +58,7 @@ public class AlephConstants {
     public static final String CONFIG_ALEPH_CIRC_STATUS_AVAILABLE = "AlephCircStatusAvailable";
     public static final String CONFIG_ALEPH_CIRC_STATUS_POSSIBLY_AVAILABLE = "AlephCircStatusPossiblyAvailable";
     public static final String CONFIG_ALEPH_CIRC_STATUS_NOT_AVAILABLE = "AlephCircStatusNotAvailable";
+    public static final String ON_SHELF = "On Shelf";
     
     /**
      * Location Type Enum, Defined in the Schema
@@ -76,4 +77,6 @@ public class AlephConstants {
     public static final String LOCATION_TYPE_CURRENT = "Current";
     
     public static final String CIRC_STATUS_CHECKED_OUT = "A";
+
+	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 }

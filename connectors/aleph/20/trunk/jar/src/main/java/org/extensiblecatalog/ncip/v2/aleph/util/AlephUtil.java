@@ -98,17 +98,15 @@ public class AlephUtil {
 
 		location = new Location();
 		location.setLocationName(locationName);
-		location.setLocationType(new LocationType("" /* FIXME */, AlephConstants.LOCATION_TYPE_PERMANENT));
+		location.setLocationType(new LocationType(AlephConstants.DEFAULT_SCHEME, AlephConstants.LOCATION_TYPE_PERMANENT));
 		return location;
 	}
 	
 	public static ItemOptionalFields getItemOptionalFields(AlephItem alephItem){
 		ItemOptionalFields iof = new ItemOptionalFields();
-		if (alephItem.getCirculationStatus()!=null){
-			if (alephItem.getCirculationStatus()!=null){
-				if (alephItem.getCirculationStatus().equalsIgnoreCase(AlephConstants.CIRC_STATUS_CHECKED_OUT)){
-					iof.setCirculationStatus(new XcCirculationStatus(XcCirculationStatus.XC_CIRCULATION_STATUS, "Checked Out"));
-				}
+		if (alephItem.getCirculationStatus() != null) {
+			if (alephItem.getCirculationStatus().equalsIgnoreCase(AlephConstants.ON_SHELF)) {
+				iof.setCirculationStatus(new XcCirculationStatus(AlephConstants.DEFAULT_SCHEME, alephItem.getCirculationStatus()));
 			}
 		}
 		if (alephItem.getElectronicResource()!=null){
@@ -117,8 +115,10 @@ public class AlephUtil {
 			iof.setElectronicResource(resource);
 		}
 		
-		if (alephItem.getHoldQueueLength()>0){
+		if (alephItem.getHoldQueueLength()>=0){
 			iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
+		} else if(alephItem.getHoldQueue() != null) {
+			iof.setHoldQueue(alephItem.getHoldQueue());
 		}
 		
 		ItemDescription description = null;
@@ -146,7 +146,7 @@ public class AlephUtil {
 
 			Location location = new Location();
 			location.setLocationName(locationName);
-			location.setLocationType(new LocationType("" /* FIXME */, AlephConstants.LOCATION_TYPE_PERMANENT));
+			location.setLocationType(new LocationType(AlephConstants.DEFAULT_SCHEME, AlephConstants.LOCATION_TYPE_PERMANENT));
 			List<Location> locations = new ArrayList<Location>();
         	locations.add(location);
         	iof.setLocations(locations);
@@ -154,7 +154,8 @@ public class AlephUtil {
 		
 		if (alephItem.getDescription()!=null){
 			if (description == null) description = new ItemDescription();
-			description.setItemDescriptionLevel(new ItemDescriptionLevel(""/* FIXME */ /*, (Version1ItemDescriptionLevel.VERSION_1_ITEM_DESCRIPTION_LEVEL,*/, alephItem.getDescription()));
+			description.setNumberOfPieces(alephItem.getItemsCount());
+			description.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, alephItem.getDescription()));
 			iof.setItemDescription(description);
 		}
 		return iof;

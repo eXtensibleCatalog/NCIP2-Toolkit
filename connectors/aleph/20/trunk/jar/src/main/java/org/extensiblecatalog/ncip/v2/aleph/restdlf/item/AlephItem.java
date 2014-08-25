@@ -58,6 +58,7 @@ public class AlephItem implements Serializable {
 	private int holdQueueLength = 0;
 	
 	private BigDecimal fineAmount;
+	private BigDecimal itemsCount;
 	private Date fineAccrualDate;
 	
 	private List<AlephUser> borrowingUsers;
@@ -70,6 +71,7 @@ public class AlephItem implements Serializable {
 	
 	private String holdRequestId;
 	private AlephAgency agency;
+	private String holdQueue;
 	
 	public AlephItem(){
 		borrowingUsers = new ArrayList<AlephUser>();
@@ -347,6 +349,13 @@ public class AlephItem implements Serializable {
 	 */
 	public int getHoldQueueLength() {
 		return holdQueueLength;
+	}
+	
+	/**
+	 * @return the holdQueueErrorMessage
+	 */
+	public String getHoldQueue() {
+		return holdQueue;
 	}
 	
 	/**
@@ -779,5 +788,16 @@ public class AlephItem implements Serializable {
 		sb.append("[RequestingUsers:"+(getRequestingUsers()!=null?getRequestingUsers():"null")+"],");
 		sb.append("[SessionId:"+(getSessionId()!=null?getSessionId():"null")+"],");
 		return sb.toString();
+	}
+	public void setholdQueue(String errorHoldQueueNotFound) {
+		this.holdQueueLength = -1;
+		this.holdQueue = errorHoldQueueNotFound;
+		
+	}
+	public BigDecimal getItemsCount() {
+		return itemsCount;
+	}
+	public void setItemsCount(BigDecimal itemsCount) {
+		this.itemsCount = itemsCount;
 	}
 }

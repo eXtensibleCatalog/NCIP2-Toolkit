@@ -145,7 +145,7 @@ public class AlephConstants {
 	public static final String UNAVAILABLE_STATUS = "unavailable";
 	public static final String AVAILABLE_STATUS = "available";
 	public static final String BLOCK_NONE_CODE = "00";
-	public static final String ON_SHELF = "On Shelf";
+	
 	
 	public static final String YES = "Y";
 	public static final String NO = "N";
@@ -199,6 +199,17 @@ public class AlephConstants {
 	public static final String ERROR_BIB_LIBRARY_NOT_SET = "Bib library not set for agency";
 	public static final String ERROR_ADM_LIBRARY_NOT_SET = "Adm library not set for agency";
 	public static final String ERROR_HOLD_LIBRARY_NOT_SET = "Hold library not set for agency";
+	
+	//Parser found empty XML node
+	public static final String ERROR_ITEM_DESCRIPTION_NOT_FOUND = "Item description is not set to this item.";
+	public static final String ERROR_CIRCULATION_STATUS_NOT_FOUND = "Circulation status is not set to this item.";
+	public static final String ERROR_HOLD_QUEUE_NOT_FOUND = "Hold queue is not set to this item.";
+	public static final String ERROR_ITEM_ID_NOT_FOUND = "Item id is not set to this item.";
+	public static final String ERROR_AUTHOR_NOT_FOUND = "Author is not set to this item.";
+	public static final String ERROR_ISBN_NOT_FOUND  = "ISBN is not set to this item.";
+	public static final String ERROR_TITLE_NOT_FOUND  = "Title is not set to this item.";
+	public static final String ERROR_PUBLISHER_NOT_FOUND = "Publisher is not set to this item.";
+	public static final String ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND = "Biblioghraphic id is not set to this item.";
 	
 	//AlephAPI
 	//TODO: edit those constants into valid format, which Aleph RESTful APIs uses

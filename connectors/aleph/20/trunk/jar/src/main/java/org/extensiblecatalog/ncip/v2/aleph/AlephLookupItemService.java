@@ -35,6 +35,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.GregorianCalendar;
@@ -51,6 +52,8 @@ import org.xml.sax.SAXException;
 public class AlephLookupItemService implements LookupItemService {
 
 	static Logger log = Logger.getLogger(AlephLookupItemService.class);
+	
+	static int itemsFound;
 
 	/**
 	 * Construct a AlephRemoteServiceManager; this class is not configurable so there are no parameters.
@@ -79,8 +82,6 @@ public class AlephLookupItemService implements LookupItemService {
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
 		boolean getItemDescription = initData.getItemDescriptionDesired();
 		boolean getLocation = initData.getLocationDesired();
-		boolean getCurrentBorrowers = initData.getCurrentBorrowerDesired();
-		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
 		/*
 		 * Another possibilities (highly customizable):
 		 * 
@@ -92,53 +93,56 @@ public class AlephLookupItemService implements LookupItemService {
 		}
 		AlephItem alephItem = null;
 		// Execute request if agency Id is blank or NRU
-		if (initData.getItemId().getAgencyId() != null && !initData.getItemId().getAgencyId().getValue().equalsIgnoreCase("") && alephRemoteServiceManager.getAlephAgency(initData.getItemId().getAgencyId().getValue()) == null) {
+		if (initData.getItemId().getAgencyId() != null && !initData.getItemId().getAgencyId().getValue().equalsIgnoreCase("")
+				&& alephRemoteServiceManager.getAlephAgency(initData.getItemId().getAgencyId().getValue()) == null) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "This request cannot be processed. Agency ID is invalid or not found.");
 		}
 
 		try {
-			// TODO, get adm and bib from agency id...adm id translates to item
-			// id in ncip item
-			alephItem = null;
 			// get bib library and adm library...just set to ND for now
-
-			boolean getBibInformation = getBibDescription || getCircStatus || getElectronicResource || getItemDescription || getLocation;
+			List<AlephItem> alephItems = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), getBibDescription, getCircStatus, getHoldQueueLength,
+					getItemDescription);
 			
-			alephItem = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), getBibInformation, getCircStatus, getHoldQueueLength, getItemDescription).get(0);
-
+			itemsFound = alephItems.size();
+			
+			//TODO: Think about all the returned items with identical ItemId ..
+			alephItem = alephItems.get(0);
+			
+			alephItem.setItemsCount(new BigDecimal(itemsFound));
+			
 			// update NCIP response data with aleph item data
 			updateResponseData(initData, responseData, alephItem);
 		} catch (IOException ie) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemType(new ProblemType("Procesing IOException error"));
 			p.setProblemDetail(ie.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (ParserConfigurationException pce) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemType(new ProblemType("Procesing ParserConfigurationException error"));
 			p.setProblemDetail(pce.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (SAXException se) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemType(new ProblemType("Procesing SAXException error"));
 			p.setProblemDetail(se.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (AlephException ae) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemType(new ProblemType("Procesing AlephException error"));
 			p.setProblemDetail(ae.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (Exception e) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemType(new ProblemType("Unknown procesing exception error"));
 			p.setProblemDetail(e.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
@@ -173,8 +177,18 @@ public class AlephLookupItemService implements LookupItemService {
 				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 			}
 
-			if (iof != null)
+			if (iof != null) {
+				// TODO:set circ status - it is parsed, not included to iof
 				responseData.setItemOptionalFields(iof);
+				if (iof.getHoldQueue() != null) {
+					Problem p = new Problem();
+					p.setProblemType(new ProblemType(iof.getHoldQueue()));
+					p.setProblemDetail(iof.getHoldQueue());
+					List<Problem> problems = new ArrayList<Problem>();
+					problems.add(p);
+					responseData.setProblems(problems);
+				}
+			}
 			ItemTransaction itemTransaction = null;
 			if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
 				if (itemTransaction == null)

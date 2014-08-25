@@ -26,6 +26,7 @@ public class ItemOptionalFields {
     protected List<Location> locations;
     protected PhysicalCondition physicalCondition;
     protected SecurityMarker securityMarker;
+    protected String holdQueue;
     protected Boolean sensitizationFlag = false;
 
     public ItemDescription getItemDescription() {
@@ -67,6 +68,14 @@ public class ItemOptionalFields {
     public void setHoldQueueLength(BigDecimal holdQueueLength) {
         this.holdQueueLength = holdQueueLength;
     }
+
+	public String getHoldQueue() {
+		return holdQueue;
+	}
+
+	public void setHoldQueue(String holdQueue) {
+		this.holdQueue = holdQueue;
+	}
 
     public List<ItemUseRestrictionType> getItemUseRestrictionTypes() {
         return itemUseRestrictionTypes;
