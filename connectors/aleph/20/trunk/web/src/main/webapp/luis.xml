@@ -4,15 +4,12 @@
 	<ns1:LookupItemSet>
 		<ns1:BibliographicId>
 			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>65021</ns1:BibliographicItemIdentifier>
+				<ns1:BibliographicItemIdentifier>421</ns1:BibliographicItemIdentifier>
 			</ns1:BibliographicItemId>
 		</ns1:BibliographicId>
 		<ns1:ItemElementType>Bibliographic Description</ns1:ItemElementType>
-		<ns1:ItemElementType>Circulation Status</ns1:ItemElementType>
-		<ns1:ItemElementType>Electronic Resource</ns1:ItemElementType>
 		<ns1:ItemElementType>Hold Queue Length</ns1:ItemElementType>
+		<ns1:ItemElementType>Circulation Status</ns1:ItemElementType>
 		<ns1:ItemElementType>Item Description</ns1:ItemElementType>
-		<ns1:ItemElementType>Item Use Restriction Type</ns1:ItemElementType>
-		<ns1:ItemElementType>Location</ns1:ItemElementType>
 	</ns1:LookupItemSet>
 </ns1:NCIPMessage>
