@@ -65,10 +65,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-		boolean getCircStatus = initData.getCirculationStatusDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-		boolean getItemDescription = initData.getItemDescriptionDesired();
 		boolean getLocation = initData.getLocationDesired();
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
@@ -116,7 +114,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						BibInformation bibInformation = new BibInformation();
 						bibInformation.setBibliographicId(bibId);
 
-						List<AlephItem> alephItems = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+						List<AlephItem> alephItems = alephSvcMgr.lookupItem(id, getBibDescription, false, getHoldQueueLength, false);
 
 						if (alephItems != null) {
 							// TODO: Think about all the returned items with identical ItemId ..
@@ -126,9 +124,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							if (getHoldQueueLength)
 								bibInformation.setTitleHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
 							
-							if(getCircStatus)
-								
-
 							if (getBibDescription) {
 								// TODO Handle exception if agencyId not supplied - by default use local agencyId
 								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, new AgencyId("MZK"));
@@ -214,12 +209,30 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						BibInformation bibInformation = new BibInformation();
 						bibInformation.setBibliographicId(bibId);
 
-						AlephItem bibItem = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription).get(0);
+						List<AlephItem> alephItems = alephSvcMgr.lookupItem(id, getBibDescription, false, getHoldQueueLength, false);
 
-						bibInformation.setTitleHoldQueueLength(new BigDecimal(bibItem.getHoldQueueLength()));
-						if (getBibDescription) {
-							BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(bibItem, bibId.getBibliographicRecordId().getAgencyId());
-							bibInformation.setBibliographicDescription(bDesc);
+						if (alephItems != null) {
+							// TODO: Think about all the returned items with identical ItemId ..
+							AlephItem alephItem = alephItems.get(0);
+							alephItem.setItemsCount(new BigDecimal(alephItems.size()));
+
+							if (getHoldQueueLength)
+								bibInformation.setTitleHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
+							
+							if (getBibDescription) {
+								// TODO Handle exception if agencyId not supplied - by default use local agencyId
+								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, new AgencyId("MZK"));
+								bibInformation.setBibliographicDescription(bDesc);
+							}
+							bibInformations.add(bibInformation);
+
+						} else if (alephSvcMgr.echoParticularProblemsToLUIS) {
+							Problem p = new Problem();
+							p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
+							p.setProblemDetail("Item " + id + " you are searching for has been probably manually deleted.");
+							List<Problem> problems = new ArrayList<Problem>();
+							problems.add(p);
+							responseData.setProblems(problems);
 						}
 					} catch (AlephException e) {
 						Problem p = new Problem();
