@@ -7,6 +7,21 @@
 				<ns1:BibliographicItemIdentifier>421</ns1:BibliographicItemIdentifier>
 			</ns1:BibliographicItemId>
 		</ns1:BibliographicId>
+		<ns1:BibliographicId>
+			<ns1:BibliographicItemId>
+				<ns1:BibliographicItemIdentifier>425</ns1:BibliographicItemIdentifier>
+			</ns1:BibliographicItemId>
+		</ns1:BibliographicId>
+		<ns1:BibliographicId>
+			<ns1:BibliographicItemId>
+				<ns1:BibliographicItemIdentifier>62064</ns1:BibliographicItemIdentifier>
+			</ns1:BibliographicItemId>
+		</ns1:BibliographicId>
+		<ns1:BibliographicId>
+			<ns1:BibliographicItemId>
+				<ns1:BibliographicItemIdentifier>62052</ns1:BibliographicItemIdentifier>
+			</ns1:BibliographicItemId>
+		</ns1:BibliographicId>
 		<ns1:ItemElementType>Bibliographic Description</ns1:ItemElementType>
 		<ns1:ItemElementType>Hold Queue Length</ns1:ItemElementType>
 		<ns1:ItemElementType>Circulation Status</ns1:ItemElementType>
