@@ -33,6 +33,7 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean responseReached = false;
 	private boolean agencyReached = false;
 	private boolean itemFound = false;
+	private boolean openDateReached = false;
 
 	/**
 	 * @return the listOfItems
@@ -95,6 +96,8 @@ public class AlephItemHandler extends DefaultHandler {
 			responseReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
 			agencyReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE)) {
+			openDateReached  = true;
 		}
 	}
 
@@ -112,23 +115,23 @@ public class AlephItemHandler extends DefaultHandler {
 			item.setDescription(AlephConstants.ERROR_ITEM_DESCRIPTION_NOT_FOUND);
 			itemDesrciptionReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemIdReached) {
-			item.setDescription(AlephConstants.ERROR_ITEM_ID_NOT_FOUND);
+			item.setItemId(AlephConstants.ERROR_ITEM_ID_NOT_FOUND);
 			itemIdReached = false;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
-				item.setDescription(AlephConstants.ERROR_AUTHOR_NOT_FOUND);
+				item.setAuthor(AlephConstants.ERROR_AUTHOR_NOT_FOUND);
 				authorReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
-				item.setDescription(AlephConstants.ERROR_ISBN_NOT_FOUND);
+				item.setIsbn(AlephConstants.ERROR_ISBN_NOT_FOUND);
 				isbnReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
-				item.setDescription(AlephConstants.ERROR_TITLE_NOT_FOUND);
+				item.setTitle(AlephConstants.ERROR_TITLE_NOT_FOUND);
 				titleReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
-				item.setDescription(AlephConstants.ERROR_PUBLISHER_NOT_FOUND);
+				item.setPublisher(AlephConstants.ERROR_PUBLISHER_NOT_FOUND);
 				publisherReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibIdReached) {
-				item.setDescription(AlephConstants.ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND);
+				item.setBibId(AlephConstants.ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND);
 				bibIdReached = false;
 			}
 		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
@@ -137,9 +140,14 @@ public class AlephItemHandler extends DefaultHandler {
 			}
 		} else if (qName.equalsIgnoreCase(AlephConstants.GET_ITEM_LIST_NODE) && !itemFound) {
 			listOfItems.add(new AlephItem(responseCode));
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
-			item.setDescription(AlephConstants.ERROR_AGENCY_NOT_FOUND);
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && agencyReached) {
+			AlephAgency agency = new AlephAgency(); //FIXME: sublibrary is not agency! see {@link AlephItem.setSubLibrary(String subLibrary)}
+			agency.setAgencyId(AlephConstants.ERROR_AGENCY_NOT_FOUND);
+			item.setAgency(agency);
 			agencyReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE) && openDateReached) {
+			//TODO: Set opendate not set for this item
+			openDateReached = false;
 		}
 	}
 
@@ -182,6 +190,11 @@ public class AlephItemHandler extends DefaultHandler {
 			agency.setAgencyId(new String(ch,start,length));
 			item.setAgency(agency);
 			agencyReached = false;
+		} else if (openDateReached) {
+			//TODO: set open date (publicationDate {@link BibliographicDescription}
+			//TODO: you have to first implement this service to {@link AlephItem} with respect to bibDescription
+			
+			openDateReached = false;
 		}
 	}
 }

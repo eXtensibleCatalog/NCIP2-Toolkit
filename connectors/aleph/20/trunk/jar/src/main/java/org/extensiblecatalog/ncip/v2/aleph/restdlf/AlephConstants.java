@@ -31,6 +31,7 @@ public class AlephConstants {
 	public static final String Z36_ITEM_SEQUENCE_NODE = "z36-item-sequence";
 	public static final String Z36_MATERIAL_NODE = "z36-material";
 	public static final String Z36_SUB_LIBRARY_NODE = "z36-sub-library";
+	
 	//circ status
 	public static final String CIRC_STATUS_NODE = "circ-status";
 	public static final String Z30_DESCRIPTION_NODE = "z30-description";
@@ -46,6 +47,7 @@ public class AlephConstants {
 	public static final String Z30_ITEM_SEQUENCE_NODE = "z30-item-sequence";
 	public static final String Z30_MATERIAL_NODE = "z30-material";
 	public static final String Z30_SUB_LIBRARY_NODE = "z30-sub-library";
+	public static final String Z30_OPEN_DATE_NODE = "z30-open-date";
 	//could be hold id, not sure?
 	public static final String Z30_HOLD_DOC_NUMBER_NODE = "z30-hol-doc-number";
 	//get fine data
