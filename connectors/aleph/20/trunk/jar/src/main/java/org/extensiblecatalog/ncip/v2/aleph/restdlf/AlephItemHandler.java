@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -30,6 +31,7 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean bibIdReached = false;
 	private boolean itemIdReached = false;
 	private boolean responseReached = false;
+	private boolean agencyReached = false;
 	private boolean itemFound = false;
 
 	/**
@@ -91,6 +93,8 @@ public class AlephItemHandler extends DefaultHandler {
 			}
 		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
 			responseReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
+			agencyReached = true;
 		}
 	}
 
@@ -133,6 +137,9 @@ public class AlephItemHandler extends DefaultHandler {
 			}
 		} else if (qName.equalsIgnoreCase(AlephConstants.GET_ITEM_LIST_NODE) && !itemFound) {
 			listOfItems.add(new AlephItem(responseCode));
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
+			item.setDescription(AlephConstants.ERROR_AGENCY_NOT_FOUND);
+			agencyReached = false;
 		}
 	}
 
@@ -170,6 +177,11 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (responseReached) {
 			responseCode = new String(ch, start, length);
 			responseReached = false;
+		} else if (agencyReached) {
+			AlephAgency agency = new AlephAgency();
+			agency.setAgencyId(new String(ch,start,length));
+			item.setAgency(agency);
+			agencyReached = false;
 		}
 	}
 }

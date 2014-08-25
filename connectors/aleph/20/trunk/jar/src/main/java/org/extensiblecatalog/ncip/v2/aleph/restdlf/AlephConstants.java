@@ -211,6 +211,7 @@ public class AlephConstants {
 	public static final String ERROR_TITLE_NOT_FOUND  = "Title is not set to this item.";
 	public static final String ERROR_PUBLISHER_NOT_FOUND = "Publisher is not set to this item.";
 	public static final String ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND = "Biblioghraphic id is not set to this item.";
+	public static final String ERROR_AGENCY_NOT_FOUND = "Agency is not set to this item.";
 	
 	//AlephAPI
 	//TODO: edit those constants into valid format, which Aleph RESTful APIs uses
