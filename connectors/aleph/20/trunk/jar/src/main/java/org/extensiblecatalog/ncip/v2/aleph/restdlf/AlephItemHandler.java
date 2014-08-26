@@ -109,6 +109,7 @@ public class AlephItemHandler extends DefaultHandler {
 			item.setCirculationStatus(AlephConstants.ERROR_CIRCULATION_STATUS_NOT_FOUND);
 			circulationStatusReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLnegthDesired && holdQueueLnegthReached) {
+			item.setHoldQueueLength(-1);
 			item.setholdQueue(AlephConstants.ERROR_HOLD_QUEUE_NOT_FOUND);
 			holdQueueLnegthReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired && itemDesrciptionReached) {
@@ -146,7 +147,7 @@ public class AlephItemHandler extends DefaultHandler {
 			item.setAgency(agency);
 			agencyReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE) && openDateReached) {
-			//TODO: Set opendate not set for this item
+			item.setPublicationDate(AlephConstants.ERROR_OPENDATE_NOT_FOUND);
 			openDateReached = false;
 		}
 	}
@@ -191,9 +192,7 @@ public class AlephItemHandler extends DefaultHandler {
 			item.setAgency(agency);
 			agencyReached = false;
 		} else if (openDateReached) {
-			//TODO: set open date (publicationDate {@link BibliographicDescription}
-			//TODO: you have to first implement this service to {@link AlephItem} with respect to bibDescription
-			
+			item.setPublicationDate(new String(ch, start, length));
 			openDateReached = false;
 		}
 	}

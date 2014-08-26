@@ -27,6 +27,7 @@ import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
@@ -148,11 +149,10 @@ public class AlephLookupItemService implements LookupItemService {
 			problems.add(p);
 			responseData.setProblems(problems);
 		}
-
 		if (alephItem == null) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
-			p.setProblemDetail("Unknown item for Item Id: " + initData.getItemId());
+			p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
+			p.setProblemDetail("Unknown item for Item Id: " + initData.getItemId().getItemIdentifierValue());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);

@@ -72,6 +72,7 @@ public class AlephItem implements Serializable {
 	private String holdRequestId;
 	private AlephAgency agency;
 	private String holdQueue;
+	private String publicationDate;
 	
 	public AlephItem(){
 		borrowingUsers = new ArrayList<AlephUser>();
@@ -789,7 +790,7 @@ public class AlephItem implements Serializable {
 		sb.append("[DateHoldRequested:"+(getDateHoldRequested()!=null?getDateHoldRequested():"null")+"],");
 		sb.append("[DateAvailablePickup:"+(getDateAvailablePickup()!=null?getDateAvailablePickup():"null")+"],");
 		sb.append("[DueDate:"+(getDueDate()!=null?getDueDate():"null")+"],");
-		sb.append("[HoldQueueLength:"+getHoldQueueLength()+"],");
+		sb.append("[HoldQueueLength:"+(getHoldQueueLength()!=-1?getHoldQueueLength():getHoldQueue())+"],");
 		sb.append("[FineAmount:"+(getFineAmount()!=null?getFineAmount().doubleValue():"null")+"],");
 		sb.append("[FineAccrualDate:"+(getFineAccrualDate()!=null?getFineAccrualDate():"null")+"],");
 		sb.append("[FineStatus:"+(getFineStatus()!=null?getFineStatus():"null")+"],");
@@ -809,5 +810,13 @@ public class AlephItem implements Serializable {
 	}
 	public void setItemsCount(BigDecimal itemsCount) {
 		this.itemsCount = itemsCount;
+	}
+	
+	public String getPublicationDate() {
+		return publicationDate;
+	}
+
+	public void setPublicationDate(String publicationDate) {
+		this.publicationDate = publicationDate;		
 	}
 }
