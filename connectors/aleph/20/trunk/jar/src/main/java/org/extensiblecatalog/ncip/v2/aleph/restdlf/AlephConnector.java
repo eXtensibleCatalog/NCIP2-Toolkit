@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -76,10 +77,12 @@ public class AlephConnector extends AlephMediator {
 	}
 
 	/**
+	 * Looks up item with desired services in following order:
+	 * 
 	 * @param itemId
 	 * @param bibliographicDescription
 	 * @param circulationStatus
-	 * @param holdQueueLnegth
+	 * @param holdQueueLength
 	 * @param itemDesrciption
 	 * @return
 	 * @throws ParserConfigurationException
@@ -87,7 +90,7 @@ public class AlephConnector extends AlephMediator {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public List<AlephItem> lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLnegth, boolean itemDesrciption) throws ParserConfigurationException, IOException, SAXException,
+	public List<AlephItem> lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption) throws ParserConfigurationException, IOException, SAXException,
 			AlephException {
 		
 		itemId = normalizeItem(itemId);
@@ -95,8 +98,8 @@ public class AlephConnector extends AlephMediator {
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + itemId, itemsElement).addRequest("view", "full").toURL();
 		
 		InputSource streamSource = new InputSource(url.openStream());
-
-		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLnegth, itemDesrciption);
+		
+		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
 

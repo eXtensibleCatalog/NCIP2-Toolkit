@@ -109,7 +109,7 @@ public class AlephLookupItemService implements LookupItemService {
 			//TODO: Think about all the returned items with identical ItemId ..
 			alephItem = alephItems.get(0);
 			
-			alephItem.setItemsCount(new BigDecimal(itemsFound));
+			alephItem.setNumberOfPieces(new BigDecimal(itemsFound));
 			
 			// update NCIP response data with aleph item data
 			updateResponseData(initData, responseData, alephItem);

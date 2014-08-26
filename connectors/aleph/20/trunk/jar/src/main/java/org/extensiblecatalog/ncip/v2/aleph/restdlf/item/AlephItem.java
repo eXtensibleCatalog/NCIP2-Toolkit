@@ -4,6 +4,8 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants.Availability;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -45,7 +47,7 @@ public class AlephItem implements Serializable {
 	private String series;
 	private String title;
 	
-	private String circulationStatus;
+	private CirculationStatus circulationStatus;
 	private String electronicResource;
 	private String sessionId;
 	private String barcode;
@@ -58,7 +60,7 @@ public class AlephItem implements Serializable {
 	private int holdQueueLength = 0;
 	
 	private BigDecimal fineAmount;
-	private BigDecimal itemsCount;
+	private BigDecimal numberOfPieces;
 	private Date fineAccrualDate;
 	
 	private List<AlephUser> borrowingUsers;
@@ -73,19 +75,17 @@ public class AlephItem implements Serializable {
 	private AlephAgency agency;
 	private String holdQueue;
 	private String publicationDate;
+	private String copyNumber;
+	private boolean exists = true;
 	
 	public AlephItem(){
 		borrowingUsers = new ArrayList<AlephUser>();
 		requestingUsers = new ArrayList<AlephUser>();
 	}
 	
-	public AlephItem(String replyCode) {
-		this();
-		if (replyCode == "0019") {
-			this.setAvailability(AlephConstants.Availability.DOESNT_EXIST);
-		} else if (replyCode == "0000") {
-			this.setAvailability(AlephConstants.Availability.DOESNT_EXIST_REMOVED_MANUALLY);
-		}
+	public AlephItem doesntExists() {
+		this.exists = false;
+		return this;
 	}
 	
 	/**
@@ -289,7 +289,7 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the circulationStatus
 	 */
-	public String getCirculationStatus() {
+	public CirculationStatus getCirculationStatus() {
 		return circulationStatus;
 	}
 	
@@ -297,6 +297,13 @@ public class AlephItem implements Serializable {
 	 * @param circulationStatus the circulationStatus to set
 	 */
 	public void setCirculationStatus(String circulationStatus) {
+		this.circulationStatus = new CirculationStatus(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus);
+	}
+	
+	/**
+	 * @param circulationStatus the circulationStatus to set
+	 */
+	public void setCirculationStatus(CirculationStatus circulationStatus) {
 		this.circulationStatus = circulationStatus;
 	}
 	
@@ -805,11 +812,11 @@ public class AlephItem implements Serializable {
 		this.holdQueue = errorHoldQueueNotFound;
 		
 	}
-	public BigDecimal getItemsCount() {
-		return itemsCount;
+	public BigDecimal getNumberOfPieces() {
+		return numberOfPieces;
 	}
-	public void setItemsCount(BigDecimal itemsCount) {
-		this.itemsCount = itemsCount;
+	public void setNumberOfPieces(BigDecimal numberOfPieces) {
+		this.numberOfPieces = numberOfPieces;
 	}
 	
 	public String getPublicationDate() {
@@ -818,5 +825,17 @@ public class AlephItem implements Serializable {
 
 	public void setPublicationDate(String publicationDate) {
 		this.publicationDate = publicationDate;		
+	}
+
+	public String getCopyNumber() {
+		return copyNumber;
+	}
+	
+	public void setCopyNumber(String copyNumber) {
+		this.copyNumber = copyNumber;
+	}
+
+	public boolean exists() {
+		return exists ;
 	}
 }

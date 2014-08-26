@@ -16,7 +16,6 @@ import org.xml.sax.helpers.DefaultHandler;
 public class AlephItemHandler extends DefaultHandler {
 	private List<AlephItem> listOfItems;
 	private AlephItem item;
-	private String responseCode;
 	private boolean bibDescriptionDesired;
 	private boolean circulationStatusDesired;
 	private boolean holdQueueLnegthDesired;
@@ -30,10 +29,10 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean publisherReached = false;
 	private boolean bibIdReached = false;
 	private boolean itemIdReached = false;
-	private boolean responseReached = false;
 	private boolean agencyReached = false;
-	private boolean itemFound = false;
 	private boolean openDateReached = false;
+	private boolean callNoReached = false;
+	private boolean copyNoReached = false;
 
 	/**
 	 * @return the listOfItems
@@ -64,10 +63,7 @@ public class AlephItemHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equalsIgnoreCase(AlephConstants.GET_ITEM_LIST_NODE) && itemFound) {
-			itemFound = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
-			itemFound = true;
+		if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 			item = new AlephItem();
 			item.setLink(attributes.getValue(AlephConstants.HREF_NODE_ATTR));
 			if (listOfItems == null)
@@ -80,6 +76,14 @@ public class AlephItemHandler extends DefaultHandler {
 			itemDesrciptionReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
 			itemIdReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
+			agencyReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE)) {
+			openDateReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE)) {
+			callNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE)) {
+			copyNoReached = true;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 				authorReached = true;
@@ -92,12 +96,6 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
 				bibIdReached = true;
 			}
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
-			responseReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
-			agencyReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE)) {
-			openDateReached  = true;
 		}
 	}
 
@@ -118,6 +116,20 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemIdReached) {
 			item.setItemId(AlephConstants.ERROR_ITEM_ID_NOT_FOUND);
 			itemIdReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && agencyReached) {
+			AlephAgency agency = new AlephAgency(); // FIXME: sublibrary is not agency! see {@link AlephItem.setSubLibrary(String subLibrary)}
+			agency.setAgencyId(AlephConstants.ERROR_AGENCY_NOT_FOUND);
+			item.setAgency(agency);
+			agencyReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE) && openDateReached) {
+			item.setPublicationDate(AlephConstants.ERROR_OPENDATE_NOT_FOUND);
+			openDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
+			item.setCallNumber(AlephConstants.ERROR_CALL_NO_NOT_FOUND);
+			callNoReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
+			item.setCopyNumber(AlephConstants.ERROR_COPY_NO_NOT_FOUND);
+			copyNoReached = false;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 				item.setAuthor(AlephConstants.ERROR_AUTHOR_NOT_FOUND);
@@ -135,20 +147,6 @@ public class AlephItemHandler extends DefaultHandler {
 				item.setBibId(AlephConstants.ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND);
 				bibIdReached = false;
 			}
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
-			if (responseCode == "0019") {
-				listOfItems.add(new AlephItem(responseCode));
-			}
-		} else if (qName.equalsIgnoreCase(AlephConstants.GET_ITEM_LIST_NODE) && !itemFound) {
-			listOfItems.add(new AlephItem(responseCode));
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && agencyReached) {
-			AlephAgency agency = new AlephAgency(); //FIXME: sublibrary is not agency! see {@link AlephItem.setSubLibrary(String subLibrary)}
-			agency.setAgencyId(AlephConstants.ERROR_AGENCY_NOT_FOUND);
-			item.setAgency(agency);
-			agencyReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE) && openDateReached) {
-			item.setPublicationDate(AlephConstants.ERROR_OPENDATE_NOT_FOUND);
-			openDateReached = false;
 		}
 	}
 
@@ -166,6 +164,20 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (itemIdReached) {
 			item.setItemId(new String(ch, start, length));
 			itemIdReached = false;
+		} else if (agencyReached) {
+			AlephAgency agency = new AlephAgency();
+			agency.setAgencyId(new String(ch, start, length));
+			item.setAgency(agency);
+			agencyReached = false;
+		} else if (openDateReached) {
+			item.setPublicationDate(new String(ch, start, length));
+			openDateReached = false;
+		} else if (callNoReached) {
+			item.setCallNumber(new String(ch, start, length));
+			callNoReached = false;
+		} else if (copyNoReached) {
+			item.setCopyNumber(new String(ch, start, length));
+			copyNoReached = false;
 		} else if (bibDescriptionDesired && (authorReached || isbnReached || titleReached || publisherReached || bibIdReached)) {
 			if (authorReached) {
 				item.setAuthor(new String(ch, start, length));
@@ -183,17 +195,6 @@ public class AlephItemHandler extends DefaultHandler {
 				item.setBibId(new String(ch, start, length));
 				bibIdReached = false;
 			}
-		} else if (responseReached) {
-			responseCode = new String(ch, start, length);
-			responseReached = false;
-		} else if (agencyReached) {
-			AlephAgency agency = new AlephAgency();
-			agency.setAgencyId(new String(ch,start,length));
-			item.setAgency(agency);
-			agencyReached = false;
-		} else if (openDateReached) {
-			item.setPublicationDate(new String(ch, start, length));
-			openDateReached = false;
 		}
 	}
 }

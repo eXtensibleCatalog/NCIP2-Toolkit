@@ -14,6 +14,7 @@ public class AlephConstants {
 	public static final String DUE_DATE_NODE = "due-date";
 	public static final String Z30_BARCODE = "z30-barcode";
 	public static final String Z30_CALL_NUMBER_NODE = "z30-call-no";
+	public static final String Z30_COPY_ID_NODE = "z30-copy-id";
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
 	public static final String Z13_AUTHOR_NODE = "z13-author";
 	public static final String Z13_TITLE_NODE = "z13-title";
@@ -204,6 +205,7 @@ public class AlephConstants {
 	public static final String ERROR_HOLD_LIBRARY_NOT_SET = "Hold library not set for agency";
 	
 	//Parser found empty XML node
+	//Note that NOT FOUND means XML node was found, but with no values in it
 	public static final String ERROR_ITEM_DESCRIPTION_NOT_FOUND = "Item description is not set to this item.";
 	public static final String ERROR_CIRCULATION_STATUS_NOT_FOUND = "Circulation status is not set to this item.";
 	public static final String ERROR_HOLD_QUEUE_NOT_FOUND = "Hold queue is not set to this item.";
@@ -215,6 +217,8 @@ public class AlephConstants {
 	public static final String ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND = "Biblioghraphic id is not set to this item.";
 	public static final String ERROR_AGENCY_NOT_FOUND = "Agency is not set to this item.";
 	public static final String ERROR_OPENDATE_NOT_FOUND = "Open date is not set to this item.";
+	public static final String ERROR_CALL_NO_NOT_FOUND = "Call Number is not set to this item";
+	public static final String ERROR_COPY_NO_NOT_FOUND = "Copy Number is not set to this item";
 	
 	//AlephAPI
 	//TODO: edit those constants into valid format, which Aleph RESTful APIs uses

@@ -170,7 +170,7 @@ public class AlephMediator implements Serializable {
 			if (item.getDueDate()!=null){
 				available = AlephConstants.Availability.NOT_AVAILABLE;
 			} else if (item.getCirculationStatus()!=null){
-				available = this.availabilityCircStatusMap.get(item.getCirculationStatus().toLowerCase());
+				available = this.availabilityCircStatusMap.get(item.getCirculationStatus().toString().toLowerCase());
 				if (available==null){
 					//default to possibly available if a status is set but unrecognized
 					available = AlephConstants.Availability.POSSIBLY_AVAILABLE;
