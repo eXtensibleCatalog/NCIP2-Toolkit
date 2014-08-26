@@ -121,8 +121,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							HoldingsSet holdingSet = new HoldingsSet();
 
 							if (getBibDescription) {
-								// TODO: Take default agency IF NOT supplied
-								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, new AgencyId("MZK"));
+								AgencyId suppliedAgencyId;
+								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getFromAgencyId() == null)
+									suppliedAgencyId = alephSvcMgr.getDefaultAgencyId();
+								else
+									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
+								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, suppliedAgencyId);
 								holdingSet.setBibliographicDescription(bDesc);
 							}
 
@@ -158,7 +162,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							List<Problem> problems = new ArrayList<Problem>();
 							problems.add(p);
-							
+
 							bibInformation.setProblems(problems);
 							bibInformations.add(bibInformation);
 						}
@@ -249,8 +253,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							HoldingsSet holdingSet = new HoldingsSet();
 
 							if (getBibDescription) {
-								// TODO: Take default agency IF NOT supplied
-								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, new AgencyId("MZK"));
+								AgencyId suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
+								if (suppliedAgencyId == null)
+									suppliedAgencyId = alephSvcMgr.getDefaultAgencyId();
+								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, suppliedAgencyId);
 								holdingSet.setBibliographicDescription(bDesc);
 							}
 
@@ -286,7 +292,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							List<Problem> problems = new ArrayList<Problem>();
 							problems.add(p);
-							
+
 							bibInformation.setProblems(problems);
 							bibInformations.add(bibInformation);
 						}

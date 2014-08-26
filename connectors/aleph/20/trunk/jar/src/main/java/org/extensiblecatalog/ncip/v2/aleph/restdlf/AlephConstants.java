@@ -286,6 +286,7 @@ public class AlephConstants {
 	
 	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
+	public static final String DEFAULT_AGENCY = "DefaultAgency";
 }
 
 

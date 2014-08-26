@@ -9,9 +9,11 @@ import java.util.Properties;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -35,6 +37,7 @@ public class AlephConnector extends AlephMediator {
 	private int bibIdLength;
 	private SAXParser parser;
 	public boolean echoParticularProblemsToLUIS = false;
+	public String defaultAgency = "";
 
 	public AlephConnector() throws ServiceException {
 		try {
@@ -47,6 +50,7 @@ public class AlephConnector extends AlephMediator {
 			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
 			
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
+			defaultAgency = alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY);
 
 			if (serverName == null || serverPort == null) {
 				throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Aleph server or port not set");
@@ -67,6 +71,10 @@ public class AlephConnector extends AlephMediator {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public AgencyId getDefaultAgencyId() {
+		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE,defaultAgency);
 	}
 
 	private String normalizeItem(String item) {

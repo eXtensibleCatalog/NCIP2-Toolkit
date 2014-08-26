@@ -106,7 +106,7 @@ public class AlephMediator implements Serializable {
 	/**
 	 * @return the defaultAgencyId
 	 */
-	public String getDefaultAgencyId() {
+	public String getDefaultAgency() {
 		if (defaultAgencyId!=null){
 			return defaultAgencyId;
 		} else if (defaultAgencyId==null&&getAgencies().size()>0){
