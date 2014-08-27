@@ -27,39 +27,40 @@ public class AlephConnector extends AlephMediator {
 
 	private static final long serialVersionUID = -4425639616999642735L;
 	protected AlephConfiguration alephConfig = null;
+	public boolean echoParticularProblemsToLUIS = false;
+	private boolean requiredAtLeastOneService = true;
+	public String defaultAgency = "";
 	private String serverName;
 	private String serverPort;
 	private String serverSuffix;
 	private String bibLibrary;
+	private String admLibrary;
 	private String itemPathElement;
 	private String userPathElement;
 	private String itemsElement;
 	private int bibIdLength;
+	private int itemIdUniquePart;
 	private SAXParser parser;
-	public boolean echoParticularProblemsToLUIS = false;
-	public String defaultAgency = "";
 
 	public AlephConnector() throws ServiceException {
+
 		try {
-			// Get configuration from toolkit.properties file
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			alephConfig = new AlephConfiguration(config);
 			serverName = alephConfig.getProperty(AlephConstants.REST_DLF_SERVER);
 			serverPort = alephConfig.getProperty(AlephConstants.REST_DLF_PORT);
-			serverSuffix = alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX);
-			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
-			
-			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
-			defaultAgency = alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY);
-
 			if (serverName == null || serverPort == null) {
 				throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Aleph server or port not set");
 			}
+			// Get configuration from toolkit.properties file
 
-			bibIdLength = AlephConstants.BIB_ID_LENGTH;
-			itemPathElement = AlephConstants.ITEM_PATH_ELEMENT;
-			userPathElement = AlephConstants.USER_PATH_ELEMENT;
-			itemsElement = AlephConstants.ITEMS_ELEMENT;
+			serverSuffix = alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX);
+			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
+			admLibrary = alephConfig.getProperty(AlephConstants.ALEPH_ADMINISTRATIVE_LIBRARY);
+			defaultAgency = alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY);
+
+			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
+			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
 
 			parser = SAXParserFactory.newInstance().newSAXParser();
 
@@ -70,24 +71,55 @@ public class AlephConnector extends AlephMediator {
 		} catch (SAXException e) {
 			e.printStackTrace();
 		}
+		bibIdLength = AlephConstants.BIB_ID_LENGTH;
+		itemIdUniquePart = AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH;
+		itemPathElement = AlephConstants.ITEM_PATH_ELEMENT;
+		userPathElement = AlephConstants.USER_PATH_ELEMENT;
+		itemsElement = AlephConstants.ITEMS_ELEMENT;
 
 	}
-	
+
 	public AgencyId getDefaultAgencyId() {
-		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE,defaultAgency);
+		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, defaultAgency);
 	}
 
-	private String normalizeItem(String item) {
-		while (item.length() < bibIdLength) {
-			item = "0" + item;
+	private String normalizeRecordId(String recordId) {
+		while (recordId.length() < bibIdLength) {
+			recordId = "0" + recordId;
 		}
-		return item;
+		return recordId;
+	}
+
+	private String normalizeItemIdPart(String itemId) {
+		while (itemId.length() < itemIdUniquePart) {
+			itemId = "0" + itemId;
+		}
+		return itemId;
+	}
+
+	private String normalizeItemId(String itemId) {
+		// All this is needed to build unique ItemId URL
+		// e.g. http://aleph.mzk.cz:1892/rest-dlf/record/MZK01000000421/items/MZK50000000421000010
+		String recordId = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
+		String[] itemIdParts = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1].split("\\.");
+
+		/*
+		 * Input is something like this: 421-1.0 What we need is: 000000421000010; Sure only if BIB_ID_LENGTH = 9 & ITEM_ID_UNIQUE_PART_LENGTH = 6
+		 */
+		itemId = itemIdParts[0] + itemIdParts[1];
+
+		return normalizeRecordId(recordId) + normalizeItemIdPart(itemId);
+	}
+
+	private String normalizeRecordIdFromItemId(String itemId) {
+		// Take the part before UNIQUE_ITEM_ID_SEPERATOR and normalize it
+		return normalizeRecordId(itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0]);
 	}
 
 	/**
 	 * Looks up item with desired services in following order:
 	 * 
-	 * @param itemId
+	 * @param recordId
 	 * @param bibliographicDescription
 	 * @param circulationStatus
 	 * @param holdQueueLength
@@ -98,21 +130,42 @@ public class AlephConnector extends AlephMediator {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public List<AlephItem> lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption) throws ParserConfigurationException, IOException, SAXException,
-			AlephException {
-		
-		itemId = normalizeItem(itemId);
-		
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + itemId, itemsElement).addRequest("view", "full").toURL();
-		
+	public List<AlephItem> lookupItems(String recordId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
+			throws ParserConfigurationException, IOException, SAXException, AlephException {
+
+		recordId = normalizeRecordId(recordId);
+
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + recordId, itemsElement).addRequest("view", "full").toURL();
+
 		InputSource streamSource = new InputSource(url.openStream());
-		
+
 		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
+
+		itemHandler.requireAtLeastOneService(requiredAtLeastOneService);
 
 		parser.parse(streamSource, itemHandler);
 
 		return itemHandler.getListOfItems();
 
+	}
+
+	public AlephItem lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
+			throws ParserConfigurationException, IOException, SAXException, AlephException {
+
+		String recordId = normalizeRecordIdFromItemId(itemId);
+		itemId = normalizeItemId(itemId);
+
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + recordId, itemsElement, admLibrary + itemId).toURL();
+
+		InputSource streamSource = new InputSource(url.openStream());
+
+		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
+
+		itemHandler.requireAtLeastOneService(requiredAtLeastOneService);
+
+		parser.parse(streamSource, itemHandler);
+
+		return itemHandler.item;
 	}
 
 }

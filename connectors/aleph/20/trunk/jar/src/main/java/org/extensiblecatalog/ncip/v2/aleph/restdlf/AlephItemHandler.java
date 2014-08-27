@@ -15,7 +15,11 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class AlephItemHandler extends DefaultHandler {
 	private List<AlephItem> listOfItems;
-	private AlephItem item;
+	public AlephItem item;
+	private String docNumber;
+	private String itemSequence;
+	private boolean requireAtLeastOneService;
+	private boolean itemIdNotFound = false;
 	private boolean bibDescriptionDesired;
 	private boolean circulationStatusDesired;
 	private boolean holdQueueLnegthDesired;
@@ -28,11 +32,22 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
 	private boolean bibIdReached = false;
-	private boolean itemIdReached = false;
+	private boolean docNoReached = false;
 	private boolean agencyReached = false;
 	private boolean openDateReached = false;
 	private boolean callNoReached = false;
 	private boolean copyNoReached = false;
+	private boolean barcodeReached = false;
+	private boolean itemSequenceReached;
+	
+	/**
+	 * Sets if has responder return error if there is no service desired.
+	 * 
+	 * @param requireAtLeastOneService
+	 */
+	public void requireAtLeastOneService(boolean requireAtLeastOneService) {
+		this.requireAtLeastOneService = requireAtLeastOneService;
+	}
 
 	/**
 	 * @return the listOfItems
@@ -56,7 +71,7 @@ public class AlephItemHandler extends DefaultHandler {
 			this.circulationStatusDesired = circulationStatusDesired;
 			this.holdQueueLnegthDesired = holdQueueLnegthDesired;
 			this.itemDesrciptionDesired = itemDesrciptionDesired;
-		} else {
+		} else if (requireAtLeastOneService) {
 			throw new AlephException("No service desired. Please supply at least one service you wish to use.");
 		}
 	}
@@ -75,7 +90,9 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
 			itemDesrciptionReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
-			itemIdReached = true;
+			docNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_SEQUENCE_NODE)) {
+			itemSequenceReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
 			agencyReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE)) {
@@ -84,6 +101,8 @@ public class AlephItemHandler extends DefaultHandler {
 			callNoReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE)) {
 			copyNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
+			barcodeReached = true;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 				authorReached = true;
@@ -102,6 +121,8 @@ public class AlephItemHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
+			if (!itemIdNotFound)
+				item.setItemId(docNumber.trim() + "-" + itemSequence.trim());
 			listOfItems.add(item);
 		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired && circulationStatusReached) {
 			item.setCirculationStatus(AlephConstants.ERROR_CIRCULATION_STATUS_NOT_FOUND);
@@ -113,9 +134,14 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired && itemDesrciptionReached) {
 			item.setDescription(AlephConstants.ERROR_ITEM_DESCRIPTION_NOT_FOUND);
 			itemDesrciptionReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemIdReached) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && docNoReached && itemSequence != null) {
 			item.setItemId(AlephConstants.ERROR_ITEM_ID_NOT_FOUND);
-			itemIdReached = false;
+			itemIdNotFound = true;
+			docNoReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_SEQUENCE_NODE) && itemSequenceReached && docNumber != null) {
+			item.setItemId(AlephConstants.ERROR_ITEM_ID_NOT_FOUND);
+			itemIdNotFound = true;
+			itemSequenceReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && agencyReached) {
 			AlephAgency agency = new AlephAgency(); // FIXME: sublibrary is not agency! see {@link AlephItem.setSubLibrary(String subLibrary)}
 			agency.setAgencyId(AlephConstants.ERROR_AGENCY_NOT_FOUND);
@@ -130,6 +156,9 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
 			item.setCopyNumber(AlephConstants.ERROR_COPY_NO_NOT_FOUND);
 			copyNoReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
+			item.setBarcode(AlephConstants.ERROR_BARCODE_NOT_FOUND);
+			barcodeReached = false;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 				item.setAuthor(AlephConstants.ERROR_AUTHOR_NOT_FOUND);
@@ -161,9 +190,12 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (itemDesrciptionReached) {
 			item.setDescription(new String(ch, start, length));
 			itemDesrciptionReached = false;
-		} else if (itemIdReached) {
-			item.setItemId(new String(ch, start, length));
-			itemIdReached = false;
+		} else if (docNoReached) {
+			docNumber = new String(ch, start, length);
+			docNoReached = false;
+		} else if (itemSequenceReached) {
+			itemSequence = new String(ch, start, length);
+			itemSequenceReached = false;
 		} else if (agencyReached) {
 			AlephAgency agency = new AlephAgency();
 			agency.setAgencyId(new String(ch, start, length));
@@ -178,6 +210,9 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (copyNoReached) {
 			item.setCopyNumber(new String(ch, start, length));
 			copyNoReached = false;
+		} else if (barcodeReached) {
+			item.setBarcode(new String(ch, start, length));
+			barcodeReached = false;
 		} else if (bibDescriptionDesired && (authorReached || isbnReached || titleReached || publisherReached || bibIdReached)) {
 			if (authorReached) {
 				item.setAuthor(new String(ch, start, length));

@@ -101,7 +101,7 @@ public class AlephLookupItemService implements LookupItemService {
 
 		try {
 			// get bib library and adm library...just set to ND for now
-			List<AlephItem> alephItems = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), getBibDescription, getCircStatus, getHoldQueueLength,
+			List<AlephItem> alephItems = alephRemoteServiceManager.lookupItems(initData.getItemId().getItemIdentifierValue(), getBibDescription, getCircStatus, getHoldQueueLength,
 					getItemDescription);
 			
 			itemsFound = alephItems.size();

@@ -30,7 +30,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 
 public class AlephUtil {
-	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) throws ServiceException {
+	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 
 		if (alephItem.getAuthor() != null) {
@@ -47,10 +47,16 @@ public class AlephUtil {
 
 		if (alephItem.getMediumType() != null) {
 			Version1MediumType.loadAll();
-			MediumType mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, alephItem.getMediumType());
-			if (mediumType != null) {
-				bibliographicDescription.setMediumType(mediumType);
+			MediumType mediumType;
+			try {
+				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, alephItem.getMediumType());
+				if (mediumType != null) {
+					bibliographicDescription.setMediumType(mediumType);
+				}
+			} catch (ServiceException e) {
+				e.printStackTrace();
 			}
+			
 		}
 		if (alephItem.getPublisher() != null) {
 			bibliographicDescription.setPublisher(alephItem.getPublisher());
