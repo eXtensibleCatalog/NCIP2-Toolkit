@@ -15,7 +15,7 @@ public class Version1BibliographicItemIdentifierCode extends BibliographicItemId
     private static final Logger LOG = Logger.getLogger(Version1BibliographicItemIdentifierCode.class);
 
     public static final String VERSION_1_BIBLIOGRAPHIC_ITEM_IDENTIFIER_CODE
-            = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
+            = "http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm";
 
     // Book Item Component Identifier. Source: NISO Draft Standard for Trial Use. BICI (Book Item and Component Identifier).
     public static final Version1BibliographicItemIdentifierCode BICI
