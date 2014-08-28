@@ -57,6 +57,10 @@ public class AlephConstants {
 	public static final String Z31_CREDIT_DEBIT_NODE = "z31-credit-debit";
 	public static final String Z31_NET_SUM_NODE = "z31-net-sum";
 	public static final String Z30_NODE_ID = "Z30";
+	public static final String Z30_TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
+	public static final String Z30_COLLECTION_NODE = "z30-collection";
+		
+	
 	public static final String Z31_NODE = "z31";
 	public static final String Z31_FINE_ACCRUAL_DATE_NODE = "z31-date";
 	public static final String SESSION_ID_NODE = "session-id";
@@ -225,6 +229,10 @@ public class AlephConstants {
 	public static final String ERROR_COPY_NO_NOT_FOUND = "Copy Number is not set to this item";
 	public static final String ERROR_BARCODE_NOT_FOUND = "Barcode is not set to this item";
 	public static final String ERROR_MATERIAL_NOT_FOUND = "Material (medium type) is not set to this item";
+	public static final String ERROR_LOCATION_NOT_FOUND = "Location is not set to this item";
+	public static final String ERROR_DOCUMENT_NUMBER_NOT_FOUND = "Document number is not set to this item";
+	public static final String ERROR_SEQUENCE_NUMBER_NOT_FOUND = "Sequence number is not set to this item";
+	public static final String ERROR_COLLECTION_NOT_FOUND = "Collection is not set to this item";
 
 	// AlephAPI
 	// TODO: edit those constants into valid format, which Aleph RESTful APIs uses

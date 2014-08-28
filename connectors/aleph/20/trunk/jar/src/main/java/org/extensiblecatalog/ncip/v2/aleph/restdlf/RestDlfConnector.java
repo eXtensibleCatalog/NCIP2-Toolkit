@@ -169,7 +169,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		parser.parse(streamSource, itemHandler);
 
-		return itemHandler.item;
+		return itemHandler.getAlephItem();
 	}
 
 }

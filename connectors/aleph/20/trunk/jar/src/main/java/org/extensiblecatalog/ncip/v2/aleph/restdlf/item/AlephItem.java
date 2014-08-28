@@ -298,6 +298,12 @@ public class AlephItem implements Serializable {
 	 */
 	public void setCirculationStatus(String circulationStatus) {
 		this.circulationStatus = new CirculationStatus(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus);
+		if(circulationStatus != "On Shelf")
+			try {
+				this.setDateAvailablePickup(circulationStatus);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 	}
 	
 	/**
@@ -837,5 +843,11 @@ public class AlephItem implements Serializable {
 
 	public boolean exists() {
 		return exists ;
+	}
+
+	public void setAgency(String agencyId) {
+		AlephAgency agency = new AlephAgency();
+		agency.setAgencyId(agencyId);
+		this.agency = agency;
 	}
 }
