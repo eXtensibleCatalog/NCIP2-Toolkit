@@ -17,7 +17,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
  * @author Rick Johnson
  * @organization University of Notre Dame
  */
-public class AlephRemoteServiceManager extends AlephConnector implements RemoteServiceManager {
+public class AlephRemoteServiceManager extends RestDlfConnector implements RemoteServiceManager {
 	
 	
     /**
