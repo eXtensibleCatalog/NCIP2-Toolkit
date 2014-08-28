@@ -281,7 +281,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		// TODO: Is it neccessary to set particular item ids? -> implement parsing those if yes
 		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierType(Version1ItemIdentifierType.BARCODE);
 		itemId.setItemIdentifierValue(alephItem.getBarcode());
 		info.setItemId(itemId);
 
@@ -295,6 +294,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
 				itemDescription.setCallNumber(alephItem.getCallNumber());
 				itemDescription.setCopyNumber(alephItem.getCopyNumber());
+				itemId.setItemIdentifierType(Version1ItemIdentifierType.BARCODE);
 				itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
 				iof.setItemDescription(itemDescription);
 			}
@@ -317,7 +317,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 			ItemOptionalFields iof = new ItemOptionalFields();
 
-			// bibInformation.setBibliographicDescription(null);(new BigDecimal(alephItems.size()));
 			if (getBibDescription) {
 				BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
 				holdingsSet.setBibliographicDescription(bDesc);
@@ -342,6 +341,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
 					itemDescription.setCallNumber(item.getCallNumber());
 					itemDescription.setCopyNumber(item.getCopyNumber());
+					itemId.setItemIdentifierType(Version1ItemIdentifierType.BARCODE);
 					itemDescription.setNumberOfPieces(item.getNumberOfPieces());
 					iof.setItemDescription(itemDescription);
 				}
