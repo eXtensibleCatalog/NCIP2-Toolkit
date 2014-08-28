@@ -224,6 +224,7 @@ public class AlephConstants {
 	public static final String ERROR_CALL_NO_NOT_FOUND = "Call Number is not set to this item";
 	public static final String ERROR_COPY_NO_NOT_FOUND = "Copy Number is not set to this item";
 	public static final String ERROR_BARCODE_NOT_FOUND = "Barcode is not set to this item";
+	public static final String ERROR_MATERIAL_NOT_FOUND = "Material (medium type) is not set to this item";
 
 	// AlephAPI
 	// TODO: edit those constants into valid format, which Aleph RESTful APIs uses

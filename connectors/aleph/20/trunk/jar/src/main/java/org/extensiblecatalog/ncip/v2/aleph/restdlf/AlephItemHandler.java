@@ -37,9 +37,10 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean openDateReached = false;
 	private boolean callNoReached = false;
 	private boolean copyNoReached = false;
+	private boolean materialReached = false;
 	private boolean barcodeReached = false;
 	private boolean itemSequenceReached;
-	
+
 	/**
 	 * Sets if has responder return error if there is no service desired.
 	 * 
@@ -103,6 +104,8 @@ public class AlephItemHandler extends DefaultHandler {
 			copyNoReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
 			barcodeReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
+			materialReached = true;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 				authorReached = true;
@@ -159,6 +162,9 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
 			item.setBarcode(AlephConstants.ERROR_BARCODE_NOT_FOUND);
 			barcodeReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
+			item.setMediumType(AlephConstants.ERROR_MATERIAL_NOT_FOUND);
+			materialReached = false;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 				item.setAuthor(AlephConstants.ERROR_AUTHOR_NOT_FOUND);
@@ -213,6 +219,9 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (barcodeReached) {
 			item.setBarcode(new String(ch, start, length));
 			barcodeReached = false;
+		} else if (materialReached) {
+			item.setMediumType(new String(ch, start, length));
+			materialReached = false;
 		} else if (bibDescriptionDesired && (authorReached || isbnReached || titleReached || publisherReached || bibIdReached)) {
 			if (authorReached) {
 				item.setAuthor(new String(ch, start, length));
