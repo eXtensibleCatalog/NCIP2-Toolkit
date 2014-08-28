@@ -110,76 +110,23 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				try {
 					if (bibId.getBibliographicRecordId() != null) {
 
-						// TODO: Purpose of this bunch of code?? :
-						if (bibId.getBibliographicRecordId().getAgencyId() != null) {
-
-							// Execute request if agency Id is blank or NRU
-							if (!bibId.getBibliographicRecordId().getAgencyId().getValue().equalsIgnoreCase("")
-									&& alephSvcMgr.getAlephAgency(bibId.getBibliographicRecordId().getAgencyId().getValue()) == null) {
-								throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "This request cannot be processed. Agency ID is invalid or not found.");
-							}
-
-						} else {
-
-							BibliographicRecordIdentifierCode code = bibId.getBibliographicRecordId().getBibliographicRecordIdentifierCode();
-							if (!code.equals(Version1BibliographicRecordIdentifierCode.OCLC)) {
-
-								bibInformation.setProblems(ServiceHelper.generateProblems(Version1GeneralProcessingError.UNAUTHORIZED_COMBINATION_OF_ELEMENT_VALUES_FOR_SYSTEM,
-										"//BibliographicRecordId/BibliographicRecordIdentifierCode", code.getScheme() + ": " + code.getValue(), "Bib Id type '" + code.getScheme()
-												+ ": " + code.getValue() + "' not supported."));
-								bibInformations.add(bibInformation);
-
-							}
-						}
-						// EOF TODO
-						
-						
-						log.debug("Processing Bib id = " + bibId.getBibliographicItemId().getBibliographicItemIdentifier());
-						String id = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
+						String id = bibId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+						log.debug("Processing Bib id = " + id);
 
 						bibInformation.setBibliographicId(bibId);
 
 						List<AlephItem> alephItems = alephSvcMgr.lookupItems(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
 						if (alephItems != null) {
-							List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
-							List<HoldingsSet> holdingSets = new ArrayList<HoldingsSet>();
 
-							// TODO: Think about all the returned items with identical ItemId ..
-							AlephItem alephItem = alephItems.get(0);
-							alephItem.setNumberOfPieces(new BigDecimal(alephItems.size()));
-
-							ItemOptionalFields iof = new ItemOptionalFields();
-							HoldingsSet holdingSet = new HoldingsSet();
-
+							AgencyId suppliedAgencyId;
 							if (getBibDescription) {
-								AgencyId suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
-								if (suppliedAgencyId == null)
+								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getFromAgencyId() == null)
 									suppliedAgencyId = alephSvcMgr.getDefaultAgencyId();
-								BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, suppliedAgencyId);
-								holdingSet.setBibliographicDescription(bDesc);
-							}
-
-							// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
-							ItemInformation info = new ItemInformation();
-							if (getHoldQueueLength || getCircStatus || getItemDescription) {
-								if (getHoldQueueLength)
-									iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
-								if (getCircStatus)
-									iof.setCirculationStatus(alephItem.getCirculationStatus());
-								if (getItemDescription) {
-									ItemDescription itemDescription = new ItemDescription();
-									itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
-									itemDescription.setCallNumber(alephItem.getCallNumber());
-									itemDescription.setCopyNumber(alephItem.getCopyNumber());
-									itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
-									iof.setItemDescription(itemDescription);
-								}
-								info.setItemOptionalFields(iof);
-							}
-							itemInfoList.add(info);
-
-							holdingSet.setItemInformations(itemInfoList);
-							holdingSets.add(holdingSet);
+								else
+									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
+							} else
+								suppliedAgencyId = null;
+							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);;							
 							bibInformation.setHoldingsSets(holdingSets);
 
 							bibInformations.add(bibInformation);
@@ -320,7 +267,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			boolean getItemDescription) {
 		HoldingsSet holdingsSet = new HoldingsSet();
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
-
 
 		ItemOptionalFields iof = new ItemOptionalFields();
 
