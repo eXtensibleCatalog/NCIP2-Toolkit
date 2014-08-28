@@ -101,12 +101,16 @@ public class AlephConnector extends AlephMediator {
 		// All this is needed to build unique ItemId URL
 		// e.g. http://aleph.mzk.cz:1892/rest-dlf/record/MZK01000000421/items/MZK50000000421000010
 		String recordId = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
-		String[] itemIdParts = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1].split("\\.");
+		String itemIdPart = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
+		String[] itemIdParts = itemIdPart.split("\\.");
 
-		/*
-		 * Input is something like this: 421-1.0 What we need is: 000000421000010; Sure only if BIB_ID_LENGTH = 9 & ITEM_ID_UNIQUE_PART_LENGTH = 6
-		 */
-		itemId = itemIdParts[0] + itemIdParts[1];
+		if (itemIdParts != null) {
+			/*
+			 * Input is something like this: 421-1.0 What we need is: 000000421000010; Sure only if BIB_ID_LENGTH = 9 & ITEM_ID_UNIQUE_PART_LENGTH = 6
+			 */
+			itemId = itemIdParts[0] + itemIdParts[1];
+		} else
+			itemId = itemIdPart;
 
 		return normalizeRecordId(recordId) + normalizeItemIdPart(itemId);
 	}
