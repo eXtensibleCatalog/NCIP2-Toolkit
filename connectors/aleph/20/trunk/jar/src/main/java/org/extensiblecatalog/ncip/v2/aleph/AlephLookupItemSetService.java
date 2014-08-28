@@ -64,6 +64,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		Date sService = new Date();
 		LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
+		//TODO: set remaining possible requests
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 		boolean getCircStatus = initData.getCirculationStatusDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();

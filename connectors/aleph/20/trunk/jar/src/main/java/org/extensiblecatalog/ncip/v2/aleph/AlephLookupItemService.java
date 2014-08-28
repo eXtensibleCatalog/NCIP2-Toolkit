@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
 public class AlephLookupItemService implements LookupItemService {
 
 	static Logger log = Logger.getLogger(AlephLookupItemService.class);
-	
+
 	static int itemsFound;
 
 	/**
@@ -77,6 +77,7 @@ public class AlephLookupItemService implements LookupItemService {
 		LookupItemResponseData responseData = new LookupItemResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
+		// TODO: set remaining possible requests
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 		boolean getCircStatus = initData.getCirculationStatusDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();
@@ -100,19 +101,20 @@ public class AlephLookupItemService implements LookupItemService {
 		}
 
 		try {
-			// get bib library and adm library...just set to ND for now
-			List<AlephItem> alephItems = alephRemoteServiceManager.lookupItems(initData.getItemId().getItemIdentifierValue(), getBibDescription, getCircStatus, getHoldQueueLength,
+
+			alephItem = alephRemoteServiceManager.lookupItem(initData.getItemId().getItemIdentifierValue(), getBibDescription, getCircStatus, getHoldQueueLength,
 					getItemDescription);
-			
-			itemsFound = alephItems.size();
-			
-			//TODO: Think about all the returned items with identical ItemId ..
-			alephItem = alephItems.get(0);
-			
-			alephItem.setNumberOfPieces(new BigDecimal(itemsFound));
-			
+
 			// update NCIP response data with aleph item data
-			updateResponseData(initData, responseData, alephItem);
+			if (alephItem == null) {
+				Problem p = new Problem();
+				p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
+				p.setProblemDetail("Item " + initData.getItemId().getItemIdentifierValue() + " you are searching for doesn't exists.");
+				List<Problem> problems = new ArrayList<Problem>();
+				problems.add(p);
+				responseData.setProblems(problems);
+			} else
+				updateResponseData(initData, responseData, alephItem);
 		} catch (IOException ie) {
 			Problem p = new Problem();
 			p.setProblemType(new ProblemType("Procesing IOException error"));
@@ -145,14 +147,6 @@ public class AlephLookupItemService implements LookupItemService {
 			Problem p = new Problem();
 			p.setProblemType(new ProblemType("Unknown procesing exception error"));
 			p.setProblemDetail(e.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
-		}
-		if (alephItem == null) {
-			Problem p = new Problem();
-			p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
-			p.setProblemDetail("Unknown item for Item Id: " + initData.getItemId().getItemIdentifierValue());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
