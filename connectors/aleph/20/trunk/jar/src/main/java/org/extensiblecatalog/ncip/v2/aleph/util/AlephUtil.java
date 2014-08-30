@@ -46,10 +46,14 @@ public class AlephUtil {
 		}
 
 		if (alephItem.getMediumType() != null) {
+			String mediumTypeAleph = alephItem.getMediumType();
+			//TODO: Create localized external settings
+			//Kniha = Czehc localized name of book
+			if(mediumTypeAleph.indexOf("Kniha") > -1) mediumTypeAleph = Version1MediumType.BOOK.getValue();
 			Version1MediumType.loadAll();
 			MediumType mediumType;
 			try {
-				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, alephItem.getMediumType());
+				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeAleph);
 				if (mediumType != null) {
 					bibliographicDescription.setMediumType(mediumType);
 				}
