@@ -127,6 +127,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
 							} else
 								suppliedAgencyId = null;
+							//TODO: move parseHoldingsSets method to AlephUtil & purge this horrible code so that it is more understandable
 							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);;							
 							bibInformation.setHoldingsSets(holdingSets);
 

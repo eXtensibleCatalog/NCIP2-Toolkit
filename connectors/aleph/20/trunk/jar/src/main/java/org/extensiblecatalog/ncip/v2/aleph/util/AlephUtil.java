@@ -46,21 +46,26 @@ public class AlephUtil {
 		}
 
 		if (alephItem.getMediumType() != null) {
-			String mediumTypeAleph = alephItem.getMediumType();
-			//TODO: Create localized external settings
-			//Kniha = Czehc localized name of book
-			if(mediumTypeAleph.indexOf("Kniha") > -1) mediumTypeAleph = Version1MediumType.BOOK.getValue();
-			Version1MediumType.loadAll();
-			MediumType mediumType;
-			try {
-				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeAleph);
-				if (mediumType != null) {
-					bibliographicDescription.setMediumType(mediumType);
+			String mediumTypeValue = alephItem.getMediumType();
+			MediumType mediumType = null;
+			// TODO: Create localized external settings
+			// Kniha = Czech localized name of book
+			// Vazan. ser. = of magazine
+			if (mediumTypeValue.equalsIgnoreCase("Kniha"))
+				mediumType = Version1MediumType.BOOK;
+			else if (mediumTypeValue.equalsIgnoreCase("Vazan. ser."))
+				mediumType = Version1MediumType.MAGAZINE;
+			else {
+				try {
+					Version1MediumType.loadAll();
+					mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeValue);
+				} catch (ServiceException e) {
+					e.printStackTrace();
 				}
-			} catch (ServiceException e) {
-				e.printStackTrace();
 			}
-			
+			if (mediumType != null) {
+				bibliographicDescription.setMediumType(mediumType);
+			}
 		}
 		if (alephItem.getPublisher() != null) {
 			bibliographicDescription.setPublisher(alephItem.getPublisher());
