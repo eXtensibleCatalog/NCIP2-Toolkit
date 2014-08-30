@@ -53,7 +53,7 @@ public class AlephUtil {
 			// Vazan. ser. = of magazine
 			if (mediumTypeValue.equalsIgnoreCase("Kniha"))
 				mediumType = Version1MediumType.BOOK;
-			else if (mediumTypeValue.equalsIgnoreCase("Vazan. ser."))
+			else if (mediumTypeValue.equalsIgnoreCase("Vazan. ser.") || mediumTypeValue.equalsIgnoreCase("Seriál"))
 				mediumType = Version1MediumType.MAGAZINE;
 			else {
 				try {
