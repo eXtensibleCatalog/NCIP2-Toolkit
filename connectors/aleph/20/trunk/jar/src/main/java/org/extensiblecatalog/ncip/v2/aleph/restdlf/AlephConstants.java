@@ -10,6 +10,7 @@ public class AlephConstants {
 	public static final String REPLY_NODE = "reply";
 	public static final String REPLY_CODE_NODE = "reply-code";
 	public static final String STATUS_NODE = "status";
+	public static final String TOTAL_NODE = "total";
 
 	public static final String DUE_DATE_NODE = "due-date";
 	public static final String Z30_BARCODE = "z30-barcode";
@@ -91,6 +92,7 @@ public class AlephConstants {
 	public static final String MEDIUM_LABEL_ATTR_VALUE = "m";
 	public static final String ID_NODE_ATTR = "id";
 	public static final String HREF_NODE_ATTR = "href";
+	public static final String TYPE_NODE_ATTR = "type";
 	public static final String AUTHOR_NODE_ID = "100";
 	public static final String ISBN_NODE_ID = "020";
 	public static final String TITLE_NODE_ID = "245";
@@ -115,6 +117,9 @@ public class AlephConstants {
 	public static final String Z304_ADDRESS_1_NODE = "z304-address-1";
 	public static final String Z304_ADDRESS_2_NODE = "z304-address-2";
 	public static final String Z304_ADDRESS_3_NODE = "z304-address-3";
+	public static final String Z304_ADDRESS_4_NODE = "z304-address-4";
+	public static final String Z304_ADDRESS_5_NODE = "z304-address-5";
+	public static final String Z304_ADDRESS_6_NODE = "z304-address-6";
 	// global block and notes fields
 	public static final String Z303_DELINQUENCY_1_NODE = "z303-delinq-1";
 	public static final String Z303_DELINQUENCY_NOTE_1_NODE = "z303-delinq-n-1";
@@ -146,6 +151,9 @@ public class AlephConstants {
 	public static final String Z305_FIELD_NOTE_1_NODE = "z305-field-1";
 	public static final String Z305_FIELD_NOTE_2_NODE = "z305-field-2";
 	public static final String Z305_FIELD_NOTE_3_NODE = "z305-field-3";
+	public static final String Z305_BOR_STATUS_CODE_NODE = "z305-bor-status-code";
+	public static final String Z305_BOR_STATUS_NODE = "z305-bor-status";
+	public static final String Z305_BOR_TYPE_NODE = "z305-bor-type";
 	public static final String BALANCE_NODE = "balance";
 
 	// value constants

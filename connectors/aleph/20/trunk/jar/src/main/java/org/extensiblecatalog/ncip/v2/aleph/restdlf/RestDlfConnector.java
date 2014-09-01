@@ -164,9 +164,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
-
-		itemHandler.requireAtLeastOneService(requiredAtLeastOneService);
+		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
 
@@ -184,16 +182,15 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
-
-		itemHandler.requireAtLeastOneService(requiredAtLeastOneService);
+		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
 
 		return itemHandler.getAlephItem();
 	}
 
-	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws MalformedURLException {
+	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws AlephException, IOException, SAXException {
+
 		// Please note that lookupUser can handle only implementable services - desired, not satisfiable, services are commented out
 		// boolean authenticationInputDesired = initData.getAuthenticationInputDesired();
 		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired(); // TODO: Ask librarian where the block appears & implement it
@@ -208,13 +205,18 @@ public class RestDlfConnector extends AlephMediator {
 		// boolean userLanguageDesired = initData.getUserLanguageDesired();
 		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronStatus/registration
 
+		boolean atLeastOneDesired = false;
+
+		// Create URL request only if specified service was desired
 		URL addressUrl = null;
 		if (nameInformationDesired || userIdDesired || userAddressInformationDesired) {
+			atLeastOneDesired = true;
 			addressUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, patronInfoElement, addressElement).toURL();
 		}
 
 		URL circulationsUrl = null;
 		if (userFiscalAccountDesired) {
+			atLeastOneDesired = true;
 			// TODO: Ask librarian if amount is enough, or would be better detailed transactions overview
 			// If not, use this sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/cash?view=full
 			circulationsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement).toURL();
@@ -222,24 +224,65 @@ public class RestDlfConnector extends AlephMediator {
 
 		URL loansUrl = null;
 		if (loanedItemsDesired) {
-			// WARNING! - parse as items! -> add to alephUser.loanedItems
+			atLeastOneDesired = true;
 			loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
 					.addRequest("view", "full").toURL();
 		}
 
 		URL requestsUrl = null;
 		if (requestedItemsDesired) {
+			atLeastOneDesired = true;
 			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/bookings?view=full
-			// WARNING! - parse as items! -> add to alephUser.requestedItems
 			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, bookingsElement)
 					.addRequest("view", "full").toURL();
 		}
 
 		URL registrationUrl = null;
 		if (userPrivilegeDesired) {
+			atLeastOneDesired = true;
 			registrationUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, patronStatusElement, registrationElement).toURL();
 		}
 
-		return new AlephUser();
+		if (atLeastOneDesired) {
+			AlephUser alephUser = new AlephUser();
+
+			AlephUserHandler userHandler = new AlephUserHandler(nameInformationDesired, userIdDesired, userAddressInformationDesired, userFiscalAccountDesired,
+					userPrivilegeDesired);
+
+			userHandler.setAlephUser(alephUser);
+
+			InputSource streamSource;
+
+			if (addressUrl != null) {
+				streamSource = new InputSource(addressUrl.openStream());
+				userHandler.setAddressHandlingNow();
+				parser.parse(streamSource, userHandler);
+			}
+			if (circulationsUrl != null) {
+				streamSource = new InputSource(circulationsUrl.openStream());
+				userHandler.setCirculationsHandlingNow();
+				parser.parse(streamSource, userHandler);
+			}
+			if (loansUrl != null) {
+				streamSource = new InputSource(loansUrl.openStream());
+				AlephItemHandler itemHandler = new AlephItemHandler(false, false, false, false, false).parseLoansOrRequests();
+				parser.parse(streamSource, itemHandler);//FIXME: implement parsing loans
+				alephUser.setLoanedItems(itemHandler.getListOfItems());
+			}
+			if (requestsUrl != null) {
+				streamSource = new InputSource(requestsUrl.openStream());
+				AlephItemHandler itemHandler = new AlephItemHandler(false, false, false, false, false).parseLoansOrRequests();
+				parser.parse(streamSource, itemHandler);//FIXME: implement parsing requests
+				alephUser.setRequestedItems(itemHandler.getListOfItems());
+			}
+			if (registrationUrl != null) {
+				streamSource = new InputSource(registrationUrl.openStream());
+				userHandler.setRegistrationHandlingNow();
+				parser.parse(streamSource, userHandler);
+			}
+
+			return userHandler.getAlephUser();
+		} else
+			return null;
 	}
 }

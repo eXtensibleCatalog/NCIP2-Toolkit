@@ -48,7 +48,7 @@ public class AlephUser implements Serializable {
 	 * 
 	 * @param username
 	 */
-	protected void setUsername(String username) {
+	public void setUsername(String username) {
 		this.username = username;
 	}
 	
@@ -66,7 +66,7 @@ public class AlephUser implements Serializable {
 	 * 
 	 * @param fullName
 	 */
-	protected void setFullName(String fullName) {
+	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
 	
@@ -84,7 +84,7 @@ public class AlephUser implements Serializable {
 	 * 
 	 * @param address
 	 */
-	protected void setAddress(String address) {
+	public void setAddress(String address) {
 		this.address = address;
 	}
 	
@@ -102,7 +102,7 @@ public class AlephUser implements Serializable {
 	 * 
 	 * @param emailAddress
 	 */
-	protected void setEmailAddress(String emailAddress) {
+	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
 	
@@ -120,7 +120,7 @@ public class AlephUser implements Serializable {
 	 * 
 	 * @param sessionId
 	 */
-	protected void setSessionId(String sessionId) {
+	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
 	}
 

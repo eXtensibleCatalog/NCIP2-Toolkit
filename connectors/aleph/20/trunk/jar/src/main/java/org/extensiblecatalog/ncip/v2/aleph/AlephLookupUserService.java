@@ -38,9 +38,10 @@ public class AlephLookupUserService implements LookupUserService {
 	 * @param serviceManager
 	 *            provides access to remote services
 	 * @return LookupUserResponseData
+	 * @throws ServiceException
 	 */
 	@Override
-	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) {
+	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 		// TODO: Think about forwarding password in encrypted format ({@link Version1AuthenticationDataFormatType.APPLICATION_AUTH_POLICY_XML})
 
 		final LookupUserResponseData responseData = new LookupUserResponseData();
@@ -54,11 +55,21 @@ public class AlephLookupUserService implements LookupUserService {
 		List<ResponseElementControl> responseElementControls = initData.getResponseElementControls();
 		// EOF TODO
 
+		if (patronId == null) {
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Note that Aleph supports only User Id lookup.");
+		}
+
 		AlephUser alephUser = null;
 
 		try {
 			alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (AlephException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
 			e.printStackTrace();
 		}
 
