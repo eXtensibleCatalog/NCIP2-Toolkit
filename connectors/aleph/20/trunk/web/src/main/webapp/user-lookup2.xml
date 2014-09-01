@@ -6,20 +6,20 @@
         
         <ns1:InitiationHeader>
             <ns1:FromAgencyId>
-                <ns1:AgencyId>UICdb</ns1:AgencyId>
+                <ns1:AgencyId>MZK</ns1:AgencyId>
             </ns1:FromAgencyId>
             <ns1:ToAgencyId>
-                <ns1:AgencyId>UICdb</ns1:AgencyId>
+                <ns1:AgencyId>MZK</ns1:AgencyId>
             </ns1:ToAgencyId>
         </ns1:InitiationHeader>
         
         <ns1:AuthenticationInput>
-        	<ns1:AuthenticationInputData></ns1:AuthenticationInputData>
+        	<ns1:AuthenticationInputData>700</ns1:AuthenticationInputData>
             <ns1:AuthenticationDataFormatType>text</ns1:AuthenticationDataFormatType>
             <ns1:AuthenticationInputType>Username</ns1:AuthenticationInputType>
         </ns1:AuthenticationInput>
         <ns1:AuthenticationInput>
-            <ns1:AuthenticationInputData></ns1:AuthenticationInputData>
+            <ns1:AuthenticationInputData>aaaa</ns1:AuthenticationInputData>
             <ns1:AuthenticationDataFormatType>text</ns1:AuthenticationDataFormatType>
             <ns1:AuthenticationInputType>Password</ns1:AuthenticationInputType>
         </ns1:AuthenticationInput>

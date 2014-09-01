@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+	ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+
+	<ns1:LookupUser>
+        <ns1:AuthenticationInput>
+        	<ns1:AuthenticationInputData>700</ns1:AuthenticationInputData>
+            <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
+            <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm">User Id</ns1:AuthenticationInputType>
+		<ns1:Ext><ns1:String>some value of AuthenticationInputData extensible element (TESTING)</ns1:String></ns1:Ext>
+        </ns1:AuthenticationInput>
+        <ns1:AuthenticationInput>
+            <ns1:AuthenticationInputData>aaaa</ns1:AuthenticationInputData>
+            <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
+            <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm">Password</ns1:AuthenticationInputType>
+		<ns1:Ext><ns1:String>some value of AuthenticationInputData extensible element (TESTING)</ns1:String></ns1:Ext>
+        </ns1:AuthenticationInput>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Authentication Input</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Block Or Trap</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Date Of Birth</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Address Information</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Language</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Privilege</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Id</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Previous User Id</ns1:UserElementType>
+		<ns1:LoanedItemsDesired />
+		<ns1:RequestedItemsDesired />
+		<ns1:UserFiscalAccountDesired />
+		<ns1:Ext><ns1:String>some value of LookupUser extensible element (TESTING)</ns1:String></ns1:Ext>
+	</ns1:LookupUser>
+</ns1:NCIPMessage>
