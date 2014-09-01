@@ -8,7 +8,7 @@
 			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>			
 			<ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
 			<ns1:UserIdentifierValue>930118BXGO</ns1:UserIdentifierValue>
-		<ns1:Ext><ns1:String>some value of UserId extensible element (TESTING)</ns1:String></ns1:Ext>
+		<ns1:Ext><ns1:NoticeContent>some value of UserId extensible element (TESTING)</ns1:NoticeContent></ns1:Ext>
 		</ns1:UserId>
 		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Authentication Input</ns1:UserElementType>
 		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Block Or Trap</ns1:UserElementType>
@@ -22,6 +22,6 @@
 		<ns1:LoanedItemsDesired />
 		<ns1:RequestedItemsDesired />
 		<ns1:UserFiscalAccountDesired />
-		<ns1:Ext><ns1:String>some value of LookupUser extensible element (TESTING)</ns1:String></ns1:Ext>
+		<ns1:Ext><ns1:NoticeContent>some value of LookupUser extensible element (TESTING)</ns1:NoticeContent></ns1:Ext>
 	</ns1:LookupUser>
 </ns1:NCIPMessage>

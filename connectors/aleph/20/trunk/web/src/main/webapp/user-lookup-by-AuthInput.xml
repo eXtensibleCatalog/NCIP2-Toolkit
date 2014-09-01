@@ -8,13 +8,11 @@
         	<ns1:AuthenticationInputData>700</ns1:AuthenticationInputData>
             <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
             <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm">User Id</ns1:AuthenticationInputType>
-		<ns1:Ext><ns1:String>some value of AuthenticationInputData extensible element (TESTING)</ns1:String></ns1:Ext>
         </ns1:AuthenticationInput>
         <ns1:AuthenticationInput>
             <ns1:AuthenticationInputData>aaaa</ns1:AuthenticationInputData>
             <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
             <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm">Password</ns1:AuthenticationInputType>
-		<ns1:Ext><ns1:String>some value of AuthenticationInputData extensible element (TESTING)</ns1:String></ns1:Ext>
         </ns1:AuthenticationInput>
 		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Authentication Input</ns1:UserElementType>
 		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Block Or Trap</ns1:UserElementType>
@@ -28,6 +26,6 @@
 		<ns1:LoanedItemsDesired />
 		<ns1:RequestedItemsDesired />
 		<ns1:UserFiscalAccountDesired />
-		<ns1:Ext><ns1:String>some value of LookupUser extensible element (TESTING)</ns1:String></ns1:Ext>
+		<ns1:Ext><ns1:NoticeContent>some value of LookupUser extensible element (TESTING)</ns1:NoticeContent></ns1:Ext>
 	</ns1:LookupUser>
 </ns1:NCIPMessage>
