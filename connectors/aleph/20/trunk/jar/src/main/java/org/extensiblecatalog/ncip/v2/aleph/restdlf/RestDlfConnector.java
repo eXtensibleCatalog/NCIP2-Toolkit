@@ -1,15 +1,18 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
@@ -38,9 +41,19 @@ public class RestDlfConnector extends AlephMediator {
 	private String itemPathElement;
 	private String userPathElement;
 	private String itemsElement;
+	private String patronElement;
+
 	private int bibIdLength;
 	private int itemIdUniquePart;
 	private SAXParser parser;
+	private String patronInfoElement;
+	private String addressElement;
+	private String circActionsElement;
+	private String loansElement;
+	private String requestsElement;
+	private String bookingsElement;
+	private String patronStatusElement;
+	private String registrationElement;
 
 	public RestDlfConnector() throws ServiceException {
 
@@ -75,7 +88,15 @@ public class RestDlfConnector extends AlephMediator {
 		itemIdUniquePart = AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH;
 		itemPathElement = AlephConstants.ITEM_PATH_ELEMENT;
 		userPathElement = AlephConstants.USER_PATH_ELEMENT;
-		itemsElement = AlephConstants.ITEMS_ELEMENT;
+		itemsElement = AlephConstants.PARAM_ITEMS;
+		patronInfoElement = AlephConstants.PARAM_PATRON_INFO;
+		addressElement = AlephConstants.PARAM_ADDRESS;
+		circActionsElement = AlephConstants.PARAM_CIRC_ACTIONS;
+		loansElement = AlephConstants.PARAM_LOANS;
+		bookingsElement = AlephConstants.PARAM_BOOKINGS;
+		requestsElement = AlephConstants.PARAM_REQUESTS;
+		patronStatusElement = AlephConstants.PARAM_PATRON_STATUS;
+		registrationElement = AlephConstants.PARAM_REGISTRATION;
 
 	}
 
@@ -172,4 +193,53 @@ public class RestDlfConnector extends AlephMediator {
 		return itemHandler.getAlephItem();
 	}
 
+	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws MalformedURLException {
+		// Please note that lookupUser can handle only implementable services - desired, not satisfiable, services are commented out
+		// boolean authenticationInputDesired = initData.getAuthenticationInputDesired();
+		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired(); // TODO: Ask librarian where the block appears & implement it
+		// boolean dateOfBirthDesired = initData.getDateOfBirthDesired();
+		boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
+		boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
+		// boolean previousUserIdDesired = initData.getPreviousUserIdDesired();
+		boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
+		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
+		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions -> Cash
+		boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
+		// boolean userLanguageDesired = initData.getUserLanguageDesired();
+		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronStatus/registration
+
+		URL addressUrl = null;
+		if (nameInformationDesired || userIdDesired || userAddressInformationDesired) {
+			addressUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, patronInfoElement, addressElement).toURL();
+		}
+
+		URL circulationsUrl = null;
+		if (userFiscalAccountDesired) {
+			// TODO: Ask librarian if amount is enough, or would be better detailed transactions overview
+			// If not, use this sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/cash?view=full
+			circulationsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement).toURL();
+		}
+
+		URL loansUrl = null;
+		if (loanedItemsDesired) {
+			// WARNING! - parse as items! -> add to alephUser.loanedItems
+			loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
+					.addRequest("view", "full").toURL();
+		}
+
+		URL requestsUrl = null;
+		if (requestedItemsDesired) {
+			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/bookings?view=full
+			// WARNING! - parse as items! -> add to alephUser.requestedItems
+			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, bookingsElement)
+					.addRequest("view", "full").toURL();
+		}
+
+		URL registrationUrl = null;
+		if (userPrivilegeDesired) {
+			registrationUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, patronStatusElement, registrationElement).toURL();
+		}
+
+		return new AlephUser();
+	}
 }

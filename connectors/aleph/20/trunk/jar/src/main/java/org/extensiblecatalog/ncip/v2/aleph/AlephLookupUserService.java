@@ -9,6 +9,8 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -39,42 +41,39 @@ public class AlephLookupUserService implements LookupUserService {
 	 */
 	@Override
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) {
-		//TODO: Think about forwarding password in encrypted format ({@link Version1AuthenticationDataFormatType.APPLICATION_AUTH_POLICY_XML})
+		// TODO: Think about forwarding password in encrypted format ({@link Version1AuthenticationDataFormatType.APPLICATION_AUTH_POLICY_XML})
 
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		String patronId = null;
-		String password = null;
+		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		for (AuthenticationInput authInput : initData.getAuthenticationInputs()) {
-			if (authInput.getAuthenticationInputType().getValue().equals("Username")) {
-				patronId = authInput.getAuthenticationInputData();
-			}
-			if (authInput.getAuthenticationInputType().getValue().equals("Password")) {
-				password = authInput.getAuthenticationInputData();
-			}
-		}
+		// TODO: What are these data good for?
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		AgencyId relyingPartyId = initData.getRelyingPartyId();
+		List<ResponseElementControl> responseElementControls = initData.getResponseElementControls();
+		// EOF TODO
 
-		AlephUser user = null;
+		AlephUser alephUser = null;
 
 		try {
-			//Can restful apis authenticatE?
-			//user = alephRemoteServiceManager.authenticateUser(agencyId, patronId, password);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
 		}
 
-		// AgencyId agencyId = new AgencyId(dummySvcMgr.getLibraryName());
+		updateResponseData(initData, responseData, alephUser);
 
-		// Echo back the same item id that came in
-		responseData.setUserId(initData.getUserId());
+		return responseData;
+	}
+
+	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser) {
 
 		UserOptionalFields userOptionalFields = new UserOptionalFields();
 
-		if (user != null && initData.getNameInformationDesired()) {
+		if (alephUser != null && initData.getNameInformationDesired()) {
 			PersonalNameInformation pni = new PersonalNameInformation();
-			pni.setUnstructuredPersonalUserName(user.getFullName());
+			pni.setUnstructuredPersonalUserName(alephUser.getFullName());
 			NameInformation ni = new NameInformation();
 			ni.setPersonalNameInformation(pni);
 			userOptionalFields.setNameInformation(ni);
@@ -82,7 +81,6 @@ public class AlephLookupUserService implements LookupUserService {
 
 		responseData.setUserOptionalFields(userOptionalFields);
 
-		return responseData;
 	}
 
 }

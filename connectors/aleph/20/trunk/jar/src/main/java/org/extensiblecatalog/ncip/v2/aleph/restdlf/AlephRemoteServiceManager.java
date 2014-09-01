@@ -8,6 +8,7 @@ import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephMediator;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 

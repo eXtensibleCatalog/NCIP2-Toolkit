@@ -29,7 +29,7 @@ public class AlephUser implements Serializable {
 	private double balance;
 	
 	private List<AlephItem> requestedItems;
-	private List<AlephItem> loanItems;
+	private List<AlephItem> loanedItems;
 	private List<AlephItem> fineItems;
 	private List<String> blocks;
 	private List<String> notes;
@@ -41,7 +41,7 @@ public class AlephUser implements Serializable {
 	
 	public AlephUser(){
 		requestedItems = new ArrayList<AlephItem>();
-		loanItems = new ArrayList<AlephItem>();
+		loanedItems = new ArrayList<AlephItem>();
 	}
 	/**
 	 * Set the username for this aleph user
@@ -139,18 +139,18 @@ public class AlephUser implements Serializable {
 	 * @param item
 	 */
 	public void addLoanItem(AlephItem item){
-		if (loanItems==null) loanItems = new ArrayList<AlephItem>();
-		if (!loanItems.contains(item)){
-			loanItems.add(item);
+		if (loanedItems==null) loanedItems = new ArrayList<AlephItem>();
+		if (!loanedItems.contains(item)){
+			loanedItems.add(item);
 		}
 	}
 	
 	/**
 	 * @return the items on loan for this user
 	 */
-	public List<AlephItem> getLoanItems() {
-		if (loanItems==null) loanItems = new ArrayList<AlephItem>();
-		return loanItems;
+	public List<AlephItem> getLoanedItems() {
+		if (loanedItems==null) loanedItems = new ArrayList<AlephItem>();
+		return loanedItems;
 	}
 	
 	/**
@@ -158,8 +158,8 @@ public class AlephUser implements Serializable {
 	 * 
 	 * @param items
 	 */
-	public void setLoanItems(List<AlephItem> items) {
-		this.loanItems = items;
+	public void setLoanedItems(List<AlephItem> items) {
+		this.loanedItems = items;
 	}
 	
 	/**

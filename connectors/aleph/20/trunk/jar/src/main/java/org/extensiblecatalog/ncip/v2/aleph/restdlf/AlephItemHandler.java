@@ -17,7 +17,7 @@ public class AlephItemHandler extends DefaultHandler {
 	private AlephItem item;
 	private String docNumber;
 	private String itemSequence;
-	private boolean requireAtLeastOneService;
+	private boolean requireAtLeastOneService = true;
 	private boolean itemIdNotFound = false;
 	private boolean bibDescriptionDesired;
 	private boolean circulationStatusDesired;

@@ -268,6 +268,14 @@ public class AlephConstants {
 	public static final String PARAM_CANCEL_SEQUENCE = "sequence";
 	public static final String PARAM_DUE_DATE = "due_date";
 	public static final String PARAM_DOC_NUM = "doc_num";
+	public static final String PARAM_ITEMS = "items";
+	public static final String PARAM_PATRON_INFO = "patronInformation";
+	public static final String PARAM_ADDRESS = "address";
+	public static final String PARAM_CIRC_ACTIONS = "circulationActions";
+	public static final String PARAM_BOOKINGS = "bookings";
+	public static final String PARAM_REQUESTS = "requests";
+	public static final String PARAM_PATRON_STATUS = "patronStatus";
+	public static final String PARAM_REGISTRATION = "registration";
 
 	// lookup user param values
 	public static final String USER_CASH_BALANCE_ONLY = "B";
@@ -291,7 +299,7 @@ public class AlephConstants {
 	// RESTful APIs http requests values
 	public static final String ITEM_PATH_ELEMENT = "record";
 	public static final String USER_PATH_ELEMENT = "patron";
-	public static final String ITEMS_ELEMENT = "items";
+	
 
 	// TODO: make Xservices & rest dlf switchable
 	public static final String XSERVER_NAME = "AlephXServerName";
