@@ -160,10 +160,12 @@ public class RestDlfConnector extends AlephMediator {
 
 		recordId = normalizeRecordId(recordId);
 
+		//FIXME: Allow only specific recordId - f.e. MZK01000000421
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + recordId, itemsElement).addRequest("view", "full").toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
+		//FIXME: Return sequence number in place of Barcode. -> put Barcode elsewhere
 		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
@@ -178,6 +180,7 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = normalizeRecordIdFromItemId(itemId);
 		itemId = normalizeItemId(itemId);
 
+		//FIXME: Allow only specific itemId - f.e. MZK01000000421-000010
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + recordId, itemsElement, admLibrary + itemId).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
@@ -191,8 +194,6 @@ public class RestDlfConnector extends AlephMediator {
 
 	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws AlephException, IOException, SAXException {
 
-
-		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired(); // TODO: Ask librarian where the block appears & implement it
 		boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
 		boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
