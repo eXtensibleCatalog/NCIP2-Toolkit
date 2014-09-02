@@ -40,8 +40,10 @@ public class AlephConstants {
 	public static final String DUE_HOUR_NODE = "due-hour";
 	public static final String SUB_LIBRARY_NODE = "sub-library";
 	public static final String LOCATION_NODE = "location";
+	public static final String Z36_ID_NODE = "z36-id";
 	public static final String Z36_STATUS_NODE = "z36-status";
 	public static final String Z36_DUE_DATE_NODE = "z36-due-date";
+	public static final String Z36_LOAN_DATE_NODE = "z36-loan-date";
 	public static final String Z36_RECALL_DATE_NODE = "z36-recall-date";
 	public static final String Z36_RECALL_DUE_DATE_NODE = "z36-recall-due-date";
 	public static final String Z30_NODE = "z30";
@@ -107,7 +109,7 @@ public class AlephConstants {
 	// get alephitem data for a fine
 	public static final String FINE_ITEM_NODE = "fine";
 	// loan item nodes
-	public static final String LOAN_ITEM_NODE = "item-l";
+	public static final String LOAN_ITEM_NODE = "loan";
 
 	public static final String Z304_NODE = "z304";
 	public static final String Z305_NODE = "z305";

@@ -191,18 +191,14 @@ public class RestDlfConnector extends AlephMediator {
 
 	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws AlephException, IOException, SAXException {
 
-		// Please note that lookupUser can handle only implementable services - desired, not satisfiable, services are commented out
-		// boolean authenticationInputDesired = initData.getAuthenticationInputDesired();
+
 		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired(); // TODO: Ask librarian where the block appears & implement it
-		// boolean dateOfBirthDesired = initData.getDateOfBirthDesired();
 		boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
 		boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
-		// boolean previousUserIdDesired = initData.getPreviousUserIdDesired();
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
 		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
 		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions -> Cash
 		boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
-		// boolean userLanguageDesired = initData.getUserLanguageDesired();
 		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronStatus/registration
 
 		boolean atLeastOneDesired = false;
@@ -249,9 +245,27 @@ public class RestDlfConnector extends AlephMediator {
 			AlephUserHandler userHandler = new AlephUserHandler(nameInformationDesired, userIdDesired, userAddressInformationDesired, userFiscalAccountDesired,
 					userPrivilegeDesired);
 
-			userHandler.setAlephUser(alephUser);
-
 			InputSource streamSource;
+
+			if (loansUrl != null || requestsUrl != null) {
+
+				AlephItemHandler itemHandler = new AlephItemHandler(false, false, false, false, false).parseLoansOrRequests();
+
+				if (loansUrl != null) {
+					streamSource = new InputSource(loansUrl.openStream());
+					itemHandler.setLoansHandlingNow();
+					parser.parse(streamSource, itemHandler);// FIXME: implement parsing loans
+					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
+				}
+				if (requestsUrl != null) {
+					streamSource = new InputSource(requestsUrl.openStream());
+					itemHandler.setRequestsHandlingNow();
+					parser.parse(streamSource, itemHandler);// FIXME: implement parsing requests
+					alephUser.setRequestedItems(itemHandler.getListOfRequestedItems());
+				}
+			}
+
+			userHandler.setAlephUser(alephUser);
 
 			if (addressUrl != null) {
 				streamSource = new InputSource(addressUrl.openStream());
@@ -262,18 +276,6 @@ public class RestDlfConnector extends AlephMediator {
 				streamSource = new InputSource(circulationsUrl.openStream());
 				userHandler.setCirculationsHandlingNow();
 				parser.parse(streamSource, userHandler);
-			}
-			if (loansUrl != null) {
-				streamSource = new InputSource(loansUrl.openStream());
-				AlephItemHandler itemHandler = new AlephItemHandler(false, false, false, false, false).parseLoansOrRequests();
-				parser.parse(streamSource, itemHandler);//FIXME: implement parsing loans
-				alephUser.setLoanedItems(itemHandler.getListOfItems());
-			}
-			if (requestsUrl != null) {
-				streamSource = new InputSource(requestsUrl.openStream());
-				AlephItemHandler itemHandler = new AlephItemHandler(false, false, false, false, false).parseLoansOrRequests();
-				parser.parse(streamSource, itemHandler);//FIXME: implement parsing requests
-				alephUser.setRequestedItems(itemHandler.getListOfItems());
 			}
 			if (registrationUrl != null) {
 				streamSource = new InputSource(registrationUrl.openStream());

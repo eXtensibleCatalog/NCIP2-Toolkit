@@ -29,6 +29,7 @@ public class AlephUserHandler extends DefaultHandler {
 	private boolean borStatusReached = false;
 	private String address;
 	private String city;
+	private boolean userMailReached;
 
 	public void setAddressHandlingNow() {
 		addressHandling = true;
@@ -86,6 +87,8 @@ public class AlephUserHandler extends DefaultHandler {
 				userAddressReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE) && userAddressInformationDesired) {// City
 				userCityReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE) && userAddressInformationDesired) {// E-mails
+				userMailReached = true;
 			}
 		} else if (circulationsHandling) { // Note that if there was a need to parse transaction overview, circulationsHandling boolean would be handy - please do not delete it
 			if (qName.equalsIgnoreCase(AlephConstants.TOTAL_NODE) && attributes.getValue(AlephConstants.TYPE_NODE_ATTR).equalsIgnoreCase(AlephConstants.PARAM_CASH)
@@ -101,8 +104,8 @@ public class AlephUserHandler extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		//Element can be empty, therefore it is needed to falsificate bools set to true 
-		//TODO: Add error messages ... see {@link AlephItemHandler}
+		// Element can be empty, therefore it is needed to falsificate bools set to true
+		// TODO: Add error messages ... see {@link AlephItemHandler}
 		if (addressHandling) {
 			if (userIdReached) {
 				userIdReached = false;
@@ -112,6 +115,8 @@ public class AlephUserHandler extends DefaultHandler {
 				userAddressReached = false;
 			} else if (userCityReached) {// City
 				userCityReached = false;
+			} else if (userMailReached) {// Mail
+				userMailReached = false;
 			}
 		} else if (circulationsHandling) {
 			if (cashReached) {
@@ -128,30 +133,33 @@ public class AlephUserHandler extends DefaultHandler {
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (addressHandling) {
 			if (userIdReached) {
-				user.setAuthenticatedUsername(new String(ch, start, length));
+				user.setUserId(new String(ch, start, length));
 				userIdReached = false;
 			} else if (nameInformationReached) {
 				user.setFullName(new String(ch, start, length));
 				nameInformationReached = false;
 			} else if (userAddressReached) {// Adress
 				address = new String(ch, start, length);
-				if (!city.isEmpty())
-					user.setAddress(address + ", " + city);
+				if (city != null && !city.isEmpty())
+					user.setPhysicalAddress(address + ", " + city);
 				userAddressReached = false;
 			} else if (userCityReached) {// City
 				city = new String(ch, start, length);
-				if (!address.isEmpty())
-					user.setAddress(address + ", " + city);
+				if (address != null && !address.isEmpty())
+					user.setPhysicalAddress(address + ", " + city);
 				userCityReached = false;
+			} else if (userMailReached) {// mail
+				user.setEmailAddress(new String(ch, start, length));
+				userMailReached = false;
 			}
 		} else if (circulationsHandling) {
 			if (cashReached) {
-				user.setBalance(new String(ch, start, length));
+				user.setAccountBalance(new String(ch, start, length));
 				cashReached = false;
 			}
 		} else if (registrationHandling) {
 			if (borStatusReached) {
-				//FIXME: Implement userPrivilege to user
+				user.setBorStatus(new String(ch, start, length));
 				borStatusReached = false;
 			}
 		}

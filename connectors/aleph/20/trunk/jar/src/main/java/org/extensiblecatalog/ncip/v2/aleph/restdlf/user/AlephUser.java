@@ -2,47 +2,57 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.service.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A user that exists within Aleph.  This is most likely
- * returned by the authenticate or lookup methods within
- * the AlephAPI class
+ * A user that exists within Aleph. This is most likely returned by the authenticate or lookup methods within the AlephAPI class
  * 
  * @author rjohns14
  *
  */
 
 public class AlephUser implements Serializable {
-	
+
 	private static final long serialVersionUID = 65005L;
 	private String username;
 	private String fullName;
-	private String address;
-	private String emailAddress;
 	private String authenticatedUserName;
-	
-	//store internally as double
-	private double balance;
-	
-	private List<AlephItem> requestedItems;
-	private List<AlephItem> loanedItems;
+
+	private List<RequestedItem> requestedItems;
+	private List<LoanedItem> loanedItems;
 	private List<AlephItem> fineItems;
 	private List<String> blocks;
 	private List<String> notes;
-	
-	//the current session id for this authenticated aleph user
+
+	// the current session id for this authenticated aleph user
 	private String sessionId;
-	
+
 	private AlephAgency agency;
-	
-	public AlephUser(){
-		requestedItems = new ArrayList<AlephItem>();
-		loanedItems = new ArrayList<AlephItem>();
+	private NameInformation nameInfo;
+	private List<BlockOrTrap> blockOrTraps;
+	private List<UserAddressInformation> userAddrInfos;
+	private UserAddressInformation currentUserAddrInfo;
+	private List<UserId> userIds;
+	private List<UserPrivilege> userPrivileges;
+	private UserFiscalAccountSummary userFiscalAccountSummary;
+
+	public AlephUser() {
+		requestedItems = new ArrayList<RequestedItem>();
+		loanedItems = new ArrayList<LoanedItem>();
+		blockOrTraps = new ArrayList<BlockOrTrap>();
+		userAddrInfos = new ArrayList<UserAddressInformation>();
+		currentUserAddrInfo = new UserAddressInformation();
+		userIds = new ArrayList<UserId>();
+		userPrivileges = new ArrayList<UserPrivilege>();
+		userFiscalAccountSummary = new UserFiscalAccountSummary();
+		nameInfo = new NameInformation();
 	}
+
 	/**
 	 * Set the username for this aleph user
 	 * 
@@ -51,7 +61,7 @@ public class AlephUser implements Serializable {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	/**
 	 * Get the username for this aleph user
 	 * 
@@ -60,7 +70,7 @@ public class AlephUser implements Serializable {
 	public String getUsername() {
 		return username;
 	}
-	
+
 	/**
 	 * Set the full name
 	 * 
@@ -68,8 +78,9 @@ public class AlephUser implements Serializable {
 	 */
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
+		setNameInformation(fullName);
 	}
-	
+
 	/**
 	 * Get the full name
 	 * 
@@ -78,41 +89,55 @@ public class AlephUser implements Serializable {
 	public String getFullName() {
 		return fullName;
 	}
-	
+
 	/**
 	 * Set the user's permanent address
 	 * 
 	 * @param address
 	 */
-	public void setAddress(String address) {
-		this.address = address;
+	public void setPhysicalAddress(String address) {
+
+		PhysicalAddress physicalAddress = new PhysicalAddress();
+		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
+
+		unstructuredAddress.setUnstructuredAddressData(address);
+		unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
+
+		physicalAddress.setUnstructuredAddress(unstructuredAddress);
+		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
+
+		currentUserAddrInfo.setPhysicalAddress(physicalAddress);
+
+		if (currentUserAddrInfo.getUserAddressRoleType() == null)
+			currentUserAddrInfo.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+
+		if (currentUserAddrInfo.getElectronicAddress() != null) {
+			userAddrInfos.add(currentUserAddrInfo);
+			currentUserAddrInfo = new UserAddressInformation();
+		}
 	}
-	
-	/**
-	 * Get the user's permanent address
-	 * 
-	 * @return address
-	 */
-	public String getAddress() {
-		return address;
-	}
-	
+
 	/**
 	 * Set the email address
 	 * 
 	 * @param emailAddress
 	 */
 	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
-	
-	/**
-	 * Get the email address
-	 * 
-	 * @return the email address
-	 */
-	public String getEmailAddress() {
-		return emailAddress;
+
+		ElectronicAddress electronicAddress = new ElectronicAddress();
+
+		electronicAddress.setElectronicAddressData(emailAddress);
+		electronicAddress.setElectronicAddressType(Version1ElectronicAddressType.MAILSERVER);
+
+		currentUserAddrInfo.setElectronicAddress(electronicAddress);
+
+		if (currentUserAddrInfo.getUserAddressRoleType() == null)
+			currentUserAddrInfo.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+
+		if (currentUserAddrInfo.getPhysicalAddress() != null) {
+			userAddrInfos.add(currentUserAddrInfo);
+			currentUserAddrInfo = new UserAddressInformation();
+		}
 	}
 
 	/**
@@ -132,244 +157,255 @@ public class AlephUser implements Serializable {
 	public String getSessionId() {
 		return sessionId;
 	}
-	
+
 	/**
 	 * Add on item on loan to this user
 	 * 
 	 * @param item
 	 */
-	public void addLoanItem(AlephItem item){
-		if (loanedItems==null) loanedItems = new ArrayList<AlephItem>();
-		if (!loanedItems.contains(item)){
+	public void addLoanItem(LoanedItem item) {
+		if (!loanedItems.contains(item)) {
 			loanedItems.add(item);
 		}
 	}
-	
+
 	/**
 	 * @return the items on loan for this user
 	 */
-	public List<AlephItem> getLoanedItems() {
-		if (loanedItems==null) loanedItems = new ArrayList<AlephItem>();
+	public List<LoanedItem> getLoanedItems() {
 		return loanedItems;
 	}
-	
+
 	/**
 	 * Set the loan items to a new list
 	 * 
-	 * @param items
+	 * @param loanedItems
 	 */
-	public void setLoanedItems(List<AlephItem> items) {
-		this.loanedItems = items;
+	public void setLoanedItems(List<LoanedItem> loanedItems) {
+		this.loanedItems = loanedItems;
 	}
-	
+
 	/**
-	 * Add a requested item to this user
-	 * It will not add it to the internal list if it already exists
+	 * Add a requested item to this user It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addRequestedItem(AlephItem item){
-		if (requestedItems==null) requestedItems = new ArrayList<AlephItem>();
-		if (!requestedItems.contains(item)){
-			requestedItems.add(item);
+	public void addRequestedItem(AlephItem item) {
+		RequestedItem reqItem = new RequestedItem();
+		
+		if (!requestedItems.contains(reqItem)) {
+			requestedItems.add(reqItem);
 		}
 	}
-	
+
 	/**
 	 * @return the requestedItems
 	 */
-	public List<AlephItem> getRequestedItems() {
-		if (requestedItems==null) requestedItems = new ArrayList<AlephItem>();
+	public List<RequestedItem> getRequestedItems() {
 		return requestedItems;
 	}
-	
+
 	/**
 	 * Set the requested items list to the list passed in
 	 * 
-	 * @param items
+	 * @param reqItems
 	 */
-	public void setRequestedItems(List<AlephItem> items) {
-		this.requestedItems = items;
+	public void setRequestedItems(List<RequestedItem> reqItems) {
+		this.requestedItems = reqItems;
 	}
-	
+
 	/**
-	 * Check current requested items to see if the item passed in already exists.
-	 * Try to match on either bibid or itemid.
-	 * 
-	 * @param item
-	 * @return true if exists
-	 */
-	public boolean hasRequestedItem(AlephItem item){
-		if (item==null||getRequestedItems()==null||getRequestedItems().size()<=0||
-				(item.getBibId()==null&&item.getItemId()==null)){
-			return false;
-		}
-		for (AlephItem eachItem : getRequestedItems()){
-			if (item.getItemId()!=null&&item.getItemId().equals(eachItem.getItemId())){
-				return true;
-			} else if (item.getBibId()!=null&&item.getBibId().equals(eachItem.getBibId())){
-				return true;
-			}
-		}
-		return false;
-	}
-	/**
-	 * @param blocks the blocks to set
+	 * @param blocks
+	 *            the blocks to set
 	 */
 	public void setBlocks(List<String> blocks) {
 		this.blocks = blocks;
 	}
+
 	/**
 	 * @return the blocks
 	 */
 	public List<String> getBlocks() {
 		return blocks;
 	}
-	
+
 	/**
-	 * Add a block to this user
-	 * It will not add it to the internal list if it already exists
+	 * Add a block to this user It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addBlock(String block){
-		if (blocks==null) blocks = new ArrayList<String>();
-		if (!blocks.contains(block)){
+	public void addBlock(String block) {
+		if (blocks == null)
+			blocks = new ArrayList<String>();
+		if (!blocks.contains(block)) {
 			blocks.add(block);
 		}
 	}
-	
+
 	/**
-	 * @param notes the messages to set
+	 * @param notes
+	 *            the messages to set
 	 */
 	public void setNotes(List<String> notes) {
 		this.notes = notes;
 	}
+
 	/**
 	 * @return the notes
 	 */
 	public List<String> getNotes() {
 		return notes;
 	}
-	
+
 	/**
-	 * Add a note to this user
-	 * It will not add it to the internal list if it already exists
+	 * Add a note to this user It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addNote(String note){
-		if (notes==null) notes = new ArrayList<String>();
-		if (!notes.contains(note)){
+	public void addNote(String note) {
+		if (notes == null)
+			notes = new ArrayList<String>();
+		if (!notes.contains(note)) {
 			notes.add(note);
 		}
 	}
-	
+
 	/**
 	 * Try to set the balance from the string passed in
 	 * 
 	 * @param balance
 	 */
-	public void setBalance(String balance){
-		try {
-			setBalance(Double.parseDouble(balance));
-		} catch (NumberFormatException nfe){
-			//do nothing...make
-		}
+	public void setAccountBalance(String balance) {
+		AccountBalance accountBallance = new AccountBalance();
+		accountBallance.setMonetaryValue(new BigDecimal(balance));
+		userFiscalAccountSummary.setAccountBalance(accountBallance);
 	}
-	
+
 	/**
-	 * Set the balance to the double value, constrain to two decimal places
-	 * 
-	 * @param balance
-	 */
-	public void setBalance(double balance){
-		this.balance = balance;
-	}
-	
-	public double getBalance(){
-		return balance;
-	}
-	
-	/**
-	 * This returns the balance with the decimal places shifted two
-	 * places and the dollar balance amount in an integer.  For example
-	 * $37.12 would return the int value 3712
-	 * 
-	 * @return balance with decimal shifted two places
-	 */
-	public int getBalanceInt(){
-		Double val = new Double(getBalance()*100);
-		//check if there is a trailing fraction, if so roundup if >= 5
-		boolean roundup = false;
-		String valStr = val.toString();
-		if (valStr.indexOf('.')!=-1){
-			String right = "";
-			if (valStr.length()>valStr.indexOf('.')+1){
-				right += valStr.substring(valStr.indexOf('.')+1); 
-				if (Integer.parseInt(right.substring(0,1))>5){ 
-					roundup = true;
-				}
-			}
-		}
-		int valInt = val.intValue();
-		if (roundup) valInt++;
-		return valInt;
-	}
-	
-	/**
-	 * @param fineItems the fineItems to set
+	 * @param fineItems
+	 *            the fineItems to set
 	 */
 	public void setFineItems(List<AlephItem> fineItems) {
 		this.fineItems = fineItems;
 	}
+
 	/**
 	 * @return the fineItems
 	 */
 	public List<AlephItem> getFineItems() {
-		if (fineItems==null) fineItems = new ArrayList<AlephItem>();
+		if (fineItems == null)
+			fineItems = new ArrayList<AlephItem>();
 		return fineItems;
 	}
-	
+
 	/**
-	 * Add a fine item to this user
-	 * It will not add it to the internal list if it already exists
+	 * Add a fine item to this user It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addFineItem(AlephItem item){
-		if (fineItems==null) fineItems = new ArrayList<AlephItem>();
-		if (!fineItems.contains(item)){
+	public void addFineItem(AlephItem item) {
+		if (fineItems == null)
+			fineItems = new ArrayList<AlephItem>();
+		if (!fineItems.contains(item)) {
 			fineItems.add(item);
 		}
 	}
-	
+
 	/**
-	 * @param authenticatedUsername the username used to authenticate (may be different
-	 * from username if used external authentication etc.)
+	 * @param authenticatedUsername
+	 *            the username used to authenticate (may be different from username if used external authentication etc.)
 	 */
 	public void setAuthenticatedUsername(String authenticatedUsername) {
 		this.authenticatedUserName = authenticatedUsername;
 	}
-	
+
 	/**
-	 * @return the username used to authenticate (may be different
-	 * from username if used external authentication etc.)
+	 * @return the username used to authenticate (may be different from username if used external authentication etc.)
 	 */
 	public String getAuthenticatedUsername() {
 		return authenticatedUserName;
 	}
-	
+
 	/**
-	 * @param agency the agency to set
+	 * @param agency
+	 *            the agency to set
 	 */
 	public void setAgency(AlephAgency agency) {
 		this.agency = agency;
 	}
+
 	/**
 	 * @return the agency
 	 */
 	public AlephAgency getAgency() {
 		return agency;
 	}
+
+	public NameInformation getNameInformation() {
+		return nameInfo;
+	}
+
+	public void setNameInformation(String nameInfo) {
+		PersonalNameInformation pni = new PersonalNameInformation();
+		pni.setUnstructuredPersonalUserName(nameInfo);
+		this.nameInfo.setPersonalNameInformation(pni);
+	}
+
+	public List<BlockOrTrap> getBlockOrTraps() {
+		return blockOrTraps;
+	}
+
+	public void setBlockOrTraps(List<BlockOrTrap> bot) {
+		blockOrTraps = bot;
+	}
+
+	public List<UserAddressInformation> getUserAddressInformations() {
+		return userAddrInfos;
+	}
+
+	public void setUserAddressInformations(List<UserAddressInformation> userAddrInfos) {
+		this.userAddrInfos = userAddrInfos;
+	}
+
+	public List<UserId> getUserIds() {
+		return userIds;
+	}
+
+	public void setUserIds(List<UserId> userIds) {
+		this.userIds = userIds;
+	}
+
+	public void setUserId(String userId) {
+		UserId uid = new UserId();
+		uid.setUserIdentifierValue(userId);
+		uid.setUserIdentifierType(Version1UserIdentifierType.BARCODE);
+		// uid.setAgencyId();
+		userIds.add(uid);
+	}
+
+	public List<UserPrivilege> getUserPrivileges() {
+		return userPrivileges;
+	}
+
+	public void setUserPrivileges(List<UserPrivilege> userPrivileges) {
+		this.userPrivileges = userPrivileges;
+	}
+
+	public void setBorStatus(String string) {
+
+		UserPrivilege userPrivilege = new UserPrivilege();
+
+		// http://www.niso.org/apps/group_public/download.php/8966/z39-83-1-2012_NCIP.pdf#page=88
+		userPrivilege.setUserPrivilegeDescription(string);
+		userPrivileges.add(userPrivilege);
+	}
+
+	public UserFiscalAccountSummary getUserFiscalAccountSummary() {
+		return userFiscalAccountSummary;
+	}
+
+	public void setUserFiscalAccountSummary(UserFiscalAccountSummary ufas) {
+		userFiscalAccountSummary = ufas;
+	}
+
 }

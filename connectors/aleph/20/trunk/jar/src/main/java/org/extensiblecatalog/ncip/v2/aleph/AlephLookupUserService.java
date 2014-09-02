@@ -49,6 +49,8 @@ public class AlephLookupUserService implements LookupUserService {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
+		responseData.setUserId(initData.getUserId());
+
 		// TODO: What are these data good for?
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		AgencyId relyingPartyId = initData.getRelyingPartyId();
@@ -80,18 +82,64 @@ public class AlephLookupUserService implements LookupUserService {
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser) {
 
-		UserOptionalFields userOptionalFields = new UserOptionalFields();
+		if (alephUser != null) {
+			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions -> Cash
+			boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
+			boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
 
-		if (alephUser != null && initData.getNameInformationDesired()) {
-			PersonalNameInformation pni = new PersonalNameInformation();
-			pni.setUnstructuredPersonalUserName(alephUser.getFullName());
-			NameInformation ni = new NameInformation();
-			ni.setPersonalNameInformation(pni);
-			userOptionalFields.setNameInformation(ni);
+			if (userFiscalAccountDesired) {
+				// Note that summary is enough for our purposes
+				UserFiscalAccountSummary ufas = alephUser.getUserFiscalAccountSummary();
+				responseData.setUserFiscalAccountSummary(ufas);
+
+				// Aleph is capable of returning detailed transactions
+			}
+
+			if (requestedItemsDesired) {
+				List<RequestedItem> requestedItems = alephUser.getRequestedItems();
+				responseData.setRequestedItems(requestedItems);
+			}
+
+			if (loanedItemsDesired) {
+				List<LoanedItem> loanedItems = alephUser.getLoanedItems();
+				responseData.setLoanedItems(loanedItems);
+			}
+			// User optional fields:
+			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired(); // TODO: Ask librarian where the block appears & implement it
+			boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
+			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
+			boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
+			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+
+			UserOptionalFields uof = new UserOptionalFields();
+
+			if (blockOrTrapDesired) {
+				List<BlockOrTrap> blockOrTraps = alephUser.getBlockOrTraps();
+				uof.setBlockOrTraps(blockOrTraps);
+			}
+
+			if (nameInformationDesired) {
+				NameInformation nameInfo = alephUser.getNameInformation();
+				uof.setNameInformation(nameInfo);
+			}
+
+			if (userAddressInformationDesired) {
+				List<UserAddressInformation> userAddrInfos = alephUser.getUserAddressInformations();
+				uof.setUserAddressInformations(userAddrInfos);
+				
+			}
+
+			if (userIdDesired) {
+				List<UserId> userIds = alephUser.getUserIds();
+				uof.setUserIds(userIds);
+			}
+
+			if (userPrivilegeDesired) {
+				List<UserPrivilege> userPrivileges = alephUser.getUserPrivileges();
+				uof.setUserPrivileges(userPrivileges);
+			}
+
+			responseData.setUserOptionalFields(uof);
 		}
-
-		responseData.setUserOptionalFields(userOptionalFields);
-
 	}
-
 }
