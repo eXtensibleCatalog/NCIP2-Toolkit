@@ -36,7 +36,6 @@ public class AlephUser implements Serializable {
 	private NameInformation nameInfo;
 	private List<BlockOrTrap> blockOrTraps;
 	private List<UserAddressInformation> userAddrInfos;
-	private UserAddressInformation currentUserAddrInfo;
 	private List<UserId> userIds;
 	private List<UserPrivilege> userPrivileges;
 	private UserFiscalAccountSummary userFiscalAccountSummary;
@@ -46,7 +45,6 @@ public class AlephUser implements Serializable {
 		loanedItems = new ArrayList<LoanedItem>();
 		blockOrTraps = new ArrayList<BlockOrTrap>();
 		userAddrInfos = new ArrayList<UserAddressInformation>();
-		currentUserAddrInfo = new UserAddressInformation();
 		userIds = new ArrayList<UserId>();
 		userPrivileges = new ArrayList<UserPrivilege>();
 		userFiscalAccountSummary = new UserFiscalAccountSummary();
@@ -97,6 +95,7 @@ public class AlephUser implements Serializable {
 	 */
 	public void setPhysicalAddress(String address) {
 
+		UserAddressInformation uai = new UserAddressInformation();
 		PhysicalAddress physicalAddress = new PhysicalAddress();
 		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
 
@@ -106,15 +105,12 @@ public class AlephUser implements Serializable {
 		physicalAddress.setUnstructuredAddress(unstructuredAddress);
 		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
 
-		currentUserAddrInfo.setPhysicalAddress(physicalAddress);
+		uai.setPhysicalAddress(physicalAddress);
 
-		if (currentUserAddrInfo.getUserAddressRoleType() == null)
-			currentUserAddrInfo.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+		uai.setUserAddressRoleType(Version1UserAddressRoleType.SHIP_TO);
 
-		if (currentUserAddrInfo.getElectronicAddress() != null) {
-			userAddrInfos.add(currentUserAddrInfo);
-			currentUserAddrInfo = new UserAddressInformation();
-		}
+		userAddrInfos.add(uai);
+		
 	}
 
 	/**
@@ -124,20 +120,18 @@ public class AlephUser implements Serializable {
 	 */
 	public void setEmailAddress(String emailAddress) {
 
+		UserAddressInformation uai = new UserAddressInformation();
 		ElectronicAddress electronicAddress = new ElectronicAddress();
 
 		electronicAddress.setElectronicAddressData(emailAddress);
 		electronicAddress.setElectronicAddressType(Version1ElectronicAddressType.MAILSERVER);
 
-		currentUserAddrInfo.setElectronicAddress(electronicAddress);
+		uai.setElectronicAddress(electronicAddress);
 
-		if (currentUserAddrInfo.getUserAddressRoleType() == null)
-			currentUserAddrInfo.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+		uai.setUserAddressRoleType(Version1UserAddressRoleType.NOTICE);
 
-		if (currentUserAddrInfo.getPhysicalAddress() != null) {
-			userAddrInfos.add(currentUserAddrInfo);
-			currentUserAddrInfo = new UserAddressInformation();
-		}
+		userAddrInfos.add(uai);
+		
 	}
 
 	/**
@@ -397,6 +391,8 @@ public class AlephUser implements Serializable {
 
 		// http://www.niso.org/apps/group_public/download.php/8966/z39-83-1-2012_NCIP.pdf#page=88
 		userPrivilege.setUserPrivilegeDescription(string);
+		userPrivilege.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm","MZK type"));
+		userPrivilege.setAgencyId(new AgencyId("MZK")); // FIXME: this is default - shouldn't be
 		userPrivileges.add(userPrivilege);
 	}
 
