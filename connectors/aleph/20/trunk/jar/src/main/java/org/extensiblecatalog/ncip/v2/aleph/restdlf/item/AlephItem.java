@@ -22,7 +22,7 @@ import java.util.List;
  *
  */
 public class AlephItem implements Serializable {
-	
+
 	/**
 	 * 
 	 */
@@ -42,189 +42,198 @@ public class AlephItem implements Serializable {
 
 	private String docNumber;
 	private String seqNumber;
-	
+
 	private String publisher;
 	private String series;
 	private String title;
-	
+
 	private CirculationStatus circulationStatus;
 	private String electronicResource;
 	private String sessionId;
 	private String barcode;
-	
+
 	private Date dateHoldRequested;
 	private Date dateAvailablePickup;
-	
+
 	private Date dueDate;
-	
+
 	private int holdQueueLength = 0;
-	
+
 	private BigDecimal fineAmount;
 	private BigDecimal numberOfPieces;
 	private Date fineAccrualDate;
-	
+
 	private List<AlephUser> borrowingUsers;
 	private List<AlephUser> requestingUsers;
-	
+
 	private Availability availability;
-	
+
 	private String fineStatus;
 	private String creditDebit;
-	
+
 	private String holdRequestId;
 	private AlephAgency agency;
 	private String holdQueue;
 	private String publicationDate;
 	private String copyNumber;
 	private boolean exists = true;
-	
-	public AlephItem(){
+
+	public AlephItem() {
 		borrowingUsers = new ArrayList<AlephUser>();
 		requestingUsers = new ArrayList<AlephUser>();
 	}
-	
+
 	public AlephItem doesntExists() {
 		this.exists = false;
 		return this;
 	}
-	
+
 	/**
 	 * @return the bibId
 	 */
 	public String getBibId() {
 		return bibId;
 	}
-	
+
 	/**
-	 * @param bibId the bibId to set
+	 * @param bibId
+	 *            the bibId to set
 	 */
 	public void setBibId(String bibId) {
 		this.bibId = bibId;
-		if (this.bibId!=null&&this.bibId.length()<AlephConstants.BIB_ID_LENGTH){
-			//ensure at least 9 characters, if not pad zeros on front
-			while (this.bibId.length()<AlephConstants.BIB_ID_LENGTH){
-				this.bibId = "0"+this.bibId;
+		if (this.bibId != null && this.bibId.length() < AlephConstants.BIB_ID_LENGTH) {
+			// ensure at least 9 characters, if not pad zeros on front
+			while (this.bibId.length() < AlephConstants.BIB_ID_LENGTH) {
+				this.bibId = "0" + this.bibId;
 			}
 		}
 	}
-	
+
 	/**
 	 * @return the admId
 	 */
 	public String getItemId() {
 		return itemId;
 	}
-	
+
 	/**
-	 * @param itemId the admId to set
+	 * @param itemId
+	 *            the admId to set
 	 */
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
-	
-	private void updateItemId(){
-		if (getDocNumber()!=null&&getSeqNumber()!=null){
-			setItemId(getDocNumber()+getSeqNumber());
+
+	private void updateItemId() {
+		if (getDocNumber() != null && getSeqNumber() != null) {
+			setItemId(getDocNumber() + getSeqNumber());
 		}
 	}
-	
+
 	/**
 	 * @return the description
 	 */
 	public String getDescription() {
 		return description;
 	}
-	
+
 	/**
-	 * @param description the description to set
+	 * @param description
+	 *            the description to set
 	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	/**
 	 * @return the location
 	 */
 	public String getLocation() {
 		return location;
 	}
-	
+
 	/**
-	 * @param location the location to set
+	 * @param location
+	 *            the location to set
 	 */
 	public void setLocation(String location) {
 		this.location = location;
 	}
-	
+
 	/**
 	 * @return the link
 	 */
 	public String getLink() {
 		return link;
 	}
-	
+
 	/**
-	 * @param link the link to set
+	 * @param link
+	 *            the link to set
 	 */
 	public void setLink(String link) {
 		this.link = link;
 	}
-	
+
 	/**
 	 * @return the callNumber
 	 */
 	public String getCallNumber() {
 		return callNumber;
 	}
-	
+
 	/**
-	 * @param callNumber the callNumber to set
+	 * @param callNumber
+	 *            the callNumber to set
 	 */
 	public void setCallNumber(String callNumber) {
 		this.callNumber = callNumber;
-		//check for any special characters that should be removed
-		if (callNumber!=null){
+		// check for any special characters that should be removed
+		if (callNumber != null) {
 			this.callNumber = this.callNumber.replaceAll("&nbsp;", " ");
 		}
 	}
-	
+
 	/**
 	 * @return the author
 	 */
 	public String getAuthor() {
 		return author;
 	}
-	
+
 	/**
-	 * @param author the author to set
+	 * @param author
+	 *            the author to set
 	 */
 	public void setAuthor(String author) {
 		this.author = author;
 	}
-	
+
 	/**
 	 * @return the isbn
 	 */
 	public String getIsbn() {
 		return isbn;
 	}
-	
+
 	/**
-	 * @param isbn the isbn to set
+	 * @param isbn
+	 *            the isbn to set
 	 */
 	public void setIsbn(String isbn) {
 		this.isbn = isbn;
 	}
-	
+
 	/**
 	 * @return the mediumType
 	 */
 	public String getMediumType() {
 		return mediumType;
 	}
-	
+
 	/**
-	 * @param mediumType the mediumType to set
+	 * @param mediumType
+	 *            the mediumType to set
 	 */
 	public void setMediumType(String mediumType) {
 		this.mediumType = mediumType;
@@ -233,6 +242,7 @@ public class AlephItem implements Serializable {
 	public String getSubLibrary() {
 		return subLibrary;
 	}
+
 	public void setSubLibrary(String subLibrary) {
 		this.subLibrary = subLibrary;
 	}
@@ -240,95 +250,103 @@ public class AlephItem implements Serializable {
 	public String getCollection() {
 		return collection;
 	}
+
 	public void setCollection(String collection) {
 		this.collection = collection;
 	}
-	
+
 	/**
 	 * @return the publisher
 	 */
 	public String getPublisher() {
 		return publisher;
 	}
-	
+
 	/**
-	 * @param publisher the publisher to set
+	 * @param publisher
+	 *            the publisher to set
 	 */
 	public void setPublisher(String publisher) {
 		this.publisher = publisher;
 	}
-	
+
 	/**
 	 * @return the series
 	 */
 	public String getSeries() {
 		return series;
 	}
-	
+
 	/**
-	 * @param series the series to set
+	 * @param series
+	 *            the series to set
 	 */
 	public void setSeries(String series) {
 		this.series = series;
 	}
-	
+
 	/**
 	 * @return the title
 	 */
 	public String getTitle() {
 		return title;
 	}
-	
+
 	/**
-	 * @param title the title to set
+	 * @param title
+	 *            the title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	/**
 	 * @return the circulationStatus
 	 */
 	public CirculationStatus getCirculationStatus() {
 		return circulationStatus;
 	}
-	
+
 	/**
-	 * @param circulationStatus the circulationStatus to set
+	 * @param circulationStatus
+	 *            the circulationStatus to set
 	 */
 	public void setCirculationStatus(String circulationStatus) {
 		this.circulationStatus = new CirculationStatus(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus);
-		if(! circulationStatus.equalsIgnoreCase("On Shelf"))
+		if (!circulationStatus.equalsIgnoreCase("On Shelf"))
 			try {
 				this.setDateAvailablePickup(circulationStatus);
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
 	}
-	
+
 	/**
-	 * @param circulationStatus the circulationStatus to set
+	 * @param circulationStatus
+	 *            the circulationStatus to set
 	 */
 	public void setCirculationStatus(CirculationStatus circulationStatus) {
 		this.circulationStatus = circulationStatus;
 	}
-	
+
 	/**
 	 * @return the electronicResource
 	 */
 	public String getElectronicResource() {
 		return electronicResource;
 	}
-	
+
 	/**
-	 * @param electronicResource the electronicResource to set
+	 * @param electronicResource
+	 *            the electronicResource to set
 	 */
 	public void setElectronicResource(String electronicResource) {
 		this.electronicResource = electronicResource;
 	}
-	
+
 	/**
-	 * @param sessionId the sessionId to set
+	 * @param sessionId
+	 *            the sessionId to set
 	 */
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
@@ -342,14 +360,15 @@ public class AlephItem implements Serializable {
 	}
 
 	/**
-	 * @param holdingsId the holdingsId to set
+	 * @param holdingsId
+	 *            the holdingsId to set
 	 */
 	public void setHoldingsId(String holdingsId) {
 		this.holdingsId = holdingsId;
-		if (this.holdingsId!=null&&this.holdingsId.length()<AlephConstants.HOLDINGS_ID_LENGTH){
-			//ensure at least 9 characters, if not pad zeros on front
-			while (this.holdingsId.length()<AlephConstants.HOLDINGS_ID_LENGTH){
-				this.holdingsId = "0"+this.holdingsId;
+		if (this.holdingsId != null && this.holdingsId.length() < AlephConstants.HOLDINGS_ID_LENGTH) {
+			// ensure at least 9 characters, if not pad zeros on front
+			while (this.holdingsId.length() < AlephConstants.HOLDINGS_ID_LENGTH) {
+				this.holdingsId = "0" + this.holdingsId;
 			}
 		}
 	}
@@ -362,7 +381,8 @@ public class AlephItem implements Serializable {
 	}
 
 	/**
-	 * @param holdQueueLength the holdQueueLength to set
+	 * @param holdQueueLength
+	 *            the holdQueueLength to set
 	 */
 	public void setHoldQueueLength(int holdQueueLength) {
 		this.holdQueueLength = holdQueueLength;
@@ -374,309 +394,346 @@ public class AlephItem implements Serializable {
 	public int getHoldQueueLength() {
 		return holdQueueLength;
 	}
-	
+
 	/**
 	 * @return the holdQueueErrorMessage
 	 */
 	public String getHoldQueue() {
 		return holdQueue;
 	}
-	
+
 	/**
-	 * Add a borrowing user to this aleph item.
-	 * It will not add it to the internal list if it already exists
+	 * Add a borrowing user to this aleph item. It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addBorrowingUser(AlephUser user){
-		if (!borrowingUsers.contains(user)){
+	public void addBorrowingUser(AlephUser user) {
+		if (!borrowingUsers.contains(user)) {
 			borrowingUsers.add(user);
 		}
 	}
-	
+
 	/**
 	 * @return the borrowingUsers
 	 */
 	public List<AlephUser> getBorrowingUsers() {
 		return borrowingUsers;
 	}
-	
+
 	/**
-	 * Add a requesting user to this aleph item.
-	 * It will not add it to the internal list if it already exists
+	 * Add a requesting user to this aleph item. It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addRequestingUser(AlephUser user){
-		if (!requestingUsers.contains(user)){
+	public void addRequestingUser(AlephUser user) {
+		if (!requestingUsers.contains(user)) {
 			requestingUsers.add(user);
 		}
 	}
-	
+
 	/**
 	 * @return the requestingUsers
 	 */
 	public List<AlephUser> getRequestingUsers() {
 		return requestingUsers;
 	}
+
 	/**
-	 * @param barcode the barcode to set
+	 * @param barcode
+	 *            the barcode to set
 	 */
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;
 	}
+
 	/**
 	 * @return the barcode
 	 */
 	public String getBarcode() {
 		return barcode;
 	}
+
 	/**
-	 * @param docNumber the docNumber to set
+	 * @param docNumber
+	 *            the docNumber to set
 	 */
 	public void setDocNumber(String docNumber) {
 		this.docNumber = docNumber;
-		//make sure docnumber is 9 digits, if not add leading zeroes
-		while (this.docNumber!=null&&this.docNumber.length()<AlephConstants.DOC_NUMBER_LENGTH){
-			this.docNumber = "0"+this.docNumber;	
+		// make sure docnumber is 9 digits, if not add leading zeroes
+		while (this.docNumber != null && this.docNumber.length() < AlephConstants.DOC_NUMBER_LENGTH) {
+			this.docNumber = "0" + this.docNumber;
 		}
-		//update the item id if necessary
+		// update the item id if necessary
 		updateItemId();
 	}
-	
+
 	/**
 	 * @return the docNumber
 	 */
 	public String getDocNumber() {
 		return docNumber;
 	}
-	
+
 	/**
-	 * @param seqNumber the seqNumber to set
+	 * @param seqNumber
+	 *            the seqNumber to set
 	 */
 	public void setSeqNumber(String seqNumber) {
-		this.seqNumber = seqNumber;
-		//make sure seqnumber is 6 digits, if not add leading zeroes
-		while (this.seqNumber!=null&&this.seqNumber.length()<AlephConstants.SEQ_NUMBER_LENGTH){
-			this.seqNumber = "0"+this.seqNumber;	
+		
+		this.seqNumber = seqNumber.trim();
+
+		//Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPERATOR)
+		this.seqNumber = this.seqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[0] + this.seqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[1];
+
+		// make sure seqnumber is 6 digits, if not add leading zeroes
+		while (this.seqNumber != null && this.seqNumber.length() < AlephConstants.SEQ_NUMBER_LENGTH) {
+			this.seqNumber = "0" + this.seqNumber;
 		}
-		//update the item id if necessary
+		// update the item id if necessary
 		updateItemId();
 	}
+
 	/**
 	 * @return the seqNumber
 	 */
 	public String getSeqNumber() {
 		return seqNumber;
 	}
+
 	/**
-	 * @param dateHoldRequested the dateHoldRequested to set
+	 * @param dateHoldRequested
+	 *            the dateHoldRequested to set
 	 */
 	public void setDateHoldRequested(Date dateHoldRequested) {
 		this.dateHoldRequested = dateHoldRequested;
 	}
-	
-	public void setDateHoldRequested(String date) throws ParseException{
-		//assume date in right format and parse, ignore empty values
-		if (date!=null&&date.length()>0){
+
+	public void setDateHoldRequested(String date) throws ParseException {
+		// assume date in right format and parse, ignore empty values
+		if (date != null && date.length() > 0) {
 			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.HOLD_DATE_FORMAT);
 			setDateHoldRequested(dateFormatter.parse(date));
 		}
 	}
-	
+
 	/**
 	 * @return the dateHoldRequested
 	 */
 	public Date getDateHoldRequested() {
 		return dateHoldRequested;
 	}
-	
+
 	/**
-	 * @param dateAvailablePickup the dateAvailablePickup to set
+	 * @param dateAvailablePickup
+	 *            the dateAvailablePickup to set
 	 */
 	public void setDateAvailablePickup(Date dateAvailablePickup) {
 		this.dateAvailablePickup = dateAvailablePickup;
 	}
-	
-	public void setDateAvailablePickup(String date) throws ParseException{
-		//assume date in right format and parse, ignore empty values
-		if (date!=null&&date.length()>0){
+
+	public void setDateAvailablePickup(String date) throws ParseException {
+		// assume date in right format and parse, ignore empty values
+		if (date != null && date.length() > 0) {
 			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.HOLD_DATE_FORMAT);
 			setDateAvailablePickup(dateFormatter.parse(date));
 		}
 	}
-	
+
 	/**
 	 * @return the dateAvailablePickup
 	 */
 	public Date getDateAvailablePickup() {
 		return dateAvailablePickup;
 	}
+
 	/**
-	 * @param available the available to set
+	 * @param available
+	 *            the available to set
 	 */
 	public void setAvailability(Availability available) {
 		this.availability = available;
 	}
+
 	/**
 	 * @return the available
 	 */
 	public Availability getAvailability() {
 		return availability;
 	}
+
 	/**
-	 * @param dueDate the dueDate to set
+	 * @param dueDate
+	 *            the dueDate to set
 	 */
 	public void setDueDate(Date dueDate) {
 		this.dueDate = dueDate;
 	}
-	
+
 	/**
 	 * Parse date from string and set to value if parsing successful
+	 * 
 	 * @param date
 	 * @throws ParseException
 	 */
-	public void setDueDateRenewal(String date) throws ParseException{
-		setDueDate(date,AlephConstants.RENEW_DUE_DATE_FORMAT);
+	public void setDueDateRenewal(String date) throws ParseException {
+		setDueDate(date, AlephConstants.RENEW_DUE_DATE_FORMAT);
 	}
-	
+
 	/**
 	 * Parse date from string and set to value if parsing successful
+	 * 
 	 * @param date
 	 * @throws ParseException
 	 */
-	public void setDueDateLoan(String date) throws ParseException{
-		setDueDate(date,AlephConstants.LOAN_DUE_DATE_FORMAT);
+	public void setDueDateLoan(String date) throws ParseException {
+		setDueDate(date, AlephConstants.LOAN_DUE_DATE_FORMAT);
 	}
-	
+
 	/**
 	 * Parse date from string and set to value if parsing successful
+	 * 
 	 * @param date
 	 * @throws ParseException
 	 */
-	public void setDueDate(String date, String format) throws ParseException{
-		//assume date in right format and parse, ignore empty values
-		if (date!=null&&date.length()>0){
+	public void setDueDate(String date, String format) throws ParseException {
+		// assume date in right format and parse, ignore empty values
+		if (date != null && date.length() > 0) {
 			SimpleDateFormat dateFormatter = new SimpleDateFormat(format);
 			setDueDate(dateFormatter.parse(date));
 		}
 	}
-	
+
 	/**
 	 * @return the dueDate
 	 */
 	public Date getDueDate() {
 		return dueDate;
 	}
-	
+
 	/**
-	 * @param fineAmount the fineAmount to set
+	 * @param fineAmount
+	 *            the fineAmount to set
 	 */
 	public void setFineAmount(double fineAmount) {
 		this.fineAmount = new BigDecimal(fineAmount);
-		this.fineAmount.setScale(2, BigDecimal.ROUND_HALF_UP); 
+		this.fineAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
-	
+
 	/**
 	 * @return the fineAmount
 	 */
 	public BigDecimal getFineAmount() {
 		return fineAmount;
 	}
-	
+
 	/**
 	 * Try to set the fine amount from the string passed in
 	 * 
 	 * @param fineAmount
 	 */
-	public void setFineAmount(String fineAmount){
+	public void setFineAmount(String fineAmount) {
 		try {
 			setFineAmount(Double.parseDouble(fineAmount));
-		} catch (NumberFormatException nfe){
-			//do nothing...make
+		} catch (NumberFormatException nfe) {
+			// do nothing...make
 		}
 	}
+
 	/**
-	 * @param fineAccrualDate the fineAccrualDate to set
+	 * @param fineAccrualDate
+	 *            the fineAccrualDate to set
 	 */
 	public void setFineAccrualDate(Date fineAccrualDate) {
 		this.fineAccrualDate = fineAccrualDate;
 	}
+
 	/**
 	 * @return the fineAccrualDate
 	 */
 	public Date getFineAccrualDate() {
 		return fineAccrualDate;
 	}
-	
+
 	/**
 	 * Parse date from string and set to value if parsing successful
+	 * 
 	 * @param date
 	 * @throws ParseException
 	 */
-	public void setFineAccrualDate(String date) throws ParseException{
-		//assume date in right format and parse, ignore empty values
-		if (date!=null&&date.length()>0){
+	public void setFineAccrualDate(String date) throws ParseException {
+		// assume date in right format and parse, ignore empty values
+		if (date != null && date.length() > 0) {
 			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.FINE_ACCRUAL_DATE_FORMAT);
 			setFineAccrualDate(dateFormatter.parse(date));
 		}
 	}
+
 	/**
-	 * @param fineStatus the fineStatus to set
+	 * @param fineStatus
+	 *            the fineStatus to set
 	 */
 	public void setFineStatus(String fineStatus) {
 		this.fineStatus = fineStatus;
 	}
+
 	/**
 	 * @return the fineStatus
 	 */
 	public String getFineStatus() {
 		return fineStatus;
 	}
+
 	/**
-	 * @param creditDebit the creditDebit to set
+	 * @param creditDebit
+	 *            the creditDebit to set
 	 */
 	public void setCreditDebit(String creditDebit) {
 		this.creditDebit = creditDebit;
 	}
+
 	/**
 	 * @return the creditDebit
 	 */
 	public String getCreditDebit() {
 		return creditDebit;
 	}
+
 	/**
-	 * @param holdRequestId the holdRequestId to set
+	 * @param holdRequestId
+	 *            the holdRequestId to set
 	 */
 	public void setHoldRequestId(String holdRequestId) {
 		this.holdRequestId = holdRequestId;
 	}
+
 	/**
 	 * @return the holdRequestId
 	 */
 	public String getHoldRequestId() {
 		return holdRequestId;
 	}
+
 	/**
-	 * @param agency the agency to set
+	 * @param agency
+	 *            the agency to set
 	 */
 	public void setAgency(AlephAgency agency) {
 		this.agency = agency;
 	}
+
 	/**
 	 * @return the agency
 	 */
 	public AlephAgency getAgency() {
 		return agency;
 	}
-	
+
 	/**
-	 * This method will update this overwrite anything in this alephItem
-	 * with the alephItem's values passed in if they are not null.
+	 * This method will update this overwrite anything in this alephItem with the alephItem's values passed in if they are not null.
 	 * 
 	 * @param item
 	 */
-	public void updateFromAlephItem(AlephItem item){
+	public void updateFromAlephItem(AlephItem item) {
 		if (item != null) {
 			if (item.getAgency() != null) {
 				this.setAgency(item.getAgency());
@@ -777,72 +834,75 @@ public class AlephItem implements Serializable {
 			}
 		}
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("[BibID:"+(getBibId()!=null?getBibId():"null")+"],");
-		sb.append("[ItemID:"+(getItemId()!=null?getItemId():"null")+"],");
-		sb.append("[HoldingsID:"+(getHoldingsId()!=null?getHoldingsId():"null")+"],");
-		sb.append("[DocNumber:"+(getDocNumber()!=null?getDocNumber():"null")+"],");
-		sb.append("[SeqNumber:"+(getSeqNumber()!=null?getSeqNumber():"null")+"],");
-		sb.append("[Barcode:"+(getBarcode()!=null?getBarcode():"null")+"],");
-		sb.append("[Agency:"+(getAgency()!=null&&getAgency().getAgencyId()!=null?getAgency().getAgencyId():"null")+"],");
-		sb.append("[Description:"+(getDescription()!=null?getDescription():"null")+"],");
-		sb.append("[Location:"+(getLocation()!=null?getLocation():"null")+"],");
-		sb.append("[CallNumber:"+(getCallNumber()!=null?getCallNumber():"null")+"],");
-		sb.append("[Author:"+(getAuthor()!=null?getAuthor():"null")+"],");
-		sb.append("[ISBN:"+(getIsbn()!=null?getIsbn():"null")+"],");
-		sb.append("[Medium Type:"+(getMediumType()!=null?getMediumType():"null")+"],");
-		sb.append("[Publisher:"+(getPublisher()!=null?getPublisher():"null")+"],");
-		sb.append("[Series:"+(getSeries()!=null?getSeries():"null")+"],");
-		sb.append("[Title:"+(getTitle()!=null?getTitle():"null")+"],");
-		sb.append("[CirculationStatus:"+(getCirculationStatus()!=null?getCirculationStatus():"null")+"],");
-		sb.append("[Availability:"+(getAvailability()!=null?getAvailability():"null")+"],");
-		sb.append("[ElectronicResource:"+(getElectronicResource()!=null?getElectronicResource():"null")+"],");
-		sb.append("[HoldRequestID:"+(getHoldRequestId()!=null?getHoldRequestId():"null")+"],");
-		sb.append("[DateHoldRequested:"+(getDateHoldRequested()!=null?getDateHoldRequested():"null")+"],");
-		sb.append("[DateAvailablePickup:"+(getDateAvailablePickup()!=null?getDateAvailablePickup():"null")+"],");
-		sb.append("[DueDate:"+(getDueDate()!=null?getDueDate():"null")+"],");
-		sb.append("[HoldQueueLength:"+(getHoldQueueLength()!=-1?getHoldQueueLength():getHoldQueue())+"],");
-		sb.append("[FineAmount:"+(getFineAmount()!=null?getFineAmount().doubleValue():"null")+"],");
-		sb.append("[FineAccrualDate:"+(getFineAccrualDate()!=null?getFineAccrualDate():"null")+"],");
-		sb.append("[FineStatus:"+(getFineStatus()!=null?getFineStatus():"null")+"],");
-		sb.append("[CreditDebit:"+(getCreditDebit()!=null?getCreditDebit():"null")+"],");
-		sb.append("[BorrowingUsers:"+(getBorrowingUsers()!=null?getBorrowingUsers():"null")+"],");
-		sb.append("[RequestingUsers:"+(getRequestingUsers()!=null?getRequestingUsers():"null")+"],");
-		sb.append("[SessionId:"+(getSessionId()!=null?getSessionId():"null")+"],");
+		sb.append("[BibID:" + (getBibId() != null ? getBibId() : "null") + "],");
+		sb.append("[ItemID:" + (getItemId() != null ? getItemId() : "null") + "],");
+		sb.append("[HoldingsID:" + (getHoldingsId() != null ? getHoldingsId() : "null") + "],");
+		sb.append("[DocNumber:" + (getDocNumber() != null ? getDocNumber() : "null") + "],");
+		sb.append("[SeqNumber:" + (getSeqNumber() != null ? getSeqNumber() : "null") + "],");
+		sb.append("[Barcode:" + (getBarcode() != null ? getBarcode() : "null") + "],");
+		sb.append("[Agency:" + (getAgency() != null && getAgency().getAgencyId() != null ? getAgency().getAgencyId() : "null") + "],");
+		sb.append("[Description:" + (getDescription() != null ? getDescription() : "null") + "],");
+		sb.append("[Location:" + (getLocation() != null ? getLocation() : "null") + "],");
+		sb.append("[CallNumber:" + (getCallNumber() != null ? getCallNumber() : "null") + "],");
+		sb.append("[Author:" + (getAuthor() != null ? getAuthor() : "null") + "],");
+		sb.append("[ISBN:" + (getIsbn() != null ? getIsbn() : "null") + "],");
+		sb.append("[Medium Type:" + (getMediumType() != null ? getMediumType() : "null") + "],");
+		sb.append("[Publisher:" + (getPublisher() != null ? getPublisher() : "null") + "],");
+		sb.append("[Series:" + (getSeries() != null ? getSeries() : "null") + "],");
+		sb.append("[Title:" + (getTitle() != null ? getTitle() : "null") + "],");
+		sb.append("[CirculationStatus:" + (getCirculationStatus() != null ? getCirculationStatus() : "null") + "],");
+		sb.append("[Availability:" + (getAvailability() != null ? getAvailability() : "null") + "],");
+		sb.append("[ElectronicResource:" + (getElectronicResource() != null ? getElectronicResource() : "null") + "],");
+		sb.append("[HoldRequestID:" + (getHoldRequestId() != null ? getHoldRequestId() : "null") + "],");
+		sb.append("[DateHoldRequested:" + (getDateHoldRequested() != null ? getDateHoldRequested() : "null") + "],");
+		sb.append("[DateAvailablePickup:" + (getDateAvailablePickup() != null ? getDateAvailablePickup() : "null") + "],");
+		sb.append("[DueDate:" + (getDueDate() != null ? getDueDate() : "null") + "],");
+		sb.append("[HoldQueueLength:" + (getHoldQueueLength() != -1 ? getHoldQueueLength() : getHoldQueue()) + "],");
+		sb.append("[FineAmount:" + (getFineAmount() != null ? getFineAmount().doubleValue() : "null") + "],");
+		sb.append("[FineAccrualDate:" + (getFineAccrualDate() != null ? getFineAccrualDate() : "null") + "],");
+		sb.append("[FineStatus:" + (getFineStatus() != null ? getFineStatus() : "null") + "],");
+		sb.append("[CreditDebit:" + (getCreditDebit() != null ? getCreditDebit() : "null") + "],");
+		sb.append("[BorrowingUsers:" + (getBorrowingUsers() != null ? getBorrowingUsers() : "null") + "],");
+		sb.append("[RequestingUsers:" + (getRequestingUsers() != null ? getRequestingUsers() : "null") + "],");
+		sb.append("[SessionId:" + (getSessionId() != null ? getSessionId() : "null") + "],");
 		return sb.toString();
 	}
+
 	public void setholdQueue(String errorHoldQueueNotFound) {
 		this.holdQueueLength = -1;
 		this.holdQueue = errorHoldQueueNotFound;
-		
+
 	}
+
 	public BigDecimal getNumberOfPieces() {
 		return numberOfPieces;
 	}
+
 	public void setNumberOfPieces(BigDecimal numberOfPieces) {
 		this.numberOfPieces = numberOfPieces;
 	}
-	
+
 	public String getPublicationDate() {
 		return publicationDate;
 	}
 
 	public void setPublicationDate(String publicationDate) {
-		this.publicationDate = publicationDate;		
+		this.publicationDate = publicationDate;
 	}
 
 	public String getCopyNumber() {
 		return copyNumber;
 	}
-	
+
 	public void setCopyNumber(String copyNumber) {
 		this.copyNumber = copyNumber;
 	}
 
 	public boolean exists() {
-		return exists ;
+		return exists;
 	}
 
 	public void setAgency(String agencyId) {

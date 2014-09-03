@@ -23,6 +23,7 @@ import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
@@ -39,6 +40,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
@@ -277,15 +279,17 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
+		addBarcodeToItemOptionalFields(iof, alephItem.getBarcode());
+		
 		// Schema v2_02 defines to forward alephItemInfo even though there is no optional information desired
 		// EDIT: alephItemInformation does not transfer only optional fields ...
 		ItemInformation info = new ItemInformation();
 
 		// TODO: Is it neccessary to set particular item ids? -> implement parsing those if yes
 		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierValue(alephItem.getBarcode());
+		itemId.setItemIdentifierValue(alephItem.getSeqNumber());
+		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 		info.setItemId(itemId);
-
 		if (getHoldQueueLength || getCircStatus || getItemDescription) {
 			if (getHoldQueueLength)
 				iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
@@ -296,13 +300,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
 				itemDescription.setCallNumber(alephItem.getCallNumber());
 				itemDescription.setCopyNumber(alephItem.getCopyNumber());
-				itemId.setItemIdentifierType(Version1ItemIdentifierType.BARCODE);
 				itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
 				iof.setItemDescription(itemDescription);
 			}
-			info.setItemOptionalFields(iof);
+			
 		}
-
+		info.setItemOptionalFields(iof);
 		itemInfoList.add(info);
 		holdingsSet.setItemInformations(itemInfoList);
 		
@@ -323,6 +326,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
 				holdingsSet.setBibliographicDescription(bDesc);
 			}
+			
+			addBarcodeToItemOptionalFields(iof, item.getBarcode());
 
 			// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
 			// EDIT: ItemInformation does not transfer only optional fields ...
@@ -330,7 +335,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 			// TODO: Is it neccessary to set particular item ids? -> implement parsing those if yes
 			ItemId itemId = new ItemId();
-			itemId.setItemIdentifierValue(item.getBarcode());
+			itemId.setItemIdentifierValue(item.getSeqNumber());
+			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 			info.setItemId(itemId);
 
 			if (getHoldQueueLength || getCircStatus || getItemDescription) {
@@ -343,12 +349,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
 					itemDescription.setCallNumber(item.getCallNumber());
 					itemDescription.setCopyNumber(item.getCopyNumber());
-					itemId.setItemIdentifierType(Version1ItemIdentifierType.BARCODE);
 					itemDescription.setNumberOfPieces(item.getNumberOfPieces());
 					iof.setItemDescription(itemDescription);
 				}
-				info.setItemOptionalFields(iof);
 			}
+			info.setItemOptionalFields(iof);
 
 			itemInfoList.add(info);
 		}
@@ -356,6 +361,17 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		holdingsSets.add(holdingsSet);
 		return holdingsSets;
+	}
+
+	private void addBarcodeToItemOptionalFields(ItemOptionalFields iof, String barcode) {
+		BibliographicDescription bibDesc = new BibliographicDescription();
+		List<BibliographicItemId> itemIds = new ArrayList<BibliographicItemId>();
+		BibliographicItemId bibId = new BibliographicItemId();
+		bibId.setBibliographicItemIdentifier(barcode);
+		bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+		itemIds.add(bibId);		
+		bibDesc.setBibliographicItemIds(itemIds);
+		iof.setBibliographicDescription(bibDesc);
 	}
 
 	private int getBibIdIndex(List<BibliographicId> bibIds, String bibId) {
