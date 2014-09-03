@@ -77,18 +77,21 @@ public class AlephLookupItemService implements LookupItemService {
 		LookupItemResponseData responseData = new LookupItemResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		// TODO: set remaining possible requests
+		// TODO: Which can be parsed from rest-dlf & which need x-services?
+		boolean getCurrentBorrower = initData.getCurrentBorrowerDesired();
+		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
+		boolean getItemUseRestrictionType = initData.getItemUseRestrictionTypeDesired();
+		boolean getPhysicalCondition = initData.getPhysicalConditionDesired();
+		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
+		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
+		boolean getElectronicResource = initData.getElectronicResourceDesired();
+		boolean getLocation = initData.getLocationDesired();
+		// EOF TODO;
+
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 		boolean getCircStatus = initData.getCirculationStatusDesired();
-		boolean getElectronicResource = initData.getElectronicResourceDesired();
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
 		boolean getItemDescription = initData.getItemDescriptionDesired();
-		boolean getLocation = initData.getLocationDesired();
-		/*
-		 * Another possibilities (highly customizable):
-		 * 
-		 * Item Use Restriction Type Physical Condition Security Marker Sensitization Flag
-		 */
 
 		if (initData.getItemId() == null) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item id is undefined.");
@@ -156,7 +159,7 @@ public class AlephLookupItemService implements LookupItemService {
 	}
 
 	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
-		if (responseData != null && alephItem != null && alephItem.getItemId().indexOf(initData.getItemId().getItemIdentifierValue()) != -1) {
+		if (responseData != null && alephItem != null) {
 
 			if (alephItem.getDateAvailablePickup() != null) {
 				GregorianCalendar gc = new GregorianCalendar();

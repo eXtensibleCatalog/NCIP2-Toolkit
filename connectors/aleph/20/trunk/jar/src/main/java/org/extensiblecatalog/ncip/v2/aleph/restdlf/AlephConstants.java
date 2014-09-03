@@ -62,8 +62,7 @@ public class AlephConstants {
 	public static final String Z30_NODE_ID = "Z30";
 	public static final String Z30_TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
 	public static final String Z30_COLLECTION_NODE = "z30-collection";
-		
-	
+
 	public static final String Z31_NODE = "z31";
 	public static final String Z31_FINE_ACCRUAL_DATE_NODE = "z31-date";
 	public static final String SESSION_ID_NODE = "session-id";
@@ -182,6 +181,7 @@ public class AlephConstants {
 	public static final int DOC_NUMBER_LENGTH = 9;
 	public static final int SEQ_NUMBER_LENGTH = 6;
 	public static final int ITEM_ID_UNIQUE_PART_LENGTH = 6;
+	public static final int LIBRARY_PARAM_LENGTH = 5;
 	public static final String HOLD_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String RENEW_DUE_DATE_FORMAT = "yyyyMMdd";
 	public static final String LOAN_DUE_DATE_FORMAT = "MM/dd/yyyy";
@@ -309,7 +309,6 @@ public class AlephConstants {
 	// RESTful APIs http requests values
 	public static final String ITEM_PATH_ELEMENT = "record";
 	public static final String USER_PATH_ELEMENT = "patron";
-	
 
 	// TODO: make Xservices & rest dlf switchable
 	public static final String XSERVER_NAME = "AlephXServerName";

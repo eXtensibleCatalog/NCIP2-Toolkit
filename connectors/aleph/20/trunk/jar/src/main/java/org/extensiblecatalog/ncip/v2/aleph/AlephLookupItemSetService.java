@@ -67,13 +67,22 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		Date sService = new Date();
 		LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
-		//TODO: set remaining possible requests
+
+		// TODO: Which can be parsed from rest-dlf & which need x-services?
+		boolean getCurrentBorrower = initData.getCurrentBorrowerDesired();
+		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
+		boolean getItemUseRestrictionType = initData.getItemUseRestrictionTypeDesired();
+		boolean getPhysicalCondition = initData.getPhysicalConditionDesired();
+		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
+		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
+		boolean getElectronicResource = initData.getElectronicResourceDesired();
+		boolean getLocation = initData.getLocationDesired();
+		// EOF TODO;
+
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 		boolean getCircStatus = initData.getCirculationStatusDesired();
-		boolean getElectronicResource = initData.getElectronicResourceDesired();
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
 		boolean getItemDescription = initData.getItemDescriptionDesired();
-		boolean getLocation = initData.getLocationDesired();
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
 
@@ -130,8 +139,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
 							} else
 								suppliedAgencyId = null;
-							//TODO: move parseHoldingsSets method to AlephUtil & purge this horrible code so that it is more understandable
-							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);;							
+							// TODO: move parseHoldingsSets method to AlephUtil & purge this horrible code so that it is more understandable
+							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength,
+									getItemDescription);
+							;
 							bibInformation.setHoldingsSets(holdingSets);
 
 							bibInformations.add(bibInformation);
@@ -281,7 +292,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		}
 
 		addItemIdentifierToItemOptionalFields(iof, alephItem.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-		
+
 		// Schema v2_02 defines to forward alephItemInfo even though there is no optional information desired
 		// EDIT: alephItemInformation does not transfer only optional fields ...
 		ItemInformation info = new ItemInformation();
@@ -303,12 +314,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
 				iof.setItemDescription(itemDescription);
 			}
-			
+
 		}
 		info.setItemOptionalFields(iof);
 		itemInfoList.add(info);
 		holdingsSet.setItemInformations(itemInfoList);
-		
+
 		return holdingsSet;
 	}
 
@@ -326,7 +337,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
 				holdingsSet.setBibliographicDescription(bDesc);
 			}
-			
+
 			addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 
 			// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
@@ -363,7 +374,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	}
 
 	/**
-	 * Adds passed String to Item Optional Fields as BibliographicItemIdentifier with passed BibliographicItemIdentifierCode. 
+	 * Adds passed String to Item Optional Fields as BibliographicItemIdentifier with passed BibliographicItemIdentifierCode.
 	 * 
 	 * @param iof
 	 * @param barcode
