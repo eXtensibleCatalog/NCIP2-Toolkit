@@ -24,6 +24,7 @@ import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
@@ -279,13 +280,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
-		addBarcodeToItemOptionalFields(iof, alephItem.getBarcode());
+		addItemIdentifierToItemOptionalFields(iof, alephItem.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 		
 		// Schema v2_02 defines to forward alephItemInfo even though there is no optional information desired
 		// EDIT: alephItemInformation does not transfer only optional fields ...
 		ItemInformation info = new ItemInformation();
 
-		// TODO: Is it neccessary to set particular item ids? -> implement parsing those if yes
 		ItemId itemId = new ItemId();
 		itemId.setItemIdentifierValue(alephItem.getSeqNumber());
 		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
@@ -327,13 +327,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				holdingsSet.setBibliographicDescription(bDesc);
 			}
 			
-			addBarcodeToItemOptionalFields(iof, item.getBarcode());
+			addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 
 			// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
 			// EDIT: ItemInformation does not transfer only optional fields ...
 			ItemInformation info = new ItemInformation();
 
-			// TODO: Is it neccessary to set particular item ids? -> implement parsing those if yes
 			ItemId itemId = new ItemId();
 			itemId.setItemIdentifierValue(item.getSeqNumber());
 			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
@@ -363,13 +362,20 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		return holdingsSets;
 	}
 
-	private void addBarcodeToItemOptionalFields(ItemOptionalFields iof, String barcode) {
+	/**
+	 * Adds passed String to Item Optional Fields as BibliographicItemIdentifier with passed BibliographicItemIdentifierCode. 
+	 * 
+	 * @param iof
+	 * @param barcode
+	 * @param bibItemIdCode
+	 */
+	private void addItemIdentifierToItemOptionalFields(ItemOptionalFields iof, String barcode, BibliographicItemIdentifierCode bibItemIdCode) {
 		BibliographicDescription bibDesc = new BibliographicDescription();
 		List<BibliographicItemId> itemIds = new ArrayList<BibliographicItemId>();
 		BibliographicItemId bibId = new BibliographicItemId();
 		bibId.setBibliographicItemIdentifier(barcode);
-		bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-		itemIds.add(bibId);		
+		bibId.setBibliographicItemIdentifierCode(bibItemIdCode);
+		itemIds.add(bibId);
 		bibDesc.setBibliographicItemIds(itemIds);
 		iof.setBibliographicDescription(bibDesc);
 	}
