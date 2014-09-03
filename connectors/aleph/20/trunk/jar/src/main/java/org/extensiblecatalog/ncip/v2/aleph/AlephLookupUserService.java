@@ -49,16 +49,29 @@ public class AlephLookupUserService implements LookupUserService {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		responseData.setUserId(initData.getUserId());
-
-		// TODO: What are these data good for?
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		AgencyId relyingPartyId = initData.getRelyingPartyId();
-		List<ResponseElementControl> responseElementControls = initData.getResponseElementControls();
-		// EOF TODO
-
 		if (patronId == null) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Note that Aleph supports only User Id lookup.");
+		}
+
+		responseData.setUserId(initData.getUserId());
+
+		// ResponseElementControl can regulate output
+		List<ResponseElementControl> responseElementControls = initData.getResponseElementControls();
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
 		}
 
 		AlephUser alephUser = null;
@@ -105,18 +118,12 @@ public class AlephLookupUserService implements LookupUserService {
 				responseData.setLoanedItems(loanedItems);
 			}
 			// User optional fields:
-			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired(); // TODO: Ask librarian where the block appears & implement it
 			boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
 			boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
 			UserOptionalFields uof = new UserOptionalFields();
-
-			if (blockOrTrapDesired) {
-				List<BlockOrTrap> blockOrTraps = alephUser.getBlockOrTraps();
-				uof.setBlockOrTraps(blockOrTraps);
-			}
 
 			if (nameInformationDesired) {
 				NameInformation nameInfo = alephUser.getNameInformation();
@@ -126,7 +133,6 @@ public class AlephLookupUserService implements LookupUserService {
 			if (userAddressInformationDesired) {
 				List<UserAddressInformation> userAddrInfos = alephUser.getUserAddressInformations();
 				uof.setUserAddressInformations(userAddrInfos);
-				
 			}
 
 			if (userIdDesired) {
