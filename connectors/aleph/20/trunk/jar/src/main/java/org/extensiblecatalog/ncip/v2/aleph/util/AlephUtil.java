@@ -32,18 +32,27 @@ import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 
 public class AlephUtil {
 	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
+		
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
-
+		BibliographicItemId bibliographicItemId;
+		BibliographicRecordId bibliographicRecordId;
+		
+		List<BibliographicItemId> bibIds = new ArrayList<BibliographicItemId>();
+		List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
 		if (alephItem.getAuthor() != null) {
 			bibliographicDescription.setAuthor(alephItem.getAuthor());
 		}
 		if (alephItem.getIsbn() != null) {
-			BibliographicItemId bibliographicItemId = new BibliographicItemId();
+			bibliographicItemId = new BibliographicItemId();
 			bibliographicItemId.setBibliographicItemIdentifier(alephItem.getIsbn());
 			bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
-			List<BibliographicItemId> bibIds = new ArrayList<BibliographicItemId>();
 			bibIds.add(bibliographicItemId);
-			bibliographicDescription.setBibliographicItemIds(bibIds);
+		}
+		if (alephItem.getBarcode() != null) {
+			bibliographicItemId = new BibliographicItemId();
+			bibliographicItemId.setBibliographicItemIdentifier(alephItem.getBarcode());
+			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+			bibIds.add(bibliographicItemId);
 		}
 
 		if (alephItem.getMediumType() != null) {
@@ -80,23 +89,25 @@ public class AlephUtil {
 
 		if (alephItem.getBibId() != null || alephItem.getDocNumber() != null) {
 			if (alephItem.getDocNumber() != null) {
-				BibliographicRecordId bibRecId = new BibliographicRecordId();
-				bibRecId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
-				bibRecId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
-				List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
-				bibRecIds.add(bibRecId);
-				bibliographicDescription.setBibliographicRecordIds(bibRecIds);
+				bibliographicRecordId = new BibliographicRecordId();
+				bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
+				bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
+				bibRecIds.add(bibliographicRecordId);
 			} else {
-				BibliographicRecordId bibliographicRecordId = new BibliographicRecordId();
+				bibliographicRecordId = new BibliographicRecordId();
 				bibliographicRecordId.setAgencyId(agencyId);
 				bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getBibId());
 				bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
-				List<BibliographicRecordId> bibIds = new ArrayList<BibliographicRecordId>();
-				bibIds.add(bibliographicRecordId);
-				bibliographicDescription.setBibliographicRecordIds(bibIds);
+				bibRecIds.add(bibliographicRecordId);
 			}
 		}
 
+
+		bibliographicDescription.setBibliographicItemIds(bibIds);
+		bibliographicDescription.setBibliographicRecordIds(bibRecIds);
+
+		//FIXME: NCIP cuts multiple bibliographic items/records although they are set properly - forwarded is only first bibItemId
+		//all other item ids & record ids are cut off
 		return bibliographicDescription;
 	}
 
