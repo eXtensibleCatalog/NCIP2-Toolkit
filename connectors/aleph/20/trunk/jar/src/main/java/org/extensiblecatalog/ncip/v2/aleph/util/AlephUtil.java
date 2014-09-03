@@ -45,14 +45,6 @@ public class AlephUtil {
 			bibIds.add(bibliographicItemId);
 			bibliographicDescription.setBibliographicItemIds(bibIds);
 		}
-		if (alephItem.getDocNumber() != null) {
-			BibliographicRecordId bibRecId = new BibliographicRecordId();
-			bibRecId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
-			bibRecId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
-			List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
-			bibRecIds.add(bibRecId);
-			bibliographicDescription.setBibliographicRecordIds(bibRecIds);
-		}
 
 		if (alephItem.getMediumType() != null) {
 			String mediumTypeValue = alephItem.getMediumType();
@@ -86,13 +78,23 @@ public class AlephUtil {
 			bibliographicDescription.setTitle(alephItem.getTitle());
 		}
 
-		if (alephItem.getBibId() != null) {
-			BibliographicRecordId bibliographicRecordId = new BibliographicRecordId();
-			bibliographicRecordId.setAgencyId(agencyId);
-			bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getBibId());
-			List<BibliographicRecordId> bibIds = new ArrayList<BibliographicRecordId>();
-			bibIds.add(bibliographicRecordId);
-			bibliographicDescription.setBibliographicRecordIds(bibIds);
+		if (alephItem.getBibId() != null || alephItem.getDocNumber() != null) {
+			if (alephItem.getDocNumber() != null) {
+				BibliographicRecordId bibRecId = new BibliographicRecordId();
+				bibRecId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
+				bibRecId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
+				List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
+				bibRecIds.add(bibRecId);
+				bibliographicDescription.setBibliographicRecordIds(bibRecIds);
+			} else {
+				BibliographicRecordId bibliographicRecordId = new BibliographicRecordId();
+				bibliographicRecordId.setAgencyId(agencyId);
+				bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getBibId());
+				bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
+				List<BibliographicRecordId> bibIds = new ArrayList<BibliographicRecordId>();
+				bibIds.add(bibliographicRecordId);
+				bibliographicDescription.setBibliographicRecordIds(bibIds);
+			}
 		}
 
 		return bibliographicDescription;

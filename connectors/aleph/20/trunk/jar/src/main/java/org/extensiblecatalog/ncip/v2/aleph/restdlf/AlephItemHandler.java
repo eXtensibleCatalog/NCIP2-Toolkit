@@ -328,7 +328,7 @@ public class AlephItemHandler extends DefaultHandler {
 				currentAlephItem.setDescription(new String(ch, start, length));
 				itemDesrciptionReached = false;
 			} else if (docNoReached) {
-				currentAlephItem.setBibId(new String(ch, start, length));
+				currentAlephItem.setDocNumber(new String(ch, start, length));
 				docNoReached = false;
 			} else if (itemSequenceReached) {
 				currentAlephItem.setSeqNumber(new String(ch, start, length));
