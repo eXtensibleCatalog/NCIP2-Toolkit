@@ -4,19 +4,19 @@
 	<ns1:LookupItemSet>
 		<ns1:BibliographicId>
 			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>421-1.0</ns1:BibliographicItemIdentifier>
+				<ns1:BibliographicItemIdentifier>MZK01000000421-000010</ns1:BibliographicItemIdentifier>
 				<ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">URI</ns1:BibliographicItemIdentifierCode>
 			</ns1:BibliographicItemId>
 		</ns1:BibliographicId>
 		<ns1:BibliographicId>
 			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>425-2.0</ns1:BibliographicItemIdentifier>
+				<ns1:BibliographicItemIdentifier>MZK01000000425-000020</ns1:BibliographicItemIdentifier>
 				<ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">URI</ns1:BibliographicItemIdentifierCode>
 			</ns1:BibliographicItemId>
 		</ns1:BibliographicId>
 		<ns1:BibliographicId>
 			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>425-5.0</ns1:BibliographicItemIdentifier>
+				<ns1:BibliographicItemIdentifier>MZK01000000425-000050</ns1:BibliographicItemIdentifier>
 				<ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">URI</ns1:BibliographicItemIdentifierCode>
 			</ns1:BibliographicItemId>
 		</ns1:BibliographicId>

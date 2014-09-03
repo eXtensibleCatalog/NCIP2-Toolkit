@@ -25,8 +25,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 public class RestDlfConnector extends AlephMediator {
-	// TODO: Generate URL to be built based on type of action to be performed. Then use that URL to get XML response. Then parse the response & send back ncip formatted response.
-	// FIXME: Lookup User service can't be handled by RESTful APIs. Need to provide XServices.
 
 	private static final long serialVersionUID = -4425639616999642735L;
 	protected AlephConfiguration alephConfig = null;

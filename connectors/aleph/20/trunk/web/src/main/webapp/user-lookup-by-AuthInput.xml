@@ -26,6 +26,5 @@
 		<ns1:LoanedItemsDesired />
 		<ns1:RequestedItemsDesired />
 		<ns1:UserFiscalAccountDesired />
-		<ns1:Ext><ns1:NoticeContent>some value of LookupUser extensible element (TESTING)</ns1:NoticeContent></ns1:Ext>
 	</ns1:LookupUser>
 </ns1:NCIPMessage>
