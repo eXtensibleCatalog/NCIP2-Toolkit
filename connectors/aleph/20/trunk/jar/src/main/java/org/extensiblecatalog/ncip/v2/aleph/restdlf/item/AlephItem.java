@@ -479,10 +479,10 @@ public class AlephItem implements Serializable {
 	 *            the seqNumber to set
 	 */
 	public void setSeqNumber(String seqNumber) {
-		
+
 		this.seqNumber = seqNumber.trim();
 
-		//Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPERATOR)
+		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPERATOR)
 		this.seqNumber = this.seqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[0] + this.seqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[1];
 
 		// make sure seqnumber is 6 digits, if not add leading zeroes
@@ -533,8 +533,8 @@ public class AlephItem implements Serializable {
 
 	public void setDateAvailablePickup(String date) throws ParseException {
 		// assume date in right format and parse, ignore empty values
-		if (date != null && date.length() > 0) {
-			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.HOLD_DATE_FORMAT);
+		if (date != null && !date.isEmpty()) {
+			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.STATUS_DATE_FORMAT);
 			setDateAvailablePickup(dateFormatter.parse(date));
 		}
 	}

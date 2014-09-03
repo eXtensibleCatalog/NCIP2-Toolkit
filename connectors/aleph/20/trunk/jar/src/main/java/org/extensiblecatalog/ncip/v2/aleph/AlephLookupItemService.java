@@ -160,6 +160,8 @@ public class AlephLookupItemService implements LookupItemService {
 
 	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
 		if (responseData != null && alephItem != null) {
+			
+			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
 
 			if (alephItem.getDateAvailablePickup() != null) {
 				GregorianCalendar gc = new GregorianCalendar();
@@ -167,25 +169,12 @@ public class AlephLookupItemService implements LookupItemService {
 				responseData.setHoldPickupDate(gc);
 			}
 			responseData.setItemId(initData.getItemId());
-			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
+			
 			if (initData.getBibliographicDescriptionDesired()) {
-				if (iof == null)
-					iof = new ItemOptionalFields();
 				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 			}
 
-			if (iof != null) {
-				// TODO:set circ status - it is parsed, not included to iof
-				responseData.setItemOptionalFields(iof);
-				if (iof.getHoldQueue() != null) {
-					Problem p = new Problem();
-					p.setProblemType(new ProblemType(iof.getHoldQueue()));
-					p.setProblemDetail(iof.getHoldQueue());
-					List<Problem> problems = new ArrayList<Problem>();
-					problems.add(p);
-					responseData.setProblems(problems);
-				}
-			}
+			
 			ItemTransaction itemTransaction = null;
 			if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
 				if (itemTransaction == null)
@@ -226,6 +215,7 @@ public class AlephLookupItemService implements LookupItemService {
 				requestId.setRequestIdentifierValue(alephItem.getHoldRequestId());
 				responseData.setRequestId(requestId);
 			}
+			responseData.setItemOptionalFields(iof);
 		}
 	}
 

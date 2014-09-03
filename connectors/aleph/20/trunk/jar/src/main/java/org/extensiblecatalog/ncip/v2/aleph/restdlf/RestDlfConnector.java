@@ -150,7 +150,6 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		// FIXME: Return sequence number in place of Barcode. -> put Barcode elsewhere
 		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
@@ -175,7 +174,7 @@ public class RestDlfConnector extends AlephMediator {
 			throws ParserConfigurationException, IOException, SAXException, AlephException {
 
 		/*
-		 * Input is something like this: MZK01000000421-000010 What we need is: MZK01000000421/items/MZK50000000421000010; Sure only if BIB_ID_LENGTH = 9 & ITEM_ID_UNIQUE_PART_LENGTH = 6
+		 * Input could be something like this: MZK01000000421-000010 What we need is: MZK01000000421/items/MZK50000000421000010
 		 */
 
 		String recordId = parseRecordIdFromItemId(itemId);
@@ -185,7 +184,7 @@ public class RestDlfConnector extends AlephMediator {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01000000421-000010");
 		}
 
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, admLibrary + recordId.substring(bibLibrary.length()) + sequenceNumber).toURL();
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 

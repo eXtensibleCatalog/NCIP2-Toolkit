@@ -187,6 +187,7 @@ public class AlephConstants {
 	public static final String LOAN_DUE_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String FINE_ACCRUAL_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String CIRC_STATUS_DUE_DATE_FORMAT = "MM/dd/yy";
+	public static final String STATUS_DATE_FORMAT = "dd/mmm/yyyy";
 	public static final String FINE_STATUS_PAID = "Paid";
 	public static final String FINE_STATUS_UNPAID = "Unpaid";
 	public static final String FINE_CREDIT = "C";
