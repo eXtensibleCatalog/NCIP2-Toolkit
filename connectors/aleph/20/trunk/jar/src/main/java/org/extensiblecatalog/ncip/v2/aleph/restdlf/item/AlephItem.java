@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * An item returned from Aleph
@@ -534,7 +535,7 @@ public class AlephItem implements Serializable {
 	public void setDateAvailablePickup(String date) throws ParseException {
 		// assume date in right format and parse, ignore empty values
 		if (date != null && !date.isEmpty()) {
-			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.STATUS_DATE_FORMAT);
+			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.STATUS_DATE_FORMAT, Locale.ENGLISH);
 			setDateAvailablePickup(dateFormatter.parse(date));
 		}
 	}
