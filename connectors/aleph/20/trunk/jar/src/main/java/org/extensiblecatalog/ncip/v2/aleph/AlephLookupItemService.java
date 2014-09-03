@@ -171,6 +171,7 @@ public class AlephLookupItemService implements LookupItemService {
 			responseData.setItemId(initData.getItemId());
 			
 			if (initData.getBibliographicDescriptionDesired()) {
+				//FIXME: Merge duplicate code from AlephUtil, this & AlephLookupItemSetService
 				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 			}
 
