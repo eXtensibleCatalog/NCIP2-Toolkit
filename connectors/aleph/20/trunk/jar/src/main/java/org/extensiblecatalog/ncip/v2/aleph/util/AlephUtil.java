@@ -25,6 +25,7 @@ import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
@@ -43,6 +44,14 @@ public class AlephUtil {
 			List<BibliographicItemId> bibIds = new ArrayList<BibliographicItemId>();
 			bibIds.add(bibliographicItemId);
 			bibliographicDescription.setBibliographicItemIds(bibIds);
+		}
+		if (alephItem.getDocNumber() != null) {
+			BibliographicRecordId bibRecId = new BibliographicRecordId();
+			bibRecId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
+			bibRecId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
+			List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
+			bibRecIds.add(bibRecId);
+			bibliographicDescription.setBibliographicRecordIds(bibRecIds);
 		}
 
 		if (alephItem.getMediumType() != null) {
