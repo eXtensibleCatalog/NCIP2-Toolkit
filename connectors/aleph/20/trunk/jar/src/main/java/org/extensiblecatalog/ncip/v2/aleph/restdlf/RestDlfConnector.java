@@ -42,7 +42,7 @@ public class RestDlfConnector extends AlephMediator {
 	private String patronElement;
 
 	private int bibIdLength;
-	private int itemIdUniquePart;
+	private int sequenceNumberLength;
 	private SAXParser parser;
 	private String patronInfoElement;
 	private String addressElement;
@@ -83,7 +83,7 @@ public class RestDlfConnector extends AlephMediator {
 			e.printStackTrace();
 		}
 		bibIdLength = AlephConstants.BIB_ID_LENGTH;
-		itemIdUniquePart = AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH;
+		sequenceNumberLength = AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH;
 		itemPathElement = AlephConstants.ITEM_PATH_ELEMENT;
 		userPathElement = AlephConstants.USER_PATH_ELEMENT;
 		itemsElement = AlephConstants.PARAM_ITEMS;
@@ -102,41 +102,27 @@ public class RestDlfConnector extends AlephMediator {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, defaultAgency);
 	}
 
-	private String normalizeRecordId(String recordId) {
-		while (recordId.length() < bibIdLength) {
-			recordId = "0" + recordId;
+	private boolean validateRecordId(String recordId) {
+		if (recordId.length() == bibIdLength + bibLibrary.length()) {
+			return true;
 		}
-		return recordId;
+		return false;
 	}
 
-	private String normalizeItemIdPart(String itemId) {
-		while (itemId.length() < itemIdUniquePart) {
-			itemId = "0" + itemId;
+	private boolean validateSequenceNumber(String sequenceNumber) {
+		if (sequenceNumber.length() == sequenceNumberLength) {
+			return true;
 		}
-		return itemId;
+		return false;
 	}
 
-	private String normalizeItemId(String itemId) {
-		// All this is needed to build unique ItemId URL
-		// e.g. http://aleph.mzk.cz:1892/rest-dlf/record/MZK01000000421/items/MZK50000000421000010
-		String recordId = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
-		String itemIdPart = itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
-		String[] itemIdParts = itemIdPart.split("\\.");
 
-		if (itemIdParts != null) {
-			/*
-			 * Input is something like this: 421-1.0 What we need is: 000000421000010; Sure only if BIB_ID_LENGTH = 9 & ITEM_ID_UNIQUE_PART_LENGTH = 6
-			 */
-			itemId = itemIdParts[0] + itemIdParts[1];
-		} else
-			itemId = itemIdPart;
-
-		return normalizeRecordId(recordId) + normalizeItemIdPart(itemId);
+	private String parseRecordIdFromItemId(String itemId) {
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
 	}
 
-	private String normalizeRecordIdFromItemId(String itemId) {
-		// Take the part before UNIQUE_ITEM_ID_SEPERATOR and normalize it
-		return normalizeRecordId(itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0]);
+	private String parseSequenceNumberFromItemId(String itemId) {
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
 	}
 
 	/**
@@ -156,14 +142,15 @@ public class RestDlfConnector extends AlephMediator {
 	public List<AlephItem> lookupItems(String recordId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
 			throws ParserConfigurationException, IOException, SAXException, AlephException {
 
-		recordId = normalizeRecordId(recordId);
+		if(! validateRecordId(recordId)) {
+			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
+		}
 
-		//FIXME: Allow only specific recordId - f.e. MZK01000000421
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + recordId, itemsElement).addRequest("view", "full").toURL();
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full").toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		//FIXME: Return sequence number in place of Barcode. -> put Barcode elsewhere
+		// FIXME: Return sequence number in place of Barcode. -> put Barcode elsewhere
 		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
@@ -172,14 +159,33 @@ public class RestDlfConnector extends AlephMediator {
 
 	}
 
+	/**
+	 * @param itemId
+	 * @param bibliographicDescription
+	 * @param circulationStatus
+	 * @param holdQueueLength
+	 * @param itemDesrciption
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws AlephException
+	 */
 	public AlephItem lookupItem(String itemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
 			throws ParserConfigurationException, IOException, SAXException, AlephException {
 
-		String recordId = normalizeRecordIdFromItemId(itemId);
-		itemId = normalizeItemId(itemId);
+		/*
+		 * Input is something like this: MZK01000000421-000010 What we need is: MZK01000000421/items/MZK50000000421000010; Sure only if BIB_ID_LENGTH = 9 & ITEM_ID_UNIQUE_PART_LENGTH = 6
+		 */
 
-		//FIXME: Allow only specific itemId - f.e. MZK01000000421-000010
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, bibLibrary + recordId, itemsElement, admLibrary + itemId).toURL();
+		String recordId = parseRecordIdFromItemId(itemId);
+		String sequenceNumber = parseSequenceNumberFromItemId(itemId);
+		
+		if(! validateRecordId(recordId) || ! validateSequenceNumber(sequenceNumber)) {
+			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01000000421-000010");
+		}
+
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, admLibrary + recordId.substring(bibLibrary.length()) + sequenceNumber).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -190,6 +196,14 @@ public class RestDlfConnector extends AlephMediator {
 		return itemHandler.getAlephItem();
 	}
 
+	/**
+	 * @param patronId
+	 * @param initData
+	 * @return
+	 * @throws AlephException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
 	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws AlephException, IOException, SAXException {
 
 		boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
