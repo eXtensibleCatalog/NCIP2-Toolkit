@@ -371,6 +371,7 @@ public class AlephItemHandler extends DefaultHandler {
 					}
 					currentRequestedItem.setBibliographicDescription(bibliographicDescription);
 					requestedItems.add(currentRequestedItem);
+					bibliographicDescription = new BibliographicDescription();
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE) && datePlacedReached) {
 					datePlacedReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && hourPlacedReached) {
