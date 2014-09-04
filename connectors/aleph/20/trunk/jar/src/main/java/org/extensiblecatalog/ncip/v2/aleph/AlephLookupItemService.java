@@ -170,14 +170,14 @@ public class AlephLookupItemService implements LookupItemService {
 
 			if (initData.getBibliographicDescriptionDesired()) {
 				// FIXME: Merge duplicate code from AlephUtil, this & AlephLookupItemSetService
-				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem));
+				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 			}
 
 			if (alephItem.getDateAvailablePickup() != null) {
 				GregorianCalendar gc = new GregorianCalendar();
+				gc.setTime(alephItem.getDateAvailablePickup());
 				if (AlephUtil.inDaylightTime())
 					gc.add(Calendar.HOUR_OF_DAY, 2);
-				gc.setTime(alephItem.getDateAvailablePickup());
 				responseData.setHoldPickupDate(gc);
 			}
 

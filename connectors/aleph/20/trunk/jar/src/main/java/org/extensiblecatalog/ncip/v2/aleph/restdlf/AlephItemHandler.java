@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.spi.TimeZoneNameProvider;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -384,7 +385,8 @@ public class AlephItemHandler extends DefaultHandler {
 
 					try {
 						dateDue.setTime(alephDateFormatter.parse(dateDueParsed));
-						dateDue.add(Calendar.HOUR_OF_DAY, 2);
+						if (AlephUtil.inDaylightTime())
+							dateDue.add(Calendar.HOUR_OF_DAY, 2);
 					} catch (ParseException e) {
 						throw new SAXException(e);
 					}
@@ -398,7 +400,8 @@ public class AlephItemHandler extends DefaultHandler {
 
 					try {
 						loanDate.setTime(alephDateFormatter.parse(loanDateParsed));
-						loanDate.add(Calendar.HOUR_OF_DAY, 2);
+						if (AlephUtil.inDaylightTime())
+							loanDate.add(Calendar.HOUR_OF_DAY, 2);
 					} catch (ParseException e) {
 						throw new SAXException(e);
 					}

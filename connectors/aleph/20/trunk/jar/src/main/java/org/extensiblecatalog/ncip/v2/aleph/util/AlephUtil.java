@@ -40,11 +40,11 @@ import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
 
 public class AlephUtil {
 	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
-		
+
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 		BibliographicItemId bibliographicItemId;
 		BibliographicRecordId bibliographicRecordId;
-		
+
 		List<BibliographicItemId> bibIds = new ArrayList<BibliographicItemId>();
 		List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
 		if (alephItem.getAuthor() != null) {
@@ -69,11 +69,13 @@ public class AlephUtil {
 			// TODO: Create localized external settings
 			// Kniha = Czech localized name of book
 			// Vazan. ser. = of magazine
-			if (mediumTypeValue.equalsIgnoreCase("Kniha"))
+			if (mediumTypeValue.equalsIgnoreCase("Kniha") || mediumTypeValue.equalsIgnoreCase("Mapa") || mediumTypeValue.equalsIgnoreCase("Grafika"))
 				mediumType = Version1MediumType.BOOK;
 			else if (mediumTypeValue.equalsIgnoreCase("Vazan. ser.") || mediumTypeValue.equalsIgnoreCase("Seriál"))
 				mediumType = Version1MediumType.MAGAZINE;
-			else {
+			else if (mediumTypeValue.equalsIgnoreCase("Kompaktní disk")) {
+				mediumType = Version1MediumType.CD_ROM;
+			} else {
 				try {
 					Version1MediumType.loadAll();
 					mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeValue);
@@ -111,12 +113,11 @@ public class AlephUtil {
 			}
 		}
 
-
 		bibliographicDescription.setBibliographicItemIds(bibIds);
 		bibliographicDescription.setBibliographicRecordIds(bibRecIds);
 
-		//FIXME: NCIP cuts multiple bibliographic items/records although they are set properly - forwarded is only first bibItemId
-		//all other item ids & record ids are cut off
+		// FIXME: NCIP cuts multiple bibliographic items/records although they are set properly - forwarded is only first bibItemId
+		// all other item ids & record ids are cut off
 		return bibliographicDescription;
 	}
 
@@ -167,7 +168,7 @@ public class AlephUtil {
 			description.setCallNumber(alephItem.getCallNumber());
 			iof.setItemDescription(description);
 		}
-		
+
 		if (alephItem.getCopyNumber() != null) {
 			description = new ItemDescription();
 			description.setCopyNumber(alephItem.getCopyNumber());
@@ -241,6 +242,6 @@ public class AlephUtil {
 	}
 
 	public static boolean inDaylightTime() {
-		return TimeZone.getDefault().inDaylightTime( new java.util.Date() );
+		return TimeZone.getDefault().inDaylightTime(new java.util.Date());
 	}
 }
