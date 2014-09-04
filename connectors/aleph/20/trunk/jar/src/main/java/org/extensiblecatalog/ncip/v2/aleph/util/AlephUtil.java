@@ -5,18 +5,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
+import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
+import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
@@ -24,6 +30,8 @@ import org.extensiblecatalog.ncip.v2.service.LocationType;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
@@ -90,6 +98,7 @@ public class AlephUtil {
 		if (alephItem.getBibId() != null || alephItem.getDocNumber() != null) {
 			if (alephItem.getDocNumber() != null) {
 				bibliographicRecordId = new BibliographicRecordId();
+				bibliographicRecordId.setAgencyId(agencyId);
 				bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
 				bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
 				bibRecIds.add(bibliographicRecordId);
@@ -158,6 +167,12 @@ public class AlephUtil {
 			description.setCallNumber(alephItem.getCallNumber());
 			iof.setItemDescription(description);
 		}
+		
+		if (alephItem.getCopyNumber() != null) {
+			description = new ItemDescription();
+			description.setCopyNumber(alephItem.getCopyNumber());
+			iof.setItemDescription(description);
+		}
 
 		if (alephItem.getLocation() != null) {
 
@@ -189,5 +204,43 @@ public class AlephUtil {
 			iof.setItemDescription(description);
 		}
 		return iof;
+	}
+
+	public static ItemTransaction getItemTransaction(AlephItem alephItem) {
+		ItemTransaction itemTransaction = new ItemTransaction();
+		if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
+			CurrentBorrower borrower = new CurrentBorrower();
+			UserId userId = new UserId();
+			AlephUser alephUser = alephItem.getBorrowingUsers().get(0);
+			userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
+			userId.setUserIdentifierType(new UserIdentifierType("Username"));
+			userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
+			borrower.setUserId(userId);
+			itemTransaction.setCurrentBorrower(borrower);
+		}
+
+		if (alephItem.getRequestingUsers() != null && alephItem.getRequestingUsers().size() > 0) {
+			Iterator<AlephUser> i = alephItem.getRequestingUsers().iterator();
+			while (i.hasNext()) {
+				AlephUser alephUser = i.next();
+				CurrentRequester requester = new CurrentRequester();
+				UserId userId = new UserId();
+				userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
+				userId.setUserIdentifierType(new UserIdentifierType("Username"));
+				userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
+				requester.setUserId(userId);
+				List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
+				if (requesters == null)
+					requesters = new ArrayList<CurrentRequester>();
+				requesters.add(requester);
+				itemTransaction.setCurrentRequesters(requesters);
+			}
+
+		}
+		return itemTransaction;
+	}
+
+	public static boolean inDaylightTime() {
+		return TimeZone.getDefault().inDaylightTime( new java.util.Date() );
 	}
 }

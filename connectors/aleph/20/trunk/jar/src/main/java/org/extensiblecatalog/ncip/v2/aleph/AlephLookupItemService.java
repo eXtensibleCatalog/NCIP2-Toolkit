@@ -38,6 +38,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.GregorianCalendar;
 
@@ -75,6 +76,8 @@ public class AlephLookupItemService implements LookupItemService {
 	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 		log.info("AlephLookupItemService.performService called");
 		LookupItemResponseData responseData = new LookupItemResponseData();
+		responseData.setItemId(initData.getItemId());
+
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
 		// TODO: Which can be parsed from rest-dlf & which need x-services?
@@ -160,55 +163,22 @@ public class AlephLookupItemService implements LookupItemService {
 
 	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
 		if (responseData != null && alephItem != null) {
-			
+
+			ItemTransaction itemTransaction = AlephUtil.getItemTransaction(alephItem);
+
 			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
+
+			if (initData.getBibliographicDescriptionDesired()) {
+				// FIXME: Merge duplicate code from AlephUtil, this & AlephLookupItemSetService
+				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem));
+			}
 
 			if (alephItem.getDateAvailablePickup() != null) {
 				GregorianCalendar gc = new GregorianCalendar();
+				if (AlephUtil.inDaylightTime())
+					gc.add(Calendar.HOUR_OF_DAY, 2);
 				gc.setTime(alephItem.getDateAvailablePickup());
 				responseData.setHoldPickupDate(gc);
-			}
-			responseData.setItemId(initData.getItemId());
-			
-			if (initData.getBibliographicDescriptionDesired()) {
-				//FIXME: Merge duplicate code from AlephUtil, this & AlephLookupItemSetService
-				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
-			}
-
-			
-			ItemTransaction itemTransaction = null;
-			if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
-				if (itemTransaction == null)
-					itemTransaction = new ItemTransaction();
-				CurrentBorrower borrower = new CurrentBorrower();
-				UserId userId = new UserId();
-				AlephUser alephUser = alephItem.getBorrowingUsers().get(0);
-				userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-				userId.setUserIdentifierType(new UserIdentifierType("Username"));
-				userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
-				borrower.setUserId(userId);
-				itemTransaction.setCurrentBorrower(borrower);
-			}
-
-			if (alephItem.getRequestingUsers() != null && alephItem.getRequestingUsers().size() > 0) {
-				if (itemTransaction == null)
-					itemTransaction = new ItemTransaction();
-				Iterator<AlephUser> i = alephItem.getRequestingUsers().iterator();
-				while (i.hasNext()) {
-					AlephUser alephUser = i.next();
-					CurrentRequester requester = new CurrentRequester();
-					UserId userId = new UserId();
-					userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-					userId.setUserIdentifierType(new UserIdentifierType("Username"));
-					userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
-					requester.setUserId(userId);
-					List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
-					if (requesters == null)
-						requesters = new ArrayList<CurrentRequester>();
-					requesters.add(requester);
-					itemTransaction.setCurrentRequesters(requesters);
-				}
-
 			}
 
 			if (alephItem.getHoldRequestId() != null) {
@@ -216,7 +186,9 @@ public class AlephLookupItemService implements LookupItemService {
 				requestId.setRequestIdentifierValue(alephItem.getHoldRequestId());
 				responseData.setRequestId(requestId);
 			}
+
 			responseData.setItemOptionalFields(iof);
+			responseData.setItemTransaction(itemTransaction);
 		}
 	}
 
