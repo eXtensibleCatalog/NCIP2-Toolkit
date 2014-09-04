@@ -1,5 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,13 +22,17 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
+ * This class is constructed to parse XML outputs of Aleph RESTful APIs items (regular lookup, patron loans/holdRequests)
+ * 
+ * 
  * @author Jiří Kozlovský (MZK)
- *
+ * 
  */
 public class AlephItemHandler extends DefaultHandler {
 	private List<AlephItem> listOfItems;
 	private AlephItem currentAlephItem;
 	private SimpleDateFormat alephDateFormatter;
+	private SimpleDateFormat alephHourFormatter;
 
 	private List<RequestedItem> requestedItems;
 	private RequestedItem currentRequestedItem;
@@ -46,7 +51,7 @@ public class AlephItemHandler extends DefaultHandler {
 
 	// Regular item achievements
 	private boolean circulationStatusReached = false;
-	private boolean holdQueueLnegthReached = false;
+	private boolean holdQueueLengthReached = false;
 	private boolean itemDesrciptionReached = false;
 	private boolean authorReached = false;
 	private boolean isbnReached = false;
@@ -73,10 +78,20 @@ public class AlephItemHandler extends DefaultHandler {
 	// By default (for AlephItem) are not these variables needed
 	private boolean parsingLoansOrRequests = false;
 	private boolean loansHandling = false;
-	private boolean requestsHandling = false;
+	private boolean holdRequestsHandling = false;
 	private BibliographicDescription bibliographicDescription;
 	private TimeZone localTimeZone;
 	private boolean itemIdNotFound;
+	private boolean hourPlacedReached = false;
+	private boolean earliestDateNeededReached;
+	private boolean needBeforeDateReached;
+	private boolean datePlacedReached;
+	private boolean pickupLocationReached;
+	private boolean pickupExpiryDateReached;
+	private boolean reminderLevelReached;
+	private boolean requestIdReached;
+	private boolean requestTypeReached;
+	private boolean pickupDateReached;
 
 	public AlephItemHandler parseLoansOrRequests() {
 		bibliographicDescription = new BibliographicDescription();
@@ -86,12 +101,12 @@ public class AlephItemHandler extends DefaultHandler {
 
 	public void setLoansHandlingNow() {
 		loansHandling = true;
-		requestsHandling = false;
+		holdRequestsHandling = false;
 	}
 
 	public void setRequestsHandlingNow() {
 		loansHandling = false;
-		requestsHandling = true;
+		holdRequestsHandling = true;
 	}
 
 	/**
@@ -131,6 +146,7 @@ public class AlephItemHandler extends DefaultHandler {
 			throw new AlephException("No service desired. Please supply at least one service you wish to use.");
 		}
 		alephDateFormatter = new SimpleDateFormat("yyyyMMdd");
+		alephHourFormatter = new SimpleDateFormat("HHmm");
 		localTimeZone = TimeZone.getTimeZone("ECT");
 	}
 
@@ -145,7 +161,7 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
 				circulationStatusReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLnegthDesired) {
-				holdQueueLnegthReached = true;
+				holdQueueLengthReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
 				itemDesrciptionReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
@@ -182,7 +198,19 @@ public class AlephItemHandler extends DefaultHandler {
 				}
 			}
 		} else {
-			if (loansHandling) {
+			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
+				authorReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE)) {
+				isbnReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
+				titleReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
+				publisherReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
+				bibIdReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
+				materialReached = true;
+			} else if (loansHandling) { // Handling loans XML output
 				if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 					currentLoanedItem = new LoanedItem();
 
@@ -192,26 +220,45 @@ public class AlephItemHandler extends DefaultHandler {
 					dueDateReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_LOAN_DATE_NODE)) {
 					loanDateReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_MATERIAL_NODE)) {
-					materialReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
-					authorReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE)) {
-					isbnReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
-					titleReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
-					publisherReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
-					bibIdReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE)) {
 					itemSequenceReached = true;
 				}
-			} else if (requestsHandling) { // Handling requests XML output
-				// FIXME: implement parsing requests
+			} else if (holdRequestsHandling) { // Handling requests XML output
+				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
+					currentRequestedItem = new RequestedItem();
+					// FIXME: currentRequestedItem.setPickupDate(); NOT IMPLEMETED YET!
+					// TODO: detect which node is pickupDate ( http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full )
+					if (requestedItems == null)
+						requestedItems = new ArrayList<RequestedItem>();
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE)) {
+					datePlacedReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE)) {
+					hourPlacedReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE)) {
+					earliestDateNeededReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE)) {
+					needBeforeDateReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE)) {
+					itemSequenceReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE)) {
+					holdQueueLengthReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE)) {
+					pickupLocationReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE)) {
+					pickupExpiryDateReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE)) {
+					reminderLevelReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
+					requestIdReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE)) {
+					requestTypeReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
+					pickupDateReached = true;
+				}
 			}
 		}
 	}
+	//END OF PARSING START ELEMENT
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
@@ -221,10 +268,10 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
 				// currentAlephItem.setCirculationStatus(AlephConstants.ERROR_CIRCULATION_STATUS_NOT_FOUND);
 				circulationStatusReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLnegthReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLengthReached) {
 				currentAlephItem.setHoldQueueLength(-1);
 				// currentAlephItem.setholdQueue(AlephConstants.ERROR_HOLD_QUEUE_NOT_FOUND);
-				holdQueueLnegthReached = false;
+				holdQueueLengthReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionReached) {
 				// currentAlephItem.setDescription(AlephConstants.ERROR_ITEM_DESCRIPTION_NOT_FOUND);
 				itemDesrciptionReached = false;
@@ -278,7 +325,20 @@ public class AlephItemHandler extends DefaultHandler {
 				}
 			}
 		} else {
-			if (loansHandling) {
+			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
+				authorReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
+				isbnReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
+				titleReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
+				publisherReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibIdReached) {
+				itemIdNotFound = true;
+				bibIdReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
+				materialReached = false;
+			} else if (loansHandling) {
 				if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 					if (!itemIdNotFound) {
 						ItemId itemId = new ItemId();
@@ -293,38 +353,60 @@ public class AlephItemHandler extends DefaultHandler {
 					dueDateReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_LOAN_DATE_NODE) && loanDateReached) {
 					loanDateReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_MATERIAL_NODE) && materialReached) {
-					materialReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
-					authorReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
-					isbnReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
-					titleReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
-					publisherReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibIdReached) {
-					itemIdNotFound = true;
-					bibIdReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
 					itemIdNotFound = true;
 					itemSequenceReached = false;
 				}
-			} else if (requestsHandling) {
-				// FIXME: implement parsing requests
+			} else if (holdRequestsHandling) {
+				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
+					if (!itemIdNotFound) {
+						ItemId itemId = new ItemId();
+						itemId.setItemIdentifierValue(docNumber.trim() + "-" + itemSequence.trim());
+						itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+						currentRequestedItem.setItemId(itemId);
+					}
+					currentRequestedItem.setBibliographicDescription(bibliographicDescription);
+					requestedItems.add(currentRequestedItem);
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE) && datePlacedReached) {
+					datePlacedReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && hourPlacedReached) {
+					hourPlacedReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE) && earliestDateNeededReached) {
+					earliestDateNeededReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && needBeforeDateReached) {
+					needBeforeDateReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
+					itemSequenceReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && holdQueueLengthReached) {
+					holdQueueLengthReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && pickupLocationReached) {
+					pickupLocationReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && pickupExpiryDateReached) {
+					pickupExpiryDateReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE) && reminderLevelReached) {
+					reminderLevelReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestIdReached) {
+					requestIdReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE) && requestTypeReached) {
+					requestTypeReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
+					pickupDateReached = false;
+				}
 			}
 		}
 	}
-
+	//END OF PARSING END ELEMENT
+	
+	
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (!parsingLoansOrRequests) {
 			if (circulationStatusReached) {
 				currentAlephItem.setCirculationStatus(new String(ch, start, length));
 				circulationStatusReached = false;
-			} else if (holdQueueLnegthReached) {
+			} else if (holdQueueLengthReached) {
 				currentAlephItem.setHoldQueueLength(Integer.parseInt(new String(ch, start, length)));
-				holdQueueLnegthReached = false;
+				holdQueueLengthReached = false;
 			} else if (itemDesrciptionReached) {
 				currentAlephItem.setDescription(new String(ch, start, length));
 				itemDesrciptionReached = false;
@@ -377,73 +459,199 @@ public class AlephItemHandler extends DefaultHandler {
 				}
 			}
 		} else {
-			if (loansHandling) {
+			if (materialReached) {
+				// FIXME: setMediumType here!
+				materialReached = false;
+			} else if (authorReached) {
+				bibliographicDescription.setAuthor(new String(ch, start, length));
+				authorReached = false;
+			} else if (isbnReached) {
+				bibliographicDescription.setBibliographicLevel(null);
+				isbnReached = false;
+			} else if (titleReached) {
+				bibliographicDescription.setTitle(new String(ch, start, length));
+				titleReached = false;
+			} else if (publisherReached) {
+				bibliographicDescription.setPublisher(new String(ch, start, length));
+				publisherReached = false;
+			} else if (bibIdReached) {
+				String parsedBibId = new String(ch, start, length);
+				docNumber = parsedBibId;
+				List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
+				BibliographicItemId bibId = new BibliographicItemId();
+
+				bibId.setBibliographicItemIdentifier(parsedBibId);
+				bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
+
+				bibliographicItemIds.add(bibId);
+
+				bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
+				bibIdReached = false;
+			} else if (itemSequenceReached) {
+				itemSequence = new String(ch, start, length);
+				itemSequenceReached = false;
+			} else if (loansHandling) {
 				if (dueDateReached) {
 					String dateDueParsed = new String(ch, start, length);
+					if (dateDueParsed != "00000000") {
+						GregorianCalendar dateDue = new GregorianCalendar(localTimeZone);
 
-					GregorianCalendar dateDue = new GregorianCalendar(localTimeZone);
+						try {
+							dateDue.setTime(alephDateFormatter.parse(dateDueParsed));
+							if (AlephUtil.inDaylightTime())
+								dateDue.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							throw new SAXException(e);
+						}
 
-					try {
-						dateDue.setTime(alephDateFormatter.parse(dateDueParsed));
-						if (AlephUtil.inDaylightTime())
-							dateDue.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						throw new SAXException(e);
+						currentLoanedItem.setDateDue(dateDue);
 					}
-
-					currentLoanedItem.setDateDue(dateDue);
 					dueDateReached = false;
 				} else if (loanDateReached) {
 					String loanDateParsed = new String(ch, start, length);
+					if (loanDateParsed != "00000000") {
+						GregorianCalendar loanDate = new GregorianCalendar(localTimeZone);
 
-					GregorianCalendar loanDate = new GregorianCalendar(localTimeZone);
+						try {
+							loanDate.setTime(alephDateFormatter.parse(loanDateParsed));
+							if (AlephUtil.inDaylightTime())
+								loanDate.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							throw new SAXException(e);
+						}
 
-					try {
-						loanDate.setTime(alephDateFormatter.parse(loanDateParsed));
-						if (AlephUtil.inDaylightTime())
-							loanDate.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						throw new SAXException(e);
+						currentLoanedItem.setDateCheckedOut(loanDate);
 					}
-
-					currentLoanedItem.setDateCheckedOut(loanDate);
 					loanDateReached = false;
-				} else if (materialReached) {
-					materialReached = false;
-				} else if (authorReached) {
-					bibliographicDescription.setAuthor(new String(ch, start, length));
-					authorReached = false;
-				} else if (isbnReached) {
-					bibliographicDescription.setBibliographicLevel(null);
-					isbnReached = false;
-				} else if (titleReached) {
-					bibliographicDescription.setTitle(new String(ch, start, length));
-					titleReached = false;
-				} else if (publisherReached) {
-					bibliographicDescription.setPublisher(new String(ch, start, length));
-					publisherReached = false;
-				} else if (bibIdReached) {
-					String parsedBibId = new String(ch, start, length);
-					docNumber = parsedBibId;
-					List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
-					BibliographicItemId bibId = new BibliographicItemId();
-
-					bibId.setBibliographicItemIdentifier(parsedBibId);
-					bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
-
-					bibliographicItemIds.add(bibId);
-
-					bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
-					bibIdReached = false;
-				} else if (itemSequenceReached) {
-					itemSequence = new String(ch, start, length);
-					itemSequenceReached = false;
 				}
-			} else if (requestsHandling) {
-				// FIXME: implement parsing requests
+			} else if (holdRequestsHandling) {
+				if (datePlacedReached) {
+					String datePlacedParsed = new String(ch, start, length);
+					if (datePlacedParsed != "00000000") {
+						GregorianCalendar datePlaced = new GregorianCalendar(localTimeZone);
+
+						try {
+							datePlaced.setTime(alephDateFormatter.parse(datePlacedParsed));
+							if (AlephUtil.inDaylightTime())
+								datePlaced.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+
+						currentRequestedItem.setDatePlaced(datePlaced);
+					}
+					datePlacedReached = false;
+				} else if (hourPlacedReached) {
+					String hourPlacedParsed = new String(ch, start, length);
+					if (hourPlacedParsed != "00000000") {
+						GregorianCalendar datePlaced = currentRequestedItem.getDatePlaced();
+						GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
+
+						try {
+							hourPlaced.setTime(alephHourFormatter.parse(hourPlacedParsed));
+							if (AlephUtil.inDaylightTime())
+								hourPlaced.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+
+						datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
+						datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
+
+						currentRequestedItem.setDatePlaced(datePlaced);
+					}
+					hourPlacedReached = false;
+				} else if (earliestDateNeededReached) {
+					String earliestDateNeededParsed = new String(ch, start, length);
+					if (earliestDateNeededParsed != "00000000") {
+						GregorianCalendar earliestDateNeeded = new GregorianCalendar(localTimeZone);
+
+						try {
+							earliestDateNeeded.setTime(alephDateFormatter.parse(earliestDateNeededParsed));
+							if (AlephUtil.inDaylightTime())
+								earliestDateNeeded.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+
+						currentRequestedItem.setEarliestDateNeeded(earliestDateNeeded);
+					}
+					earliestDateNeededReached = false;
+				} else if (needBeforeDateReached) {
+					String needBeforeDateParsed = new String(ch, start, length);
+					if (needBeforeDateParsed != "00000000") {
+						GregorianCalendar needBeforeDate = new GregorianCalendar(localTimeZone);
+
+						try {
+							needBeforeDate.setTime(alephDateFormatter.parse(needBeforeDateParsed));
+							if (AlephUtil.inDaylightTime())
+								needBeforeDate.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+
+						currentRequestedItem.setNeedBeforeDate(needBeforeDate);
+					}
+					needBeforeDateReached = false;
+				} else if (holdQueueLengthReached) {
+					currentRequestedItem.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
+					holdQueueLengthReached = false;
+				} else if (pickupLocationReached) {
+					PickupLocation pickupLocation = new PickupLocation(new String(ch, start, length));
+					currentRequestedItem.setPickupLocation(pickupLocation);
+					pickupLocationReached = false;
+				} else if (pickupExpiryDateReached) {
+					String pickupExpiryDateParsed = new String(ch, start, length);
+					if (pickupExpiryDateParsed != "00000000") {
+						GregorianCalendar pickupExpiryDate = new GregorianCalendar(localTimeZone);
+
+						try {
+							pickupExpiryDate.setTime(alephDateFormatter.parse(pickupExpiryDateParsed));
+							if (AlephUtil.inDaylightTime())
+								pickupExpiryDate.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+
+						currentRequestedItem.setPickupExpiryDate(pickupExpiryDate);
+					}
+					pickupExpiryDateReached = false;
+				} else if (reminderLevelReached) {
+					currentRequestedItem.setReminderLevel(new BigDecimal(new String(ch, start, length)));
+					reminderLevelReached = false;
+				} else if (requestIdReached) {
+					RequestId requestId = new RequestId();
+					requestId.setRequestIdentifierValue(new String(ch, start, length));
+					currentRequestedItem.setRequestId(requestId);
+					requestIdReached = false;
+				} else if (requestTypeReached) {
+					RequestType requestType = null;
+					String parsedValue = new String(ch, start, length);
+					if (parsedValue == "30") // TODO: Add remaining request types
+						requestType = Version1RequestType.LOAN;
+					currentRequestedItem.setRequestType(requestType);
+					requestTypeReached = false;
+				} else if (pickupDateReached) {
+					String pickupDateParsed = new String(ch, start, length);
+					if (pickupDateParsed != "00000000") {
+						GregorianCalendar pickupDate = new GregorianCalendar(localTimeZone);
+
+						try {
+							pickupDate.setTime(alephDateFormatter.parse(pickupDateParsed));
+							if (AlephUtil.inDaylightTime())
+								pickupDate.add(Calendar.HOUR_OF_DAY, 2);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+
+						currentRequestedItem.setPickupDate(pickupDate);
+					}
+					pickupDateReached = false;
+				}
 			}
 		}
 	}
+	//END OF PARSING CHARACTERS INSIDE ELEMENTS
 
 	public List<RequestedItem> getListOfRequestedItems() {
 		return requestedItems;

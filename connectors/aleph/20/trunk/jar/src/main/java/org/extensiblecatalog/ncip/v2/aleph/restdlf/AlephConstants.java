@@ -28,6 +28,15 @@ public class AlephConstants {
 	public static final String Z37_REQUEST_NUMBER_NODE = "z37-request-number";
 	public static final String Z37_REQUEST_DATE_NODE = "z37-request-date";
 	public static final String Z37_HOLD_DATE_NODE = "z37-hold-date";
+	public static final String Z37_OPEN_DATE_NODE = "z37-open-date";
+	public static final String Z37_OPEN_HOUR_NODE = "z37-open-hour";
+	public static final String Z37_END_REQUEST_DATE_NODE = "z37-end-request-date"; 
+	public static final String Z37_HOLD_SEQUENCE_NODE = "z37-hold-sequence";
+	public static final String Z37_PICKUP_LOCATION_NODE = "z37-pickup-location";
+	public static final String Z37_END_HOLD_DATE_NODE = "z37-end-hold-date";
+	public static final String Z37_RECALL_TYPE_NODE = "z37-recall-type";
+	public static final String Z37_PRIORITY_NODE = "z37-priority";
+	
 	public static final String Z36_NODE = "z36";
 	public static final String Z36_DOC_NUMBER_NODE = "z36-doc-number";
 	public static final String Z36_ITEM_SEQUENCE_NODE = "z36-item-sequence";
@@ -35,6 +44,7 @@ public class AlephConstants {
 	public static final String Z36_SUB_LIBRARY_NODE = "z36-sub-library";
 
 	// circ status
+	public static final String HOLD_REQUEST_NODE = "hold-request";
 	public static final String CIRC_STATUS_NODE = "circ-status";
 	public static final String Z30_DESCRIPTION_NODE = "z30-description";
 	public static final String DUE_HOUR_NODE = "due-hour";
@@ -246,7 +256,6 @@ public class AlephConstants {
 	public static final String ERROR_COLLECTION_NOT_FOUND = "Collection is not set to this item";
 
 	// AlephAPI
-	// TODO: edit those constants into valid format, which Aleph RESTful APIs uses
 	public static final String ALEPHAPI_BOR_AUTH = "bor-auth";
 	public static final String ALEPHAPI_BOR_INFO = "bor-info";
 	public static final String ALEPHAPI_CIRC_STATUS = "circ-status";
