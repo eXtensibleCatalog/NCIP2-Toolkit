@@ -555,13 +555,11 @@ public class AlephItemHandler extends DefaultHandler {
 
 						try {
 							hourPlaced.setTime(alephHourFormatter.parse(hourPlacedParsed));
-							if (AlephUtil.inDaylightTime())
-								hourPlaced.add(Calendar.HOUR_OF_DAY, 2);
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
 
-						datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
+						datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY) - 1);
 						datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
 
 						currentRequestedItem.setDatePlaced(datePlaced);
