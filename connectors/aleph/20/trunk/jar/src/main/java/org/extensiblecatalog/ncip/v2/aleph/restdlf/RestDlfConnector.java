@@ -49,7 +49,7 @@ public class RestDlfConnector extends AlephMediator {
 	private String circActionsElement;
 	private String loansElement;
 	private String requestsElement;
-	private String bookingsElement;
+	private String holdsElement;
 	private String patronStatusElement;
 	private String registrationElement;
 
@@ -91,7 +91,7 @@ public class RestDlfConnector extends AlephMediator {
 		addressElement = AlephConstants.PARAM_ADDRESS;
 		circActionsElement = AlephConstants.PARAM_CIRC_ACTIONS;
 		loansElement = AlephConstants.PARAM_LOANS;
-		bookingsElement = AlephConstants.PARAM_BOOKINGS;
+		holdsElement = AlephConstants.PARAM_HOLDS;
 		requestsElement = AlephConstants.PARAM_REQUESTS;
 		patronStatusElement = AlephConstants.PARAM_PATRON_STATUS;
 		registrationElement = AlephConstants.PARAM_REGISTRATION;
@@ -241,7 +241,7 @@ public class RestDlfConnector extends AlephMediator {
 		if (requestedItemsDesired) {
 			atLeastOneDesired = true;
 			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/bookings?view=full
-			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, bookingsElement)
+			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
 					.addRequest("view", "full").toURL();
 		}
 

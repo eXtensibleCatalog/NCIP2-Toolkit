@@ -36,6 +36,7 @@ public class AlephConstants {
 	public static final String Z37_END_HOLD_DATE_NODE = "z37-end-hold-date";
 	public static final String Z37_RECALL_TYPE_NODE = "z37-recall-type";
 	public static final String Z37_PRIORITY_NODE = "z37-priority";
+	public static final String Z37_STATUS_NODE = "z37-status";
 	
 	public static final String Z36_NODE = "z36";
 	public static final String Z36_DOC_NUMBER_NODE = "z36-doc-number";
@@ -279,6 +280,7 @@ public class AlephConstants {
 	public static final String PARAM_CASH = "cash";
 	public static final String PARAM_FILTER_CASH = "filter_cash";
 	public static final String PARAM_HOLD = "hold";
+	public static final String PARAM_HOLDS = "holds";
 	public static final String PARAM_SYSTEM_NUMBER = "sys_no";
 	public static final String PARAM_BASE = "base";
 	public static final String PARAM_DOC_NUMBER = "doc_number";

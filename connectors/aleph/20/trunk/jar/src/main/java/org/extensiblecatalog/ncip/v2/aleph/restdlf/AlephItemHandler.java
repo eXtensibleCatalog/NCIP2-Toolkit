@@ -92,6 +92,7 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean requestIdReached;
 	private boolean requestTypeReached;
 	private boolean pickupDateReached;
+	private boolean statusReached;
 
 	public AlephItemHandler parseLoansOrRequests() {
 		bibliographicDescription = new BibliographicDescription();
@@ -254,11 +255,14 @@ public class AlephItemHandler extends DefaultHandler {
 					requestTypeReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
 					pickupDateReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
+					statusReached = true;
 				}
 			}
 		}
 	}
-	//END OF PARSING START ELEMENT
+
+	// END OF PARSING START ELEMENT
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
@@ -391,13 +395,15 @@ public class AlephItemHandler extends DefaultHandler {
 					requestTypeReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
 					pickupDateReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && statusReached) {
+					statusReached = false;
 				}
 			}
 		}
 	}
-	//END OF PARSING END ELEMENT
-	
-	
+
+	// END OF PARSING END ELEMENT
+
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (!parsingLoansOrRequests) {
@@ -493,7 +499,7 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (loansHandling) {
 				if (dueDateReached) {
 					String dateDueParsed = new String(ch, start, length);
-					if (dateDueParsed != "00000000") {
+					if (!dateDueParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar dateDue = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -509,7 +515,7 @@ public class AlephItemHandler extends DefaultHandler {
 					dueDateReached = false;
 				} else if (loanDateReached) {
 					String loanDateParsed = new String(ch, start, length);
-					if (loanDateParsed != "00000000") {
+					if (!loanDateParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar loanDate = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -527,7 +533,7 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (holdRequestsHandling) {
 				if (datePlacedReached) {
 					String datePlacedParsed = new String(ch, start, length);
-					if (datePlacedParsed != "00000000") {
+					if (!datePlacedParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar datePlaced = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -543,7 +549,7 @@ public class AlephItemHandler extends DefaultHandler {
 					datePlacedReached = false;
 				} else if (hourPlacedReached) {
 					String hourPlacedParsed = new String(ch, start, length);
-					if (hourPlacedParsed != "00000000") {
+					if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar datePlaced = currentRequestedItem.getDatePlaced();
 						GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
 
@@ -563,7 +569,7 @@ public class AlephItemHandler extends DefaultHandler {
 					hourPlacedReached = false;
 				} else if (earliestDateNeededReached) {
 					String earliestDateNeededParsed = new String(ch, start, length);
-					if (earliestDateNeededParsed != "00000000") {
+					if (!earliestDateNeededParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar earliestDateNeeded = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -579,7 +585,7 @@ public class AlephItemHandler extends DefaultHandler {
 					earliestDateNeededReached = false;
 				} else if (needBeforeDateReached) {
 					String needBeforeDateParsed = new String(ch, start, length);
-					if (needBeforeDateParsed != "00000000") {
+					if (!needBeforeDateParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar needBeforeDate = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -602,7 +608,7 @@ public class AlephItemHandler extends DefaultHandler {
 					pickupLocationReached = false;
 				} else if (pickupExpiryDateReached) {
 					String pickupExpiryDateParsed = new String(ch, start, length);
-					if (pickupExpiryDateParsed != "00000000") {
+					if (!pickupExpiryDateParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar pickupExpiryDate = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -629,11 +635,13 @@ public class AlephItemHandler extends DefaultHandler {
 					String parsedValue = new String(ch, start, length);
 					if (parsedValue == "30") // TODO: Add remaining request types
 						requestType = Version1RequestType.LOAN;
+					else
+						requestType = Version1RequestType.ESTIMATE; // FIXME: Put here better default value
 					currentRequestedItem.setRequestType(requestType);
 					requestTypeReached = false;
 				} else if (pickupDateReached) {
 					String pickupDateParsed = new String(ch, start, length);
-					if (pickupDateParsed != "00000000") {
+					if (!pickupDateParsed.equalsIgnoreCase("00000000")) {
 						GregorianCalendar pickupDate = new GregorianCalendar(localTimeZone);
 
 						try {
@@ -647,11 +655,21 @@ public class AlephItemHandler extends DefaultHandler {
 						currentRequestedItem.setPickupDate(pickupDate);
 					}
 					pickupDateReached = false;
+				} else if (statusReached) {
+					String parsedStatus = new String(ch, start, length);
+					RequestStatusType requestStatusType;
+					if (parsedStatus == "S")
+						requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
+					else
+						requestStatusType = Version1RequestStatusType.IN_PROCESS;
+					currentRequestedItem.setRequestStatusType(requestStatusType);
+					statusReached = false;
 				}
 			}
 		}
 	}
-	//END OF PARSING CHARACTERS INSIDE ELEMENTS
+
+	// END OF PARSING CHARACTERS INSIDE ELEMENTS
 
 	public List<RequestedItem> getListOfRequestedItems() {
 		return requestedItems;
