@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
@@ -52,6 +56,7 @@ public class RestDlfConnector extends AlephMediator {
 	private String holdsElement;
 	private String patronStatusElement;
 	private String registrationElement;
+	private String recordPathElement;
 
 	public RestDlfConnector() throws ServiceException {
 
@@ -95,6 +100,7 @@ public class RestDlfConnector extends AlephMediator {
 		requestsElement = AlephConstants.PARAM_REQUESTS;
 		patronStatusElement = AlephConstants.PARAM_PATRON_STATUS;
 		registrationElement = AlephConstants.PARAM_REGISTRATION;
+		recordPathElement = AlephConstants.PARAM_RECORD;
 
 	}
 
@@ -115,7 +121,6 @@ public class RestDlfConnector extends AlephMediator {
 		}
 		return false;
 	}
-
 
 	private String parseRecordIdFromItemId(String itemId) {
 		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
@@ -142,7 +147,7 @@ public class RestDlfConnector extends AlephMediator {
 	public List<AlephItem> lookupItems(String recordId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
 			throws ParserConfigurationException, IOException, SAXException, AlephException {
 
-		if(! validateRecordId(recordId)) {
+		if (!validateRecordId(recordId)) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
 		}
 
@@ -179,12 +184,13 @@ public class RestDlfConnector extends AlephMediator {
 
 		String recordId = parseRecordIdFromItemId(itemId);
 		String sequenceNumber = parseSequenceNumberFromItemId(itemId);
-		
-		if(! validateRecordId(recordId) || ! validateSequenceNumber(sequenceNumber)) {
+
+		if (!validateRecordId(recordId) || !validateSequenceNumber(sequenceNumber)) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01000000421-000010");
 		}
 
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber).toURL();
+		URL url = new URLBuilder().setBase(serverName, serverPort)
+				.setPath(serverSuffix, itemPathElement, recordId, itemsElement, admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -298,5 +304,76 @@ public class RestDlfConnector extends AlephMediator {
 			return userHandler.getAlephUser();
 		} else
 			return null;
+	}
+
+	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws MalformedURLException, AlephException {
+		AlephRequestItem requestItem = new AlephRequestItem();
+
+		// TODO: Is any of these request item capable services needed?
+		boolean getItemUseRestrictionType = initData.getItemUseRestrictionTypeDesired();
+		boolean getPhysicalCondition = initData.getPhysicalConditionDesired();
+		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
+		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
+		boolean getElectronicResource = initData.getElectronicResourceDesired();
+		boolean getLocation = initData.getLocationDesired();
+
+		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+		boolean getCircStatus = initData.getCirculationStatusDesired();
+		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
+		boolean getItemDescription = initData.getItemDescriptionDesired();
+
+		boolean nameInformationDesired = initData.getNameInformationDesired();
+		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+		boolean userIdDesired = initData.getUserIdDesired();
+		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+		// How about calling lookupUser or lookupItem to satisfy these?
+		// EOF TODO
+
+		String patronId = initData.getUserId().getUserIdentifierValue();
+
+		// FIXME: Allow request more items with one XML request
+		String itemId = initData.getItemId(0).getItemIdentifierValue();
+
+		String recordId = parseRecordIdFromItemId(itemId);
+		String sequenceNumber = parseSequenceNumberFromItemId(itemId);
+
+		if (!validateRecordId(recordId) || !validateSequenceNumber(sequenceNumber)) {
+			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01000000421-000010");
+		}
+
+		// PUT html to e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/record/MZK01001330134/holds/MZK50001365071000010
+		URL holdUrl = new URLBuilder()
+				.setBase(serverName, serverPort)
+				.setPath(serverSuffix, userPathElement, patronId, recordPathElement, recordId, holdsElement,
+						admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber).toURL();
+
+		String pickupLocation = initData.getPickupLocation().getValue();
+
+		String needBeforeDate = convertToAlephDate(initData.getNeedBeforeDate());
+		String earliestDateNeeded = convertToAlephDate(initData.getEarliestDateNeeded());
+
+		String firstNote = null;
+		// Our own testing identifier system (Moravian Library's)
+		if (patronId.equalsIgnoreCase("700") || true) {
+			firstNote = "dg";
+		}
+
+		String XMLRequest = new XMLBuilder().setParent("hold-request-parameters").setPickupLocation(pickupLocation).setLastInterestDate(needBeforeDate)
+				.setStartInterestDate(earliestDateNeeded).setFirstNote(firstNote).setRush("N").toString();
+		
+
+		return requestItem;
+	}
+
+	private String convertToAlephDate(GregorianCalendar gregorianCalendar) {
+		// We need: 20141231
+
+		String month = Integer.toString(gregorianCalendar.get(Calendar.MONTH) + 1);
+		if (month.length() < 2)
+			month = "0" + month;
+		String day = Integer.toString(gregorianCalendar.get(Calendar.DAY_OF_MONTH));
+		if (day.length() < 2)
+			day = "0" + day;
+		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
 	}
 }

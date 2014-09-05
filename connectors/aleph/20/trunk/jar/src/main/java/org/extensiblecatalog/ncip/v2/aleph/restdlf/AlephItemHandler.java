@@ -67,6 +67,8 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean itemSequenceReached = false;
 	private boolean agencyReached = false;
 	private boolean collectionReached = false;
+	private boolean secondCallNoTypeReached = false;
+	private boolean secondCallNoReached = false;
 
 	// Variables for parsing loans & requests
 	private BibliographicDescription bibliographicDescription;
@@ -85,8 +87,6 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean requestTypeReached = false;
 	private boolean pickupDateReached = false;
 	private boolean statusReached = false;
-	private boolean secondCallNoTypeReached = false;
-	private boolean secondCallNoReached = false;
 	private boolean dueDateReached = false;
 	private boolean loanDateReached = false;
 

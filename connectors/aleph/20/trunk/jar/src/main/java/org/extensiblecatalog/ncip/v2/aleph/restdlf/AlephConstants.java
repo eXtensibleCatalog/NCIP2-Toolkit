@@ -300,6 +300,7 @@ public class AlephConstants {
 	public static final String PARAM_REQUESTS = "requests";
 	public static final String PARAM_PATRON_STATUS = "patronStatus";
 	public static final String PARAM_REGISTRATION = "registration";
+	public static final String PARAM_RECORD = "record";
 
 	// lookup user param values
 	public static final String USER_CASH_BALANCE_ONLY = "B";
