@@ -45,7 +45,7 @@ public class AlephItemHandler extends DefaultHandler {
 	// Desired services
 	private boolean bibDescriptionDesired;
 	private boolean circulationStatusDesired;
-	private boolean holdQueueLnegthDesired;
+	private boolean holdQueueLengthDesired;
 	private boolean itemDesrciptionDesired;
 
 	// Regular item achievements
@@ -132,7 +132,7 @@ public class AlephItemHandler extends DefaultHandler {
 	 *            - parsed from initData
 	 * @param circulationStatusDesired
 	 *            - parsed from initData
-	 * @param holdQueueLnegthDesired
+	 * @param holdQueueLengthDesired
 	 *            - parsed from initData
 	 * @param itemDesrciptionDesired
 	 *            - parsed from initData
@@ -143,7 +143,7 @@ public class AlephItemHandler extends DefaultHandler {
 		if (bibDescriptionDesired || circulationStatusDesired || holdQueueLnegthDesired || itemDesrciptionDesired) {
 			this.bibDescriptionDesired = bibDescriptionDesired;
 			this.circulationStatusDesired = circulationStatusDesired;
-			this.holdQueueLnegthDesired = holdQueueLnegthDesired;
+			this.holdQueueLengthDesired = holdQueueLnegthDesired;
 			this.itemDesrciptionDesired = itemDesrciptionDesired;
 		} else if (requireAtLeastOneService) {
 			throw new AlephException("No service desired. Please supply at least one service you wish to use.");
@@ -164,7 +164,7 @@ public class AlephItemHandler extends DefaultHandler {
 					listOfItems = new ArrayList<AlephItem>();
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
 				circulationStatusReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLnegthDesired) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLengthDesired) {
 				holdQueueLengthReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
 				itemDesrciptionReached = true;

@@ -11,6 +11,7 @@ public class AlephRequestItem implements Serializable {
 
 	private static final long serialVersionUID = 8760934932234833600L;
 
+	private Problem problem;
 	private UserId userId;
 	private ItemId itemId;
 	private RequestId requestId;
@@ -26,6 +27,19 @@ public class AlephRequestItem implements Serializable {
 	private ShippingInformation shippingInformation;
 	private FiscalTransactionInformation fiscalTransactionInfo;
 	private List<ItemUseRestrictionType> itemUseRestrictionTypes;
+	
+	/**
+	 * @return the problem
+	 */
+	public Problem getProblem() {
+		return problem;
+	}
+	/**
+	 * @param problem the problem to set
+	 */
+	public void setProblem(Problem problem) {
+		this.problem = problem;
+	}
 	/**
 	 * @return the userId
 	 */
@@ -122,7 +136,7 @@ public class AlephRequestItem implements Serializable {
 	public void setHoldPickupDate(GregorianCalendar holdPickupDate) {
 		this.holdPickupDate = holdPickupDate;
 	}
-	/**
+	/**requestItem.set
 	 * @return the requestScopeType
 	 */
 	public RequestScopeType getRequestScopeType() {

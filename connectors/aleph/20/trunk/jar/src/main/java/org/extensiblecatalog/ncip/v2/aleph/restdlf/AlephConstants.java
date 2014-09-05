@@ -9,6 +9,8 @@ public class AlephConstants {
 	public static final String ERROR_NODE = "error";
 	public static final String REPLY_NODE = "reply";
 	public static final String REPLY_CODE_NODE = "reply-code";
+	public static final String REPLY_TEXT_NODE = "reply-text";
+	public static final String NOTE_NODE = "note";
 	public static final String STATUS_NODE = "status";
 	public static final String TOTAL_NODE = "total";
 

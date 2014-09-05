@@ -1,12 +1,17 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 public class AlephRequestItemService implements RequestItemService {
 
@@ -26,9 +31,6 @@ public class AlephRequestItemService implements RequestItemService {
 			else if (patronId == null)
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
 		}
-
-		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId(0)); // TODO: Find out why initiation data can have multiple itemId, but response don't
 
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		if (initiationHeader != null) {
@@ -51,54 +53,71 @@ public class AlephRequestItemService implements RequestItemService {
 		AlephRequestItem requestItem = null;
 		try {
 			requestItem = alephRemoteServiceManager.requestItem(initData);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (AlephException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		updateResponseData(responseData, initData, requestItem);
+			if (requestItem.getProblem() != null || requestItem == null) {
+				List<Problem> problems = new ArrayList<Problem>();
+				if (requestItem != null)
+					problems.add(requestItem.getProblem());
+				else
+					throw new AlephException("Unknown request item returned by connector.");
+				responseData.setProblems(problems);
+				responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
+				responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
+			} else
+				updateResponseData(responseData, initData, requestItem);
+
+		} catch (IOException ie) {
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing IOException error"));
+			p.setProblemDetail(ie.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
+		} catch (SAXException se) {
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing SAXException error"));
+			p.setProblemDetail(se.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
+		} catch (AlephException ae) {
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing AlephException error"));
+			p.setProblemDetail(ae.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
+		} /*
+		 * catch (ParserConfigurationException pce) { Problem p = new Problem(); p.setProblemType(new ProblemType("Procesing ParserConfigurationException error")); p.setProblemDetail(pce.getMessage()); List<Problem> problems = new
+		 * ArrayList<Problem>(); problems.add(p); responseData.setProblems(problems); }
+		 */catch (Exception e) {
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Unknown procesing exception error"));
+			p.setProblemDetail(e.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
+		}
 
 		return responseData;
 	}
 
 	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, AlephRequestItem requestItem) {
-		
-		//TODO: fix setting not set values or not wanted by input request XML
+
+		responseData.setUserId(initData.getUserId());
+		responseData.setItemId(initData.getItemId(0)); // TODO: Figure out why initiation data can have multiple itemId, but response don't
+		responseData.setRequestScopeType(requestItem.getRequestScopeType());
+		responseData.setRequestType(requestItem.getRequestType());
+		responseData.setRequestId(requestItem.getRequestId());
+
+		//Not implemented services, most of them probably even not implementable
 		responseData.setDateAvailable(requestItem.getDateAvailable());
 		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
 		responseData.setHoldPickupDate(requestItem.getHoldPickupDate());
 		responseData.setHoldQueueLength(requestItem.getHoldQueueLength());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		
-		if(requestItem.getItemId() != null)
-		responseData.setItemId(requestItem.getItemId());
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		
-		if(requestItem.getUserId() != null)
-		responseData.setUserId(requestItem.getUserId());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-		responseData.setRequestId(requestItem.getRequestId());
-		responseData.setRequestScopeType(requestItem.getRequestScopeType());
-		responseData.setRequestType(requestItem.getRequestType());
-		responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
-		responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
 		responseData.setShippingInformation(requestItem.getShippingInformation());
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
