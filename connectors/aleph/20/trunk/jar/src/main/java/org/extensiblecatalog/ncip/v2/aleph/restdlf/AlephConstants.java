@@ -15,6 +15,8 @@ public class AlephConstants {
 	public static final String DUE_DATE_NODE = "due-date";
 	public static final String Z30_BARCODE = "z30-barcode";
 	public static final String Z30_CALL_NUMBER_NODE = "z30-call-no";
+	public static final String Z30_CALL_NUMBER_2_TYPE_NODE = "z30-call-no-2-type";
+	public static final String Z30_CALL_NUMBER_2_NODE = "z30-call-no-2";
 	public static final String Z30_COPY_ID_NODE = "z30-copy-id";
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
 	public static final String Z13_AUTHOR_NODE = "z13-author";

@@ -34,16 +34,15 @@ public class AlephItemHandler extends DefaultHandler {
 	private SimpleDateFormat alephDateFormatter;
 	private SimpleDateFormat alephHourFormatter;
 
-	private List<RequestedItem> requestedItems;
-	private RequestedItem currentRequestedItem;
-
-	private List<LoanedItem> loanedItems;
-	private LoanedItem currentLoanedItem;
-
 	// Required to build unique item id
 	private String docNumber;
 	private String itemSequence;
+	private boolean itemIdNotFound;
 
+	// Required to decide whether is set second call number the one we need
+	private String secondCallNoType;
+
+	// Desired services
 	private boolean bibDescriptionDesired;
 	private boolean circulationStatusDesired;
 	private boolean holdQueueLnegthDesired;
@@ -69,30 +68,33 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean agencyReached = false;
 	private boolean collectionReached = false;
 
-	// RequestedItem achievements
-
-	// LoanedItem achievements
-	private boolean dueDateReached = false;
-	private boolean loanDateReached = false;
-
-	// By default (for AlephItem) are not these variables needed
+	// Variables for parsing loans & requests
+	private BibliographicDescription bibliographicDescription;
+	private TimeZone localTimeZone;
 	private boolean parsingLoansOrRequests = false;
 	private boolean loansHandling = false;
 	private boolean holdRequestsHandling = false;
-	private BibliographicDescription bibliographicDescription;
-	private TimeZone localTimeZone;
-	private boolean itemIdNotFound;
 	private boolean hourPlacedReached = false;
-	private boolean earliestDateNeededReached;
-	private boolean needBeforeDateReached;
-	private boolean datePlacedReached;
-	private boolean pickupLocationReached;
-	private boolean pickupExpiryDateReached;
-	private boolean reminderLevelReached;
-	private boolean requestIdReached;
-	private boolean requestTypeReached;
-	private boolean pickupDateReached;
-	private boolean statusReached;
+	private boolean earliestDateNeededReached = false;
+	private boolean needBeforeDateReached = false;
+	private boolean datePlacedReached = false;
+	private boolean pickupLocationReached = false;
+	private boolean pickupExpiryDateReached = false;
+	private boolean reminderLevelReached = false;
+	private boolean requestIdReached = false;
+	private boolean requestTypeReached = false;
+	private boolean pickupDateReached = false;
+	private boolean statusReached = false;
+	private boolean secondCallNoTypeReached = false;
+	private boolean secondCallNoReached = false;
+	private boolean dueDateReached = false;
+	private boolean loanDateReached = false;
+
+	private List<RequestedItem> requestedItems;
+	private RequestedItem currentRequestedItem;
+
+	private List<LoanedItem> loanedItems;
+	private LoanedItem currentLoanedItem;
 
 	public AlephItemHandler parseLoansOrRequests() {
 		bibliographicDescription = new BibliographicDescription();
@@ -155,6 +157,7 @@ public class AlephItemHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (!parsingLoansOrRequests) {
 			if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
+				secondCallNoType = null;
 				currentAlephItem = new AlephItem();
 				currentAlephItem.setLink(attributes.getValue(AlephConstants.HREF_NODE_ATTR));
 				if (listOfItems == null)
@@ -175,6 +178,10 @@ public class AlephItemHandler extends DefaultHandler {
 				openDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE)) {
 				callNoReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE)) {
+				secondCallNoTypeReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE)) {
+				secondCallNoReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE)) {
 				copyNoReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
@@ -295,6 +302,10 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
 				// currentAlephItem.setCallNumber(AlephConstants.ERROR_CALL_NO_NOT_FOUND);
 				callNoReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && secondCallNoTypeReached) {
+				secondCallNoTypeReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && secondCallNoReached) {
+				secondCallNoReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
 				// currentAlephItem.setCopyNumber(AlephConstants.ERROR_COPY_NO_NOT_FOUND);
 				copyNoReached = false;
@@ -432,6 +443,15 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (callNoReached) {
 				currentAlephItem.setCallNumber(new String(ch, start, length));
 				callNoReached = false;
+			} else if (secondCallNoTypeReached) {
+				secondCallNoType = new String(ch, start, length);
+				secondCallNoTypeReached = false;
+			} else if (secondCallNoReached) {
+				if (secondCallNoType != null && !secondCallNoType.equalsIgnoreCase("9"))
+					currentAlephItem.setCallNumber(new String(ch, start, length));
+				else if (secondCallNoType == null)
+					currentAlephItem.setCallNumber(new String(ch, start, length));
+				secondCallNoReached = false;
 			} else if (copyNoReached) {
 				currentAlephItem.setCopyNumber(new String(ch, start, length));
 				copyNoReached = false;
