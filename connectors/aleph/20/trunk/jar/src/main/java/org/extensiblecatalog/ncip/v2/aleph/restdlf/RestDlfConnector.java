@@ -18,6 +18,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
@@ -487,6 +488,76 @@ public class RestDlfConnector extends AlephMediator {
 			problem.setProblemType(new ProblemType("Request does not exist."));
 			requestItem.setProblem(problem);
 		}
+		return requestItem;
+	}
+
+	public AlephRequestItem lookupRequest(LookupRequestInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+
+		String alephItemId = initData.getItemId().getItemIdentifierValue();
+
+		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
+		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
+
+		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
+			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
+		}
+
+		AlephRequestItem requestItem = new AlephRequestItem();
+
+		String patronId = initData.getUserId().getUserIdentifierValue();
+
+		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement).toURL();
+
+		
+		AlephRequestHandler requestHandler = new AlephRequestHandler(itemId, requestItem);
+		InputSource streamSource = new InputSource(holdsUrl.openStream());
+		parser.parse(streamSource, requestHandler);
+
+		if (requestHandler.requestWasFound() && requestHandler.getRequestLink() != null) {
+
+			requestItem.setRequestType(initData.getRequestType());
+			requestItem.setRequestScopeType(Version1RequestScopeType.ITEM);
+			
+			URL requestLink = new URL(requestHandler.getRequestLink());
+
+			streamSource = new InputSource(requestLink.openStream());
+
+			requestHandler.setParsingRequests();
+			parser.parse(streamSource, requestHandler);
+			
+			boolean nameInformationDesired = initData.getNameInformationDesired();
+			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+			boolean userIdDesired = initData.getUserIdDesired();
+			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+
+			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
+				LookupUserInitiationData userInitData = new LookupUserInitiationData();
+				userInitData.setNameInformationDesired(nameInformationDesired);
+				userInitData.setUserAddressInformationDesired(userAddressInformationDesired);
+				userInitData.setUserIdDesired(userIdDesired);
+				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
+				userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
+
+				AlephUser user = lookupUser(patronId, userInitData);
+				requestItem.setUserOptionalFields(user.getUserOptionalFields());
+			}
+
+			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+			boolean getCircStatus = initData.getCirculationStatusDesired();
+			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
+			boolean getItemDescription = initData.getItemDescriptionDesired();
+
+			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
+				AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+				requestItem.setItemOptionalFields(item.getItemOptionalFields());
+			}
+		} else {
+			Problem problem = new Problem();
+			problem.setProblemType(new ProblemType("Request does not exist."));
+			requestItem.setProblem(problem);
+		}
+
 		return requestItem;
 	}
 
