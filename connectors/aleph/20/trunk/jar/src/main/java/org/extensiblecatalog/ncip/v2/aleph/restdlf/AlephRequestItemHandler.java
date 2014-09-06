@@ -15,53 +15,94 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private String noteValue;
 	private String requestId;
 	private boolean errorReturned;
+	private boolean parsingSequenceNumber = false;
+	private boolean deletable;
+	private boolean holdRequestFound = false;
+	private String itemIdToLookForSeqNumber;
+	private String sequenceNumber;
+
+	/**
+	 * Sets the parser to parse sequence number of requested item matching supplied String. <br/>
+	 * Once is appropriate sequence number found, this functionality is turned off.
+	 * 
+	 * @return
+	 */
+	public AlephRequestItemHandler parseSequenceNumber(String itemId) {
+		itemIdToLookForSeqNumber = itemId;
+		parsingSequenceNumber = true;
+		return this;
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
-			replyCodeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
-			replyTextReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE)) {
-			String type = attributes.getValue(AlephConstants.TYPE_NODE_ATTR);
-			if (type.equalsIgnoreCase(AlephConstants.ERROR_NODE))
-				errorReturned = true;
-			else
-				errorReturned = false;
-			noteReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
-			requestNumberReached = true;
+		if (!parsingSequenceNumber) {
+			if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
+				replyCodeReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
+				replyTextReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE)) {
+				noteReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
+				requestNumberReached = true;
+			}
+		} else { // parsing sequence number from e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds
+			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
+				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+				if (link.indexOf(itemIdToLookForSeqNumber) > -1) {
+					holdRequestFound = true;
+					// Substring last 4 characters from link - this should be sequence number
+					// E.g. <hold-request delete="Y" href="http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001"/>
+					sequenceNumber = link.substring(link.length() - AlephConstants.SEQ_NUMBER_LENGTH);
+
+					String deleteAttr = attributes.getValue(AlephConstants.DELETE_NODE_ATTR);
+					if (deleteAttr.equalsIgnoreCase(AlephConstants.YES)) {
+						deletable = true;
+					} else
+						deletable = false;
+					parsingSequenceNumber = false;
+				}
+			}
 		}
-		
+
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE) && replyCodeReached) {
-			replyCodeReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE) && replyTextReached) {
-			replyTextReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && noteReached) {
-			noteReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestNumberReached) {
-			requestNumberReached = false;
+		if (!parsingSequenceNumber) {
+			if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE) && replyCodeReached) {
+				replyCodeReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE) && replyTextReached) {
+				replyTextReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && noteReached) {
+				noteReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestNumberReached) {
+				requestNumberReached = false;
+			}
+		} else { // nothing
 		}
 	}
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
-		if (replyCodeReached) {
-			replyCode = new String(ch, start, length);
-			replyCodeReached = false;
-		} else if (replyTextReached) {
-			replyText = new String(ch, start, length);
-			replyTextReached = false;
-		} else if (noteReached) {
-			noteValue = new String(ch, start, length);
-			noteReached = false;
-		} else if (requestNumberReached) {
-			requestId = new String(ch, start, length);
-			requestNumberReached = false;
+		if (!parsingSequenceNumber) {
+			if (replyCodeReached) {
+				replyCode = new String(ch, start, length);
+				if (!replyCode.equalsIgnoreCase("0000"))
+					errorReturned = true;
+				else
+					errorReturned = false;
+				replyCodeReached = false;
+			} else if (replyTextReached) {
+				replyText = new String(ch, start, length);
+				replyTextReached = false;
+			} else if (noteReached) {
+				noteValue = new String(ch, start, length);
+				noteReached = false;
+			} else if (requestNumberReached) {
+				requestId = new String(ch, start, length);
+				requestNumberReached = false;
+			}
+		} else { // nothing
 		}
 	}
 
@@ -100,7 +141,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	public int getReplyCode() {
 		return Integer.parseInt(replyCode);
 	}
-	
+
 	/**
 	 * Returns "z37-request-number" element value.
 	 * 
@@ -108,5 +149,27 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	 */
 	public String getRequestId() {
 		return requestId;
+	}
+
+	/**
+	 * Returns sequence number from "hold-request" element's "href" attribute value.
+	 * 
+	 * @return
+	 */
+	public String getSequenceNumber() {
+		return sequenceNumber;
+	}
+
+	/**
+	 * Returns true, if an hold request is deletable.
+	 * 
+	 * @return
+	 */
+	public boolean isDeletable() {
+		return deletable;
+	}
+	
+	public boolean requestWasFound() {
+		return holdRequestFound;
 	}
 }

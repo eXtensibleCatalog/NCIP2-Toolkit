@@ -109,6 +109,7 @@ public class AlephConstants {
 	public static final String ID_NODE_ATTR = "id";
 	public static final String HREF_NODE_ATTR = "href";
 	public static final String TYPE_NODE_ATTR = "type";
+	public static final String DELETE_NODE_ATTR = "delete";
 	public static final String AUTHOR_NODE_ID = "100";
 	public static final String ISBN_NODE_ID = "020";
 	public static final String TITLE_NODE_ID = "245";
@@ -194,9 +195,11 @@ public class AlephConstants {
 	public static final int BIB_ID_LENGTH = 9;
 	public static final int HOLDINGS_ID_LENGTH = 9;
 	public static final int DOC_NUMBER_LENGTH = 9;
-	public static final int SEQ_NUMBER_LENGTH = 6;
+	public static final int ITEM_SEQ_NUMBER_LENGTH = 6;
+	public static final int SEQ_NUMBER_LENGTH = 4;
 	public static final int ITEM_ID_UNIQUE_PART_LENGTH = 6;
 	public static final int LIBRARY_PARAM_LENGTH = 5;
+	 
 	public static final String HOLD_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String RENEW_DUE_DATE_FORMAT = "yyyyMMdd";
 	public static final String LOAN_DUE_DATE_FORMAT = "MM/dd/yyyy";
@@ -335,6 +338,10 @@ public class AlephConstants {
 	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
 	public static final String ALEPH_ADMINISTRATIVE_LIBRARY = "AlephAdmLibrary";
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
+	public static final String INCLUDE_ITEM_INFO_IN_REQUEST_ITEM = "IncludeItemInfoInRequestItemService";
+	public static final String INCLUDE_USER_INFO_IN_REQUEST_ITEM = "IncludeUserInfoInRequestItemService";
+	public static final String INCLUDE_ITEM_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeItemInfoInCancelRequestItemService";
+	public static final String INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeUserInfoInCancelRequestItemService";
 	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
 	public static final String DEFAULT_AGENCY = "DefaultAgency";
 	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";

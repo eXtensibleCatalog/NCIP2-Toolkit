@@ -87,10 +87,14 @@ public class AlephRequestItemService implements RequestItemService {
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
-		} /*
-		 * catch (ParserConfigurationException pce) { Problem p = new Problem(); p.setProblemType(new ProblemType("Procesing ParserConfigurationException error")); p.setProblemDetail(pce.getMessage()); List<Problem> problems = new
-		 * ArrayList<Problem>(); problems.add(p); responseData.setProblems(problems); }
-		 */catch (Exception e) {
+		} catch (ParserConfigurationException pce) {
+			Problem p = new Problem();
+			p.setProblemType(new ProblemType("Procesing ParserConfigurationException error"));
+			p.setProblemDetail(pce.getMessage());
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(p);
+			responseData.setProblems(problems);
+		} catch (Exception e) {
 			Problem p = new Problem();
 			p.setProblemType(new ProblemType("Unknown procesing exception error"));
 			p.setProblemDetail(e.getMessage());
@@ -109,15 +113,15 @@ public class AlephRequestItemService implements RequestItemService {
 		responseData.setRequestScopeType(requestItem.getRequestScopeType());
 		responseData.setRequestType(requestItem.getRequestType());
 		responseData.setRequestId(requestItem.getRequestId());
+		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
+		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
+		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values 
 
-		//Not implemented services, most of them probably even not implementable
+		// Not implemented services, most of them probably even not implementable
 		responseData.setDateAvailable(requestItem.getDateAvailable());
-		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
 		responseData.setHoldPickupDate(requestItem.getHoldPickupDate());
 		responseData.setHoldQueueLength(requestItem.getHoldQueueLength());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
 		responseData.setShippingInformation(requestItem.getShippingInformation());
 	}
 }

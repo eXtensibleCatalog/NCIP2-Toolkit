@@ -17,6 +17,7 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
@@ -40,8 +41,12 @@ public class RestDlfConnector extends AlephMediator {
 
 	private static final long serialVersionUID = -4425639616999642735L;
 	protected AlephConfiguration alephConfig = null;
-	public boolean echoParticularProblemsToLUIS = false;
-	private boolean requiredAtLeastOneService = true;
+	public boolean echoParticularProblemsToLUIS;
+	private boolean requiredAtLeastOneService;
+	private boolean iofDesiredWithinRequestItem;
+	private boolean uofDesiredWithinRequestItem;
+	private boolean iofDesiredWithinCancelRequestItem;
+	private boolean uofDesiredWithinCancelRequestItem;
 	public String defaultAgency = "";
 	private String serverName;
 	private String serverPort;
@@ -85,6 +90,10 @@ public class RestDlfConnector extends AlephMediator {
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
 			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
+			iofDesiredWithinRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_ITEM_INFO_IN_REQUEST_ITEM));
+			uofDesiredWithinRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_USER_INFO_IN_REQUEST_ITEM));
+			iofDesiredWithinCancelRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_ITEM_INFO_IN_CANCEL_REQUEST_ITEM));
+			uofDesiredWithinCancelRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM));
 
 			parser = SAXParserFactory.newInstance().newSAXParser();
 
@@ -359,11 +368,19 @@ public class RestDlfConnector extends AlephMediator {
 			requestItem.setRequestType(initData.getRequestType());
 			requestItem.setRequestScopeType(initData.getRequestScopeType());
 
+			// Parse sequence number
+			URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
+					.toURL();
+
+			streamSource = new InputSource(holdsUrl.openStream());
+			parser.parse(streamSource, requestItemHandler.parseSequenceNumber(itemId));
+
+			String seqNumber = requestItemHandler.getSequenceNumber();
+
 			// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
 			URL requestsUrl = new URLBuilder().setBase(serverName, serverPort)
-					.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement, itemId + "0001").toURL();
-			// Please note that "0001" is sequence number, which Aleph generates after is request done & can't be looked up with certainty.
-			
+					.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement, itemId + seqNumber).toURL();
+
 			streamSource = new InputSource(requestsUrl.openStream());
 			parser.parse(streamSource, requestItemHandler);
 
@@ -371,38 +388,103 @@ public class RestDlfConnector extends AlephMediator {
 			requestId.setRequestIdentifierValue(requestItemHandler.getRequestId());
 			requestItem.setRequestId(requestId);
 
-			boolean nameInformationDesired = initData.getNameInformationDesired();
-			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
-			boolean userIdDesired = initData.getUserIdDesired();
-			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
-
-			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired) {
+			if (uofDesiredWithinRequestItem) {
 				LookupUserInitiationData userInitData = new LookupUserInitiationData();
-				userInitData.setNameInformationDesired(nameInformationDesired);
-				userInitData.setUserAddressInformationDesired(userAddressInformationDesired);
-				userInitData.setUserIdDesired(userIdDesired);
-				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
+				userInitData.setNameInformationDesired(true);
+				userInitData.setUserAddressInformationDesired(true);
+				userInitData.setUserIdDesired(true);
+				userInitData.setUserPrivilegeDesired(true);
+				userInitData.setBlockOrTrapDesired(true);
 
 				AlephUser user = lookupUser(patronId, userInitData);
 				requestItem.setUserOptionalFields(user.getUserOptionalFields());
 			}
 
-			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-			boolean getCircStatus = initData.getCirculationStatusDesired();
-			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-			boolean getItemDescription = initData.getItemDescriptionDesired();
-
-			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
-				AlephItem item = lookupItem(itemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+			if (iofDesiredWithinRequestItem) {
+				AlephItem item = lookupItem(alephItemId, true, true, true, true);
 				requestItem.setItemOptionalFields(item.getItemOptionalFields());
 			}
-			
+
 		} else {
 			Problem problem = new Problem();
-			problem.setProblemElement("");
 			problem.setProblemDetail(requestItemHandler.getNoteValue());
 			problem.setProblemValue(requestItemHandler.getReplyText());
-			problem.setProblemType(new ProblemType("Aleph returned error while processing the request."));
+			problem.setProblemType(new ProblemType("Aleph returned error while processing the request. See details below."));
+			requestItem.setProblem(problem);
+		}
+		return requestItem;
+	}
+
+	public AlephRequestItem cancelRequestItem(CancelRequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+
+		String alephItemId = initData.getItemId().getItemIdentifierValue();
+
+		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
+		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
+
+		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
+			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
+		}
+
+		AlephRequestItem requestItem = new AlephRequestItem();
+
+		String patronId = initData.getUserId().getUserIdentifierValue();
+
+		// Parse sequence number
+		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement).toURL();
+
+		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler().parseSequenceNumber(itemId);
+
+		InputSource streamSource = new InputSource(holdsUrl.openStream());
+		parser.parse(streamSource, requestItemHandler);
+
+		if (requestItemHandler.requestWasFound() && requestItemHandler.isDeletable()) {
+
+			String seqNumber = requestItemHandler.getSequenceNumber();
+
+			// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
+			URL holdRequestUrl = new URLBuilder().setBase(serverName, serverPort)
+					.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement, itemId + seqNumber).toURL();
+
+			HttpURLConnection httpCon = (HttpURLConnection) holdRequestUrl.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("DELETE");
+
+			streamSource = new InputSource(httpCon.getInputStream());
+
+			parser.parse(streamSource, requestItemHandler);
+
+			if (!requestItemHandler.returnedError()) {
+				if (uofDesiredWithinCancelRequestItem) {
+					LookupUserInitiationData userInitData = new LookupUserInitiationData();
+					userInitData.setNameInformationDesired(true);
+					userInitData.setUserAddressInformationDesired(true);
+					userInitData.setUserIdDesired(true);
+					userInitData.setUserPrivilegeDesired(true);
+					userInitData.setBlockOrTrapDesired(true);
+
+					AlephUser user = lookupUser(patronId, userInitData);
+					requestItem.setUserOptionalFields(user.getUserOptionalFields());
+				}
+
+				if (iofDesiredWithinCancelRequestItem) {
+					AlephItem item = lookupItem(alephItemId, true, true, true, true);
+					requestItem.setItemOptionalFields(item.getItemOptionalFields());
+				}
+			} else {
+				Problem problem = new Problem();
+				problem.setProblemValue(requestItemHandler.getReplyText());
+				problem.setProblemType(new ProblemType("Aleph returned error while processing cancel request. See details below."));
+				requestItem.setProblem(problem);
+			}
+		} else if (requestItemHandler.requestWasFound()) {
+			Problem problem = new Problem();
+			problem.setProblemValue("Delete value of specified hold request is set to \"N\"");
+			problem.setProblemType(new ProblemType("Requested deletion is not allowed."));
+			requestItem.setProblem(problem);
+		} else {
+			Problem problem = new Problem();
+			problem.setProblemType(new ProblemType("Request does not exist."));
 			requestItem.setProblem(problem);
 		}
 		return requestItem;
