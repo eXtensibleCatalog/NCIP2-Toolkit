@@ -110,7 +110,7 @@ public class AlephUser implements Serializable {
 		uai.setUserAddressRoleType(Version1UserAddressRoleType.SHIP_TO);
 
 		userAddrInfos.add(uai);
-		
+
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class AlephUser implements Serializable {
 		uai.setUserAddressRoleType(Version1UserAddressRoleType.NOTICE);
 
 		userAddrInfos.add(uai);
-		
+
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class AlephUser implements Serializable {
 	 */
 	public void addRequestedItem(AlephItem item) {
 		RequestedItem reqItem = new RequestedItem();
-		
+
 		if (!requestedItems.contains(reqItem)) {
 			requestedItems.add(reqItem);
 		}
@@ -391,7 +391,8 @@ public class AlephUser implements Serializable {
 
 		// http://www.niso.org/apps/group_public/download.php/8966/z39-83-1-2012_NCIP.pdf#page=88
 		userPrivilege.setUserPrivilegeDescription(string);
-		userPrivilege.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm","MZK type"));
+		userPrivilege.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm",
+				"MZK type"));
 		userPrivilege.setAgencyId(new AgencyId("MZK")); // FIXME: this is default - shouldn't be
 		userPrivileges.add(userPrivilege);
 	}
@@ -402,6 +403,21 @@ public class AlephUser implements Serializable {
 
 	public void setUserFiscalAccountSummary(UserFiscalAccountSummary ufas) {
 		userFiscalAccountSummary = ufas;
+	}
+
+	public UserOptionalFields getUserOptionalFields() {
+		UserOptionalFields uof = new UserOptionalFields();
+		if (nameInfo != null)
+			uof.setNameInformation(nameInfo);
+		if (blockOrTraps != null)
+			uof.setBlockOrTraps(blockOrTraps);
+		if (userAddrInfos != null)
+			uof.setUserAddressInformations(userAddrInfos);
+		if (userIds != null)
+			uof.setUserIds(userIds);
+		if (userPrivileges != null)
+			uof.setUserPrivileges(userPrivileges);
+		return uof;
 	}
 
 }

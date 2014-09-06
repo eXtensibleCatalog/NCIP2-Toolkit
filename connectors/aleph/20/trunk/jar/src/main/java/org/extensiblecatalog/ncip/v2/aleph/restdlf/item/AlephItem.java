@@ -4,7 +4,10 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants.Availability;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 
 import java.io.Serializable;
@@ -42,7 +45,7 @@ public class AlephItem implements Serializable {
 	private String collection;
 
 	private String docNumber;
-	private String seqNumber;
+	private String itemSeqNumber;
 
 	private String publisher;
 	private String series;
@@ -78,6 +81,7 @@ public class AlephItem implements Serializable {
 	private String publicationDate;
 	private String copyNumber;
 	private boolean exists = true;
+	private String seqNumber;
 
 	public AlephItem() {
 		borrowingUsers = new ArrayList<AlephUser>();
@@ -126,8 +130,8 @@ public class AlephItem implements Serializable {
 	}
 
 	private void updateItemId() {
-		if (getDocNumber() != null && getSeqNumber() != null) {
-			setItemId(getDocNumber() + getSeqNumber());
+		if (getDocNumber() != null && getItemSeqNumber() != null) {
+			setItemId(getDocNumber() + getItemSeqNumber());
 		}
 	}
 
@@ -476,27 +480,35 @@ public class AlephItem implements Serializable {
 	}
 
 	/**
-	 * @param seqNumber
-	 *            the seqNumber to set
+	 * @param itemSeqNumber
+	 *            the itemSeqNumber to set
 	 */
-	public void setSeqNumber(String seqNumber) {
+	public void setItemSeqNumber(String itemSeqNumber) {
 
-		this.seqNumber = seqNumber.trim();
+		this.itemSeqNumber = itemSeqNumber.trim();
 
 		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPERATOR)
-		this.seqNumber = this.seqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[0] + this.seqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[1];
+		this.itemSeqNumber = this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[0] + this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[1];
 
 		// make sure seqnumber is 6 digits, if not add leading zeroes
-		while (this.seqNumber != null && this.seqNumber.length() < AlephConstants.SEQ_NUMBER_LENGTH) {
-			this.seqNumber = "0" + this.seqNumber;
+		while (this.itemSeqNumber != null && this.itemSeqNumber.length() < AlephConstants.SEQ_NUMBER_LENGTH) {
+			this.itemSeqNumber = "0" + this.itemSeqNumber;
 		}
 		// update the item id if necessary
 		updateItemId();
 	}
 
 	/**
-	 * @return the seqNumber
+	 * @return the itemSeqNumber
 	 */
+	public String getItemSeqNumber() {
+		return itemSeqNumber;
+	}
+	
+	public void setSeqNumber(String seqNumber) {
+		this.seqNumber = seqNumber;
+	}
+	
 	public String getSeqNumber() {
 		return seqNumber;
 	}
@@ -821,8 +833,8 @@ public class AlephItem implements Serializable {
 					this.addRequestingUser(user);
 				}
 			}
-			if (item.getSeqNumber() != null) {
-				this.setSeqNumber(item.getSeqNumber());
+			if (item.getItemSeqNumber() != null) {
+				this.setItemSeqNumber(item.getItemSeqNumber());
 			}
 			if (item.getSeries() != null) {
 				this.setSeries(item.getSeries());
@@ -842,7 +854,7 @@ public class AlephItem implements Serializable {
 		sb.append("[ItemID:" + (getItemId() != null ? getItemId() : "null") + "],");
 		sb.append("[HoldingsID:" + (getHoldingsId() != null ? getHoldingsId() : "null") + "],");
 		sb.append("[DocNumber:" + (getDocNumber() != null ? getDocNumber() : "null") + "],");
-		sb.append("[SeqNumber:" + (getSeqNumber() != null ? getSeqNumber() : "null") + "],");
+		sb.append("[SeqNumber:" + (getItemSeqNumber() != null ? getItemSeqNumber() : "null") + "],");
 		sb.append("[Barcode:" + (getBarcode() != null ? getBarcode() : "null") + "],");
 		sb.append("[Agency:" + (getAgency() != null && getAgency().getAgencyId() != null ? getAgency().getAgencyId() : "null") + "],");
 		sb.append("[Description:" + (getDescription() != null ? getDescription() : "null") + "],");
@@ -910,5 +922,11 @@ public class AlephItem implements Serializable {
 		AlephAgency agency = new AlephAgency();
 		agency.setAgencyId(agencyId);
 		this.agency = agency;
+	}
+
+	public ItemOptionalFields getItemOptionalFields() {
+		ItemOptionalFields iof = AlephUtil.getItemOptionalFields(this);
+		iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
+		return iof;
 	}
 }

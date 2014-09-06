@@ -32,6 +32,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
 			requestNumberReached = true;
 		}
+		
 	}
 
 	@Override

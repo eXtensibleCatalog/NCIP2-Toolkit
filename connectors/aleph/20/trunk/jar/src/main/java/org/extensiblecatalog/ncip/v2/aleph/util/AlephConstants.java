@@ -79,4 +79,6 @@ public class AlephConstants {
     public static final String CIRC_STATUS_CHECKED_OUT = "A";
 
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
+
+	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
 }

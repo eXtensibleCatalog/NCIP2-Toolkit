@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
@@ -243,5 +245,25 @@ public class AlephUtil {
 
 	public static boolean inDaylightTime() {
 		return TimeZone.getDefault().inDaylightTime(new java.util.Date());
+	}
+
+	public static String convertToAlephDate(GregorianCalendar gregorianCalendar) {
+		// We need: 20141231
+
+		String month = Integer.toString(gregorianCalendar.get(Calendar.MONTH) + 1);
+		if (month.length() < 2)
+			month = "0" + month;
+		String day = Integer.toString(gregorianCalendar.get(Calendar.DAY_OF_MONTH));
+		if (day.length() < 2)
+			day = "0" + day;
+		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
+	}
+	
+	public static String parseRecordIdFromAlephItemId(String itemId) {
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
+	}
+
+	public static String parseItemIdFromAlephItemId(String itemId) {
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
 	}
 }

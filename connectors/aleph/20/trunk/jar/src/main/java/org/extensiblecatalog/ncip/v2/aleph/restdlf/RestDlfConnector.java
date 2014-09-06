@@ -130,14 +130,6 @@ public class RestDlfConnector extends AlephMediator {
 		return false;
 	}
 
-	private String parseRecordIdFromAlephItemId(String itemId) {
-		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
-	}
-
-	private String parseItemIdFromAlephItemId(String itemId) {
-		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
-	}
-
 	/**
 	 * Looks up item with desired services in following order:
 	 * 
@@ -190,8 +182,8 @@ public class RestDlfConnector extends AlephMediator {
 		 * Input could be something like this: MZK01000000421-000010 What we need is: MZK01000000421/items/MZK50000000421000010
 		 */
 
-		String recordId = parseRecordIdFromAlephItemId(alephItemId);
-		String itemId = parseItemIdFromAlephItemId(alephItemId);
+		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
+		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
 		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -313,13 +305,13 @@ public class RestDlfConnector extends AlephMediator {
 			return null;
 	}
 
-	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException {
+	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 
 		// FIXME: Allow request more items with one XML request
 		String alephItemId = initData.getItemId(0).getItemIdentifierValue();
 
-		String recordId = parseRecordIdFromAlephItemId(alephItemId);
-		String itemId = parseItemIdFromAlephItemId(alephItemId);
+		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
+		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
 		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -329,37 +321,16 @@ public class RestDlfConnector extends AlephMediator {
 
 		String pickupLocation = initData.getPickupLocation().getValue();
 
-		String needBeforeDate = convertToAlephDate(initData.getNeedBeforeDate());
-		String earliestDateNeeded = convertToAlephDate(initData.getEarliestDateNeeded());
+		String needBeforeDate = AlephUtil.convertToAlephDate(initData.getNeedBeforeDate());
+		String earliestDateNeeded = AlephUtil.convertToAlephDate(initData.getEarliestDateNeeded());
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
-
-		// TODO: Is any of these request item capable services needed?
-		boolean getItemUseRestrictionType = initData.getItemUseRestrictionTypeDesired();
-		boolean getPhysicalCondition = initData.getPhysicalConditionDesired();
-		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
-		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
-		boolean getElectronicResource = initData.getElectronicResourceDesired();
-		boolean getLocation = initData.getLocationDesired();
-
-		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-		boolean getCircStatus = initData.getCirculationStatusDesired();
-		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-		boolean getItemDescription = initData.getItemDescriptionDesired();
-
-		boolean nameInformationDesired = initData.getNameInformationDesired();
-		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
-		boolean userIdDesired = initData.getUserIdDesired();
-		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
-		// How about calling lookupUser or lookupItem to satisfy these?
-		// EOF TODO
 
 		// Build e.g. this: MZK50001365071000010
 		// String alephItemId = admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber;
 
 		// We need to put HTML PUT request to e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/record/MZK01001330134/holds/MZK50001365071000010
-		URL holdUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, recordPathElement, recordId, holdsElement, itemId)
-				.toURL();
+		URL holdUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, recordPathElement, recordId, holdsElement, itemId).toURL();
 
 		String firstNote = null;
 		// Our own testing identifier system (Moravian Library's)
@@ -385,13 +356,14 @@ public class RestDlfConnector extends AlephMediator {
 		parser.parse(streamSource, requestItemHandler);
 
 		if (!requestItemHandler.returnedError()) {
-			requestItem.setRequestType(Version1RequestType.HOLD);
-			requestItem.setRequestScopeType(Version1RequestScopeType.ITEM);
-			// Need to parse dateAvailable, holdQueueLength & holdQueuePosition
-			// We need to assume the sequence number of requested item is 0001, or (FIXME) lookup that item and parse it
+			requestItem.setRequestType(initData.getRequestType());
+			requestItem.setRequestScopeType(initData.getRequestScopeType());
+
 			// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
 			URL requestsUrl = new URLBuilder().setBase(serverName, serverPort)
 					.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement, itemId + "0001").toURL();
+			// Please note that "0001" is sequence number, which Aleph generates after is request done & can't be looked up with certainty.
+			
 			streamSource = new InputSource(requestsUrl.openStream());
 			parser.parse(streamSource, requestItemHandler);
 
@@ -399,9 +371,32 @@ public class RestDlfConnector extends AlephMediator {
 			requestId.setRequestIdentifierValue(requestItemHandler.getRequestId());
 			requestItem.setRequestId(requestId);
 
-			//TODO: Parse itemOptionalFields & userOptionalFields
-			//requestItem.setItemOptionalFields(null);
+			boolean nameInformationDesired = initData.getNameInformationDesired();
+			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+			boolean userIdDesired = initData.getUserIdDesired();
+			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
+			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired) {
+				LookupUserInitiationData userInitData = new LookupUserInitiationData();
+				userInitData.setNameInformationDesired(nameInformationDesired);
+				userInitData.setUserAddressInformationDesired(userAddressInformationDesired);
+				userInitData.setUserIdDesired(userIdDesired);
+				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
+
+				AlephUser user = lookupUser(patronId, userInitData);
+				requestItem.setUserOptionalFields(user.getUserOptionalFields());
+			}
+
+			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+			boolean getCircStatus = initData.getCirculationStatusDesired();
+			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
+			boolean getItemDescription = initData.getItemDescriptionDesired();
+
+			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
+				AlephItem item = lookupItem(itemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+				requestItem.setItemOptionalFields(item.getItemOptionalFields());
+			}
+			
 		} else {
 			Problem problem = new Problem();
 			problem.setProblemElement("");
@@ -413,15 +408,4 @@ public class RestDlfConnector extends AlephMediator {
 		return requestItem;
 	}
 
-	private String convertToAlephDate(GregorianCalendar gregorianCalendar) {
-		// We need: 20141231
-
-		String month = Integer.toString(gregorianCalendar.get(Calendar.MONTH) + 1);
-		if (month.length() < 2)
-			month = "0" + month;
-		String day = Integer.toString(gregorianCalendar.get(Calendar.DAY_OF_MONTH));
-		if (day.length() < 2)
-			day = "0" + day;
-		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
-	}
 }

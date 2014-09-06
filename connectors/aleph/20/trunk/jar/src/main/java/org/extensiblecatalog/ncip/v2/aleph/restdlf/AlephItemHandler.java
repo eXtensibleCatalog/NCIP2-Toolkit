@@ -432,7 +432,7 @@ public class AlephItemHandler extends DefaultHandler {
 				currentAlephItem.setDocNumber(new String(ch, start, length));
 				docNoReached = false;
 			} else if (itemSequenceReached) {
-				currentAlephItem.setSeqNumber(new String(ch, start, length));
+				currentAlephItem.setItemSeqNumber(new String(ch, start, length));
 				itemSequenceReached = false;
 			} else if (locationReached) {
 				currentAlephItem.setLocation(new String(ch, start, length));

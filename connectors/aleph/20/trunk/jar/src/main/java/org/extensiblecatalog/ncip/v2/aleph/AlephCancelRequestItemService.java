@@ -20,6 +20,7 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 		
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 		
+		
 		return responseData;
 	}
 

@@ -298,7 +298,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		ItemInformation info = new ItemInformation();
 
 		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierValue(alephItem.getSeqNumber());
+		itemId.setItemIdentifierValue(alephItem.getItemSeqNumber());
 		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 		info.setItemId(itemId);
 		if (getHoldQueueLength || getCircStatus || getItemDescription) {
@@ -345,7 +345,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			ItemInformation info = new ItemInformation();
 
 			ItemId itemId = new ItemId();
-			itemId.setItemIdentifierValue(item.getSeqNumber());
+			itemId.setItemIdentifierValue(item.getItemSeqNumber());
 			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 			info.setItemId(itemId);
 
