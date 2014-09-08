@@ -15,6 +15,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class AlephUserHandler extends DefaultHandler {
 	private AlephUser user;
+	private String address;
+	private String city;
 	private boolean nameInformationDesired;
 	private boolean userIdDesired;
 	private boolean userAddressInformationDesired;
@@ -29,9 +31,8 @@ public class AlephUserHandler extends DefaultHandler {
 	private boolean userCityReached = false;
 	private boolean cashReached = false;
 	private boolean borStatusReached = false;
-	private String address;
-	private String city;
-	private boolean userMailReached;
+	private boolean userMailReached = false;
+	private boolean phoneNoReached = false;
 
 	public void setAddressHandlingNow() {
 		addressHandling = true;
@@ -91,6 +92,8 @@ public class AlephUserHandler extends DefaultHandler {
 				userCityReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE) && userAddressInformationDesired) {// E-mails
 				userMailReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE) && userAddressInformationDesired) {// Phone No.
+				phoneNoReached  = true;
 			}
 		} else if (circulationsHandling) { // Note that if there was a need to parse transaction overview, circulationsHandling boolean would be handy - please do not delete it
 			if (qName.equalsIgnoreCase(AlephConstants.TOTAL_NODE) && attributes.getValue(AlephConstants.TYPE_NODE_ATTR).equalsIgnoreCase(AlephConstants.PARAM_CASH)
@@ -107,25 +110,26 @@ public class AlephUserHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		// Element can be empty, therefore it is needed to falsificate bools set to true
-		// TODO: Add error messages ... see {@link AlephItemHandler}
 		if (addressHandling) {
-			if (userIdReached) {
+			if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_1_NODE) && userIdReached) {
 				userIdReached = false;
-			} else if (nameInformationReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_2_NODE) && nameInformationReached) {
 				nameInformationReached = false;
-			} else if (userAddressReached) {// Adress
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE) && userAddressReached) {// Adress
 				userAddressReached = false;
-			} else if (userCityReached) {// City
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE) && userCityReached) {// City
 				userCityReached = false;
-			} else if (userMailReached) {// Mail
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE) && userMailReached) {// Mail
 				userMailReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE) && phoneNoReached) {// Phone No.
+				phoneNoReached  = false;
 			}
 		} else if (circulationsHandling) {
-			if (cashReached) {
+			if (qName.equalsIgnoreCase(AlephConstants.TOTAL_NODE) && cashReached) {
 				cashReached = false;
 			}
 		} else if (registrationHandling) {
-			if (borStatusReached) {
+			if (qName.equalsIgnoreCase(AlephConstants.Z305_BOR_STATUS_NODE) && borStatusReached) {
 				borStatusReached = false;
 			}
 		}
@@ -153,6 +157,9 @@ public class AlephUserHandler extends DefaultHandler {
 			} else if (userMailReached) {// mail
 				user.setEmailAddress(new String(ch, start, length));
 				userMailReached = false;
+			} else if (phoneNoReached) {// Phone No.
+				user.setPhoneNumber(new String(ch, start, length));
+				phoneNoReached  = false;
 			}
 		} else if (circulationsHandling) {
 			if (cashReached) {

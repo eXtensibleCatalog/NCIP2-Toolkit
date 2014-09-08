@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.*;
 
 import java.io.Serializable;
@@ -97,16 +98,8 @@ public class AlephUser implements Serializable {
 	public void setPhysicalAddress(String address) {
 
 		UserAddressInformation uai = new UserAddressInformation();
-		PhysicalAddress physicalAddress = new PhysicalAddress();
-		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
 
-		unstructuredAddress.setUnstructuredAddressData(address);
-		unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
-
-		physicalAddress.setUnstructuredAddress(unstructuredAddress);
-		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
-
-		uai.setPhysicalAddress(physicalAddress);
+		uai.setPhysicalAddress(AlephUtil.parsePhysicalAddress(address));
 
 		uai.setUserAddressRoleType(Version1UserAddressRoleType.SHIP_TO);
 
@@ -343,7 +336,7 @@ public class AlephUser implements Serializable {
 	public void setNameInformation(String nameInfo) {
 		PersonalNameInformation pni = new PersonalNameInformation();
 		StructuredPersonalUserName spun = new StructuredPersonalUserName();
-		String[] nameInfos = nameInfo.split(AlephConstants.UNSTRUCTURED_NAME_SEPERATOR);
+		String[] nameInfos = nameInfo.split(AlephConstants.UNSTRUCTURED_NAME_SEPARATOR);
 		if (nameInfos.length > 0) {
 			if (AlephConstants.FIRST_SURNAME) {
 				spun.setSurname(nameInfos[0].trim());
@@ -432,6 +425,16 @@ public class AlephUser implements Serializable {
 		if (userPrivileges != null)
 			uof.setUserPrivileges(userPrivileges);
 		return uof;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		UserAddressInformation uai = new UserAddressInformation();
+		ElectronicAddress electronicAddress = new ElectronicAddress();
+		electronicAddress.setElectronicAddressType(Version1ElectronicAddressType.TEL);
+		electronicAddress.setElectronicAddressData(phoneNumber);
+		uai.setElectronicAddress(electronicAddress);
+		uai.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+		userAddrInfos.add(uai);
 	}
 
 }

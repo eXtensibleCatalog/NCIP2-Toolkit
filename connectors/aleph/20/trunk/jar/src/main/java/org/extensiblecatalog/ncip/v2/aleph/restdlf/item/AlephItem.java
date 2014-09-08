@@ -487,8 +487,8 @@ public class AlephItem implements Serializable {
 
 		this.itemSeqNumber = itemSeqNumber.trim();
 
-		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPERATOR)
-		this.itemSeqNumber = this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[0] + this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPERATOR)[1];
+		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPARATOR)
+		this.itemSeqNumber = this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[0] + this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[1];
 
 		// make sure seqnumber is 6 digits, if not add leading zeroes
 		while (this.itemSeqNumber != null && this.itemSeqNumber.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {

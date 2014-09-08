@@ -138,6 +138,11 @@ public class AlephConstants {
 	public static final String Z304_ADDRESS_4_NODE = "z304-address-4";
 	public static final String Z304_ADDRESS_5_NODE = "z304-address-5";
 	public static final String Z304_ADDRESS_6_NODE = "z304-address-6";
+	public static final String Z304_TELEPHONE_1_NODE = "z304-telephone-1";
+	public static final String Z304_TELEPHONE_2_NODE = "z304-telephone-2";
+	public static final String Z304_TELEPHONE_3_NODE = "z304-telephone-3";
+	public static final String Z304_TELEPHONE_4_NODE = "z304-telephone-4";
+	public static final String Z304_TELEPHONE_5_NODE = "z304-telephone-5";
 	// global block and notes fields
 	public static final String Z303_DELINQUENCY_1_NODE = "z303-delinq-1";
 	public static final String Z303_DELINQUENCY_NOTE_1_NODE = "z303-delinq-n-1";
@@ -200,6 +205,7 @@ public class AlephConstants {
 	public static final int SEQ_NUMBER_LENGTH = 4;
 	public static final int ITEM_ID_UNIQUE_PART_LENGTH = 6;
 	public static final int LIBRARY_PARAM_LENGTH = 5;
+	public static final int POSTAL_CODE_LENGTH = 6;
 	 
 	public static final String HOLD_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String RENEW_DUE_DATE_FORMAT = "yyyyMMdd";
@@ -345,9 +351,15 @@ public class AlephConstants {
 	public static final String INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeUserInfoInCancelRequestItemService";
 	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
 	public static final String DEFAULT_AGENCY = "DefaultAgency";
-	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
-	public static final String UNSTRUCTURED_NAME_SEPERATOR = ",";
-	public static final String SEQUENCE_NUMBER_SEPERATOR = "\\."; // Be aware of this regex (dot is reserved character)
+	public static final String UNIQUE_ITEM_ID_SEPARATOR = "-";
+	public static final String UNSTRUCTURED_NAME_SEPARATOR = ", ";
+	public static final String UNSTRUCTURED_ADDRESS_SEPARATOR = ", ";
+	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
 	
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
+	
+
+	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
+	
+	
 }

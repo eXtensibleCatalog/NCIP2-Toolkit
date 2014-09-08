@@ -13,7 +13,7 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
  * may be used throughout the NCIP Toolkit
  * 
  */
-public class AlephConstants {
+public class AlephConstants extends org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants {
     // Aleph configuration
 
     /**
@@ -80,5 +80,4 @@ public class AlephConstants {
 
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 
-	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
 }

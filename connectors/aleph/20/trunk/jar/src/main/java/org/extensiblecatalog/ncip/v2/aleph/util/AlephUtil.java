@@ -14,31 +14,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
-import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
-import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
-import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
-import org.extensiblecatalog.ncip.v2.service.Location;
-import org.extensiblecatalog.ncip.v2.service.LocationName;
-import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
-import org.extensiblecatalog.ncip.v2.service.LocationType;
-import org.extensiblecatalog.ncip.v2.service.MediumType;
-import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
-import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
-import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
-import org.extensiblecatalog.ncip.v2.service.XcCirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.*;
 
 public class AlephUtil {
 	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
@@ -267,5 +243,42 @@ public class AlephUtil {
 			}
 		}
 		return mediumType;
+	}
+
+	public static PhysicalAddress parsePhysicalAddress(String address) {
+
+		PhysicalAddress physicalAddress = new PhysicalAddress();
+		StructuredAddress structuredAddress = new StructuredAddress();
+
+		String[] addressParts = address.split(AlephConstants.UNSTRUCTURED_ADDRESS_SEPARATOR);
+
+		int addressPartsLength = addressParts.length;
+
+		if (addressPartsLength > 2) {
+			// In this case address = "Vysokoškolské koleje VUT - Kolejní 2, A05/237, 612 00 Brno";
+			structuredAddress.setStreet(addressParts[0]);
+			structuredAddress.setPostOfficeBox(addressParts[1]);
+			
+			String postalCode = addressParts[2].substring(0, AlephConstants.POSTAL_CODE_LENGTH);
+			structuredAddress.setPostalCode(postalCode);
+			
+			String city = addressParts[2].substring(AlephConstants.POSTAL_CODE_LENGTH);
+			structuredAddress.setLocality(city.trim());
+		} else if (addressPartsLength > 1) {
+			// F.e. Trvalá ulice 123, 12345 Trvalé
+			structuredAddress.setStreet(addressParts[0]);
+			
+			String postalCode = addressParts[1].substring(0, AlephConstants.POSTAL_CODE_LENGTH);
+			structuredAddress.setPostalCode(postalCode);
+			
+			String city = addressParts[1].substring(AlephConstants.POSTAL_CODE_LENGTH);
+			structuredAddress.setLocality(city.trim());
+		} else
+			structuredAddress.setStreet(addressParts[0]);
+
+		physicalAddress.setStructuredAddress(structuredAddress);
+		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
+
+		return physicalAddress;
 	}
 }
