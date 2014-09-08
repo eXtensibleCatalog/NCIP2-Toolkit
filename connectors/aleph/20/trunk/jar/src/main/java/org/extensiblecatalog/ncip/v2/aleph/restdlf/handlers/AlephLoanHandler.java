@@ -27,9 +27,13 @@ public class AlephLoanHandler extends DefaultHandler {
 	private AlephRenewItem renewItem;
 	private String itemIdToLookFor;
 	private String loanLink;
+	private String docNumber;
+	private String itemSequenceNumber;
 	private boolean parsingLoan = false;
 	private boolean loanFound = false;
 	private boolean renewable;
+	private boolean docNoReached;
+	private boolean itemSeqReached;
 
 	public AlephLoanHandler(String itemIdToLookFor, AlephRenewItem renewItem) {
 		this.itemIdToLookFor = itemIdToLookFor;
@@ -44,30 +48,24 @@ public class AlephLoanHandler extends DefaultHandler {
 		return this;
 	}
 
-	/*		responseData.setRequestScopeType(renewItem.getRequestScopeType());
-	responseData.setRequestType(renewItem.getRequestType());
-	responseData.setRequestId(renewItem.getRequestId());
-	responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
-	responseData.setUserOptionalFields(renewItem.getUserOptionalFields()); 
-
-	// Not implemented services, most of them probably even not implementable
-	responseData.setDateAvailable(renewItem.getDateAvailable());
-	responseData.setHoldQueuePosition(renewItem.getHoldQueuePosition());
-	responseData.setShippingInformation(renewItem.getShippingInformation());
-	responseData.setAcknowledgedFeeAmount(renewItem.getAcknowledgedFeeAmout());
-	responseData.setDateOfUserRequest(renewItem.getDateOfUserRequest());
-	responseData.setEarliestDateNeeded(renewItem.getEarliestDateNeeded());
-	responseData.setHoldQueuePosition(renewItem.getHoldQueuePosition());
-	responseData.setNeedBeforeDate(renewItem.getNeedBeforeDate());
-	responseData.setPaidFeeAmount(renewItem.getPaidFeeAmount());
-	responseData.setPickupDate(renewItem.getHoldPickupDate());
-	responseData.setPickupExpiryDate(renewItem.getPickupExpiryDate());
-	responseData.setPickupLocation(renewItem.getPickupLocation());
-	responseData.setRequestStatusType(renewItem.getRequestStatusType());*/
+	/*
+	responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
+	responseData.setDateDue(renewItem.getDateDue());
+	responseData.setDateForReturn(renewItem.getDateForReturn());
+	responseData.setPending(renewItem.getPending());
+	responseData.setRenewalCount(renewItem.getRenewalCount());
+	responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
+	responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
+	*/
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (parsingLoan) {
-
+			if (qName.equalsIgnoreCase(AlephConstants.Z36_DOC_NUMBER_NODE)) {
+				docNoReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE)) {
+				itemSeqReached = true;
+			}
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
@@ -88,15 +86,33 @@ public class AlephLoanHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (parsingLoan) {
-
+			if (qName.equalsIgnoreCase(AlephConstants.Z36_DOC_NUMBER_NODE) && docNoReached) {
+				docNoReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSeqReached) {
+				itemSeqReached = false;
+			}
 		}
 	}
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (parsingLoan) {
-
+			if (docNoReached) {
+				docNumber = new String(ch, start, length);
+				docNoReached = false;
+			} else if (itemSeqReached) {
+				itemSequenceNumber = new String(ch, start, length);
+				itemSeqReached = false;
+			}
 		}
+	}
+	
+	public String getDocNumber() {
+		return docNumber;
+	}
+	
+	public String getItemSequenceNumber() {
+		return itemSequenceNumber;
 	}
 
 	public String getLoanLink() {

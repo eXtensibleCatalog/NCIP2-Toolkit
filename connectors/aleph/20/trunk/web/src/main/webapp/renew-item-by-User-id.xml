@@ -12,7 +12,7 @@
 		<ns1:ItemId>
 			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
 			<ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
-			<ns1:ItemIdentifierValue>MZK01000065021-MZK50000065021000010</ns1:ItemIdentifierValue>
+			<ns1:ItemIdentifierValue>MZK50004929137</ns1:ItemIdentifierValue>
 		</ns1:ItemId>
 		
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Bibliographic Description</ns1:ItemElementType>
@@ -36,8 +36,8 @@
 		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Id</ns1:UserElementType>
 		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Previous User Id</ns1:UserElementType>
         
-        <ns1:DesiredDateDue>2014-09-09T00:00:00</ns1:DesiredDateDue>
-        <ns1:DesiredDateForReturn>2014-09-17T00:00:00</ns1:DesiredDateForReturn>
+        <ns1:DesiredDateDue>2014-09-17T00:00:00</ns1:DesiredDateDue>
+        <ns1:DesiredDateForReturn>2014-09-25T00:00:00</ns1:DesiredDateForReturn>
         <ns1:AcknowledgedFeeAmount>
         	<ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">CZK</ns1:CurrencyCode>
         	<ns1:MonetaryValue>10</ns1:MonetaryValue>

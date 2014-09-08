@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.service.*;
@@ -280,5 +281,23 @@ public class AlephUtil {
 		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
 
 		return physicalAddress;
+	}
+
+	/**
+	 * Pattern for building unique item Id from document number & item sequence item is:<br/>
+	 * bibLibrary + docNumber + "-" + admLibrary + docNumber + itemSequenceNumber<br/><br/>
+	 * 
+	 * Output should look like this example:<br />
+	 * MZK01000000421-MZK50000000421000010
+	 * 
+	 * @param bibLibrary
+	 * @param admLibrary
+	 * @param docNumber
+	 * @param itemSequenceNumber
+	 * @return
+	 */
+	public static String buildAlephItemId(String bibLibrary, String admLibrary, String docNumber, String itemSequenceNumber) {
+		String itemId =	bibLibrary + docNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + admLibrary + docNumber + itemSequenceNumber;
+		return itemId;
 	}
 }

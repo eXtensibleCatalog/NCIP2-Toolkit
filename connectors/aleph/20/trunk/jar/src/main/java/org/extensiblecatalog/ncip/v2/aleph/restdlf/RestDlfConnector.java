@@ -131,6 +131,11 @@ public class RestDlfConnector extends AlephMediator {
 		return false;
 	}
 
+	private boolean validateLoanId(String alephLoanId) {
+		// Loan Id has the same length specifications as Record Id
+		return validateRecordId(alephLoanId);
+	}
+
 	/**
 	 * Looks up item with desired services in following order:
 	 * 
@@ -558,13 +563,10 @@ public class RestDlfConnector extends AlephMediator {
 
 	public AlephRenewItem renewItem(RenewItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 
-		String alephItemId = initData.getItemId().getItemIdentifierValue();
+		String alephLoanId = initData.getItemId().getItemIdentifierValue();
 
-		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
-		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
-
-		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
-			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
+		if (!validateLoanId(alephLoanId)) {
+			throw new AlephException("Loan Id is accepted only in strict format with strict length. e.g. MZK50004929137");
 		}
 
 		AlephRenewItem renewItem = new AlephRenewItem();
@@ -573,40 +575,53 @@ public class RestDlfConnector extends AlephMediator {
 
 		URL loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement).toURL();
 
-		// we need to find specific loan (e.g. <loan renew="Y" href="http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans/MZK50004938631"/>)
-		// cut off item sequence number
-		itemId = itemId.substring(0, itemId.length() - AlephConstants.ITEM_SEQ_NUMBER_LENGTH);
-
-		AlephLoanHandler loanHandler = new AlephLoanHandler(itemId, renewItem);
+		AlephLoanHandler loanHandler = new AlephLoanHandler(alephLoanId, renewItem);
 
 		InputSource streamSource = new InputSource(loansUrl.openStream());
 
 		parser.parse(streamSource, loanHandler);
 
 		if (loanHandler.loanWasFound() && loanHandler.isRenewable()) {
-						
+
 			URL loanLink = new URL(loanHandler.getLoanLink());
-			
+
 			streamSource = new InputSource(loanLink.openStream());
-			
+
 			loanHandler.setParsingLoans();
 			parser.parse(streamSource, loanHandler);
-			
-			Version1ItemUseRestrictionType;
-			/*
-			responseData.setUserId(initData.getUserId());
-			responseData.setItemId(initData.getItemId());
-			responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
-			responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
-			responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
-			responseData.setDateDue(renewItem.getDateDue());
-			responseData.setDateForReturn(renewItem.getDateForReturn());
-			responseData.setPending(renewItem.getPending());
-			responseData.setRenewalCount(renewItem.getRenewalCount());
-			responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
-			responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
-			*/
-			
+			// FIXME: this parser parses output of GET html request .. which just shows desired loan description
+			// we want to PUT XML request for renewal and parse response. After that we can parse loan and verify its properties
+
+			boolean nameInformationDesired = initData.getNameInformationDesired();
+			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+			boolean userIdDesired = initData.getUserIdDesired();
+			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+
+			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
+				LookupUserInitiationData userInitData = new LookupUserInitiationData();
+				userInitData.setNameInformationDesired(nameInformationDesired);
+				userInitData.setUserAddressInformationDesired(userAddressInformationDesired);
+				userInitData.setUserIdDesired(userIdDesired);
+				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
+				userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
+
+				AlephUser user = lookupUser(patronId, userInitData);
+				renewItem.setUserOptionalFields(user.getUserOptionalFields());
+			}
+
+			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+			boolean getCircStatus = initData.getCirculationStatusDesired();
+			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
+			boolean getItemDescription = initData.getItemDescriptionDesired();
+
+			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
+				String alephItemId = AlephUtil.buildAlephItemId(bibLibrary, admLibrary, loanHandler.getDocNumber(), loanHandler.getItemSequenceNumber());
+
+				AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+				renewItem.setItemOptionalFields(item.getItemOptionalFields());
+			}
+
 		} else if (loanHandler.loanWasFound()) {
 			Problem problem = new Problem();
 			problem.setProblemType(new ProblemType("Loan is marked as not renewable."));
