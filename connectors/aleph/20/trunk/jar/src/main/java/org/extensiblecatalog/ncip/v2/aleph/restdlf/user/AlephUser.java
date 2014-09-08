@@ -1,5 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.service.*;
@@ -341,7 +342,20 @@ public class AlephUser implements Serializable {
 
 	public void setNameInformation(String nameInfo) {
 		PersonalNameInformation pni = new PersonalNameInformation();
-		pni.setUnstructuredPersonalUserName(nameInfo);
+		StructuredPersonalUserName spun = new StructuredPersonalUserName();
+		String[] nameInfos = nameInfo.split(AlephConstants.UNSTRUCTURED_NAME_SEPERATOR);
+		if (nameInfos.length > 0) {
+			if (AlephConstants.FIRST_SURNAME) {
+				spun.setSurname(nameInfos[0].trim());
+				if (nameInfos.length > 1)
+					spun.setGivenName(nameInfos[1].trim());
+			} else {
+				spun.setGivenName(nameInfos[0].trim());
+				if (nameInfos.length > 1)
+					spun.setSurname(nameInfos[1].trim());
+			}
+		}
+		pni.setStructuredPersonalUserName(spun);
 		this.nameInfo.setPersonalNameInformation(pni);
 	}
 

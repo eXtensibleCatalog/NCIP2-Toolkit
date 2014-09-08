@@ -346,5 +346,8 @@ public class AlephConstants {
 	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
 	public static final String DEFAULT_AGENCY = "DefaultAgency";
 	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
+	public static final String UNSTRUCTURED_NAME_SEPERATOR = ",";
 	public static final String SEQUENCE_NUMBER_SEPERATOR = "\\."; // Be aware of this regex (dot is reserved character)
+	
+	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
 }
