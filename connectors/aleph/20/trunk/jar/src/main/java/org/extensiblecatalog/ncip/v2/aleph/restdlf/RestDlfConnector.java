@@ -317,7 +317,12 @@ public class RestDlfConnector extends AlephMediator {
 
 	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 
-		// FIXME: Allow request more items with one XML request
+		// Let requesting application know it is impossible to return response with multiple item ids, ergo it is not possible to accept more than one request at once
+		// Another problem is Aleph can't actually return one request Id for separate requests.
+		if (initData.getItemIds().size() > 1) {
+			throw new IOException("Aleph cannot process more requests at once, please supply these in a row.");
+		}
+		
 		String alephItemId = initData.getItemId(0).getItemIdentifierValue();
 
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
@@ -508,7 +513,6 @@ public class RestDlfConnector extends AlephMediator {
 
 		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement).toURL();
 
-		
 		AlephRequestHandler requestHandler = new AlephRequestHandler(itemId, requestItem);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
 		parser.parse(streamSource, requestHandler);
@@ -517,14 +521,14 @@ public class RestDlfConnector extends AlephMediator {
 
 			requestItem.setRequestType(initData.getRequestType());
 			requestItem.setRequestScopeType(Version1RequestScopeType.ITEM);
-			
+
 			URL requestLink = new URL(requestHandler.getRequestLink());
 
 			streamSource = new InputSource(requestLink.openStream());
 
 			requestHandler.setParsingRequests();
 			parser.parse(streamSource, requestHandler);
-			
+
 			boolean nameInformationDesired = initData.getNameInformationDesired();
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
 			boolean userIdDesired = initData.getUserIdDesired();
