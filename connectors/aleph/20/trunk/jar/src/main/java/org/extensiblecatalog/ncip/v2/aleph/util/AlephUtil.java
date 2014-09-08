@@ -66,28 +66,8 @@ public class AlephUtil {
 		}
 
 		if (alephItem.getMediumType() != null) {
-			String mediumTypeValue = alephItem.getMediumType();
-			MediumType mediumType = null;
-			// TODO: Create localized external settings
-			// Kniha = Czech localized name of book
-			// Vazan. ser. = of magazine
-			if (mediumTypeValue.equalsIgnoreCase("Kniha") || mediumTypeValue.equalsIgnoreCase("Mapa") || mediumTypeValue.equalsIgnoreCase("Grafika"))
-				mediumType = Version1MediumType.BOOK;
-			else if (mediumTypeValue.equalsIgnoreCase("Vazan. ser.") || mediumTypeValue.equalsIgnoreCase("Seriál"))
-				mediumType = Version1MediumType.MAGAZINE;
-			else if (mediumTypeValue.equalsIgnoreCase("Kompaktní disk")) {
-				mediumType = Version1MediumType.CD_ROM;
-			} else {
-				try {
-					Version1MediumType.loadAll();
-					mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeValue);
-				} catch (ServiceException e) {
-					e.printStackTrace();
-				}
-			}
-			if (mediumType != null) {
-				bibliographicDescription.setMediumType(mediumType);
-			}
+			MediumType mediumType = AlephUtil.detectMediumType(alephItem.getMediumType());
+			bibliographicDescription.setMediumType(mediumType);
 		}
 		if (alephItem.getPublisher() != null) {
 			bibliographicDescription.setPublisher(alephItem.getPublisher());
@@ -258,12 +238,34 @@ public class AlephUtil {
 			day = "0" + day;
 		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
 	}
-	
+
 	public static String parseRecordIdFromAlephItemId(String itemId) {
 		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
 	}
 
 	public static String parseItemIdFromAlephItemId(String itemId) {
 		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
+	}
+
+	public static MediumType detectMediumType(String mediumTypeParsed) {
+		MediumType mediumType = null;
+		// TODO: Create localized external settings
+		// Kniha = Czech localized name of book
+		// Vazan. ser. = of magazine
+		if (mediumTypeParsed.equalsIgnoreCase("Kniha") || mediumTypeParsed.equalsIgnoreCase("Mapa") || mediumTypeParsed.equalsIgnoreCase("Grafika"))
+			mediumType = Version1MediumType.BOOK;
+		else if (mediumTypeParsed.equalsIgnoreCase("Vazan. ser.") || mediumTypeParsed.equalsIgnoreCase("Seriál"))
+			mediumType = Version1MediumType.MAGAZINE;
+		else if (mediumTypeParsed.equalsIgnoreCase("Kompaktní disk")) {
+			mediumType = Version1MediumType.CD_ROM;
+		} else {
+			try {
+				Version1MediumType.loadAll();
+				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeParsed);
+			} catch (ServiceException e) {
+				e.printStackTrace();
+			}
+		}
+		return mediumType;
 	}
 }

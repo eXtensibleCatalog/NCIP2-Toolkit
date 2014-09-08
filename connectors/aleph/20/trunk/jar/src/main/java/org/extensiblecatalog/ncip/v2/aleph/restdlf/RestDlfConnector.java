@@ -287,7 +287,7 @@ public class RestDlfConnector extends AlephMediator {
 				if (requestsUrl != null) {
 					streamSource = new InputSource(requestsUrl.openStream());
 					itemHandler.setRequestsHandlingNow();
-					parser.parse(streamSource, itemHandler);// FIXME: implement parsing requests
+					parser.parse(streamSource, itemHandler);
 					alephUser.setRequestedItems(itemHandler.getListOfRequestedItems());
 				}
 			}

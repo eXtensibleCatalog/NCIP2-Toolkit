@@ -234,8 +234,6 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (holdRequestsHandling) { // Handling requests XML output
 				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 					currentRequestedItem = new RequestedItem();
-					// FIXME: currentRequestedItem.setPickupDate(); NOT IMPLEMETED YET!
-					// TODO: detect which node is pickupDate ( http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full )
 					if (requestedItems == null)
 						requestedItems = new ArrayList<RequestedItem>();
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE)) {
@@ -487,7 +485,9 @@ public class AlephItemHandler extends DefaultHandler {
 			}
 		} else {
 			if (materialReached) {
-				// FIXME: setMediumType here!
+				String mediumTypeParsed = new String(ch, start, length);
+				MediumType mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
+				bibliographicDescription.setMediumType(mediumType);
 				materialReached = false;
 			} else if (authorReached) {
 				bibliographicDescription.setAuthor(new String(ch, start, length));

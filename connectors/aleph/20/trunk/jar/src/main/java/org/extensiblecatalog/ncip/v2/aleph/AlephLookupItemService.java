@@ -168,8 +168,7 @@ public class AlephLookupItemService implements LookupItemService {
 
 			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
 
-			if (initData.getBibliographicDescriptionDesired()) {
-				// FIXME: Merge duplicate code from AlephUtil, this & AlephLookupItemSetService
+			if (initData.getBibliographicDescriptionDesired()) { 
 				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 			}
 
