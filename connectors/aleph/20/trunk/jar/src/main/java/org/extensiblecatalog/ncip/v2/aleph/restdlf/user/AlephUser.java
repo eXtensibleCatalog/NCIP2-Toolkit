@@ -114,17 +114,20 @@ public class AlephUser implements Serializable {
 	 */
 	public void setEmailAddress(String emailAddress) {
 
-		UserAddressInformation uai = new UserAddressInformation();
-		ElectronicAddress electronicAddress = new ElectronicAddress();
+		String[] emailAddresses = emailAddress.split(AlephConstants.UNSTRUCTURED_ADDRESS_SEPARATOR);
+		for (String email : emailAddresses) {
+			UserAddressInformation uai = new UserAddressInformation();
+			ElectronicAddress electronicAddress = new ElectronicAddress();
 
-		electronicAddress.setElectronicAddressData(emailAddress);
-		electronicAddress.setElectronicAddressType(Version1ElectronicAddressType.MAILSERVER);
+			electronicAddress.setElectronicAddressData(email);
+			electronicAddress.setElectronicAddressType(Version1ElectronicAddressType.MAILSERVER);
 
-		uai.setElectronicAddress(electronicAddress);
+			uai.setElectronicAddress(electronicAddress);
 
-		uai.setUserAddressRoleType(Version1UserAddressRoleType.NOTICE);
+			uai.setUserAddressRoleType(Version1UserAddressRoleType.NOTICE);
 
-		userAddrInfos.add(uai);
+			userAddrInfos.add(uai);
+		}
 
 	}
 
