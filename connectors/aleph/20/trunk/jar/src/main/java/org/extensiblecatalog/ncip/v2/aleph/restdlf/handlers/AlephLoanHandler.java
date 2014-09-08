@@ -29,18 +29,6 @@ public class AlephLoanHandler extends DefaultHandler {
 	private String loanLink;
 	private boolean parsingLoan = false;
 	private boolean loanFound = false;
-	private boolean requestNumberReached = false;
-	private boolean hourPlacedReached = false;
-	private boolean earliestDateNeededReached = false;
-	private boolean needBeforeDateReached = false;
-	private boolean datePlacedReached = false;
-	private boolean pickupLocationReached = false;
-	private boolean pickupExpiryDateReached = false;
-	private boolean requestIdReached = false;
-	private boolean requestTypeReached = false;
-	private boolean pickupDateReached = false;
-	private boolean statusReached = false;
-	private boolean holdQueueLengthReached = false;
 	private boolean renewable;
 
 	public AlephLoanHandler(String itemIdToLookFor, AlephRenewItem renewItem) {

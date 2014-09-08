@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Properties;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephLoanHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.*;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
+import org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements.MandatedAction;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.InputSource;
@@ -311,7 +313,7 @@ public class RestDlfConnector extends AlephMediator {
 		if (initData.getItemIds().size() > 1) {
 			throw new IOException("Aleph cannot process more requests at once, please supply these in a row.");
 		}
-		
+
 		String alephItemId = initData.getItemId(0).getItemIdentifierValue();
 
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
@@ -554,9 +556,8 @@ public class RestDlfConnector extends AlephMediator {
 		return requestItem;
 	}
 
-
 	public AlephRenewItem renewItem(RenewItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
-		
+
 		String alephItemId = initData.getItemId().getItemIdentifierValue();
 
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
@@ -569,25 +570,52 @@ public class RestDlfConnector extends AlephMediator {
 		AlephRenewItem renewItem = new AlephRenewItem();
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
-		
+
 		URL loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement).toURL();
-		
-		
-		
-		/*
-		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId());
-		responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
-		responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
-		responseData.setDateDue(renewItem.getDateDue());
-		responseData.setDateForReturn(renewItem.getDateForReturn());
-		responseData.setPending(renewItem.getPending());
-		responseData.setRenewalCount(renewItem.getRenewalCount());
-		responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
-		responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
-		*/
-		
+
+		// we need to find specific loan (e.g. <loan renew="Y" href="http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans/MZK50004938631"/>)
+		// cut off item sequence number
+		itemId = itemId.substring(0, itemId.length() - AlephConstants.ITEM_SEQ_NUMBER_LENGTH);
+
+		AlephLoanHandler loanHandler = new AlephLoanHandler(itemId, renewItem);
+
+		InputSource streamSource = new InputSource(loansUrl.openStream());
+
+		parser.parse(streamSource, loanHandler);
+
+		if (loanHandler.loanWasFound() && loanHandler.isRenewable()) {
+						
+			URL loanLink = new URL(loanHandler.getLoanLink());
+			
+			streamSource = new InputSource(loanLink.openStream());
+			
+			loanHandler.setParsingLoans();
+			parser.parse(streamSource, loanHandler);
+			
+			Version1ItemUseRestrictionType;
+			/*
+			responseData.setUserId(initData.getUserId());
+			responseData.setItemId(initData.getItemId());
+			responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
+			responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
+			responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
+			responseData.setDateDue(renewItem.getDateDue());
+			responseData.setDateForReturn(renewItem.getDateForReturn());
+			responseData.setPending(renewItem.getPending());
+			responseData.setRenewalCount(renewItem.getRenewalCount());
+			responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
+			responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
+			*/
+			
+		} else if (loanHandler.loanWasFound()) {
+			Problem problem = new Problem();
+			problem.setProblemType(new ProblemType("Loan is marked as not renewable."));
+			renewItem.setProblem(problem);
+		} else {
+			Problem problem = new Problem();
+			problem.setProblemType(new ProblemType("Loan does not exist."));
+			renewItem.setProblem(problem);
+		}
 		return renewItem;
 	}
 }
