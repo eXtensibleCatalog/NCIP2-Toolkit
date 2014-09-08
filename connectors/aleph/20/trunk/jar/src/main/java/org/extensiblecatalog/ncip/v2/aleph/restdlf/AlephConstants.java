@@ -110,6 +110,7 @@ public class AlephConstants {
 	public static final String HREF_NODE_ATTR = "href";
 	public static final String TYPE_NODE_ATTR = "type";
 	public static final String DELETE_NODE_ATTR = "delete";
+	public static final String RENEW_NODE_ATTR = "renew";
 	public static final String AUTHOR_NODE_ID = "100";
 	public static final String ISBN_NODE_ID = "020";
 	public static final String TITLE_NODE_ID = "245";

@@ -11,26 +11,15 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestHandler;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephUserHandler;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.*;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.common.*;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
-import org.extensiblecatalog.ncip.v2.service.Problem;
-import org.extensiblecatalog.ncip.v2.service.ProblemType;
-import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
-import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.ShippingInformation;
-import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -565,4 +554,40 @@ public class RestDlfConnector extends AlephMediator {
 		return requestItem;
 	}
 
+
+	public AlephRenewItem renewItem(RenewItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+		
+		String alephItemId = initData.getItemId().getItemIdentifierValue();
+
+		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
+		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
+
+		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
+			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
+		}
+
+		AlephRenewItem renewItem = new AlephRenewItem();
+
+		String patronId = initData.getUserId().getUserIdentifierValue();
+		
+		URL loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement).toURL();
+		
+		
+		
+		/*
+		responseData.setUserId(initData.getUserId());
+		responseData.setItemId(initData.getItemId());
+		responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
+		responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
+		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
+		responseData.setDateDue(renewItem.getDateDue());
+		responseData.setDateForReturn(renewItem.getDateForReturn());
+		responseData.setPending(renewItem.getPending());
+		responseData.setRenewalCount(renewItem.getRenewalCount());
+		responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
+		responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
+		*/
+		
+		return renewItem;
+	}
 }

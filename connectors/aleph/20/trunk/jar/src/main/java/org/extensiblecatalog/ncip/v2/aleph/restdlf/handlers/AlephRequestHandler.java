@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf;
+package org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.*;
@@ -30,7 +31,6 @@ public class AlephRequestHandler extends DefaultHandler {
 	private boolean datePlacedReached = false;
 	private boolean pickupLocationReached = false;
 	private boolean pickupExpiryDateReached = false;
-	private boolean requestIdReached = false;
 	private boolean requestTypeReached = false;
 	private boolean pickupDateReached = false;
 	private boolean statusReached = false;
@@ -87,8 +87,6 @@ public class AlephRequestHandler extends DefaultHandler {
 				pickupLocationReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE)) {
 				pickupExpiryDateReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
-				requestIdReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE)) {
 				requestTypeReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
@@ -127,8 +125,6 @@ public class AlephRequestHandler extends DefaultHandler {
 				pickupLocationReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && pickupExpiryDateReached) {
 				pickupExpiryDateReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestIdReached) {
-				requestIdReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE) && requestTypeReached) {
 				requestTypeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
@@ -237,11 +233,6 @@ public class AlephRequestHandler extends DefaultHandler {
 					requestItem.setPickupExpiryDate(pickupExpiryDate);
 				}
 				pickupExpiryDateReached = false;
-			} else if (requestIdReached) {
-				RequestId requestId = new RequestId();
-				requestId.setRequestIdentifierValue(new String(ch, start, length));
-				requestItem.setRequestId(requestId);
-				requestIdReached = false;
 			} else if (requestTypeReached) {
 				RequestType requestType = null;
 				String parsedValue = new String(ch, start, length);
