@@ -219,11 +219,11 @@ public class AlephUtil {
 	}
 
 	public static String parseRecordIdFromAlephItemId(String itemId) {
-		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[0];
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPARATOR)[0];
 	}
 
 	public static String parseItemIdFromAlephItemId(String itemId) {
-		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPERATOR)[1];
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPARATOR)[1];
 	}
 
 	public static MediumType detectMediumType(String mediumTypeParsed) {

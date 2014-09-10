@@ -615,7 +615,7 @@ public class RestDlfConnector extends AlephMediator {
 			parser.parse(streamSource, loanHandler);
 
 			if (loanHandler.actionSucceeded()) {
-				
+
 				streamSource = new InputSource(loanLink.openStream());
 
 				loanHandler.setParsingLoans();

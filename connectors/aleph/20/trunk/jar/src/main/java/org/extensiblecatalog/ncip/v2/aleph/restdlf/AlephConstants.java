@@ -15,7 +15,7 @@ public class AlephConstants {
 	public static final String NOTE_NODE = "note";
 	public static final String STATUS_NODE = "status";
 	public static final String TOTAL_NODE = "total";
-	
+
 	public static final SimpleDateFormat ALEPH_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
 	public static final SimpleDateFormat ALEPH_HOUR_FORMATTER = new SimpleDateFormat("HHmm");
 
@@ -39,14 +39,14 @@ public class AlephConstants {
 	public static final String Z37_HOLD_DATE_NODE = "z37-hold-date";
 	public static final String Z37_OPEN_DATE_NODE = "z37-open-date";
 	public static final String Z37_OPEN_HOUR_NODE = "z37-open-hour";
-	public static final String Z37_END_REQUEST_DATE_NODE = "z37-end-request-date"; 
+	public static final String Z37_END_REQUEST_DATE_NODE = "z37-end-request-date";
 	public static final String Z37_HOLD_SEQUENCE_NODE = "z37-hold-sequence";
 	public static final String Z37_PICKUP_LOCATION_NODE = "z37-pickup-location";
 	public static final String Z37_END_HOLD_DATE_NODE = "z37-end-hold-date";
 	public static final String Z37_RECALL_TYPE_NODE = "z37-recall-type";
 	public static final String Z37_PRIORITY_NODE = "z37-priority";
 	public static final String Z37_STATUS_NODE = "z37-status";
-	
+
 	public static final String Z36_NODE = "z36";
 	public static final String Z36_DOC_NUMBER_NODE = "z36-doc-number";
 	public static final String Z36_ITEM_SEQUENCE_NODE = "z36-item-sequence";
@@ -130,7 +130,7 @@ public class AlephConstants {
 	public static final String BIB_ID_NODE_ATTR_VALUE = "b";
 	// get alephitem data for a fine
 	public static final String FINE_ITEM_NODE = "fine";
-	
+
 	public static final String PATRON_BLOCK_NODE = "patron-block";
 	public static final String CONSORTIAL_BLOCK_NODE = "consortial-block";
 	// loan item nodes
@@ -216,7 +216,7 @@ public class AlephConstants {
 	public static final int ITEM_ID_UNIQUE_PART_LENGTH = 6;
 	public static final int LIBRARY_PARAM_LENGTH = 5;
 	public static final int POSTAL_CODE_LENGTH = 6;
-	 
+
 	public static final String HOLD_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String RENEW_DUE_DATE_FORMAT = "yyyyMMdd";
 	public static final String LOAN_DUE_DATE_FORMAT = "MM/dd/yyyy";
@@ -366,10 +366,7 @@ public class AlephConstants {
 	public static final String UNSTRUCTURED_NAME_SEPARATOR = ", ";
 	public static final String UNSTRUCTURED_ADDRESS_SEPARATOR = ", ";
 	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
-	
-	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
-	
 
-	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
-	
+	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
+
 }
