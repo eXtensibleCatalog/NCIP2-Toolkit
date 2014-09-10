@@ -28,12 +28,19 @@ public class AlephLoanHandler extends DefaultHandler {
 	private String itemIdToLookFor;
 	private String loanLink;
 	private String docNumber;
+	private String status;
+	private String replyText;
 	private String itemSequenceNumber;
 	private boolean parsingLoan = false;
 	private boolean loanFound = false;
 	private boolean renewable;
 	private boolean docNoReached;
 	private boolean itemSeqReached;
+	private boolean returnedOkResponseCode;
+	private boolean replyCodeReached;
+	private boolean replyTextReached;
+	private boolean statusReached;
+	private boolean newDueDateReached;
 
 	public AlephLoanHandler(String itemIdToLookFor, AlephRenewItem renewItem) {
 		this.itemIdToLookFor = itemIdToLookFor;
@@ -49,15 +56,11 @@ public class AlephLoanHandler extends DefaultHandler {
 	}
 
 	/*
-	responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
-	responseData.setDateDue(renewItem.getDateDue());
-	responseData.setDateForReturn(renewItem.getDateForReturn());
-	responseData.setPending(renewItem.getPending());
-	responseData.setRenewalCount(renewItem.getRenewalCount());
-	responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
-	responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
-	*/
-	
+	 * responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values responseData.setDateDue(renewItem.getDateDue());
+	 * responseData.setDateForReturn(renewItem.getDateForReturn()); responseData.setPending(renewItem.getPending()); responseData.setRenewalCount(renewItem.getRenewalCount());
+	 * responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount()); responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
+	 */
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (parsingLoan) {
@@ -69,7 +72,7 @@ public class AlephLoanHandler extends DefaultHandler {
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
-				if (link.indexOf(itemIdToLookFor) > -1) {
+				if (link != null && link.indexOf(itemIdToLookFor) > -1) {
 					loanLink = link;
 					loanFound = true;
 					String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
@@ -78,6 +81,14 @@ public class AlephLoanHandler extends DefaultHandler {
 					} else
 						renewable = false;
 				}
+			} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
+				replyCodeReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
+				replyTextReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
+				statusReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.NEW_DUE_DATE_NODE)) {
+				newDueDateReached = true;
 			}
 		}
 
@@ -90,6 +101,16 @@ public class AlephLoanHandler extends DefaultHandler {
 				docNoReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSeqReached) {
 				itemSeqReached = false;
+			}
+		} else {
+			if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE) && replyCodeReached) {
+				replyCodeReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE) && replyTextReached) {
+				replyTextReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
+				statusReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.NEW_DUE_DATE_NODE) && newDueDateReached) {
+				newDueDateReached = false;
 			}
 		}
 	}
@@ -104,13 +125,34 @@ public class AlephLoanHandler extends DefaultHandler {
 				itemSequenceNumber = new String(ch, start, length);
 				itemSeqReached = false;
 			}
+		} else {
+			if (replyCodeReached) {
+				String replyCodeParsed = new String(ch, start, length);
+				if (replyCodeParsed.equalsIgnoreCase(AlephConstants.SUCCESS_REPLY_CODE)) {
+					returnedOkResponseCode = true;
+				} else
+					returnedOkResponseCode = false;
+			} else if (replyTextReached) {
+				replyText = new String(ch, start, length);
+				replyTextReached = false;
+			} else if (statusReached) {
+				status = new String(ch, start, length);
+				statusReached = false;
+			} else if (newDueDateReached) {
+				String newDueDateParsed = new String(ch, start, length);
+				GregorianCalendar newDueDate = AlephUtil.parseGregorianCalendarFromAlephDate(newDueDateParsed);
+
+				renewItem.setDateDue(newDueDate);
+
+				newDueDateReached = false;
+			}
 		}
 	}
-	
+
 	public String getDocNumber() {
 		return docNumber;
 	}
-	
+
 	public String getItemSequenceNumber() {
 		return itemSequenceNumber;
 	}
@@ -122,8 +164,20 @@ public class AlephLoanHandler extends DefaultHandler {
 	public boolean loanWasFound() {
 		return loanFound;
 	}
-	
+
 	public boolean isRenewable() {
 		return renewable;
+	}
+
+	public boolean actionSucceeded() {
+		return returnedOkResponseCode;
+	}
+
+	public String getReplyText() {
+		return replyText;
+	}
+
+	public String getStatusText() {
+		return status;
 	}
 }

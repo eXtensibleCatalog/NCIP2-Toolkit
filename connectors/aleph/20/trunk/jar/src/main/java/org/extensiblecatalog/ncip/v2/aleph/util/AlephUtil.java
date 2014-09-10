@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -16,6 +17,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 public class AlephUtil {
 	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
@@ -259,19 +261,19 @@ public class AlephUtil {
 			// In this case address = "Vysokoškolské koleje VUT - Kolejní 2, A05/237, 612 00 Brno";
 			structuredAddress.setStreet(addressParts[0]);
 			structuredAddress.setPostOfficeBox(addressParts[1]);
-			
+
 			String postalCode = addressParts[2].substring(0, AlephConstants.POSTAL_CODE_LENGTH);
 			structuredAddress.setPostalCode(postalCode);
-			
+
 			String city = addressParts[2].substring(AlephConstants.POSTAL_CODE_LENGTH);
 			structuredAddress.setLocality(city.trim());
 		} else if (addressPartsLength > 1) {
 			// F.e. Trvalá ulice 123, 12345 Trvalé
 			structuredAddress.setStreet(addressParts[0]);
-			
+
 			String postalCode = addressParts[1].substring(0, AlephConstants.POSTAL_CODE_LENGTH);
 			structuredAddress.setPostalCode(postalCode);
-			
+
 			String city = addressParts[1].substring(AlephConstants.POSTAL_CODE_LENGTH);
 			structuredAddress.setLocality(city.trim());
 		} else
@@ -285,7 +287,8 @@ public class AlephUtil {
 
 	/**
 	 * Pattern for building unique item Id from document number & item sequence item is:<br/>
-	 * bibLibrary + docNumber + "-" + admLibrary + docNumber + itemSequenceNumber<br/><br/>
+	 * bibLibrary + docNumber + "-" + admLibrary + docNumber + itemSequenceNumber<br/>
+	 * <br/>
 	 * 
 	 * Output should look like this example:<br />
 	 * MZK01000000421-MZK50000000421000010
@@ -297,15 +300,40 @@ public class AlephUtil {
 	 * @return
 	 */
 	public static String buildAlephItemId(String bibLibrary, String admLibrary, String docNumber, String itemSequenceNumber) {
-		String itemId =	bibLibrary + docNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + admLibrary + docNumber + itemSequenceNumber;
+		String itemId = bibLibrary + docNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + admLibrary + docNumber + itemSequenceNumber;
 		return itemId;
 	}
 
 	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {
 		BlockOrTrap blockOrTrap = new BlockOrTrap();
-		
+
 		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", parsedBlock));
-		
+
 		return blockOrTrap;
+	}
+
+	/**
+	 * Tries to convert date string parsed from aleph response to GregorianCalendar format.<br />
+	 * Throws SAXException if not successful.
+	 * 
+	 * @param alephDateParsed
+	 * @return
+	 * @throws SAXException
+	 */
+	public static GregorianCalendar parseGregorianCalendarFromAlephDate(String alephDateParsed) throws SAXException {
+		if (!alephDateParsed.equalsIgnoreCase("00000000")) {
+			GregorianCalendar loanDate = new GregorianCalendar(TimeZone.getDefault());
+
+			try {
+				loanDate.setTime(AlephConstants.ALEPH_DATE_FORMATTER.parse(alephDateParsed));
+				if (AlephUtil.inDaylightTime())
+					loanDate.add(Calendar.HOUR_OF_DAY, 2);
+			} catch (ParseException e) {
+				throw new SAXException(e);
+			}
+
+			return loanDate;
+		} else
+			return null;
 	}
 }

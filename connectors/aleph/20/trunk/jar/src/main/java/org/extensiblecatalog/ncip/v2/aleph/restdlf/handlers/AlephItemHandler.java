@@ -33,8 +33,6 @@ import org.xml.sax.helpers.DefaultHandler;
 public class AlephItemHandler extends DefaultHandler {
 	private List<AlephItem> listOfItems;
 	private AlephItem currentAlephItem;
-	private SimpleDateFormat alephDateFormatter;
-	private SimpleDateFormat alephHourFormatter;
 
 	// Required to build unique item id
 	private String docNumber;
@@ -150,8 +148,6 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (requireAtLeastOneService) {
 			throw new AlephException("No service desired. Please supply at least one service you wish to use.");
 		}
-		alephDateFormatter = new SimpleDateFormat("yyyyMMdd");
-		alephHourFormatter = new SimpleDateFormat("HHmm");
 		localTimeZone = TimeZone.getTimeZone("ECT");
 	}
 
@@ -522,53 +518,26 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (loansHandling) {
 				if (dueDateReached) {
 					String dateDueParsed = new String(ch, start, length);
-					if (!dateDueParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar dateDue = new GregorianCalendar(localTimeZone);
+					GregorianCalendar dateDue = AlephUtil.parseGregorianCalendarFromAlephDate(dateDueParsed);
 
-						try {
-							dateDue.setTime(alephDateFormatter.parse(dateDueParsed));
-							if (AlephUtil.inDaylightTime())
-								dateDue.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							throw new SAXException(e);
-						}
+					currentLoanedItem.setDateDue(dateDue);
 
-						currentLoanedItem.setDateDue(dateDue);
-					}
 					dueDateReached = false;
 				} else if (loanDateReached) {
 					String loanDateParsed = new String(ch, start, length);
-					if (!loanDateParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar loanDate = new GregorianCalendar(localTimeZone);
+					GregorianCalendar loanDate = AlephUtil.parseGregorianCalendarFromAlephDate(loanDateParsed);
 
-						try {
-							loanDate.setTime(alephDateFormatter.parse(loanDateParsed));
-							if (AlephUtil.inDaylightTime())
-								loanDate.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							throw new SAXException(e);
-						}
+					currentLoanedItem.setDateCheckedOut(loanDate);
 
-						currentLoanedItem.setDateCheckedOut(loanDate);
-					}
 					loanDateReached = false;
 				}
 			} else if (holdRequestsHandling) {
 				if (datePlacedReached) {
 					String datePlacedParsed = new String(ch, start, length);
-					if (!datePlacedParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar datePlaced = new GregorianCalendar(localTimeZone);
+					GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(datePlacedParsed);
 
-						try {
-							datePlaced.setTime(alephDateFormatter.parse(datePlacedParsed));
-							if (AlephUtil.inDaylightTime())
-								datePlaced.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+					currentLoanedItem.setDateCheckedOut(datePlaced);
 
-						currentRequestedItem.setDatePlaced(datePlaced);
-					}
 					datePlacedReached = false;
 				} else if (hourPlacedReached) {
 					String hourPlacedParsed = new String(ch, start, length);
@@ -577,7 +546,7 @@ public class AlephItemHandler extends DefaultHandler {
 						GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
 
 						try {
-							hourPlaced.setTime(alephHourFormatter.parse(hourPlacedParsed));
+							hourPlaced.setTime(AlephConstants.ALEPH_HOUR_FORMATTER.parse(hourPlacedParsed));
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
@@ -590,35 +559,17 @@ public class AlephItemHandler extends DefaultHandler {
 					hourPlacedReached = false;
 				} else if (earliestDateNeededReached) {
 					String earliestDateNeededParsed = new String(ch, start, length);
-					if (!earliestDateNeededParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar earliestDateNeeded = new GregorianCalendar(localTimeZone);
+					GregorianCalendar earliestDateNeeded = AlephUtil.parseGregorianCalendarFromAlephDate(earliestDateNeededParsed);
 
-						try {
-							earliestDateNeeded.setTime(alephDateFormatter.parse(earliestDateNeededParsed));
-							if (AlephUtil.inDaylightTime())
-								earliestDateNeeded.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+					currentLoanedItem.setDateCheckedOut(earliestDateNeeded);
 
-						currentRequestedItem.setEarliestDateNeeded(earliestDateNeeded);
-					}
 					earliestDateNeededReached = false;
 				} else if (needBeforeDateReached) {
 					String needBeforeDateParsed = new String(ch, start, length);
-					if (!needBeforeDateParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar needBeforeDate = new GregorianCalendar(localTimeZone);
+					GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(needBeforeDateParsed);
 
-						try {
-							needBeforeDate.setTime(alephDateFormatter.parse(needBeforeDateParsed));
-							if (AlephUtil.inDaylightTime())
-								needBeforeDate.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+					currentLoanedItem.setDateCheckedOut(needBeforeDate);
 
-						currentRequestedItem.setNeedBeforeDate(needBeforeDate);
-					}
 					needBeforeDateReached = false;
 				} else if (holdQueueLengthReached) {
 					currentRequestedItem.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
@@ -629,19 +580,10 @@ public class AlephItemHandler extends DefaultHandler {
 					pickupLocationReached = false;
 				} else if (pickupExpiryDateReached) {
 					String pickupExpiryDateParsed = new String(ch, start, length);
-					if (!pickupExpiryDateParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar pickupExpiryDate = new GregorianCalendar(localTimeZone);
+					GregorianCalendar pickupExpiryDate = AlephUtil.parseGregorianCalendarFromAlephDate(pickupExpiryDateParsed);
 
-						try {
-							pickupExpiryDate.setTime(alephDateFormatter.parse(pickupExpiryDateParsed));
-							if (AlephUtil.inDaylightTime())
-								pickupExpiryDate.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+					currentLoanedItem.setDateCheckedOut(pickupExpiryDate);
 
-						currentRequestedItem.setPickupExpiryDate(pickupExpiryDate);
-					}
 					pickupExpiryDateReached = false;
 				} else if (reminderLevelReached) {
 					currentRequestedItem.setReminderLevel(new BigDecimal(new String(ch, start, length)));
@@ -662,19 +604,10 @@ public class AlephItemHandler extends DefaultHandler {
 					requestTypeReached = false;
 				} else if (pickupDateReached) {
 					String pickupDateParsed = new String(ch, start, length);
-					if (!pickupDateParsed.equalsIgnoreCase("00000000")) {
-						GregorianCalendar pickupDate = new GregorianCalendar(localTimeZone);
+					GregorianCalendar pickupDate = AlephUtil.parseGregorianCalendarFromAlephDate(pickupDateParsed);
 
-						try {
-							pickupDate.setTime(alephDateFormatter.parse(pickupDateParsed));
-							if (AlephUtil.inDaylightTime())
-								pickupDate.add(Calendar.HOUR_OF_DAY, 2);
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+					currentLoanedItem.setDateCheckedOut(pickupDate);
 
-						currentRequestedItem.setPickupDate(pickupDate);
-					}
 					pickupDateReached = false;
 				} else if (statusReached) {
 					String parsedStatus = new String(ch, start, length);

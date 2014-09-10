@@ -598,43 +598,64 @@ public class RestDlfConnector extends AlephMediator {
 
 			URL loanLink = new URL(loanHandler.getLoanLink());
 
-			streamSource = new InputSource(loanLink.openStream());
+			String desiredDueDate = AlephUtil.convertToAlephDate(initData.getDesiredDateDue());
 
-			loanHandler.setParsingLoans();
+			String XMLRequest = "<z36-due-date>" + desiredDueDate + "</z36-due-date>";
+
+			HttpURLConnection httpCon = (HttpURLConnection) loanLink.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("POST");
+
+			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
+			outWriter.write(XMLRequest);
+			outWriter.close();
+
+			streamSource = new InputSource(httpCon.getInputStream());
+
 			parser.parse(streamSource, loanHandler);
-			// FIXME: this parser parses output of GET html request .. which just shows desired loan description
-			// we want to PUT XML request for renewal and parse response. After that we can parse loan and verify its properties
 
-			boolean nameInformationDesired = initData.getNameInformationDesired();
-			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
-			boolean userIdDesired = initData.getUserIdDesired();
-			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
-			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+			if (loanHandler.actionSucceeded()) {
+				
+				streamSource = new InputSource(loanLink.openStream());
 
-			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
-				LookupUserInitiationData userInitData = new LookupUserInitiationData();
-				userInitData.setNameInformationDesired(nameInformationDesired);
-				userInitData.setUserAddressInformationDesired(userAddressInformationDesired);
-				userInitData.setUserIdDesired(userIdDesired);
-				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
-				userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
+				loanHandler.setParsingLoans();
+				parser.parse(streamSource, loanHandler);
 
-				AlephUser user = lookupUser(patronId, userInitData);
-				renewItem.setUserOptionalFields(user.getUserOptionalFields());
+				boolean nameInformationDesired = initData.getNameInformationDesired();
+				boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+				boolean userIdDesired = initData.getUserIdDesired();
+				boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+				boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+
+				if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
+					LookupUserInitiationData userInitData = new LookupUserInitiationData();
+					userInitData.setNameInformationDesired(nameInformationDesired);
+					userInitData.setUserAddressInformationDesired(userAddressInformationDesired);
+					userInitData.setUserIdDesired(userIdDesired);
+					userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
+					userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
+
+					AlephUser user = lookupUser(patronId, userInitData);
+					renewItem.setUserOptionalFields(user.getUserOptionalFields());
+				}
+
+				boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+				boolean getCircStatus = initData.getCirculationStatusDesired();
+				boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
+				boolean getItemDescription = initData.getItemDescriptionDesired();
+
+				if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
+					String alephItemId = AlephUtil.buildAlephItemId(bibLibrary, admLibrary, loanHandler.getDocNumber(), loanHandler.getItemSequenceNumber());
+
+					AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+					renewItem.setItemOptionalFields(item.getItemOptionalFields());
+				}
+			} else {
+				Problem problem = new Problem();
+				problem.setProblemDetail(loanHandler.getStatusText());
+				problem.setProblemType(new ProblemType(loanHandler.getReplyText()));
+				renewItem.setProblem(problem);
 			}
-
-			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-			boolean getCircStatus = initData.getCirculationStatusDesired();
-			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-			boolean getItemDescription = initData.getItemDescriptionDesired();
-
-			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
-				String alephItemId = AlephUtil.buildAlephItemId(bibLibrary, admLibrary, loanHandler.getDocNumber(), loanHandler.getItemSequenceNumber());
-
-				AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
-				renewItem.setItemOptionalFields(item.getItemOptionalFields());
-			}
-
 		} else if (loanHandler.loanWasFound()) {
 			Problem problem = new Problem();
 			problem.setProblemType(new ProblemType("Loan is marked as not renewable."));

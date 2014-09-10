@@ -1,5 +1,7 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf;
 
+import java.text.SimpleDateFormat;
+
 //TODO: remove unused RESTful APIs constants (migrated from X-Service)
 public class AlephConstants {
 
@@ -13,6 +15,9 @@ public class AlephConstants {
 	public static final String NOTE_NODE = "note";
 	public static final String STATUS_NODE = "status";
 	public static final String TOTAL_NODE = "total";
+	
+	public static final SimpleDateFormat ALEPH_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
+	public static final SimpleDateFormat ALEPH_HOUR_FORMATTER = new SimpleDateFormat("HHmm");
 
 	public static final String DUE_DATE_NODE = "due-date";
 	public static final String Z30_BARCODE = "z30-barcode";
@@ -67,6 +72,7 @@ public class AlephConstants {
 	public static final String Z30_MATERIAL_NODE = "z30-material";
 	public static final String Z30_SUB_LIBRARY_NODE = "z30-sub-library";
 	public static final String Z30_OPEN_DATE_NODE = "z30-open-date";
+	public static final String NEW_DUE_DATE_NODE = "new-due-date";
 	// could be hold id, not sure?
 	public static final String Z30_HOLD_DOC_NUMBER_NODE = "z30-hol-doc-number";
 	// get fine data
@@ -187,6 +193,7 @@ public class AlephConstants {
 	public static final String UNAVAILABLE_STATUS = "unavailable";
 	public static final String AVAILABLE_STATUS = "available";
 	public static final String BLOCK_NONE_CODE = "00";
+	public static final String SUCCESS_REPLY_CODE = "0000";
 
 	public static final String YES = "Y";
 	public static final String NO = "N";
@@ -363,6 +370,6 @@ public class AlephConstants {
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
 	
 
-	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";	
+	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
 	
 }
