@@ -300,4 +300,12 @@ public class AlephUtil {
 		String itemId =	bibLibrary + docNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + admLibrary + docNumber + itemSequenceNumber;
 		return itemId;
 	}
+
+	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {
+		BlockOrTrap blockOrTrap = new BlockOrTrap();
+		
+		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", parsedBlock));
+		
+		return blockOrTrap;
+	}
 }

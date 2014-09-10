@@ -118,12 +118,18 @@ public class AlephLookupUserService implements LookupUserService {
 				responseData.setLoanedItems(loanedItems);
 			}
 			// User optional fields:
+			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 			boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
 			boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
 			UserOptionalFields uof = new UserOptionalFields();
+
+			if (blockOrTrapDesired) {
+				List<BlockOrTrap> blockOrTraps = alephUser.getBlockOrTraps();
+				uof.setBlockOrTraps(blockOrTraps);
+			}
 
 			if (nameInformationDesired) {
 				NameInformation nameInfo = alephUser.getNameInformation();

@@ -62,6 +62,7 @@ public class RestDlfConnector extends AlephMediator {
 	private String patronStatusElement;
 	private String registrationElement;
 	private String recordPathElement;
+	private String blocksElement;
 
 	public RestDlfConnector() throws ServiceException {
 
@@ -106,6 +107,7 @@ public class RestDlfConnector extends AlephMediator {
 		circActionsElement = AlephConstants.PARAM_CIRC_ACTIONS;
 		loansElement = AlephConstants.PARAM_LOANS;
 		holdsElement = AlephConstants.PARAM_HOLDS;
+		blocksElement = AlephConstants.PARAM_BLOCKS;
 		requestsElement = AlephConstants.PARAM_REQUESTS;
 		patronStatusElement = AlephConstants.PARAM_PATRON_STATUS;
 		registrationElement = AlephConstants.PARAM_REGISTRATION;
@@ -216,13 +218,14 @@ public class RestDlfConnector extends AlephMediator {
 	 */
 	public AlephUser lookupUser(String patronId, LookupUserInitiationData initData) throws AlephException, IOException, SAXException {
 
-		boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
-		boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
-		boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
-		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
-		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions -> Cash
-		boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
-		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronStatus/registration
+		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
+		boolean nameInformationDesired = initData.getNameInformationDesired();
+		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
+		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+		boolean userIdDesired = initData.getUserIdDesired();
+		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
 		boolean atLeastOneDesired = false;
 
@@ -256,6 +259,12 @@ public class RestDlfConnector extends AlephMediator {
 					.addRequest("view", "full").toURL();
 		}
 
+		URL blocksOrTrapsUrl = null;
+		if (blockOrTrapDesired) {
+			atLeastOneDesired = true;
+			blocksOrTrapsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, patronStatusElement, blocksElement).toURL();
+		}
+
 		URL registrationUrl = null;
 		if (userPrivilegeDesired) {
 			atLeastOneDesired = true;
@@ -265,8 +274,7 @@ public class RestDlfConnector extends AlephMediator {
 		if (atLeastOneDesired) {
 			AlephUser alephUser = new AlephUser();
 
-			AlephUserHandler userHandler = new AlephUserHandler(nameInformationDesired, userIdDesired, userAddressInformationDesired, userFiscalAccountDesired,
-					userPrivilegeDesired);
+			AlephUserHandler userHandler = new AlephUserHandler(initData);
 
 			InputSource streamSource;
 
@@ -292,17 +300,22 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (addressUrl != null) {
 				streamSource = new InputSource(addressUrl.openStream());
-				userHandler.setAddressHandlingNow();
+
 				parser.parse(streamSource, userHandler);
 			}
 			if (circulationsUrl != null) {
 				streamSource = new InputSource(circulationsUrl.openStream());
-				userHandler.setCirculationsHandlingNow();
+
+				parser.parse(streamSource, userHandler);
+			}
+			if (blocksOrTrapsUrl != null) {
+				streamSource = new InputSource(blocksOrTrapsUrl.openStream());
+
 				parser.parse(streamSource, userHandler);
 			}
 			if (registrationUrl != null) {
 				streamSource = new InputSource(registrationUrl.openStream());
-				userHandler.setRegistrationHandlingNow();
+
 				parser.parse(streamSource, userHandler);
 			}
 

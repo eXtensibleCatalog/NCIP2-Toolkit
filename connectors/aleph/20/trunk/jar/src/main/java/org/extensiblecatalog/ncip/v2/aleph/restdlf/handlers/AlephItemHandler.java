@@ -190,7 +190,7 @@ public class AlephItemHandler extends DefaultHandler {
 				barcodeReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
 				materialReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
 				agencyReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE)) {
 				collectionReached = true;
@@ -315,7 +315,7 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 				// currentAlephItem.setMediumType(AlephConstants.ERROR_MATERIAL_NOT_FOUND);
 				materialReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
 				// currentAlephItem.setAgency(AlephConstants.ERROR_AGENCY_NOT_FOUND);
 				agencyReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && collectionReached) {

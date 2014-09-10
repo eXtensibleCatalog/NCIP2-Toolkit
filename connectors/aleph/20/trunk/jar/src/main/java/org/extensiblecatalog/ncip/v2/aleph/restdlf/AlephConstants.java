@@ -75,7 +75,7 @@ public class AlephConstants {
 	public static final String Z31_CREDIT_DEBIT_NODE = "z31-credit-debit";
 	public static final String Z31_NET_SUM_NODE = "z31-net-sum";
 	public static final String Z30_NODE_ID = "Z30";
-	public static final String Z30_TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
+	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
 	public static final String Z30_COLLECTION_NODE = "z30-collection";
 
 	public static final String Z31_NODE = "z31";
@@ -124,6 +124,9 @@ public class AlephConstants {
 	public static final String BIB_ID_NODE_ATTR_VALUE = "b";
 	// get alephitem data for a fine
 	public static final String FINE_ITEM_NODE = "fine";
+	
+	public static final String PATRON_BLOCK_NODE = "patron-block";
+	public static final String CONSORTIAL_BLOCK_NODE = "consortial-block";
 	// loan item nodes
 	public static final String LOAN_ITEM_NODE = "loan";
 
@@ -295,6 +298,7 @@ public class AlephConstants {
 	public static final String PARAM_FILTER_CASH = "filter_cash";
 	public static final String PARAM_HOLD = "hold";
 	public static final String PARAM_HOLDS = "holds";
+	public static final String PARAM_BLOCKS = "blocks";
 	public static final String PARAM_SYSTEM_NUMBER = "sys_no";
 	public static final String PARAM_BASE = "base";
 	public static final String PARAM_DOC_NUMBER = "doc_number";
@@ -359,7 +363,6 @@ public class AlephConstants {
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
 	
 
-	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";
-	
+	public static final String UNIQUE_ITEM_ID_SEPERATOR = "-";	
 	
 }
