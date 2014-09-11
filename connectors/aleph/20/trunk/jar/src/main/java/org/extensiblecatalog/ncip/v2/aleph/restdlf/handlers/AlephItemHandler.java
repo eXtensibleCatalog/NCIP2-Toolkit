@@ -536,7 +536,7 @@ public class AlephItemHandler extends DefaultHandler {
 					String datePlacedParsed = new String(ch, start, length);
 					GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(datePlacedParsed);
 
-					currentLoanedItem.setDateCheckedOut(datePlaced);
+					currentRequestedItem.setDatePlaced(datePlaced);
 
 					datePlacedReached = false;
 				} else if (hourPlacedReached) {
@@ -561,14 +561,14 @@ public class AlephItemHandler extends DefaultHandler {
 					String earliestDateNeededParsed = new String(ch, start, length);
 					GregorianCalendar earliestDateNeeded = AlephUtil.parseGregorianCalendarFromAlephDate(earliestDateNeededParsed);
 
-					currentLoanedItem.setDateCheckedOut(earliestDateNeeded);
+					currentRequestedItem.setEarliestDateNeeded(earliestDateNeeded);
 
 					earliestDateNeededReached = false;
 				} else if (needBeforeDateReached) {
 					String needBeforeDateParsed = new String(ch, start, length);
 					GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(needBeforeDateParsed);
 
-					currentLoanedItem.setDateCheckedOut(needBeforeDate);
+					currentRequestedItem.setNeedBeforeDate(needBeforeDate);
 
 					needBeforeDateReached = false;
 				} else if (holdQueueLengthReached) {
@@ -582,7 +582,7 @@ public class AlephItemHandler extends DefaultHandler {
 					String pickupExpiryDateParsed = new String(ch, start, length);
 					GregorianCalendar pickupExpiryDate = AlephUtil.parseGregorianCalendarFromAlephDate(pickupExpiryDateParsed);
 
-					currentLoanedItem.setDateCheckedOut(pickupExpiryDate);
+					currentRequestedItem.setPickupExpiryDate(pickupExpiryDate);
 
 					pickupExpiryDateReached = false;
 				} else if (reminderLevelReached) {
@@ -606,7 +606,7 @@ public class AlephItemHandler extends DefaultHandler {
 					String pickupDateParsed = new String(ch, start, length);
 					GregorianCalendar pickupDate = AlephUtil.parseGregorianCalendarFromAlephDate(pickupDateParsed);
 
-					currentLoanedItem.setDateCheckedOut(pickupDate);
+					currentRequestedItem.setPickupDate(pickupDate);
 
 					pickupDateReached = false;
 				} else if (statusReached) {
