@@ -276,7 +276,7 @@ public class AlephItemHandler extends DefaultHandler {
 				// currentAlephItem.setCirculationStatus(AlephConstants.ERROR_CIRCULATION_STATUS_NOT_FOUND);
 				circulationStatusReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
-				currentAlephItem.setHoldQueueLength(-1);
+				currentAlephItem.setHoldQueueLength(0);
 				// currentAlephItem.setholdQueue(AlephConstants.ERROR_HOLD_QUEUE_NOT_FOUND);
 				holdQueueLengthReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionReached) {
