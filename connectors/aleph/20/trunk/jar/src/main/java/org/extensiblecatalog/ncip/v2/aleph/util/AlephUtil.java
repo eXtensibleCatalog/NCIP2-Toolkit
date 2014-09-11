@@ -136,24 +136,40 @@ public class AlephUtil {
 			iof.setItemDescription(description);
 		}
 
-		if (alephItem.getLocation() != null) {
-
-			LocationNameInstance locationNameInstance = new LocationNameInstance();
-
-			locationNameInstance.setLocationNameValue(alephItem.getLocation());
-			// TODO: more to come from requirement for level
-			locationNameInstance.setLocationNameLevel(new BigDecimal("1"));// temperarily set to 1.
-
-			List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
-			locationNameInstances.add(locationNameInstance);
+		if (alephItem.getLocation() != null || alephItem.getCollection() != null) {
+			List<Location> locations = new ArrayList<Location>();
+			Location location = new Location();
 
 			LocationName locationName = new LocationName();
+
+			List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+			LocationNameInstance locationNameInstance;
+
+			if (alephItem.getLocation() != null) {
+				locationNameInstance = new LocationNameInstance();
+
+				locationNameInstance.setLocationNameValue(alephItem.getLocation());
+				// TODO: more to come from requirement for level
+				locationNameInstance.setLocationNameLevel(new BigDecimal("1"));// temporarily set to 1.
+
+				locationNameInstances.add(locationNameInstance);
+			}
+
+			if (alephItem.getCollection() != null) {
+				locationNameInstance = new LocationNameInstance();
+
+				locationNameInstance.setLocationNameValue(alephItem.getCollection());
+				// TODO: more to come from requirement for level
+				locationNameInstance.setLocationNameLevel(new BigDecimal("2"));// temporarily set to 2.
+
+				locationNameInstances.add(locationNameInstance);
+			}
+
 			locationName.setLocationNameInstances(locationNameInstances);
 
-			Location location = new Location();
 			location.setLocationName(locationName);
 			location.setLocationType(new LocationType(AlephConstants.DEFAULT_SCHEME, AlephConstants.LOCATION_TYPE_PERMANENT));
-			List<Location> locations = new ArrayList<Location>();
+
 			locations.add(location);
 			iof.setLocations(locations);
 		}
