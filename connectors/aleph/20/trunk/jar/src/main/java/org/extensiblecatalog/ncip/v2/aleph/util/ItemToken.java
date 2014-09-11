@@ -7,15 +7,15 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
  *
  */
 public class ItemToken {
-	
+
 	private String bibliographicId;
-	
+
 	private String holdingsId;
-	
+
 	private String itemId;
-	
+
 	private String nextToken;
-	
+
 	public String getBibliographicId() {
 		return bibliographicId;
 	}
@@ -50,10 +50,10 @@ public class ItemToken {
 
 	public String toString() {
 		StringBuffer b = new StringBuffer();
-		b.append("[bibliographicId="+bibliographicId);
-		b.append(", holdingsId="+holdingsId);
-		b.append(", itemId="+itemId);
-		b.append(", nextToken="+nextToken + "]");
+		b.append("[bibliographicId=" + bibliographicId);
+		b.append(", holdingsId=" + holdingsId);
+		b.append(", itemId=" + itemId);
+		b.append(", nextToken=" + nextToken + "]");
 		return b.toString();
 	}
 

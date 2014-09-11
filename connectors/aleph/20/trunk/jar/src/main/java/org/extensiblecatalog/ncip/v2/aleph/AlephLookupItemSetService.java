@@ -55,6 +55,9 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
+	private int itemsForwarded;
+	private int maximumItemsCount;
+
 	/**
 	 * Construct an AlephRemoteServiceManager; this class is not configurable so there are no parameters.
 	 */
@@ -67,6 +70,20 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		Date sService = new Date();
 		LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
+
+		itemsForwarded = 0;
+		maximumItemsCount = 0;
+		if (initData.getMaximumItemsCount() != null)
+			try {
+				maximumItemsCount = Integer.parseInt(initData.getMaximumItemsCount().toString());
+			} catch (Exception e) {
+				List<Problem> problems = new ArrayList<Problem>();
+				Problem problem = new Problem();
+				problem.setProblemDetail(e.getMessage());
+				problem.setProblemType(new ProblemType("Maximum items count is not in parseable format."));
+				problems.add(problem);
+				responseData.setProblems(problems);
+			}
 
 		// TODO: Which can be parsed from rest-dlf & which need x-services?
 		boolean getCurrentBorrower = initData.getCurrentBorrowerDesired();
@@ -90,7 +107,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		ItemToken nextItemToken = null;
 		// remove any bib ids from bibIds list that may have already been processed
 		if (token != null) {
-			//FIXME: Debug this ..
+			// FIXME: Debug this ..
 			nextItemToken = tokens.get(token);
 			if (nextItemToken != null) {
 				int index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
@@ -143,10 +160,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							// TODO: move parseHoldingsSets method to AlephUtil & purge this horrible code so that it is more understandable
 							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength,
 									getItemDescription);
-							;
+
 							bibInformation.setHoldingsSets(holdingSets);
 
-							bibInformations.add(bibInformation);
+							if (holdingSets.get(0).getItemInformations().size() > 0)
+								bibInformations.add(bibInformation);
+							if (maximumItemsCount == itemsForwarded)
+								break;
 
 						} else if (alephSvcMgr.echoParticularProblemsToLUIS) {
 							Problem p = new Problem();
@@ -157,7 +177,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							problems.add(p);
 
 							bibInformation.setProblems(problems);
-							bibInformations.add(bibInformation);
+							if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
+								bibInformations.add(bibInformation);
+								itemsForwarded++;
+							}
+							if (maximumItemsCount == itemsForwarded)
+								break;
 						}
 
 					} else if (bibId.getBibliographicItemId() != null) {
@@ -181,9 +206,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							List<HoldingsSet> holdingsSets = new ArrayList<HoldingsSet>();
 							holdingsSets.add(holdingsSet);
 							bibInformation.setHoldingsSets(holdingsSets);
-
-							bibInformations.add(bibInformation);
-
+							if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
+								bibInformations.add(bibInformation);
+								itemsForwarded++;
+							}
+							if (maximumItemsCount == itemsForwarded)
+								break;
 						} else if (alephSvcMgr.echoParticularProblemsToLUIS) {
 							Problem p = new Problem();
 							p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
@@ -366,7 +394,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			}
 			info.setItemOptionalFields(iof);
 
-			itemInfoList.add(info);
+			if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
+				itemInfoList.add(info);
+				itemsForwarded++;
+			} else
+				break;
 		}
 		holdingsSet.setItemInformations(itemInfoList);
 
