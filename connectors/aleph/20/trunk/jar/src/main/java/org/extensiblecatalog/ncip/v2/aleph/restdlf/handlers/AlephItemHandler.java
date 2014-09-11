@@ -162,7 +162,7 @@ public class AlephItemHandler extends DefaultHandler {
 					listOfItems = new ArrayList<AlephItem>();
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
 				circulationStatusReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLengthDesired) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthDesired) {
 				holdQueueLengthReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
 				itemDesrciptionReached = true;
@@ -244,7 +244,7 @@ public class AlephItemHandler extends DefaultHandler {
 					needBeforeDateReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE)) {
 					itemSequenceReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE)) {
+				} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE)) {
 					holdQueueLengthReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE)) {
 					pickupLocationReached = true;
@@ -275,7 +275,7 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
 				// currentAlephItem.setCirculationStatus(AlephConstants.ERROR_CIRCULATION_STATUS_NOT_FOUND);
 				circulationStatusReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_HOLD_DOC_NUMBER_NODE) && holdQueueLengthReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
 				currentAlephItem.setHoldQueueLength(-1);
 				// currentAlephItem.setholdQueue(AlephConstants.ERROR_HOLD_QUEUE_NOT_FOUND);
 				holdQueueLengthReached = false;
@@ -389,7 +389,7 @@ public class AlephItemHandler extends DefaultHandler {
 					needBeforeDateReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
 					itemSequenceReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && holdQueueLengthReached) {
+				} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
 					holdQueueLengthReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && pickupLocationReached) {
 					pickupLocationReached = false;
@@ -419,7 +419,9 @@ public class AlephItemHandler extends DefaultHandler {
 				currentAlephItem.setCirculationStatus(new String(ch, start, length));
 				circulationStatusReached = false;
 			} else if (holdQueueLengthReached) {
-				currentAlephItem.setHoldQueueLength(Integer.parseInt(new String(ch, start, length)));
+				// Parse this: <queue>1 request(s) of 4 items</queue>
+				String parsedHoldQueueLength = (new String(ch, start, length)).split(" ")[0];
+				currentAlephItem.setHoldQueueLength(Integer.parseInt(parsedHoldQueueLength));
 				holdQueueLengthReached = false;
 			} else if (itemDesrciptionReached) {
 				currentAlephItem.setDescription(new String(ch, start, length));
@@ -572,7 +574,9 @@ public class AlephItemHandler extends DefaultHandler {
 
 					needBeforeDateReached = false;
 				} else if (holdQueueLengthReached) {
-					currentRequestedItem.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
+					// Parse this: <queue>1 request(s) of 4 items</queue>
+					String parsedHoldQueueLength = (new String(ch, start, length)).split(" ")[0];
+					currentRequestedItem.setHoldQueueLength(new BigDecimal(parsedHoldQueueLength));
 					holdQueueLengthReached = false;
 				} else if (pickupLocationReached) {
 					PickupLocation pickupLocation = new PickupLocation(new String(ch, start, length));
