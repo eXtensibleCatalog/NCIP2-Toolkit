@@ -42,5 +42,6 @@
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Security Marker</ns1:ItemElementType>
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Description</ns1:ItemElementType>
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Sensitization Flag</ns1:ItemElementType>
+		<ns1:MaximumItemsCount>2</ns1:MaximumItemsCount>
 	</ns1:LookupItemSet>
 </ns1:NCIPMessage>
