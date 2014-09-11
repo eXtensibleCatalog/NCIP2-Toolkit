@@ -83,7 +83,39 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				problem.setProblemType(new ProblemType("Maximum items count is not in parseable format."));
 				problems.add(problem);
 				responseData.setProblems(problems);
+				return responseData;
 			}
+
+		List<BibliographicId> bibIds = initData.getBibliographicIds();
+
+		String token = initData.getNextItemToken();
+		ItemToken nextItemToken = null;
+		// remove any bib ids from bibIds list that may have already been processed
+		if (token != null) {
+			// FIXME: Implement parsing tokens, which points into bibliographic record to specific bibliographic item id
+			// In case maximum items returned was reached while parsing one bibliographic Id with a lot alephItems inside
+			nextItemToken = tokens.get(token); 
+			if (nextItemToken != null) {
+				int index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
+				if (index != -1) {
+					// remove the ones already processed
+					bibIds.subList(0, index).clear();
+				}
+
+				// Remove token from memory hashmap
+				tokens.remove(token);
+			} else {
+				Problem problem = new Problem();
+				problem.setProblemDetail("Invalid nextItemToken");
+				problem.setProblemValue("nextItemToken =" + token);
+				List<Problem> problems = new ArrayList<Problem>();
+				problems.add(problem);
+				responseData.setProblems(problems);
+				return responseData;
+			}
+			log.debug("after removing already processed Bib ids =" + bibIds);
+
+		}
 
 		// TODO: Which can be parsed from rest-dlf & which need x-services?
 		boolean getCurrentBorrower = initData.getCurrentBorrowerDesired();
@@ -101,36 +133,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
 		boolean getItemDescription = initData.getItemDescriptionDesired();
 
-		List<BibliographicId> bibIds = initData.getBibliographicIds();
-
-		String token = initData.getNextItemToken();
-		ItemToken nextItemToken = null;
-		// remove any bib ids from bibIds list that may have already been processed
-		if (token != null) {
-			// FIXME: Debug this ..
-			nextItemToken = tokens.get(token);
-			if (nextItemToken != null) {
-				int index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
-				if (index != -1) {
-					// remove the ones already processed
-					bibIds.subList(0, index).clear();
-				}
-
-				// Remove token from memory hashmap
-				tokens.remove(token);
-			} else {
-				Problem problem = new Problem();
-				problem.setProblemDetail("Invalid nextItemToken");
-				problem.setProblemValue("nextItemToken =" + token);
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(problem);
-				responseData.setProblems(problems);
-
-				return responseData;
-			}
-			log.debug("after removing already processed Bib ids =" + bibIds);
-
-		}
 		List<BibInformation> bibInformations = new ArrayList<BibInformation>();
 
 		if (bibIds != null && bibIds.size() > 0) {
