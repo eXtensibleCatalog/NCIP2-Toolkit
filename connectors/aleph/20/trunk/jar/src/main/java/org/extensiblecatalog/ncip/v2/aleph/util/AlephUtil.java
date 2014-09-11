@@ -110,6 +110,7 @@ public class AlephUtil {
 				iof.setCirculationStatus(alephItem.getCirculationStatus());
 			}
 		}
+		
 		if (alephItem.getElectronicResource() != null) {
 			ElectronicResource resource = new ElectronicResource();
 			resource.setReferenceToResource(alephItem.getElectronicResource());

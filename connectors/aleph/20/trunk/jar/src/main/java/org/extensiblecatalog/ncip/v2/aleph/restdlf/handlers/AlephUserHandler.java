@@ -23,6 +23,8 @@ public class AlephUserHandler extends DefaultHandler {
 	private String address;
 	private AgencyId agencyId;
 	private String city;
+	private String privileges;
+	private String validToDateParsed;
 	private List<BlockOrTrap> blockOrTraps;
 	private boolean nameInformationDesired;
 	private boolean userIdDesired;
@@ -39,7 +41,9 @@ public class AlephUserHandler extends DefaultHandler {
 	private boolean userMailReached = false;
 	private boolean phoneNoReached = false;
 	private boolean blockOrTrapReached = false;
-	private boolean agencyReached;
+	private boolean agencyReached = false;
+	private boolean validUntilDateReached = false;
+	private boolean validFromDateReached = false;
 
 	/**
 	 * Initializes new AlephUserHandler instance with desired services in the following order:
@@ -100,6 +104,10 @@ public class AlephUserHandler extends DefaultHandler {
 			blockOrTrapReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
 			agencyReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_TO_NODE) && userPrivilegeDesired) {
+			validUntilDateReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_FROM_NODE) && userPrivilegeDesired) {
+			validFromDateReached = true;
 		}
 	}
 
@@ -127,6 +135,10 @@ public class AlephUserHandler extends DefaultHandler {
 			blockOrTrapReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
 			agencyReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_TO_NODE) && validUntilDateReached) {
+			validUntilDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_FROM_NODE) && validFromDateReached) {
+			validFromDateReached = false;
 		}
 
 	}
@@ -171,6 +183,12 @@ public class AlephUserHandler extends DefaultHandler {
 			String parsedAgencyId = new String(ch, start, length);
 			agencyId = new AgencyId("http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm", parsedAgencyId);
 			agencyReached = false;
+		} else if (validUntilDateReached) {
+			user.setValidToDate(new String(ch, start, length));
+			validUntilDateReached = false;
+		} else if (validFromDateReached) {
+			user.setValidFromDate(new String(ch, start, length));
+			validFromDateReached = false;
 		}
 
 	}

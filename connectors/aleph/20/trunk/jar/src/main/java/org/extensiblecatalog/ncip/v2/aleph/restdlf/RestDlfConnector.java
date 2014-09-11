@@ -231,7 +231,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		// Create URL request only if specified service was desired
 		URL addressUrl = null;
-		if (nameInformationDesired || userIdDesired || userAddressInformationDesired) {
+		if (nameInformationDesired || userIdDesired || userAddressInformationDesired || userPrivilegeDesired) {
 			atLeastOneDesired = true;
 			addressUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, patronInfoElement, addressElement).toURL();
 		}

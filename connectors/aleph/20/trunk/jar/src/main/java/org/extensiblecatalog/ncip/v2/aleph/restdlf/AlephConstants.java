@@ -141,6 +141,8 @@ public class AlephConstants {
 	public static final String Z303_ID_NODE = "z303-id";
 	public static final String Z304_EMAIL_NODE = "z304-email-address";
 	public static final String Z303_NAME_NODE = "z303-name";
+	public static final String Z304_DATE_TO_NODE = "z304-date-to";
+	public static final String Z304_DATE_FROM_NODE = "z304-date-from";
 	public static final String Z304_ADDRESS_1_NODE = "z304-address-1";
 	public static final String Z304_ADDRESS_2_NODE = "z304-address-2";
 	public static final String Z304_ADDRESS_3_NODE = "z304-address-3";

@@ -5,6 +5,7 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ public class AlephUser implements Serializable {
 	private List<UserId> userIds;
 	private List<UserPrivilege> userPrivileges;
 	private UserFiscalAccountSummary userFiscalAccountSummary;
+	private UserPrivilege userPrivilege;
 
 	public AlephUser() {
 		requestedItems = new ArrayList<RequestedItem>();
@@ -395,16 +397,39 @@ public class AlephUser implements Serializable {
 		this.userPrivileges = userPrivileges;
 	}
 
-	public void setBorStatus(String string) {
+	public void setBorStatus(String string) throws SAXException {
 
-		UserPrivilege userPrivilege = new UserPrivilege();
+		if (userPrivilege == null)
+			userPrivilege = new UserPrivilege();
 
 		// http://www.niso.org/apps/group_public/download.php/8966/z39-83-1-2012_NCIP.pdf#page=88
 		userPrivilege.setUserPrivilegeDescription(string);
 		userPrivilege.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm",
 				"MZK type"));
 		userPrivilege.setAgencyId(new AgencyId("MZK")); // FIXME: this is default - shouldn't be
-		userPrivileges.add(userPrivilege);
+
+		if (userPrivilege.getValidFromDate() != null && userPrivilege.getValidToDate() != null)
+			userPrivileges.add(userPrivilege);
+	}
+
+	public void setValidToDate(String validToDateParsed) throws SAXException {
+		if (userPrivilege == null)
+			userPrivilege = new UserPrivilege();
+
+		userPrivilege.setValidToDate(AlephUtil.parseGregorianCalendarFromAlephDate(validToDateParsed));
+		
+		if (userPrivilege.getUserPrivilegeDescription() != null && userPrivilege.getValidFromDate() != null)
+			userPrivileges.add(userPrivilege);
+	}
+
+	public void setValidFromDate(String validFromDateParsed) throws SAXException {
+		if (userPrivilege == null)
+			userPrivilege = new UserPrivilege();
+
+		userPrivilege.setValidFromDate(AlephUtil.parseGregorianCalendarFromAlephDate(validFromDateParsed));
+		
+		if (userPrivilege.getUserPrivilegeDescription() != null && userPrivilege.getValidToDate() != null)
+			userPrivileges.add(userPrivilege);
 	}
 
 	public UserFiscalAccountSummary getUserFiscalAccountSummary() {
