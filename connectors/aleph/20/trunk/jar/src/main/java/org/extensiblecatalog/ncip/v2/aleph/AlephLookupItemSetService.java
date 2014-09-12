@@ -223,10 +223,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							problems.add(p);
 
 							bibInformation.setProblems(problems);
-							if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
-								bibInformations.add(bibInformation);
-								itemsForwarded++;
-							}
+
+							bibInformations.add(bibInformation);
+							itemsForwarded++;
+
 							if (maximumItemsCount == itemsForwarded) {
 								// Set next item token
 								ItemToken itemToken = new ItemToken();
@@ -264,10 +264,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							List<HoldingsSet> holdingsSets = new ArrayList<HoldingsSet>();
 							holdingsSets.add(holdingsSet);
 							bibInformation.setHoldingsSets(holdingsSets);
-							if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
-								bibInformations.add(bibInformation);
-								itemsForwarded++;
-							}
+
+							bibInformations.add(bibInformation);
+							itemsForwarded++;
+
 							if (maximumItemsCount == itemsForwarded) {
 								// Set next item token
 								ItemToken itemToken = new ItemToken();
@@ -289,7 +289,24 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							problems.add(p);
 
 							bibInformation.setProblems(problems);
+							
 							bibInformations.add(bibInformation);
+							itemsForwarded++;
+
+							if (maximumItemsCount == itemsForwarded) {
+								// Set next item token
+								ItemToken itemToken = new ItemToken();
+
+								itemToken.setBibliographicId(id);
+
+								int newToken = random.nextInt();
+								itemToken.setNextToken(Integer.toString(newToken));
+
+								tokens.put(Integer.toString(newToken), itemToken);
+
+								responseData.setNextItemToken(Integer.toString(newToken));
+								break;
+							}
 						}
 
 					} else {
@@ -427,41 +444,41 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
 		for (AlephItem item : alephItems) {
 
-			ItemOptionalFields iof = new ItemOptionalFields();
-
-			if (getBibDescription) {
-				BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
-				holdingsSet.setBibliographicDescription(bDesc);
-			}
-
-			addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-
-			// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
-			// EDIT: ItemInformation does not transfer only optional fields ...
-			ItemInformation info = new ItemInformation();
-
-			ItemId itemId = new ItemId();
-			itemId.setItemIdentifierValue(item.getItemSeqNumber());
-			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-			info.setItemId(itemId);
-
-			if (getHoldQueueLength || getCircStatus || getItemDescription) {
-				if (getHoldQueueLength)
-					iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
-				if (getCircStatus)
-					iof.setCirculationStatus(item.getCirculationStatus());
-				if (getItemDescription) {
-					ItemDescription itemDescription = new ItemDescription();
-					itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
-					itemDescription.setCallNumber(item.getCallNumber());
-					itemDescription.setCopyNumber(item.getCopyNumber());
-					itemDescription.setNumberOfPieces(item.getNumberOfPieces());
-					iof.setItemDescription(itemDescription);
-				}
-			}
-			info.setItemOptionalFields(iof);
-
 			if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
+				ItemOptionalFields iof = new ItemOptionalFields();
+
+				if (getBibDescription) {
+					BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
+					holdingsSet.setBibliographicDescription(bDesc);
+				}
+
+				addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+
+				// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
+				// EDIT: ItemInformation does not transfer only optional fields ...
+				ItemInformation info = new ItemInformation();
+
+				ItemId itemId = new ItemId();
+				itemId.setItemIdentifierValue(item.getItemSeqNumber());
+				itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+				info.setItemId(itemId);
+
+				if (getHoldQueueLength || getCircStatus || getItemDescription) {
+					if (getHoldQueueLength)
+						iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
+					if (getCircStatus)
+						iof.setCirculationStatus(item.getCirculationStatus());
+					if (getItemDescription) {
+						ItemDescription itemDescription = new ItemDescription();
+						itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
+						itemDescription.setCallNumber(item.getCallNumber());
+						itemDescription.setCopyNumber(item.getCopyNumber());
+						itemDescription.setNumberOfPieces(item.getNumberOfPieces());
+						iof.setItemDescription(itemDescription);
+					}
+				}
+				info.setItemOptionalFields(iof);
+
 				itemInfoList.add(info);
 				itemsForwarded++;
 			} else
