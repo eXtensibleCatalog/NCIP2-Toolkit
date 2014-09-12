@@ -113,7 +113,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			} else {
 				Problem problem = new Problem();
 				problem.setProblemType(new ProblemType("Invalid NextItemToken"));
-				problem.setProblemDetail("Recieved token: " + token);
+				problem.setProblemValue("Recieved token: " + token);
 				List<Problem> problems = new ArrayList<Problem>();
 				problems.add(problem);
 				responseData.setProblems(problems);
@@ -289,7 +289,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							problems.add(p);
 
 							bibInformation.setProblems(problems);
-							
+
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
 
@@ -380,7 +380,16 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 			}
 
-		} // /else - Do nothing, the fact that the bibInformationsList is empty will cause a Problem to be created below
+		} else if (nextItemToken != null) {
+			Problem problem = new Problem();
+			problem.setProblemType(new ProblemType("Unknown NextItemToken"));
+			problem.setProblemValue("Recieved token: " + token);
+			problem.setProblemDetail("You have probably set MaximumItemsCount the same value as the number of elements output had before. You should therefore have all items parsed already.");
+			List<Problem> problems = new ArrayList<Problem>();
+			problems.add(problem);
+			responseData.setProblems(problems);
+			return responseData;
+		}
 
 		if (responseData.getProblems() == null || responseData.getProblem(0) == null)
 			responseData.setBibInformations(bibInformations);
