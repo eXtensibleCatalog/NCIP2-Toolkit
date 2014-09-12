@@ -25,12 +25,15 @@ public class AlephConstants {
 	public static final String Z30_CALL_NUMBER_2_TYPE_NODE = "z30-call-no-2-type";
 	public static final String Z30_CALL_NUMBER_2_NODE = "z30-call-no-2";
 	public static final String Z30_COPY_ID_NODE = "z30-copy-id";
+	
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
 	public static final String Z13_AUTHOR_NODE = "z13-author";
 	public static final String Z13_TITLE_NODE = "z13-title";
 	public static final String Z13_PUBLISHER_NODE = "z13-imprint";
 	public static final String Z13_ISBN_NODE = "z13-isbn-issn";
 	public static final String Z13_NODE = "z13";
+	public static final String Z13_DOC_NUMBER_NODE = "z13-doc-number";
+	
 	public static final String Z37_NODE = "z37";
 	public static final String Z37_DOC_NUMBER_NODE = "z37-doc-number";
 	public static final String Z37_ITEM_SEQUENCE_NODE = "z37-item-sequence";

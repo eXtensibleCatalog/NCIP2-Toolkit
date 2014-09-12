@@ -129,12 +129,6 @@ public class AlephItem implements Serializable {
 		this.itemId = itemId;
 	}
 
-	private void updateItemId() {
-		if (getDocNumber() != null && getItemSeqNumber() != null) {
-			setItemId(getDocNumber() + getItemSeqNumber());
-		}
-	}
-
 	/**
 	 * @return the description
 	 */
@@ -468,8 +462,6 @@ public class AlephItem implements Serializable {
 		while (this.docNumber != null && this.docNumber.length() < AlephConstants.DOC_NUMBER_LENGTH) {
 			this.docNumber = "0" + this.docNumber;
 		}
-		// update the item id if necessary
-		updateItemId();
 	}
 
 	/**
@@ -494,8 +486,6 @@ public class AlephItem implements Serializable {
 		while (this.itemSeqNumber != null && this.itemSeqNumber.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {
 			this.itemSeqNumber = "0" + this.itemSeqNumber;
 		}
-		// update the item id if necessary
-		updateItemId();
 	}
 
 	/**

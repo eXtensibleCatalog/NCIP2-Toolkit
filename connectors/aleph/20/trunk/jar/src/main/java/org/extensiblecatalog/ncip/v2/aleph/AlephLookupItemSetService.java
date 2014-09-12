@@ -219,7 +219,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						} else if (alephSvcMgr.echoParticularProblemsToLUIS) {
 							Problem p = new Problem();
 							p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
-							p.setProblemDetail("Item " + id + " you are searching for doesn't exists.");
+							p.setProblemDetail("Item " + id + ", you are searching for, does not exists.");
 
 							List<Problem> problems = new ArrayList<Problem>();
 							problems.add(p);
@@ -289,7 +289,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						} else if (alephSvcMgr.echoParticularProblemsToLUIS) {
 							Problem p = new Problem();
 							p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
-							p.setProblemDetail("Item " + id + " you are searching for doesn't exists.");
+							p.setProblemDetail("Item " + id + ", you are searching for, does not exists.");
 
 							List<Problem> problems = new ArrayList<Problem>();
 							problems.add(p);
@@ -428,7 +428,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		ItemInformation info = new ItemInformation();
 
 		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierValue(alephItem.getItemSeqNumber());
+		itemId.setItemIdentifierValue(alephItem.getItemId());
 		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 		info.setItemId(itemId);
 		if (getHoldQueueLength || getCircStatus || getItemDescription) {
@@ -475,7 +475,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				ItemInformation info = new ItemInformation();
 
 				ItemId itemId = new ItemId();
-				itemId.setItemIdentifierValue(item.getItemSeqNumber());
+				itemId.setItemIdentifierValue(item.getItemId());
 				itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 				info.setItemId(itemId);
 

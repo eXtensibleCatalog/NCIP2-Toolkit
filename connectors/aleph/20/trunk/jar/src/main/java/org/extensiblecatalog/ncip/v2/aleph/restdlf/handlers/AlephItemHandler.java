@@ -31,11 +31,14 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  */
 public class AlephItemHandler extends DefaultHandler {
+	//FIXME: Move human not readable operations to AlephUtil
+	
 	private List<AlephItem> listOfItems;
 	private AlephItem currentAlephItem;
 
 	// Required to build unique item id
-	private String docNumber;
+	private String agencyId;
+	private String bibDocNumber;
 	private String itemSequence;
 	private boolean itemIdNotFound;
 
@@ -56,8 +59,8 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean isbnReached = false;
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
-	private boolean bibIdReached = false;
-	private boolean docNoReached = false;
+	private boolean bibDocNoReached = false;
+	private boolean itemDocNoReached = false;
 	private boolean locationReached = false;
 	private boolean openDateReached = false;
 	private boolean callNoReached = false;
@@ -95,7 +98,9 @@ public class AlephItemHandler extends DefaultHandler {
 
 	private List<LoanedItem> loanedItems;
 	private LoanedItem currentLoanedItem;
+	private String itemDocNumber;
 
+	//FIXME: Remove this logic structure & create more human readable
 	public AlephItemHandler parseLoansOrRequests() {
 		bibliographicDescription = new BibliographicDescription();
 		parsingLoansOrRequests = true;
@@ -167,7 +172,9 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
 				itemDesrciptionReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
-				docNoReached = true;
+				itemDocNoReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE)) {
+				bibDocNoReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_SEQUENCE_NODE)) {
 				itemSequenceReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE)) {
@@ -200,7 +207,7 @@ public class AlephItemHandler extends DefaultHandler {
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
 					publisherReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
-					bibIdReached = true;
+					bibDocNoReached = true;
 				}
 			}
 		} else {
@@ -212,8 +219,12 @@ public class AlephItemHandler extends DefaultHandler {
 				titleReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
 				publisherReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
-				bibIdReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
+				itemDocNoReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE)) {
+				bibDocNoReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
+				agencyReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
 				materialReached = true;
 			} else if (loansHandling) { // Handling loans XML output
@@ -271,68 +282,63 @@ public class AlephItemHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (!parsingLoansOrRequests) {
 			if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
+				if (!itemIdNotFound) {
+					itemSequence = itemSequence.trim().replace(".","");
+					while (itemSequence.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {
+						itemSequence = "0" + itemSequence;
+					}
+					//FIXME: Remove hard-coded MZK01 after are reparations done
+					currentAlephItem.setItemId("MZK01" + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
+				}
 				listOfItems.add(currentAlephItem);
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
-				// currentAlephItem.setCirculationStatus(AlephConstants.ERROR_CIRCULATION_STATUS_NOT_FOUND);
 				circulationStatusReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
 				currentAlephItem.setHoldQueueLength(0);
-				// currentAlephItem.setholdQueue(AlephConstants.ERROR_HOLD_QUEUE_NOT_FOUND);
 				holdQueueLengthReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionReached) {
-				// currentAlephItem.setDescription(AlephConstants.ERROR_ITEM_DESCRIPTION_NOT_FOUND);
 				itemDesrciptionReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && docNoReached) {
-				// currentAlephItem.setBibId(AlephConstants.ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND);
-				// currentAlephItem.setDocNumber(AlephConstants.ERROR_DOCUMENT_NUMBER_NOT_FOUND);
-				docNoReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemDocNoReached) {
+				itemIdNotFound = true;
+				itemDocNoReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && bibDocNoReached) {
+				itemIdNotFound = true;
+				bibDocNoReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
-				// currentAlephItem.setSeqNumber(AlephConstants.ERROR_SEQUENCE_NUMBER_NOT_FOUND);
+				itemIdNotFound = true;
 				itemSequenceReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationReached) {
-				// currentAlephItem.setLocation(AlephConstants.ERROR_LOCATION_NOT_FOUND);
 				locationReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_OPEN_DATE_NODE) && openDateReached) {
-				// currentAlephItem.setPublicationDate(AlephConstants.ERROR_OPENDATE_NOT_FOUND);
 				openDateReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
-				// currentAlephItem.setCallNumber(AlephConstants.ERROR_CALL_NO_NOT_FOUND);
 				callNoReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && secondCallNoTypeReached) {
 				secondCallNoTypeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && secondCallNoReached) {
 				secondCallNoReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
-				// currentAlephItem.setCopyNumber(AlephConstants.ERROR_COPY_NO_NOT_FOUND);
 				copyNoReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
-				// currentAlephItem.setBarcode(AlephConstants.ERROR_BARCODE_NOT_FOUND);
 				barcodeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
-				// currentAlephItem.setMediumType(AlephConstants.ERROR_MATERIAL_NOT_FOUND);
 				materialReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
-				// currentAlephItem.setAgency(AlephConstants.ERROR_AGENCY_NOT_FOUND);
+				itemIdNotFound = true;
 				agencyReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && collectionReached) {
-				// currentAlephItem.setCollection(AlephConstants.ERROR_COLLECTION_NOT_FOUND);
 				collectionReached = false;
 			} else if (bibDescriptionDesired) {
 				if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
-					// currentAlephItem.setAuthor(AlephConstants.ERROR_AUTHOR_NOT_FOUND);
 					authorReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
-					// currentAlephItem.setIsbn(AlephConstants.ERROR_ISBN_NOT_FOUND);
 					isbnReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
-					// currentAlephItem.setTitle(AlephConstants.ERROR_TITLE_NOT_FOUND);
 					titleReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
-					// currentAlephItem.setPublisher(AlephConstants.ERROR_PUBLISHER_NOT_FOUND);
 					publisherReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibIdReached) {
-					// currentAlephItem.setBibId(AlephConstants.ERROR_BIBLIOGRAPHIC_ID_NOT_FOUND);
-					bibIdReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibDocNoReached) {
+					bibDocNoReached = false;
 				}
 			}
 		} else {
@@ -344,16 +350,23 @@ public class AlephItemHandler extends DefaultHandler {
 				titleReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
 				publisherReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibIdReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemDocNoReached) {
 				itemIdNotFound = true;
-				bibIdReached = false;
+				itemDocNoReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && bibDocNoReached) {
+				itemIdNotFound = true;
+				bibDocNoReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
+				itemIdNotFound = true;
+				agencyReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 				materialReached = false;
 			} else if (loansHandling) {
 				if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 					if (!itemIdNotFound) {
 						ItemId itemId = new ItemId();
-						itemId.setItemIdentifierValue(docNumber.trim() + "-" + itemSequence.trim());
+						//FIXME: Remove hard-coded MZK01 after are reparations done
+						itemId.setItemIdentifierValue("MZK01" + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
 						itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 						currentLoanedItem.setItemId(itemId);
 					}
@@ -372,7 +385,8 @@ public class AlephItemHandler extends DefaultHandler {
 				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 					if (!itemIdNotFound) {
 						ItemId itemId = new ItemId();
-						itemId.setItemIdentifierValue(docNumber.trim() + "-" + itemSequence.trim());
+						//FIXME: Remove hard-coded MZK01 after are reparations done
+						itemId.setItemIdentifierValue("MZK01" + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
 						itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 						currentRequestedItem.setItemId(itemId);
 					}
@@ -383,6 +397,7 @@ public class AlephItemHandler extends DefaultHandler {
 					datePlacedReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && hourPlacedReached) {
 					hourPlacedReached = false;
+					itemIdNotFound = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE) && earliestDateNeededReached) {
 					earliestDateNeededReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && needBeforeDateReached) {
@@ -426,11 +441,14 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (itemDesrciptionReached) {
 				currentAlephItem.setDescription(new String(ch, start, length));
 				itemDesrciptionReached = false;
-			} else if (docNoReached) {
-				currentAlephItem.setDocNumber(new String(ch, start, length));
-				docNoReached = false;
+			} else if (itemDocNoReached) {
+				itemDocNumber = new String(ch, start, length);
+				itemDocNoReached = false;
+			} else if (bibDocNoReached) {
+				bibDocNumber = new String(ch, start, length);
+				bibDocNoReached = false;
 			} else if (itemSequenceReached) {
-				currentAlephItem.setItemSeqNumber(new String(ch, start, length));
+				itemSequence = new String(ch, start, length);
 				itemSequenceReached = false;
 			} else if (locationReached) {
 				currentAlephItem.setLocation(new String(ch, start, length));
@@ -460,7 +478,7 @@ public class AlephItemHandler extends DefaultHandler {
 				currentAlephItem.setMediumType(new String(ch, start, length));
 				materialReached = false;
 			} else if (agencyReached) {
-				currentAlephItem.setAgency(new String(ch, start, length));
+				agencyId = new String(ch, start, length);
 				agencyReached = false;
 			} else if (collectionReached) {
 				currentAlephItem.setCollection(new String(ch, start, length));
@@ -478,9 +496,9 @@ public class AlephItemHandler extends DefaultHandler {
 				} else if (publisherReached) {
 					currentAlephItem.setPublisher(new String(ch, start, length));
 					publisherReached = false;
-				} else if (bibIdReached) {
+				} else if (bibDocNoReached) {
 					currentAlephItem.setBibId(new String(ch, start, length));
-					bibIdReached = false;
+					bibDocNoReached = false;
 				}
 			}
 		} else {
@@ -501,9 +519,12 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (publisherReached) {
 				bibliographicDescription.setPublisher(new String(ch, start, length));
 				publisherReached = false;
-			} else if (bibIdReached) {
+			} else if (itemDocNoReached) {
+				itemDocNumber = new String(ch, start, length);
+				itemDocNoReached = false;
+			} else if (bibDocNoReached) {
 				String parsedBibId = new String(ch, start, length);
-				docNumber = parsedBibId;
+				bibDocNumber = parsedBibId;
 				List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
 				BibliographicItemId bibId = new BibliographicItemId();
 
@@ -513,10 +534,13 @@ public class AlephItemHandler extends DefaultHandler {
 				bibliographicItemIds.add(bibId);
 
 				bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
-				bibIdReached = false;
+				bibDocNoReached = false;
 			} else if (itemSequenceReached) {
 				itemSequence = new String(ch, start, length);
 				itemSequenceReached = false;
+			} else if (agencyReached) {
+				agencyId = new String(ch, start, length);
+				agencyReached = false;
 			} else if (loansHandling) {
 				if (dueDateReached) {
 					String dateDueParsed = new String(ch, start, length);
