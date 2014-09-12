@@ -388,11 +388,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 			}
 
-		} else if (nextItemToken != null) {
+		} else {
 			Problem problem = new Problem();
-			problem.setProblemType(new ProblemType("Unknown NextItemToken"));
-			problem.setProblemValue("Recieved token: " + token);
-			problem.setProblemDetail("You have probably set MaximumItemsCount the same value as the number of elements output had before. You should therefore have all items parsed already.");
+			problem.setProblemType(new ProblemType("Unknown Problem"));
+			problem.setProblemValue("Toolkit passed through empty response data.");
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(problem);
 			responseData.setProblems(problems);
