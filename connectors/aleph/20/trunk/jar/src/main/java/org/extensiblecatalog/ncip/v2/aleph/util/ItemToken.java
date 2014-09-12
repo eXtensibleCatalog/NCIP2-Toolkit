@@ -16,6 +16,12 @@ public class ItemToken {
 
 	private String nextToken;
 
+	private boolean isRecordId = false;
+
+	private boolean doneWithRecordId = false;
+
+	private int numberOfDoneItemIds = 0;
+
 	public String getBibliographicId() {
 		return bibliographicId;
 	}
@@ -46,6 +52,30 @@ public class ItemToken {
 
 	public void setNextToken(String nextToken) {
 		this.nextToken = nextToken;
+	}
+
+	public boolean isRecordId() {
+		return isRecordId;
+	}
+
+	public void setIsRecordId(boolean isRecordId) {
+		this.isRecordId = isRecordId;
+	}
+
+	public int getNoOfDoneItemIds() {
+		return numberOfDoneItemIds;
+	}
+
+	public void setNoOfDoneItemIds(int numberOfDoneItemIds) {
+		this.numberOfDoneItemIds = numberOfDoneItemIds;
+	}
+
+	public boolean doneWithRecordId() {
+		return doneWithRecordId;
+	}
+
+	public void setDoneWithRecordId(boolean doneWithRecordId) {
+		this.doneWithRecordId = doneWithRecordId;
 	}
 
 	public String toString() {
