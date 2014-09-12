@@ -142,7 +142,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		List<BibInformation> bibInformations = new ArrayList<BibInformation>();
 
 		if (bibIds != null && bibIds.size() > 0) {
-
 			for (BibliographicId bibId : bibIds) {
 				BibInformation bibInformation = new BibInformation();
 
@@ -161,6 +160,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							if (nextItemToken != null) {
 								if (nextItemToken.isRecordId() && !nextItemToken.doneWithRecordId()) {
 									alephItems.subList(0, nextItemToken.getNoOfDoneItemIds()).clear();
+									nextItemToken.setDoneWithRecordId(true);
 								}
 							}
 
