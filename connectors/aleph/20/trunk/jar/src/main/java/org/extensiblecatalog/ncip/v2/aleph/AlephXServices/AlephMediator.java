@@ -8,6 +8,12 @@ import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUserFactory;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XServiceFactory;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConfiguration;
+import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
+import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
 
 import java.io.IOException;
@@ -18,8 +24,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+
+
+
+import javax.xml.parsers.SAXParserFactory;
+
 
 
 
@@ -51,11 +64,17 @@ public class AlephMediator implements Serializable{
 	private Map<String,AlephAgency> agencies;
 	private Map<String,AlephConstants.Availability> availabilityCircStatusMap;
 	private String defaultAgencyId;
+	private AlephConfiguration alephConfig;
+	private String bibLibrary;
+	private String admLibrary;
+	private String defaultAgency;
+	private String ILSAgency;
+	private String holdLibrary;
 	
 	/**
 	 * Protected constructor to limit construction to the factory
 	 */
-	protected AlephMediator(){}
+	protected AlephMediator() {}
 
 	/**
 	 * Set the X Server Name called with requests

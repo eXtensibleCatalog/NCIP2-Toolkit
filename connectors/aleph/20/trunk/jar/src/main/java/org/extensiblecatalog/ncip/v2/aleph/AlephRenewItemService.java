@@ -9,7 +9,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.SAXException;
@@ -115,7 +115,7 @@ public class AlephRenewItemService implements RenewItemService {
 		responseData.setItemId(initData.getItemId());
 		responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values
+		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); // TODO: Ask librarian when this service costs something & where to find those values
 		responseData.setDateDue(renewItem.getDateDue());
 		responseData.setDateForReturn(renewItem.getDateForReturn());
 		responseData.setPending(renewItem.getPending());

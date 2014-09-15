@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf;
+package org.extensiblecatalog.ncip.v2.aleph.util;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -11,6 +11,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephLoanHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestHandler;
@@ -18,6 +20,7 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestItemHand
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.*;
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
 import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements.MandatedAction;
 import org.extensiblecatalog.ncip.v2.common.*;
@@ -114,9 +117,9 @@ public class RestDlfConnector extends AlephMediator {
 		recordPathElement = AlephConstants.PARAM_RECORD;
 
 	}
-
-	public AgencyId getDefaultAgencyId() {
-		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, defaultAgency);
+	
+	public AgencyId toAgencyId(String agencyId) {
+		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
 
 	private boolean validateRecordId(String recordId) {

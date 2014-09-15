@@ -29,7 +29,7 @@ import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
@@ -164,6 +164,7 @@ public class AlephLookupItemService implements LookupItemService {
 	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
 		if (responseData != null && alephItem != null) {
 
+			//TODO: include circulation status to response even if there is hold pickup date set
 			ItemTransaction itemTransaction = AlephUtil.getItemTransaction(alephItem);
 
 			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);

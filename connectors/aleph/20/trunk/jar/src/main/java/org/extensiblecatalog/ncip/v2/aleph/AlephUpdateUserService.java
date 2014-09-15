@@ -8,8 +8,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.SAXException;
 
@@ -37,10 +37,6 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Please authenticate user. " + details);
 		}
 
-		UserId id = new UserId();
-		id.setUserIdentifierValue(patronId);
-		responseData.setUserId(id);
-
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		if (initiationHeader != null) {
 			ResponseHeader responseHeader = new ResponseHeader();
@@ -63,6 +59,11 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
 			if (alephUser == null)
 				throw new AlephException("alephUser returned by responder is null");
+			else {
+				UserId id = new UserId();
+				id.setUserIdentifierValue(patronId);
+				responseData.setUserId(id);
+			}
 		} catch (IOException ie) {
 			Problem p = new Problem();
 			p.setProblemType(new ProblemType("Procesing IOException error"));

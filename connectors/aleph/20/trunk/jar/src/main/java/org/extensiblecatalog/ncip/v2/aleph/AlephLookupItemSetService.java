@@ -16,7 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
@@ -131,7 +131,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
 		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();
-		boolean getLocation = initData.getLocationDesired();
+		boolean getLocation = initData.getLocationDesired(); //FIXME
 		// EOF TODO;
 
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
@@ -171,7 +171,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							AgencyId suppliedAgencyId;
 							if (getBibDescription) {
 								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getFromAgencyId() == null)
-									suppliedAgencyId = alephSvcMgr.getDefaultAgencyId();
+									suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 								else
 									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
 							} else
@@ -261,7 +261,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							AgencyId suppliedAgencyId;
 							if (getBibDescription) {
 								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getFromAgencyId() == null)
-									suppliedAgencyId = alephSvcMgr.getDefaultAgencyId();
+									suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 								else
 									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
 							} else

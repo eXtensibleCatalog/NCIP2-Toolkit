@@ -242,6 +242,12 @@ public class AlephConstants {
 	public static final String USER_HOLDS_NO_DATA = "N";
 	public static final String USER_HOLDS_PARTIAL_DATA = "P";
 	
+	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
+	public static final String ALEPH_ADMINISTRATIVE_LIBRARY = "AlephAdmLibrary";
+	public static final String DEFAULT_AGENCY = "DefaultAgency";
+	public static final String ALEPH_ILS_AGENCY = "AlephILSAgency";
+	public static final String ALEPH_HOLD_LIBRARY = "AlephHoldLibrary";
+	
 }
 
 

@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 
 import junit.framework.TestCase;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.test.TestConfiguration;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 //import org.extensiblecatalog.ncip.v2.common.NCIPConfiguration;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
