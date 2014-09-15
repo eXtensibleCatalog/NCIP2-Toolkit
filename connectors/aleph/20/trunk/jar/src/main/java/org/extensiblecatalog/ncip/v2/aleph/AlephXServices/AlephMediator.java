@@ -8,6 +8,7 @@ import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUserFactory;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XServiceFactory;
+import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+
+
 
 //import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -1328,5 +1332,13 @@ public class AlephMediator implements Serializable{
 			}
 		}
 		return available;
+	}
+
+	public AlephUser updateUser(String patronId, String password, UpdateUserInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+		
+		AlephUser user = authenticateUser(patronId, password);
+		
+
+		return user;
 	}
 }
