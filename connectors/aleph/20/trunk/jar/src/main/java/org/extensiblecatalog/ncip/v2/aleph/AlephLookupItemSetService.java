@@ -187,7 +187,9 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 								bibInformations.add(bibInformation);
 
-								boolean isLast = itemsToForward == alephItems.size();
+								// It is important to let token create even if the bibId is last of all desired bibIds if not all items can be forwarded
+								boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId) && itemsToForward == alephItems.size();
+								
 								// Do not create NextItemToken if this is last item desired
 								if (maximumItemsCount == itemsForwarded && !isLast) {
 									// Set next item token
@@ -229,7 +231,9 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
 
+							
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
+							
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
 								// Set next item token
