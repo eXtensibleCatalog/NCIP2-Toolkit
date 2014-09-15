@@ -109,6 +109,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				}
 
 				// Remove token from memory hashmap
+				// TODO: Create expiration function 
 				tokens.remove(token);
 			} else {
 				Problem problem = new Problem();
