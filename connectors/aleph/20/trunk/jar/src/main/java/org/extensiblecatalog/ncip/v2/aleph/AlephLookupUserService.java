@@ -47,13 +47,30 @@ public class AlephLookupUserService implements LookupUserService {
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		String patronId = initData.getUserId().getUserIdentifierValue();
+		String patronId = null;
+		String password = null;
+		boolean authenticateOnly = false;
 
-		if (patronId == null) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Note that Aleph supports only User Id lookup.");
+		if (initData.getUserId() != null)
+			patronId = initData.getUserId().getUserIdentifierValue();
+		else {
+			for (AuthenticationInput authInput : initData.getAuthenticationInputs()) {
+				if (authInput.getAuthenticationInputType().getValue().equals(Version1AuthenticationInputType.USER_ID.getValue())) {
+					patronId = authInput.getAuthenticationInputData();
+				} else if (authInput.getAuthenticationInputType().getValue().equals(Version1AuthenticationInputType.PASSWORD.getValue())) {
+					password = authInput.getAuthenticationInputData();
+				}
+			}
+			authenticateOnly = true;
 		}
 
-		responseData.setUserId(initData.getUserId());
+		if (patronId == null) {
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
+		}
+
+		if (initData.getAuthenticationInputs().size() > 0 && password == null) {
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Password is undefined.");
+		}
 
 		// ResponseElementControl can regulate output
 		List<ResponseElementControl> responseElementControls = initData.getResponseElementControls();
@@ -74,28 +91,56 @@ public class AlephLookupUserService implements LookupUserService {
 			responseData.setResponseHeader(responseHeader);
 		}
 
-		AlephUser alephUser = null;
+		if (!authenticateOnly) {
+			AlephUser alephUser = null;
+			try {
+				alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (AlephException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			}
 
-		try {
-			alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (AlephException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
+			updateResponseData(initData, responseData, alephUser);
+		} else {
+			AgencyId suppliedAgencyId;
+			if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null)
+				suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
+			else
+				suppliedAgencyId = new AgencyId(alephRemoteServiceManager.getDefaultAgencyId());
+
+			try {
+
+				String username = alephRemoteServiceManager.authenticateUser(suppliedAgencyId, patronId, password);
+
+				UserId userId = new UserId();
+				userId.setAgencyId(suppliedAgencyId);
+				userId.setUserIdentifierValue(username);
+				userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+
+				responseData.setUserId(userId);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException e) {
+				e.printStackTrace();
+			}
 		}
-
-		updateResponseData(initData, responseData, alephUser);
-
 		return responseData;
 	}
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser) {
 
 		if (alephUser != null) {
+			responseData.setUserId(initData.getUserId());
 			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions -> Cash
 			boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
 			boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full

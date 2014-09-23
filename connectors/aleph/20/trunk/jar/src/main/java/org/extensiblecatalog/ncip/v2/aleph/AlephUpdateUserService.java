@@ -34,7 +34,7 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 
 		if (patronId == null || password == null) {
 			String details = patronId == null ? "Username" : "Password" + " is missing.";
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Please authenticate user. " + details);
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Please supply both authentication inputs of user. " + details);
 		}
 
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
