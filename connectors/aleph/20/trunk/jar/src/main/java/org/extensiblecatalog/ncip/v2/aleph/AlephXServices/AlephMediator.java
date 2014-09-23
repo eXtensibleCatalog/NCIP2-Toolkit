@@ -1335,11 +1335,7 @@ public class AlephMediator implements Serializable{
 	public AlephUser updateUser(String patronId, String password, UpdateUserInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 		
 		AlephUser user = authenticateUser(patronId, password);
-		
-		if(user.getUsername() != patronId) {
-			throw new AlephException("Wrong username provided. Did you mean " + user.getUsername() + " ?");
-		}
-		
+
 		return user;
 	}
 }

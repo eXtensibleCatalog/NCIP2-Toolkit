@@ -61,7 +61,8 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 				throw new AlephException("alephUser returned by responder is null");
 			else {
 				UserId id = new UserId();
-				id.setUserIdentifierValue(patronId);
+				String username = alephUser.getUsername(); 
+				id.setUserIdentifierValue(username);
 				responseData.setUserId(id);
 			}
 		} catch (IOException ie) {
