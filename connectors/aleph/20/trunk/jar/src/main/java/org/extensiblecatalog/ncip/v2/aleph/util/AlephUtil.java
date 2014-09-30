@@ -150,7 +150,7 @@ public class AlephUtil {
 				if (itemUseRestrictionType != null)
 					itemUseRestrictionTypes.add(itemUseRestrictionType);
 			}
-			
+
 			if (itemUseRestrictionTypes.size() > 0)
 				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
 		}
@@ -206,13 +206,13 @@ public class AlephUtil {
 	private static Version1ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
 		Version1ItemUseRestrictionType itemUseRestrictionType = null;
 
-		if (itemRestriction == AlephConstants.ITEM_STATUS_STUDY_ROOM) {
+		if (itemRestriction.equals(AlephConstants.ITEM_STATUS_STUDY_ROOM)) {
 			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
-		} else if (itemRestriction == AlephConstants.ITEM_STATUS_MONTH) {
+		} else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_MONTH)) {
 			itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
-		} else if (itemRestriction == AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH) {
+		} else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH)) {
 			itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
-		} else if (itemRestriction == AlephConstants.ITEM_STATUS_REFERENCE_ONLY) {
+		} else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_REFERENCE_ONLY)) {
 			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
 		}
 
