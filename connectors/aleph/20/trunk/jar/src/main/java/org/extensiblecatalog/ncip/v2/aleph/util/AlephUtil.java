@@ -110,7 +110,7 @@ public class AlephUtil {
 				iof.setCirculationStatus(alephItem.getCirculationStatus());
 			}
 		}
-		
+
 		if (alephItem.getElectronicResource() != null) {
 			ElectronicResource resource = new ElectronicResource();
 			resource.setReferenceToResource(alephItem.getElectronicResource());
@@ -135,6 +135,24 @@ public class AlephUtil {
 			description = new ItemDescription();
 			description.setCopyNumber(alephItem.getCopyNumber());
 			iof.setItemDescription(description);
+		}
+
+		if (alephItem.getItemRestrictions().size() > 0) {
+
+			List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+
+			for (String itemRestriction : alephItem.getItemRestrictions()) {
+
+				Version1ItemUseRestrictionType itemUseRestrictionTypeScheme = parseItemUseRestrictionType(itemRestriction);
+
+				ItemUseRestrictionType itemUseRestrictionType = itemUseRestrictionTypeScheme;
+
+				if (itemUseRestrictionType != null)
+					itemUseRestrictionTypes.add(itemUseRestrictionType);
+			}
+			
+			if (itemUseRestrictionTypes.size() > 0)
+				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
 		}
 
 		if (alephItem.getLocation() != null || alephItem.getCollection() != null) {
@@ -183,6 +201,22 @@ public class AlephUtil {
 			iof.setItemDescription(description);
 		}
 		return iof;
+	}
+
+	private static Version1ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
+		Version1ItemUseRestrictionType itemUseRestrictionType = null;
+
+		if (itemRestriction == AlephConstants.ITEM_STATUS_STUDY_ROOM) {
+			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
+		} else if (itemRestriction == AlephConstants.ITEM_STATUS_MONTH) {
+			itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
+		} else if (itemRestriction == AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH) {
+			itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
+		} else if (itemRestriction == AlephConstants.ITEM_STATUS_REFERENCE_ONLY) {
+			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
+		}
+
+		return itemUseRestrictionType;
 	}
 
 	public static ItemTransaction getItemTransaction(AlephItem alephItem) {

@@ -20,11 +20,6 @@ public class AlephConstants {
 	public static final SimpleDateFormat ALEPH_HOUR_FORMATTER = new SimpleDateFormat("HHmm");
 
 	public static final String DUE_DATE_NODE = "due-date";
-	public static final String Z30_BARCODE = "z30-barcode";
-	public static final String Z30_CALL_NUMBER_NODE = "z30-call-no";
-	public static final String Z30_CALL_NUMBER_2_TYPE_NODE = "z30-call-no-2-type";
-	public static final String Z30_CALL_NUMBER_2_NODE = "z30-call-no-2";
-	public static final String Z30_COPY_ID_NODE = "z30-copy-id";
 	
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
 	public static final String Z13_AUTHOR_NODE = "z13-author";
@@ -75,17 +70,26 @@ public class AlephConstants {
 	public static final String Z30_MATERIAL_NODE = "z30-material";
 	public static final String Z30_SUB_LIBRARY_NODE = "z30-sub-library";
 	public static final String Z30_OPEN_DATE_NODE = "z30-open-date";
-	public static final String NEW_DUE_DATE_NODE = "new-due-date";
-	// could be hold id, not sure?
+	public static final String Z30_ITEM_STATUS_NODE = "z30-item-status";
 	public static final String Z30_HOLD_DOC_NUMBER_NODE = "z30-hol-doc-number";
+	public static final String Z30_COLLECTION_NODE = "z30-collection";
+	public static final String Z30_NODE_ID = "Z30";
+	public static final String Z30_BARCODE = "z30-barcode";
+	public static final String Z30_CALL_NUMBER_NODE = "z30-call-no";
+	public static final String Z30_CALL_NUMBER_2_TYPE_NODE = "z30-call-no-2-type";
+	public static final String Z30_CALL_NUMBER_2_NODE = "z30-call-no-2";
+	public static final String Z30_COPY_ID_NODE = "z30-copy-id";
+	
+	public static final String NEW_DUE_DATE_NODE = "new-due-date";
+
 	// get fine data
 	public static final String Z31_FINE_DATE_NODE = "z31-date";
 	public static final String Z31_FINE_STATUS_NODE = "z31-status";
 	public static final String Z31_CREDIT_DEBIT_NODE = "z31-credit-debit";
 	public static final String Z31_NET_SUM_NODE = "z31-net-sum";
-	public static final String Z30_NODE_ID = "Z30";
+	
 	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
-	public static final String Z30_COLLECTION_NODE = "z30-collection";
+	
 
 	public static final String Z31_NODE = "z31";
 	public static final String Z31_FINE_ACCRUAL_DATE_NODE = "z31-date";
@@ -373,5 +377,10 @@ public class AlephConstants {
 	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
 
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
-
+	
+	// Item Restrictions here:
+	public static final String ITEM_STATUS_REFERENCE_ONLY = "Reference only";
+	public static final String ITEM_STATUS_MONTH = "Month";
+	public static final String ITEM_STATUS_OPEN_STOCK_MONTH = "Open Stock Month";
+	public static final String ITEM_STATUS_STUDY_ROOM = "Study room";
 }

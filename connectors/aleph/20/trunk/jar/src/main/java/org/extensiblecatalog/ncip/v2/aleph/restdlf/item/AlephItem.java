@@ -8,6 +8,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 
 import java.io.Serializable;
@@ -82,10 +83,13 @@ public class AlephItem implements Serializable {
 	private String copyNumber;
 	private boolean exists = true;
 	private String seqNumber;
+	
+	private List<String> itemRestrictions;
 
 	public AlephItem() {
 		borrowingUsers = new ArrayList<AlephUser>();
 		requestingUsers = new ArrayList<AlephUser>();
+		itemRestrictions = new ArrayList<String>();
 	}
 
 	public AlephItem doesntExists() {
@@ -731,6 +735,15 @@ public class AlephItem implements Serializable {
 		return agency;
 	}
 
+	public void addItemRestriction(String itemRestriction) {
+		itemRestrictions.add(itemRestriction);
+	}
+
+
+	public List<String> getItemRestrictions() {
+		return itemRestrictions;
+	}
+
 	/**
 	 * This method will update this overwrite anything in this alephItem with the alephItem's values passed in if they are not null.
 	 * 
@@ -919,4 +932,8 @@ public class AlephItem implements Serializable {
 		iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
 		return iof;
 	}
+
+
+
+
 }

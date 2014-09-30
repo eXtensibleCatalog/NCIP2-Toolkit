@@ -99,6 +99,7 @@ public class AlephItemHandler extends DefaultHandler {
 	private List<LoanedItem> loanedItems;
 	private LoanedItem currentLoanedItem;
 	private String itemDocNumber;
+	private boolean itemStatusReached;
 
 	//FIXME: Remove this logic structure & create more human readable
 	public AlephItemHandler parseLoansOrRequests() {
@@ -116,6 +117,7 @@ public class AlephItemHandler extends DefaultHandler {
 		loansHandling = false;
 		holdRequestsHandling = true;
 	}
+	//End of FIXME
 
 	/**
 	 * @return the listOfItems
@@ -197,6 +199,8 @@ public class AlephItemHandler extends DefaultHandler {
 				agencyReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE)) {
 				collectionReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE)) {
+				itemStatusReached = true;
 			} else if (bibDescriptionDesired) {
 				if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 					authorReached = true;
@@ -328,6 +332,8 @@ public class AlephItemHandler extends DefaultHandler {
 				agencyReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && collectionReached) {
 				collectionReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && itemStatusReached) {
+				itemStatusReached = false;
 			} else if (bibDescriptionDesired) {
 				if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 					authorReached = false;
@@ -483,6 +489,9 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (collectionReached) {
 				currentAlephItem.setCollection(new String(ch, start, length));
 				collectionReached = false;
+			} else if (itemStatusReached) {
+				currentAlephItem.addItemRestriction(new String(ch, start, length));
+				itemStatusReached = false;
 			} else if (bibDescriptionDesired) {
 				if (authorReached) {
 					currentAlephItem.setAuthor(new String(ch, start, length));
