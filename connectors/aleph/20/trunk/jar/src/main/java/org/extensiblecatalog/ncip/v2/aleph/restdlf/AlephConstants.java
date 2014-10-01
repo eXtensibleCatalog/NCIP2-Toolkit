@@ -378,9 +378,42 @@ public class AlephConstants {
 
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
 	
-	// Item Restrictions here:
+	// Item Restrictions of MZK's Aleph ILS here:
+	public static final String ITEM_STATUS_TO_THE_MUSIC_CORNER_ONLY_4F = "To The Music Corner only (4F)";
+	public static final String ITEM_STATUS_REFERENCE_ONLY_SPN_2F = "Reference only (SPN 2F)";
+	public static final String ITEM_STATUS_REFERENCE_ONLY_ST_4F = "Reference only (ST 4F)";
+	public static final String ITEM_STATUS_REFERENCE_SHELF= "Reference shelf";
 	public static final String ITEM_STATUS_REFERENCE_ONLY = "Reference only";
-	public static final String ITEM_STATUS_MONTH = "Month";
-	public static final String ITEM_STATUS_OPEN_STOCK_MONTH = "Open Stock Month";
+	public static final String ITEM_STATUS_IN_HOUSE_LOAN = "In house loan";
 	public static final String ITEM_STATUS_STUDY_ROOM = "Study room";
+
+	public static final String ITEM_STATUS_OPEN_STOCK_MONTH = "Open Stock Month";
+	public static final String ITEM_STATUS_LONG_TERM_LOAN = "Long-term loan";
+	public static final String ITEM_STATUS_MONTH = "Month";
+	public static final String ITEM_STATUS_WEEK = "Week";
+		
+	public static final String ITEM_STATUS_14_DAYS = "14 days";
+	public static final String ITEM_STATUS_7_DAYS= "7 days";
+	public static final String ITEM_STATUS_2_HOURS = "2 hours";	
+	
+	public static final String ITEM_STATUS_IN_HOUSE_ILL= "In-house ILL";
+	public static final String ITEM_STATUS_CHECK_OUT_ILL = "Check out ILL";
+	
+	public static final String ITEM_STATUS_ITEM_UNDER_CLAIN = "Item under claim";
+	public static final String ITEM_STATUS_CURRENT_YEAR_2 = "Current Year 2";
+	public static final String ITEM_STATUS_NOT_PUBLISHED = "Not published";
+	public static final String ITEM_STATUS_INVESTIGATED = "Investigated";
+	public static final String ITEM_STATUS_CURRENT_YEAR= "Current Year";
+	public static final String ITEM_STATUS_NOT_FOUND_1 = "Not found 1";
+	public static final String ITEM_STATUS_NOT_FOUND_2 = "Not found 2";
+	public static final String ITEM_STATUS_NOT_FOUND_3 = "Not found 3";
+	public static final String ITEM_STATUS_DIGITIZING = "Digitizing";
+	public static final String ITEM_STATUS_BINDING_1 = "Binding 1";
+	public static final String ITEM_STATUS_BINDING_2 = "Binding 2";
+	public static final String ITEM_STATUS_RETRO = "Retro";
+
+	
+	// Item Restriction's HashMap keys
+	public static final String ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY = "Library only";
+	public static final String ITEM_RESTRICTION_LOAN_PERIOD = "Loan Period";
 }

@@ -8,8 +8,10 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +22,40 @@ import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.SAXException;
 
 public class AlephUtil {
+
+	private static Map<String, List<String>> itemRestrictionClasses;
+	private static boolean itemRestrictionClassesInitialized = false;
+
+	private static void initializeItemRestrictionClasses() {
+		itemRestrictionClasses = new HashMap<String, List<String>>();
+
+		// Define & add list of item statuses defining restriction 'In Library Use Only'
+		List<String> inLibraryUseOnly = new ArrayList<String>();
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_TO_THE_MUSIC_CORNER_ONLY_4F);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_IN_HOUSE_LOAN);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_REFERENCE_ONLY);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_REFERENCE_ONLY_SPN_2F);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_REFERENCE_ONLY_ST_4F);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_REFERENCE_SHELF);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_STUDY_ROOM);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_IN_HOUSE_ILL);
+		itemRestrictionClasses.put(AlephConstants.ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY, inLibraryUseOnly);
+
+		// Define & add list of item statuses defining restrictions of type 'Loan Period'
+		List<String> loanPeriods = new ArrayList<String>();
+		loanPeriods.add(AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH);
+		loanPeriods.add(AlephConstants.ITEM_STATUS_LONG_TERM_LOAN);
+		loanPeriods.add(AlephConstants.ITEM_STATUS_MONTH);
+		loanPeriods.add(AlephConstants.ITEM_STATUS_WEEK);
+		loanPeriods.add(AlephConstants.ITEM_STATUS_14_DAYS);
+		loanPeriods.add(AlephConstants.ITEM_STATUS_7_DAYS);
+		loanPeriods.add(AlephConstants.ITEM_STATUS_2_HOURS);
+		itemRestrictionClasses.put(AlephConstants.ITEM_RESTRICTION_LOAN_PERIOD, loanPeriods);
+
+		// Note that other item statuses returned by Aleph RESTful APIs ILS are non-restrictive
+		itemRestrictionClassesInitialized = true;
+	}
+
 	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
 
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
@@ -203,17 +239,27 @@ public class AlephUtil {
 		return iof;
 	}
 
-	private static Version1ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
+	public static Version1ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
 		Version1ItemUseRestrictionType itemUseRestrictionType = null;
 
-		if (itemRestriction.equals(AlephConstants.ITEM_STATUS_STUDY_ROOM)) {
+		if (! itemRestrictionClassesInitialized)
+			initializeItemRestrictionClasses();
+		
+		boolean isLibraryOnlyRestrictionType = itemRestrictionClasses.get(AlephConstants.ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY).contains(itemRestriction);
+		boolean isLoanPeriodRestrictionType = itemRestrictionClasses.get(AlephConstants.ITEM_RESTRICTION_LOAN_PERIOD).contains(itemRestriction);
+
+		if (isLibraryOnlyRestrictionType) {
 			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
-		} else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_MONTH)) {
-			itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
-		} else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH)) {
-			itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
-		} else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_REFERENCE_ONLY)) {
-			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
+		} else if (isLoanPeriodRestrictionType) {
+			
+			if (itemRestriction.equals(AlephConstants.ITEM_STATUS_LONG_TERM_LOAN))
+				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_LONG_LOAN_PERIOD;
+			
+			else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_MONTH) || itemRestriction.equals(AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH))				
+				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
+			
+			else
+				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_SHORT_LOAN_PERIOD;
 		}
 
 		return itemUseRestrictionType;

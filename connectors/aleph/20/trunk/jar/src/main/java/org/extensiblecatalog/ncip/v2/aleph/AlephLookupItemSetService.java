@@ -32,6 +32,7 @@ import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
@@ -47,6 +48,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifi
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
@@ -109,7 +111,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				}
 
 				// Remove token from memory hashmap
-				// TODO: Create expiration function 
+				// TODO: Create expiration function
 				tokens.remove(token);
 			} else {
 				Problem problem = new Problem();
@@ -132,7 +134,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
 		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();
-		boolean getLocation = initData.getLocationDesired(); //FIXME
+		boolean getLocation = initData.getLocationDesired(); // FIXME
 		// EOF TODO;
 
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
@@ -178,8 +180,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							} else
 								suppliedAgencyId = null;
 							// TODO: move parseHoldingsSets method to AlephUtil & purge this horrible code so that it is more understandable
-							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength,
-									getItemDescription);
+							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, initData);
 
 							bibInformation.setHoldingsSets(holdingSets);
 
@@ -190,7 +191,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 								// It is important to let token create even if the bibId is last of all desired bibIds if not all items can be forwarded
 								boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId) && itemsToForward == alephItems.size();
-								
+
 								// Do not create NextItemToken if this is last item desired
 								if (maximumItemsCount == itemsForwarded && !isLast) {
 									// Set next item token
@@ -232,9 +233,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
 
-							
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
-							
+
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
 								// Set next item token
@@ -268,7 +268,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							} else
 								suppliedAgencyId = null;
 
-							HoldingsSet holdingsSet = parseHoldingsSet(alephItem, suppliedAgencyId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+							HoldingsSet holdingsSet = parseHoldingsSet(alephItem, suppliedAgencyId, initData);
 
 							List<HoldingsSet> holdingsSets = new ArrayList<HoldingsSet>();
 							holdingsSets.add(holdingsSet);
@@ -276,7 +276,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
-							
+
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
@@ -303,9 +303,9 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
-							
+
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
-							// Do not create NextItemToken if this is last item desired							
+							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
 								// Set next item token
 								ItemToken itemToken = new ItemToken();
@@ -414,43 +414,70 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		return responseData;
 	}
 
-	private HoldingsSet parseHoldingsSet(AlephItem alephItem, AgencyId suppliedAgencyId, boolean getBibDescription, boolean getCircStatus, boolean getHoldQueueLength,
-			boolean getItemDescription) {
+	/**
+	 * 
+	 * Parses response from requested ItemId (we know for sure there is only one item to parse)
+	 * 
+	 * @param alephItem
+	 * @param suppliedAgencyId
+	 * @param getBibDescription
+	 * @param getCircStatus
+	 * @param getHoldQueueLength
+	 * @param getItemDescription
+	 * @return
+	 */
+	private HoldingsSet parseHoldingsSet(AlephItem alephItem, AgencyId suppliedAgencyId, LookupItemSetInitiationData initData) {
 		HoldingsSet holdingsSet = new HoldingsSet();
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
 
 		ItemOptionalFields iof = new ItemOptionalFields();
 
-		if (getBibDescription) {
+		if (initData.getBibliographicDescriptionDesired()) {
 			BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, suppliedAgencyId);
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
 		addItemIdentifierToItemOptionalFields(iof, alephItem.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 
-		// Schema v2_02 defines to forward alephItemInfo even though there is no optional information desired
-		// EDIT: alephItemInformation does not transfer only optional fields ...
 		ItemInformation info = new ItemInformation();
 
 		ItemId itemId = new ItemId();
 		itemId.setItemIdentifierValue(alephItem.getItemId());
 		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 		info.setItemId(itemId);
-		if (getHoldQueueLength || getCircStatus || getItemDescription) {
-			if (getHoldQueueLength)
-				iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
-			if (getCircStatus)
-				iof.setCirculationStatus(alephItem.getCirculationStatus());
-			if (getItemDescription) {
-				ItemDescription itemDescription = new ItemDescription();
-				itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
-				itemDescription.setCallNumber(alephItem.getCallNumber());
-				itemDescription.setCopyNumber(alephItem.getCopyNumber());
-				itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
-				iof.setItemDescription(itemDescription);
-			}
 
+		if (initData.getHoldQueueLengthDesired())
+			iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
+		if (initData.getCirculationStatusDesired())
+			iof.setCirculationStatus(alephItem.getCirculationStatus());
+		if (initData.getItemDescriptionDesired()) {
+			ItemDescription itemDescription = new ItemDescription();
+			itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
+			itemDescription.setCallNumber(alephItem.getCallNumber());
+			itemDescription.setCopyNumber(alephItem.getCopyNumber());
+			itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
+			iof.setItemDescription(itemDescription);
 		}
+		if (initData.getItemUseRestrictionTypeDesired()) {
+			if (alephItem.getItemRestrictions().size() > 0) {
+
+				List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+
+				for (String itemRestriction : alephItem.getItemRestrictions()) {
+
+					Version1ItemUseRestrictionType itemUseRestrictionTypeScheme = AlephUtil.parseItemUseRestrictionType(itemRestriction);
+
+					ItemUseRestrictionType itemUseRestrictionType = itemUseRestrictionTypeScheme;
+
+					if (itemUseRestrictionType != null)
+						itemUseRestrictionTypes.add(itemUseRestrictionType);
+				}
+
+				if (itemUseRestrictionTypes.size() > 0)
+					iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+			}
+		}
+
 		info.setItemOptionalFields(iof);
 		itemInfoList.add(info);
 		holdingsSet.setItemInformations(itemInfoList);
@@ -458,8 +485,19 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		return holdingsSet;
 	}
 
-	private List<HoldingsSet> parseHoldingsSets(List<AlephItem> alephItems, AgencyId suppliedAgencyId, boolean getBibDescription, boolean getCircStatus,
-			boolean getHoldQueueLength, boolean getItemDescription) {
+	/**
+	 * 
+	 * Parses response from requested RecordId
+	 * 
+	 * @param alephItems
+	 * @param suppliedAgencyId
+	 * @param getBibDescription
+	 * @param getCircStatus
+	 * @param getHoldQueueLength
+	 * @param getItemDescription
+	 * @return
+	 */
+	private List<HoldingsSet> parseHoldingsSets(List<AlephItem> alephItems, AgencyId suppliedAgencyId, LookupItemSetInitiationData initData) {
 		List<HoldingsSet> holdingsSets = new ArrayList<HoldingsSet>();
 		HoldingsSet holdingsSet = new HoldingsSet();
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
@@ -468,15 +506,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
 				ItemOptionalFields iof = new ItemOptionalFields();
 
-				if (getBibDescription) {
+				if (initData.getBibliographicDescriptionDesired()) {
 					BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
 					holdingsSet.setBibliographicDescription(bDesc);
 				}
 
 				addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 
-				// Schema v2_02 defines to forward itemInfo even though there is no optional information desired
-				// EDIT: ItemInformation does not transfer only optional fields ...
 				ItemInformation info = new ItemInformation();
 
 				ItemId itemId = new ItemId();
@@ -484,20 +520,38 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 				info.setItemId(itemId);
 
-				if (getHoldQueueLength || getCircStatus || getItemDescription) {
-					if (getHoldQueueLength)
-						iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
-					if (getCircStatus)
-						iof.setCirculationStatus(item.getCirculationStatus());
-					if (getItemDescription) {
-						ItemDescription itemDescription = new ItemDescription();
-						itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
-						itemDescription.setCallNumber(item.getCallNumber());
-						itemDescription.setCopyNumber(item.getCopyNumber());
-						itemDescription.setNumberOfPieces(item.getNumberOfPieces());
-						iof.setItemDescription(itemDescription);
+				if (initData.getHoldQueueLengthDesired())
+					iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
+				if (initData.getCirculationStatusDesired())
+					iof.setCirculationStatus(item.getCirculationStatus());
+				if (initData.getItemDescriptionDesired()) {
+					ItemDescription itemDescription = new ItemDescription();
+					itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
+					itemDescription.setCallNumber(item.getCallNumber());
+					itemDescription.setCopyNumber(item.getCopyNumber());
+					itemDescription.setNumberOfPieces(item.getNumberOfPieces());
+					iof.setItemDescription(itemDescription);
+				}
+				if (initData.getItemUseRestrictionTypeDesired()) {
+					if (item.getItemRestrictions().size() > 0) {
+
+						List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+
+						for (String itemRestriction : item.getItemRestrictions()) {
+
+							Version1ItemUseRestrictionType itemUseRestrictionTypeScheme = AlephUtil.parseItemUseRestrictionType(itemRestriction);
+
+							ItemUseRestrictionType itemUseRestrictionType = itemUseRestrictionTypeScheme;
+
+							if (itemUseRestrictionType != null)
+								itemUseRestrictionTypes.add(itemUseRestrictionType);
+						}
+
+						if (itemUseRestrictionTypes.size() > 0)
+							iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
 					}
 				}
+
 				info.setItemOptionalFields(iof);
 
 				itemInfoList.add(info);
