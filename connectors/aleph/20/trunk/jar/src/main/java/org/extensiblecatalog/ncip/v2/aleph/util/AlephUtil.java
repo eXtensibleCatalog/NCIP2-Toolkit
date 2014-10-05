@@ -242,22 +242,22 @@ public class AlephUtil {
 	public static Version1ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
 		Version1ItemUseRestrictionType itemUseRestrictionType = null;
 
-		if (! itemRestrictionClassesInitialized)
+		if (!itemRestrictionClassesInitialized)
 			initializeItemRestrictionClasses();
-		
+
 		boolean isLibraryOnlyRestrictionType = itemRestrictionClasses.get(AlephConstants.ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY).contains(itemRestriction);
 		boolean isLoanPeriodRestrictionType = itemRestrictionClasses.get(AlephConstants.ITEM_RESTRICTION_LOAN_PERIOD).contains(itemRestriction);
 
 		if (isLibraryOnlyRestrictionType) {
 			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
 		} else if (isLoanPeriodRestrictionType) {
-			
+
 			if (itemRestriction.equals(AlephConstants.ITEM_STATUS_LONG_TERM_LOAN))
 				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_LONG_LOAN_PERIOD;
-			
-			else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_MONTH) || itemRestriction.equals(AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH))				
+
+			else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_MONTH) || itemRestriction.equals(AlephConstants.ITEM_STATUS_OPEN_STOCK_MONTH))
 				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
-			
+
 			else
 				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_SHORT_LOAN_PERIOD;
 		}
@@ -432,5 +432,57 @@ public class AlephUtil {
 			return loanDate;
 		} else
 			return null;
+	}
+
+	public static List<OrganizationNameInformation> getOrganizationNameInformations(String agencyId) {
+		List<OrganizationNameInformation> organizationNameInformations = new ArrayList<OrganizationNameInformation>();
+		OrganizationNameInformation organizationNameInfo = new OrganizationNameInformation();
+
+		// FIXME: parse these from database!
+		organizationNameInfo.setOrganizationName("Moravian Library");
+		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
+		organizationNameInformations.add(organizationNameInfo);
+		return organizationNameInformations;
+	}
+
+	public static List<AgencyAddressInformation> getAgencyAddressInformations(String agencyId) {
+		List<AgencyAddressInformation> agencyAddressInformations = new ArrayList<AgencyAddressInformation>();
+		AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
+
+		// FIXME: parse these from database!
+		PhysicalAddress physicalAddress = new PhysicalAddress();
+
+		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
+		unstructuredAddress.setUnstructuredAddressData("Kounicova 65a, 601 87 Brno");
+		unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
+		physicalAddress.setUnstructuredAddress(unstructuredAddress);
+		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
+
+		agencyAddressInformation.setPhysicalAddress(physicalAddress);
+		
+
+		AgencyAddressRoleType agencyAddressRoleType = Version1AgencyAddressRoleType.OFFICIAL;
+		agencyAddressInformation.setAgencyAddressRoleType(agencyAddressRoleType);
+
+		agencyAddressInformations.add(agencyAddressInformation);
+		return agencyAddressInformations;
+	}
+
+	public static List<ApplicationProfileSupportedType> getApplicationProfileSupportedTypes(String agencyId) {
+		// FIXME: What is this good for?
+		List<ApplicationProfileSupportedType> applicationProfileSupportedTypes = new ArrayList<ApplicationProfileSupportedType>();
+		ApplicationProfileSupportedType applicationProfileSupportedType = new ApplicationProfileSupportedType("unknown", "Development profile");
+		applicationProfileSupportedTypes.add(applicationProfileSupportedType);
+		return applicationProfileSupportedTypes;
+	}
+
+	public static List<ConsortiumAgreement> getConsortiumAgreements(String agencyId) {
+		List<ConsortiumAgreement> consortiumAgreements = new ArrayList<ConsortiumAgreement>();
+		ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Testing consortium agreement value.");
+		consortiumAgreements.add(consortiumAgreement);
+		
+		consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Another testing consortium agreement value.");
+		consortiumAgreements.add(consortiumAgreement);
+		return consortiumAgreements;
 	}
 }
