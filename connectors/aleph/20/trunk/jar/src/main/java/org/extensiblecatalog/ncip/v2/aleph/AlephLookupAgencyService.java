@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyElementType;
@@ -29,6 +30,8 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 	public LookupAgencyResponseData performService(LookupAgencyInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 		LookupAgencyResponseData responseData = new LookupAgencyResponseData();
 
+		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
+
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		if (initiationHeader != null) {
 			ResponseHeader responseHeader = new ResponseHeader();
@@ -48,7 +51,7 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 		String agencyId = initData.getAgencyId().getValue();
 
 		if (agencyId == null) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Cannot look for empty agency Id. Please supply one.");
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "You have not supplied your agency id.");
 		}
 
 		boolean getAgencyAddressInformation = false;
@@ -73,51 +76,26 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 				else if (aet.getValue().equals(Version1AgencyElementType.ORGANIZATION_NAME_INFORMATION.getValue()))
 					getOrganizationNameInformation = true;
 			} else {
-				throw new ServiceException(ServiceError.INVALID_SCHEME_VALUE, "AgencyElementType has not valid scheme value.");
+				throw new ServiceException(ServiceError.INVALID_SCHEME_VALUE, "AgencyElementType has not supported scheme value.");
 			}
 		}
 
-		// Note that this class is not going to work properly until there aren't records of agencies connected with (could be solved with database connection)
-		// Another possible resource of data: http://www.mkcr.cz/assets/literatura-a-knihovny/Evidovane-knihovny-web-16-07-12.xls
-		String hardCodedAgency = "MZK";
-		String ncipVersion = "1.0.0";
+		String localAgencyId = alephSvcMgr.getDefaultAgency();
+		String ncipVersion = alephSvcMgr.getNCIPVersion();
 
-		if (!agencyId.equals(hardCodedAgency)) {
-			List<Problem> problems = new ArrayList<Problem>();
-			Problem problem = new Problem();
-			problem.setProblemType(new ProblemType("Unknown agency"));
-			problem.setProblemDetail("Missing database of agencies to look into.");
-			problem.setProblemValue("Passed agencyId (" + initData.getAgencyId().getValue() + ") was not found.");
-			problems.add(problem);
-			responseData.setProblems(problems);
-		} else {
-			responseData.setAgencyId(new AgencyId(agencyId));
-
-			if (getAgencyAddressInformation) {
-				List<AgencyAddressInformation> agencyAddressInformations = AlephUtil.getAgencyAddressInformations(agencyId);
-				responseData.setAgencyAddressInformations(agencyAddressInformations);
-			}
-			/*
-			 * if (getAgencyUserPrivilegeType) { throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Agency user privilege type has not been implemented yet."); }
-			 */
-			if (getApplicationProfileSupportedType) {
-				List<ApplicationProfileSupportedType> applicationProfileSupportedTypes = AlephUtil.getApplicationProfileSupportedTypes(agencyId);
-				responseData.setApplicationProfileSupportedTypes(applicationProfileSupportedTypes);
-			}
-			/*
-			 * if (getAuthenticationPrompt) { throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Authentication prompt has not been implemented yet."); }
-			 */
-			if (getConsortiumAgreement) {
-				List<ConsortiumAgreement> consortiumAgreements = AlephUtil.getConsortiumAgreements(agencyId);
-				responseData.setConsortiumAgreements(consortiumAgreements);
-			}
-
-			if (getOrganizationNameInformation) {
-				List<OrganizationNameInformation> organizationNameInformations = AlephUtil.getOrganizationNameInformations(agencyId);
-				responseData.setOrganizationNameInformations(organizationNameInformations);
-			}
-			responseData.setVersion(ncipVersion);
+		if (getAgencyAddressInformation) {
+			List<AgencyAddressInformation> agencyAddressInformations = alephSvcMgr.getAgencyAddressInformations(agencyId);
+			responseData.setAgencyAddressInformations(agencyAddressInformations);
 		}
+
+		if (getOrganizationNameInformation) {
+			List<OrganizationNameInformation> organizationNameInformations = alephSvcMgr.getOrganizationNameInformations(agencyId);
+			responseData.setOrganizationNameInformations(organizationNameInformations);
+		}
+
+		responseData.setAgencyId(alephSvcMgr.toAgencyId(localAgencyId));
+		responseData.setVersion(ncipVersion);
+
 		return responseData;
 	}
 

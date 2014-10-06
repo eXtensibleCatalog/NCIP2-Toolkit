@@ -357,7 +357,10 @@ public class AlephConstants {
 	public static final String ITEM_PATH_ELEMENT = "record";
 	public static final String USER_PATH_ELEMENT = "patron";
 
-	// TODO: make Xservices & rest dlf switchable
+	public static final String AGENCY_UNSTRUCTURED_ADDRESS = "AgencyUnstructuredAddress";
+	public static final String AGENCY_TRANSLATED_NAME = "AgencyTranslatedName";
+	public static final String NCIP_TOOLKIT_VERSION = "NCIPToolkitVersion";
+	
 	public static final String XSERVER_NAME = "AlephXServerName";
 	public static final String XSERVER_PORT = "AlephXServerPort";
 	public static final String XSERVER_SUFFIX = "AlephXServerSuffix";

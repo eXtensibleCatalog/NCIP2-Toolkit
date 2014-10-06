@@ -42,7 +42,12 @@ public class RestDlfConnector extends AlephMediator {
 	private boolean uofDesiredWithinRequestItem;
 	private boolean iofDesiredWithinCancelRequestItem;
 	private boolean uofDesiredWithinCancelRequestItem;
-	public String defaultAgency = "";
+	
+	private String defaultAgency;
+	private String agencyAddress;
+	private String agencyName;
+	private String NCIPVersion;
+	
 	private String serverName;
 	private String serverPort;
 	private String serverSuffix;
@@ -83,6 +88,10 @@ public class RestDlfConnector extends AlephMediator {
 			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
 			admLibrary = alephConfig.getProperty(AlephConstants.ALEPH_ADMINISTRATIVE_LIBRARY);
 			defaultAgency = alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY);
+			
+			NCIPVersion = alephConfig.getProperty(AlephConstants.NCIP_TOOLKIT_VERSION);
+			agencyAddress = alephConfig.getProperty(AlephConstants.AGENCY_UNSTRUCTURED_ADDRESS);
+			agencyName = alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME);
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
 			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
@@ -116,6 +125,22 @@ public class RestDlfConnector extends AlephMediator {
 		registrationElement = AlephConstants.PARAM_REGISTRATION;
 		recordPathElement = AlephConstants.PARAM_RECORD;
 
+	}
+	
+	public String getDefaultAgency() {
+		return defaultAgency;
+	}
+	
+	public String getAgencyAddress() {
+		return agencyAddress;
+	}
+	
+	public String getAgencyName() {
+		return agencyName;
+	}
+	
+	public String getNCIPVersion() {
+		return NCIPVersion;
 	}
 	
 	public AgencyId toAgencyId(String agencyId) {
@@ -669,5 +694,56 @@ public class RestDlfConnector extends AlephMediator {
 			renewItem.setProblem(problem);
 		}
 		return renewItem;
+	}
+	
+	public List<AgencyAddressInformation> getAgencyAddressInformations(String agencyId) {
+		List<AgencyAddressInformation> agencyAddressInformations = new ArrayList<AgencyAddressInformation>();
+		AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
+
+		PhysicalAddress physicalAddress = new PhysicalAddress();
+
+		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
+		unstructuredAddress.setUnstructuredAddressData(agencyAddress);
+		unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
+		physicalAddress.setUnstructuredAddress(unstructuredAddress);
+		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
+
+		agencyAddressInformation.setPhysicalAddress(physicalAddress);
+		
+
+		AgencyAddressRoleType agencyAddressRoleType = Version1AgencyAddressRoleType.OFFICIAL;
+		agencyAddressInformation.setAgencyAddressRoleType(agencyAddressRoleType);
+
+		agencyAddressInformations.add(agencyAddressInformation);
+		return agencyAddressInformations;
+	}
+	
+	public List<OrganizationNameInformation> getOrganizationNameInformations(String agencyId) {
+		List<OrganizationNameInformation> organizationNameInformations = new ArrayList<OrganizationNameInformation>();
+		OrganizationNameInformation organizationNameInfo = new OrganizationNameInformation();
+
+		// FIXME: parse these from database!
+		organizationNameInfo.setOrganizationName(agencyName);
+		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
+		organizationNameInformations.add(organizationNameInfo);
+		return organizationNameInformations;
+	}	
+
+	public List<ApplicationProfileSupportedType> getApplicationProfileSupportedTypes(String agencyId) {
+		// FIXME: What is this good for?
+		List<ApplicationProfileSupportedType> applicationProfileSupportedTypes = new ArrayList<ApplicationProfileSupportedType>();
+		ApplicationProfileSupportedType applicationProfileSupportedType = new ApplicationProfileSupportedType("unknown", "Development profile");
+		applicationProfileSupportedTypes.add(applicationProfileSupportedType);
+		return applicationProfileSupportedTypes;
+	}
+
+	public List<ConsortiumAgreement> getConsortiumAgreements(String agencyId) {
+		List<ConsortiumAgreement> consortiumAgreements = new ArrayList<ConsortiumAgreement>();
+		ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Testing consortium agreement value.");
+		consortiumAgreements.add(consortiumAgreement);
+		
+		consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Another testing consortium agreement value.");
+		consortiumAgreements.add(consortiumAgreement);
+		return consortiumAgreements;
 	}
 }
