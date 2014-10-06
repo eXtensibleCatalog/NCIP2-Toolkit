@@ -31,8 +31,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  */
 public class AlephItemHandler extends DefaultHandler {
-	//FIXME: Move human not readable operations to AlephUtil
-	
+	// FIXME: Move human not readable operations to AlephUtil
+
 	private List<AlephItem> listOfItems;
 	private AlephItem currentAlephItem;
 
@@ -40,6 +40,9 @@ public class AlephItemHandler extends DefaultHandler {
 	private String agencyId;
 	private String bibDocNumber;
 	private String itemSequence;
+	private String itemDocNumber;
+	private String bibLibrary;
+	private String loanNumber;
 	private boolean itemIdNotFound;
 
 	// Required to decide whether is set second call number the one we need
@@ -92,16 +95,16 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean statusReached = false;
 	private boolean dueDateReached = false;
 	private boolean loanDateReached = false;
+	private boolean itemStatusReached = false;
+	private boolean loanNumberReached = false;
 
 	private List<RequestedItem> requestedItems;
 	private RequestedItem currentRequestedItem;
 
 	private List<LoanedItem> loanedItems;
 	private LoanedItem currentLoanedItem;
-	private String itemDocNumber;
-	private boolean itemStatusReached;
 
-	//FIXME: Remove this logic structure & create more human readable
+	// FIXME: Remove this logic structure & create more human readable
 	public AlephItemHandler parseLoansOrRequests() {
 		bibliographicDescription = new BibliographicDescription();
 		parsingLoansOrRequests = true;
@@ -117,7 +120,8 @@ public class AlephItemHandler extends DefaultHandler {
 		loansHandling = false;
 		holdRequestsHandling = true;
 	}
-	//End of FIXME
+
+	// End of FIXME
 
 	/**
 	 * @return the listOfItems
@@ -145,8 +149,9 @@ public class AlephItemHandler extends DefaultHandler {
 	 *            - parsed from initData
 	 * @throws AlephException
 	 */
-	public AlephItemHandler(boolean requireAtLeastOneService, boolean bibDescriptionDesired, boolean circulationStatusDesired, boolean holdQueueLnegthDesired,
+	public AlephItemHandler(String bibLibrary, boolean requireAtLeastOneService, boolean bibDescriptionDesired, boolean circulationStatusDesired, boolean holdQueueLnegthDesired,
 			boolean itemDesrciptionDesired) throws AlephException {
+		this.bibLibrary = bibLibrary;
 		if (bibDescriptionDesired || circulationStatusDesired || holdQueueLnegthDesired || itemDesrciptionDesired) {
 			this.bibDescriptionDesired = bibDescriptionDesired;
 			this.circulationStatusDesired = circulationStatusDesired;
@@ -243,6 +248,8 @@ public class AlephItemHandler extends DefaultHandler {
 					loanDateReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE)) {
 					itemSequenceReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_NUMBER_NODE)) {
+					loanNumberReached = true;
 				}
 			} else if (holdRequestsHandling) { // Handling requests XML output
 				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
@@ -287,12 +294,11 @@ public class AlephItemHandler extends DefaultHandler {
 		if (!parsingLoansOrRequests) {
 			if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 				if (!itemIdNotFound) {
-					itemSequence = itemSequence.trim().replace(".","");
+					itemSequence = itemSequence.trim().replace(".", "");
 					while (itemSequence.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {
 						itemSequence = "0" + itemSequence;
 					}
-					//FIXME: Remove hard-coded MZK01 after are reparations done
-					currentAlephItem.setItemId("MZK01" + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
+					currentAlephItem.setItemId(bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
 				}
 				listOfItems.add(currentAlephItem);
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
@@ -370,9 +376,18 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (loansHandling) {
 				if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 					if (!itemIdNotFound) {
+						// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
+						List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
+						BibliographicItemId bibliographicItemId = new BibliographicItemId();
+						String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence;
+						bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
+						bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
+						bibliographicItemIds.add(bibliographicItemId);
+						bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
+
+						// Create loan identifier from admLibrary & loanNumber
 						ItemId itemId = new ItemId();
-						//FIXME: Remove hard-coded MZK01 after are reparations done
-						itemId.setItemIdentifierValue("MZK01" + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
+						itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
 						itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 						currentLoanedItem.setItemId(itemId);
 					}
@@ -386,13 +401,15 @@ public class AlephItemHandler extends DefaultHandler {
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
 					itemIdNotFound = true;
 					itemSequenceReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_NUMBER_NODE) && loanNumberReached) {
+					loanNumberReached = false;
 				}
 			} else if (holdRequestsHandling) {
 				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 					if (!itemIdNotFound) {
 						ItemId itemId = new ItemId();
-						//FIXME: Remove hard-coded MZK01 after are reparations done
-						itemId.setItemIdentifierValue("MZK01" + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
+						// FIXME: Remove hard-coded MZK01 after are reparations done
+						itemId.setItemIdentifierValue(bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
 						itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 						currentRequestedItem.setItemId(itemId);
 					}
@@ -534,15 +551,6 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (bibDocNoReached) {
 				String parsedBibId = new String(ch, start, length);
 				bibDocNumber = parsedBibId;
-				List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
-				BibliographicItemId bibId = new BibliographicItemId();
-
-				bibId.setBibliographicItemIdentifier(parsedBibId);
-				bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
-
-				bibliographicItemIds.add(bibId);
-
-				bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
 				bibDocNoReached = false;
 			} else if (itemSequenceReached) {
 				itemSequence = new String(ch, start, length);
@@ -565,6 +573,9 @@ public class AlephItemHandler extends DefaultHandler {
 					currentLoanedItem.setDateCheckedOut(loanDate);
 
 					loanDateReached = false;
+				} else if (loanNumberReached) {
+					loanNumber = new String(ch, start, length);					
+					loanNumberReached = false;
 				}
 			} else if (holdRequestsHandling) {
 				if (datePlacedReached) {

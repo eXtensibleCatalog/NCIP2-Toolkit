@@ -191,7 +191,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
+		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
 
@@ -229,7 +229,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
+		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
 
 		parser.parse(streamSource, itemHandler);
 
@@ -308,7 +308,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (loansUrl != null || requestsUrl != null) {
 
-				AlephItemHandler itemHandler = new AlephItemHandler(false, false, false, false, false).parseLoansOrRequests();
+				AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, false, false, false, false, false).parseLoansOrRequests();
 
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());

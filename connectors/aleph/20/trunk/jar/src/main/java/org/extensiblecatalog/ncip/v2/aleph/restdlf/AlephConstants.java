@@ -64,6 +64,8 @@ public class AlephConstants {
 	public static final String Z36_LOAN_DATE_NODE = "z36-loan-date";
 	public static final String Z36_RECALL_DATE_NODE = "z36-recall-date";
 	public static final String Z36_RECALL_DUE_DATE_NODE = "z36-recall-due-date";
+	public static final String Z36_NUMBER_NODE = "z36-number";
+	
 	public static final String Z30_NODE = "z30";
 	public static final String Z30_DOC_NUMBER_NODE = "z30-doc-number";
 	public static final String Z30_ITEM_SEQUENCE_NODE = "z30-item-sequence";
