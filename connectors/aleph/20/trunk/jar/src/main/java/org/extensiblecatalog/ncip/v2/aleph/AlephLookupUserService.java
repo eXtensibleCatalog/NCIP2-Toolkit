@@ -21,25 +21,8 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.SAXException;
 
-/**
- * This class implements the Lookup User service for the Dummy back-end connector. Basically this just calls the DummyRemoteServiceManager to get hard-coded data (e.g. title, call #, etc.).
- * <p/>
- * Note: If you're looking for a model of how to code your own ILS's NCIPService classes, do not use this class as an example. See the NCIP toolkit Connector developer's documentation for guidance.
- */
 public class AlephLookupUserService implements LookupUserService {
 
-	static Logger log = Logger.getLogger(AlephLookupUserService.class);
-
-	/**
-	 * Handles a NCIP LookupUser service by returning hard-coded data.
-	 *
-	 * @param initData
-	 *            the LookupUserInitiationData
-	 * @param serviceManager
-	 *            provides access to remote services
-	 * @return LookupUserResponseData
-	 * @throws ServiceException
-	 */
 	@Override
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 		// TODO: Think about forwarding password in encrypted format ({@link Version1AuthenticationDataFormatType.APPLICATION_AUTH_POLICY_XML})
