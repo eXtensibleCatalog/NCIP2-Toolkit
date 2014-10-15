@@ -354,6 +354,8 @@ public class AlephConstants {
 	public static final String REST_DLF_SERVER = "RestDlfServer";
 	public static final String REST_DLF_PORT = "RestDlfPort";
 	public static final String REST_DLF_SUFFIX = "RestDlfSuffix";
+	public static final String USER_REGISTRATION_LINK = "UserRegistrationLink";
+	public static final String AUTH_DATA_FORMAT_TYPE = "AuthDataFormatType";
 
 	// RESTful APIs http requests values
 	public static final String ITEM_PATH_ELEMENT = "record";

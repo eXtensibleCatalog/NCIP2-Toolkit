@@ -47,6 +47,8 @@ public class RestDlfConnector extends AlephMediator {
 	private String agencyAddress;
 	private String agencyName;
 	private String NCIPVersion;
+	private String userRegistrationLink;
+	private String authDataFormatType;
 	
 	private String serverName;
 	private String serverPort;
@@ -92,6 +94,8 @@ public class RestDlfConnector extends AlephMediator {
 			NCIPVersion = alephConfig.getProperty(AlephConstants.NCIP_TOOLKIT_VERSION);
 			agencyAddress = alephConfig.getProperty(AlephConstants.AGENCY_UNSTRUCTURED_ADDRESS);
 			agencyName = alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME);
+			userRegistrationLink = alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK);
+			authDataFormatType = alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE);
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
 			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
@@ -141,6 +145,14 @@ public class RestDlfConnector extends AlephMediator {
 	
 	public String getNCIPVersion() {
 		return NCIPVersion;
+	}
+	
+	public String getRegistrationLink() {
+		return userRegistrationLink;
+	}
+	
+	public String getAuthDataFormatType() {
+		return authDataFormatType;
 	}
 	
 	public AgencyId toAgencyId(String agencyId) {
@@ -696,7 +708,7 @@ public class RestDlfConnector extends AlephMediator {
 		return renewItem;
 	}
 	
-	public List<AgencyAddressInformation> getAgencyAddressInformations(String agencyId) {
+	public List<AgencyAddressInformation> getAgencyAddressInformations() {
 		List<AgencyAddressInformation> agencyAddressInformations = new ArrayList<AgencyAddressInformation>();
 		AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
 
@@ -718,26 +730,24 @@ public class RestDlfConnector extends AlephMediator {
 		return agencyAddressInformations;
 	}
 	
-	public List<OrganizationNameInformation> getOrganizationNameInformations(String agencyId) {
+	public List<OrganizationNameInformation> getOrganizationNameInformations() {
 		List<OrganizationNameInformation> organizationNameInformations = new ArrayList<OrganizationNameInformation>();
 		OrganizationNameInformation organizationNameInfo = new OrganizationNameInformation();
 
-		// FIXME: parse these from database!
 		organizationNameInfo.setOrganizationName(agencyName);
 		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;
 	}	
 
-	public List<ApplicationProfileSupportedType> getApplicationProfileSupportedTypes(String agencyId) {
-		// FIXME: What is this good for?
+	public List<ApplicationProfileSupportedType> getApplicationProfileSupportedTypes() {
 		List<ApplicationProfileSupportedType> applicationProfileSupportedTypes = new ArrayList<ApplicationProfileSupportedType>();
 		ApplicationProfileSupportedType applicationProfileSupportedType = new ApplicationProfileSupportedType("unknown", "Development profile");
 		applicationProfileSupportedTypes.add(applicationProfileSupportedType);
 		return applicationProfileSupportedTypes;
 	}
 
-	public List<ConsortiumAgreement> getConsortiumAgreements(String agencyId) {
+	public List<ConsortiumAgreement> getConsortiumAgreements() {
 		List<ConsortiumAgreement> consortiumAgreements = new ArrayList<ConsortiumAgreement>();
 		ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Testing consortium agreement value.");
 		consortiumAgreements.add(consortiumAgreement);

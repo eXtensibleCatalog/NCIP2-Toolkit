@@ -3,12 +3,17 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.ApplicationProfileSupportedType;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationPrompt;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationPromptType;
 import org.extensiblecatalog.ncip.v2.service.ConsortiumAgreement;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData;
@@ -17,12 +22,16 @@ import org.extensiblecatalog.ncip.v2.service.LookupAgencyService;
 import org.extensiblecatalog.ncip.v2.service.OrganizationNameInformation;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.PromptInput;
+import org.extensiblecatalog.ncip.v2.service.PromptOutput;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
+import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationDataFormatType;
+import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
 
 public class AlephLookupAgencyService implements LookupAgencyService {
 
@@ -82,17 +91,51 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 
 		String localAgencyId = alephSvcMgr.getDefaultAgency();
 		String ncipVersion = alephSvcMgr.getNCIPVersion();
+		String registrationLink = alephSvcMgr.getRegistrationLink();
 
 		if (getAgencyAddressInformation) {
-			List<AgencyAddressInformation> agencyAddressInformations = alephSvcMgr.getAgencyAddressInformations(agencyId);
+			List<AgencyAddressInformation> agencyAddressInformations = alephSvcMgr.getAgencyAddressInformations();
 			responseData.setAgencyAddressInformations(agencyAddressInformations);
 		}
 
 		if (getOrganizationNameInformation) {
-			List<OrganizationNameInformation> organizationNameInformations = alephSvcMgr.getOrganizationNameInformations(agencyId);
+			List<OrganizationNameInformation> organizationNameInformations = alephSvcMgr.getOrganizationNameInformations();
 			responseData.setOrganizationNameInformations(organizationNameInformations);
 		}
 
+		List<AuthenticationPrompt> authenticationPrompts = new ArrayList<AuthenticationPrompt>();
+		AuthenticationPrompt authenticationPrompt = new AuthenticationPrompt();
+
+		PromptOutput promptOutput = new PromptOutput();
+
+		AuthenticationPromptType authenticationPromptType = new AuthenticationPromptType("", "User Registration Link");
+		promptOutput.setAuthenticationPromptType(authenticationPromptType);
+
+		promptOutput.setAuthenticationPromptData(registrationLink);
+
+		authenticationPrompt.setPromptOutput(promptOutput);
+
+		PromptInput promptInput = new PromptInput();
+
+		AuthenticationDataFormatType authenticationDataFormatType;
+		
+		String authenticationDataFormatTypeScheme = Version1AuthenticationDataFormatType.VERSION_1_AUTHENTICATION_DATA_FORMAT_TYPE;
+		String authenticationDataFormatTypeValue = alephSvcMgr.getAuthDataFormatType();
+		
+		authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
+		promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);
+
+		AuthenticationInputType authenticationInputType;
+		
+		String authenticationInputTypeScheme = Version1AuthenticationInputType.VERSION_1_AUTHENTICATION_INPUT_TYPE;
+		String authenticationInputTypeValue = ""; // This AuthenticationInput is used to forward user registration link.
+		
+		authenticationInputType = new AuthenticationInputType(authenticationInputTypeScheme, authenticationInputTypeValue);
+		promptInput.setAuthenticationInputType(authenticationInputType);
+
+		authenticationPrompt.setPromptInput(promptInput);
+		authenticationPrompts.add(authenticationPrompt);
+		responseData.setAuthenticationPrompts(authenticationPrompts);
 		responseData.setAgencyId(alephSvcMgr.toAgencyId(localAgencyId));
 		responseData.setVersion(ncipVersion);
 
