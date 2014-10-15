@@ -103,42 +103,44 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 			responseData.setOrganizationNameInformations(organizationNameInformations);
 		}
 
-		List<AuthenticationPrompt> authenticationPrompts = new ArrayList<AuthenticationPrompt>();
-		AuthenticationPrompt authenticationPrompt = new AuthenticationPrompt();
+		if (getAuthenticationPrompt) {
+			List<AuthenticationPrompt> authenticationPrompts = new ArrayList<AuthenticationPrompt>();
+			AuthenticationPrompt authenticationPrompt = new AuthenticationPrompt();
 
-		PromptOutput promptOutput = new PromptOutput();
+			PromptOutput promptOutput = new PromptOutput();
 
-		AuthenticationPromptType authenticationPromptType = new AuthenticationPromptType("", "User Registration Link");
-		promptOutput.setAuthenticationPromptType(authenticationPromptType);
+			AuthenticationPromptType authenticationPromptType = new AuthenticationPromptType("", "User Registration Link");
+			promptOutput.setAuthenticationPromptType(authenticationPromptType);
 
-		promptOutput.setAuthenticationPromptData(registrationLink);
+			promptOutput.setAuthenticationPromptData(registrationLink);
 
-		authenticationPrompt.setPromptOutput(promptOutput);
+			authenticationPrompt.setPromptOutput(promptOutput);
 
-		PromptInput promptInput = new PromptInput();
+			PromptInput promptInput = new PromptInput();
 
-		AuthenticationDataFormatType authenticationDataFormatType;
-		
-		String authenticationDataFormatTypeScheme = Version1AuthenticationDataFormatType.VERSION_1_AUTHENTICATION_DATA_FORMAT_TYPE;
-		String authenticationDataFormatTypeValue = alephSvcMgr.getAuthDataFormatType();
-		
-		authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
-		promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);
+			AuthenticationDataFormatType authenticationDataFormatType;
 
-		AuthenticationInputType authenticationInputType;
-		
-		String authenticationInputTypeScheme = Version1AuthenticationInputType.VERSION_1_AUTHENTICATION_INPUT_TYPE;
-		String authenticationInputTypeValue = ""; // This AuthenticationInput is used to forward user registration link.
-		
-		authenticationInputType = new AuthenticationInputType(authenticationInputTypeScheme, authenticationInputTypeValue);
-		promptInput.setAuthenticationInputType(authenticationInputType);
+			String authenticationDataFormatTypeScheme = Version1AuthenticationDataFormatType.VERSION_1_AUTHENTICATION_DATA_FORMAT_TYPE;
+			String authenticationDataFormatTypeValue = alephSvcMgr.getAuthDataFormatType();
 
-		authenticationPrompt.setPromptInput(promptInput);
-		authenticationPrompts.add(authenticationPrompt);
-		responseData.setAuthenticationPrompts(authenticationPrompts);
+			authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
+			promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);
+
+			AuthenticationInputType authenticationInputType;
+
+			String authenticationInputTypeScheme = Version1AuthenticationInputType.VERSION_1_AUTHENTICATION_INPUT_TYPE;
+			String authenticationInputTypeValue = ""; // This AuthenticationInput is used to forward user registration link.
+
+			authenticationInputType = new AuthenticationInputType(authenticationInputTypeScheme, authenticationInputTypeValue);
+			promptInput.setAuthenticationInputType(authenticationInputType);
+
+			authenticationPrompt.setPromptInput(promptInput);
+			authenticationPrompts.add(authenticationPrompt);
+			responseData.setAuthenticationPrompts(authenticationPrompts);
+		}
 		responseData.setAgencyId(alephSvcMgr.toAgencyId(localAgencyId));
-		responseData.setVersion(ncipVersion);
 
+		responseData.setVersion("someversion");
 		return responseData;
 	}
 
