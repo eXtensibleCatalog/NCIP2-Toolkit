@@ -269,6 +269,10 @@ public class RestDlfConnector extends AlephMediator {
 
 		boolean atLeastOneDesired = false;
 
+		// If there are only loanedItems desired, that means to include loans history to output
+		boolean loanedItemsDesiredOnly = loanedItemsDesired
+				&& !(blockOrTrapDesired || nameInformationDesired || requestedItemsDesired || userAddressInformationDesired || userFiscalAccountDesired || userIdDesired || userPrivilegeDesired);
+
 		// Create URL request only if specified service was desired
 		URL addressUrl = null;
 		if (nameInformationDesired || userIdDesired || userAddressInformationDesired || userPrivilegeDesired) {
@@ -285,10 +289,15 @@ public class RestDlfConnector extends AlephMediator {
 		}
 
 		URL loansUrl = null;
+		URL loansHistoryUrl = null;
 		if (loanedItemsDesired) {
 			atLeastOneDesired = true;
 			loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
 					.addRequest("view", "full").toURL();
+			
+			if (loanedItemsDesiredOnly)
+				loansHistoryUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
+				.addRequest("view", "full").addRequest("type", "history").toURL();
 		}
 
 		URL requestsUrl = null;
@@ -327,6 +336,11 @@ public class RestDlfConnector extends AlephMediator {
 					itemHandler.setLoansHandlingNow();
 					parser.parse(streamSource, itemHandler);
 					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
+				}
+				if (loansHistoryUrl != null) {
+					streamSource = new InputSource(loansUrl.openStream());
+					parser.parse(streamSource, itemHandler);
+					alephUser.addLoanedItems(itemHandler.getListOfLoanedItems());
 				}
 				if (requestsUrl != null) {
 					streamSource = new InputSource(requestsUrl.openStream());

@@ -465,4 +465,11 @@ public class AlephUser implements Serializable {
 		userAddrInfos.add(uai);
 	}
 
+	public void addLoanedItems(List<LoanedItem> loanedItems) {
+		if (this.loanedItems != null)
+			this.loanedItems.addAll(loanedItems);
+		else
+			this.loanedItems = loanedItems;
+	}
+
 }

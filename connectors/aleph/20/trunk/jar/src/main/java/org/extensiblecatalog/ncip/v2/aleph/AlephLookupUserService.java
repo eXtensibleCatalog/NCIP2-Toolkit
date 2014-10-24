@@ -130,15 +130,15 @@ public class AlephLookupUserService implements LookupUserService {
 
 			if (userFiscalAccountDesired) {
 				// Note that summary is enough for our purposes
-				
+
 				UserFiscalAccountSummary ufas = alephUser.getUserFiscalAccountSummary();
 				AccountBalance accountBalance = ufas.getAccountBalance();
-				
+
 				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), 2);
 				accountBalance.setCurrencyCode(currencyCode);
-				
+
 				ufas.setAccountBalance(accountBalance);
-				
+
 				responseData.setUserFiscalAccountSummary(ufas);
 
 				// Aleph is capable of returning detailed transactions
@@ -161,33 +161,40 @@ public class AlephLookupUserService implements LookupUserService {
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
 			UserOptionalFields uof = new UserOptionalFields();
+			boolean includeUserOptionalFields = false;
 
 			if (blockOrTrapDesired) {
 				List<BlockOrTrap> blockOrTraps = alephUser.getBlockOrTraps();
 				uof.setBlockOrTraps(blockOrTraps);
+				includeUserOptionalFields = true;
 			}
 
 			if (nameInformationDesired) {
 				NameInformation nameInfo = alephUser.getNameInformation();
 				uof.setNameInformation(nameInfo);
+				includeUserOptionalFields = true;
 			}
 
 			if (userAddressInformationDesired) {
 				List<UserAddressInformation> userAddrInfos = alephUser.getUserAddressInformations();
 				uof.setUserAddressInformations(userAddrInfos);
+				includeUserOptionalFields = true;
 			}
 
 			if (userIdDesired) {
 				List<UserId> userIds = alephUser.getUserIds();
 				uof.setUserIds(userIds);
+				includeUserOptionalFields = true;
 			}
 
 			if (userPrivilegeDesired) {
 				List<UserPrivilege> userPrivileges = alephUser.getUserPrivileges();
 				uof.setUserPrivileges(userPrivileges);
+				includeUserOptionalFields = true;
 			}
 
-			responseData.setUserOptionalFields(uof);
+			if (includeUserOptionalFields)
+				responseData.setUserOptionalFields(uof);
 		}
 	}
 }
