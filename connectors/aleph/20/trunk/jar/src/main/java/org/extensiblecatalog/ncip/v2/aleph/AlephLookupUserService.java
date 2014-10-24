@@ -88,7 +88,7 @@ public class AlephLookupUserService implements LookupUserService {
 				e.printStackTrace();
 			}
 
-			updateResponseData(initData, responseData, alephUser);
+			updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
 		} else {
 			AgencyId suppliedAgencyId;
 			if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null)
@@ -120,7 +120,7 @@ public class AlephLookupUserService implements LookupUserService {
 		return responseData;
 	}
 
-	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser) {
+	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser, AlephRemoteServiceManager svcMgr) {
 
 		if (alephUser != null) {
 			responseData.setUserId(initData.getUserId());
@@ -130,7 +130,15 @@ public class AlephLookupUserService implements LookupUserService {
 
 			if (userFiscalAccountDesired) {
 				// Note that summary is enough for our purposes
+				
 				UserFiscalAccountSummary ufas = alephUser.getUserFiscalAccountSummary();
+				AccountBalance accountBalance = ufas.getAccountBalance();
+				
+				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), 2);
+				accountBalance.setCurrencyCode(currencyCode);
+				
+				ufas.setAccountBalance(accountBalance);
+				
 				responseData.setUserFiscalAccountSummary(ufas);
 
 				// Aleph is capable of returning detailed transactions
