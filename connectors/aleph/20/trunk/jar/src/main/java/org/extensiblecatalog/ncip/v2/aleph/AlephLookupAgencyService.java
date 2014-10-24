@@ -90,11 +90,13 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 		}
 
 		String localAgencyId = alephSvcMgr.getDefaultAgency();
-		String ncipVersion = alephSvcMgr.getNCIPVersion();
 		String registrationLink = alephSvcMgr.getRegistrationLink();
 
 		if (getAgencyAddressInformation) {
-			List<AgencyAddressInformation> agencyAddressInformations = alephSvcMgr.getAgencyAddressInformations();
+			List<AgencyAddressInformation> agencyAddressInformations = new ArrayList<AgencyAddressInformation>();
+			
+			agencyAddressInformations.add(alephSvcMgr.getAgencyPhysicalAddressInformation());
+			
 			responseData.setAgencyAddressInformations(agencyAddressInformations);
 		}
 

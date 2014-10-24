@@ -42,14 +42,14 @@ public class RestDlfConnector extends AlephMediator {
 	private boolean uofDesiredWithinRequestItem;
 	private boolean iofDesiredWithinCancelRequestItem;
 	private boolean uofDesiredWithinCancelRequestItem;
-	
+
 	private String defaultAgency;
 	private String agencyAddress;
 	private String agencyName;
 	private String NCIPVersion;
 	private String userRegistrationLink;
 	private String authDataFormatType;
-	
+
 	private String serverName;
 	private String serverPort;
 	private String serverSuffix;
@@ -90,7 +90,7 @@ public class RestDlfConnector extends AlephMediator {
 			bibLibrary = alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY);
 			admLibrary = alephConfig.getProperty(AlephConstants.ALEPH_ADMINISTRATIVE_LIBRARY);
 			defaultAgency = alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY);
-			
+
 			NCIPVersion = alephConfig.getProperty(AlephConstants.NCIP_TOOLKIT_VERSION);
 			agencyAddress = alephConfig.getProperty(AlephConstants.AGENCY_UNSTRUCTURED_ADDRESS);
 			agencyName = alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME);
@@ -130,31 +130,31 @@ public class RestDlfConnector extends AlephMediator {
 		recordPathElement = AlephConstants.PARAM_RECORD;
 
 	}
-	
+
 	public String getDefaultAgency() {
 		return defaultAgency;
 	}
-	
+
 	public String getAgencyAddress() {
 		return agencyAddress;
 	}
-	
+
 	public String getAgencyName() {
 		return agencyName;
 	}
-	
+
 	public String getNCIPVersion() {
 		return NCIPVersion;
 	}
-	
+
 	public String getRegistrationLink() {
 		return userRegistrationLink;
 	}
-	
+
 	public String getAuthDataFormatType() {
 		return authDataFormatType;
 	}
-	
+
 	public AgencyId toAgencyId(String agencyId) {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
@@ -707,29 +707,28 @@ public class RestDlfConnector extends AlephMediator {
 		}
 		return renewItem;
 	}
-	
-	public List<AgencyAddressInformation> getAgencyAddressInformations() {
-		List<AgencyAddressInformation> agencyAddressInformations = new ArrayList<AgencyAddressInformation>();
+
+	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {
 		AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
 
 		PhysicalAddress physicalAddress = new PhysicalAddress();
 
 		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
+
 		unstructuredAddress.setUnstructuredAddressData(agencyAddress);
 		unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
-		physicalAddress.setUnstructuredAddress(unstructuredAddress);
-		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
 
+		physicalAddress.setUnstructuredAddress(unstructuredAddress);
+
+		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
 		agencyAddressInformation.setPhysicalAddress(physicalAddress);
-		
 
 		AgencyAddressRoleType agencyAddressRoleType = Version1AgencyAddressRoleType.OFFICIAL;
 		agencyAddressInformation.setAgencyAddressRoleType(agencyAddressRoleType);
 
-		agencyAddressInformations.add(agencyAddressInformation);
-		return agencyAddressInformations;
+		return agencyAddressInformation;
 	}
-	
+
 	public List<OrganizationNameInformation> getOrganizationNameInformations() {
 		List<OrganizationNameInformation> organizationNameInformations = new ArrayList<OrganizationNameInformation>();
 		OrganizationNameInformation organizationNameInfo = new OrganizationNameInformation();
@@ -738,7 +737,7 @@ public class RestDlfConnector extends AlephMediator {
 		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;
-	}	
+	}
 
 	public List<ApplicationProfileSupportedType> getApplicationProfileSupportedTypes() {
 		List<ApplicationProfileSupportedType> applicationProfileSupportedTypes = new ArrayList<ApplicationProfileSupportedType>();
@@ -751,7 +750,7 @@ public class RestDlfConnector extends AlephMediator {
 		List<ConsortiumAgreement> consortiumAgreements = new ArrayList<ConsortiumAgreement>();
 		ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Testing consortium agreement value.");
 		consortiumAgreements.add(consortiumAgreement);
-		
+
 		consortiumAgreement = new ConsortiumAgreement("some-agreement-scheme", "Another testing consortium agreement value.");
 		consortiumAgreements.add(consortiumAgreement);
 		return consortiumAgreements;
