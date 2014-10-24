@@ -457,6 +457,9 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (iofDesiredWithinRequestItem) {
 				AlephItem item = lookupItem(alephItemId, true, true, true, true);
+				if (item.getAgency() == null) {
+					item.setAgency(defaultAgency);
+				}
 				requestItem.setItemOptionalFields(item.getItemOptionalFields());
 			}
 
@@ -524,6 +527,9 @@ public class RestDlfConnector extends AlephMediator {
 
 				if (iofDesiredWithinCancelRequestItem) {
 					AlephItem item = lookupItem(alephItemId, true, true, true, true);
+					if (item.getAgency() == null) {
+						item.setAgency(defaultAgency);
+					}
 					requestItem.setItemOptionalFields(item.getItemOptionalFields());
 				}
 			} else {
@@ -603,6 +609,9 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
 				AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+				if (item.getAgency() == null) {
+					item.setAgency(defaultAgency);
+				}
 				requestItem.setItemOptionalFields(item.getItemOptionalFields());
 			}
 		} else {
@@ -688,6 +697,9 @@ public class RestDlfConnector extends AlephMediator {
 					String alephItemId = AlephUtil.buildAlephItemId(bibLibrary, admLibrary, loanHandler.getDocNumber(), loanHandler.getItemSequenceNumber());
 
 					AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+					if (item.getAgency() == null) {
+						item.setAgency(defaultAgency);
+					}
 					renewItem.setItemOptionalFields(item.getItemOptionalFields());
 				}
 			} else {
