@@ -281,9 +281,12 @@ public class RestDlfConnector extends AlephMediator {
 		}
 
 		URL circulationsUrl = null;
+		URL cashUrl = null;
 		if (userFiscalAccountDesired) {
 			atLeastOneDesired = true;
-			circulationsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, "cash").addRequest("view", "full").toURL();
+			circulationsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement).toURL();
+			cashUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, "cash").addRequest("view", "full")
+					.toURL();
 		}
 
 		URL loansUrl = null;
@@ -357,6 +360,11 @@ public class RestDlfConnector extends AlephMediator {
 			if (addressUrl != null) {
 				streamSource = new InputSource(addressUrl.openStream());
 
+				parser.parse(streamSource, userHandler);
+			}
+			if (cashUrl != null) {
+				streamSource = new InputSource(cashUrl.openStream());
+				
 				parser.parse(streamSource, userHandler);
 			}
 			if (circulationsUrl != null) {

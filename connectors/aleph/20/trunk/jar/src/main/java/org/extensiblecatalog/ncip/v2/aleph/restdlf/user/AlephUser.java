@@ -55,11 +55,11 @@ public class AlephUser implements Serializable {
 		userAddrInfos = new ArrayList<UserAddressInformation>();
 		userIds = new ArrayList<UserId>();
 		userPrivileges = new ArrayList<UserPrivilege>();
-		
+
 		userFiscalAccountSummary = new UserFiscalAccountSummary();
 		userFiscalAccount = new UserFiscalAccount();
 		accountDetails = new ArrayList<AccountDetails>();
-		
+
 		nameInfo = new NameInformation();
 	}
 
@@ -282,13 +282,49 @@ public class AlephUser implements Serializable {
 		balanceMinorUnit = balance.split("\\.")[1].length();
 
 		String balanceValue = balance.split("\\.")[0];
-		
+
 		balanceValue = balanceValue.replace(" ", "");
 
 		accountBalance.setMonetaryValue(new BigDecimal(balanceValue).multiply(new BigDecimal(100)));
 
 		userFiscalAccountSummary.setAccountBalance(accountBalance);
 		userFiscalAccount.setAccountBalance(accountBalance);
+	}
+	
+
+
+	public void setCashTypeNote(String noteValue) {
+		// Parsed text example:
+		// Please note that there is an additional accrued overdue items fine of: 35.00.
+		
+		// AccrualDate will be today
+		GregorianCalendar accrualDate = new GregorianCalendar();
+
+		FiscalTransactionInformation fiscalTransactionInformation = new FiscalTransactionInformation();
+		
+		String[] values = noteValue.split(" ");
+		
+		String value = values[values.length - 1].split("\\.")[0];		
+		values = null;
+		
+		Amount amount = new Amount();
+		amount.setMonetaryValue(new BigDecimal(value).multiply(new BigDecimal(100)));
+
+		fiscalTransactionInformation.setAmount(amount);
+		
+		FiscalTransactionType fiscalTransactionType = Version1FiscalTransactionType.SERVICE_CHARGE;
+		fiscalTransactionInformation.setFiscalTransactionType(fiscalTransactionType);
+
+		FiscalActionType fiscalActionType = Version1FiscalActionType.PENALTY;
+		fiscalTransactionInformation.setFiscalActionType(fiscalActionType);
+		
+		fiscalTransactionInformation.setFiscalTransactionDescription(noteValue);
+		
+		AccountDetails details = new AccountDetails();
+		details.setAccrualDate(accrualDate);
+		details.setFiscalTransactionInformation(fiscalTransactionInformation);
+		
+		accountDetails.add(details);
 	}
 
 	public void addAccountDetails(String accrualDateParsed, String value, String description) throws SAXException {
@@ -312,7 +348,7 @@ public class AlephUser implements Serializable {
 
 		FiscalActionType fiscalActionType = Version1FiscalActionType.PAYMENT;
 		fiscalTransactionInformation.setFiscalActionType(fiscalActionType);
-		
+
 		fiscalTransactionInformation.setFiscalTransactionDescription(description);
 
 		details.setFiscalTransactionInformation(fiscalTransactionInformation);
@@ -325,7 +361,7 @@ public class AlephUser implements Serializable {
 
 		userFiscalAccount.setAccountDetails(accountDetails);
 		userFiscalAccounts.add(userFiscalAccount);
-		
+
 		return userFiscalAccounts;
 	}
 
