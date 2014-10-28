@@ -10,6 +10,7 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -131,16 +132,23 @@ public class AlephLookupUserService implements LookupUserService {
 			if (userFiscalAccountDesired) {
 				// Note that summary is enough for our purposes
 
-				UserFiscalAccountSummary ufas = alephUser.getUserFiscalAccountSummary();
+				List<UserFiscalAccount> userFiscalAccounts = new ArrayList<UserFiscalAccount>();
+				UserFiscalAccount userFiscalAccount = new UserFiscalAccount();
+
+				UserFiscalAccountSummary ufas = alephUser.getUserFiscalAccountSummary();				
 				AccountBalance accountBalance = ufas.getAccountBalance();
 
-				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), 2);
+				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), alephUser.getBalanceMinorUnit());
 				accountBalance.setCurrencyCode(currencyCode);
+				
+				userFiscalAccount.setAccountBalance(accountBalance);
 
-				ufas.setAccountBalance(accountBalance);
+				userFiscalAccounts.add(userFiscalAccount);
+				responseData.setUserFiscalAccounts(userFiscalAccounts);
+
 
 				responseData.setUserFiscalAccountSummary(ufas);
-
+				ufas.setAccountBalance(accountBalance);
 				// Aleph is capable of returning detailed transactions
 			}
 

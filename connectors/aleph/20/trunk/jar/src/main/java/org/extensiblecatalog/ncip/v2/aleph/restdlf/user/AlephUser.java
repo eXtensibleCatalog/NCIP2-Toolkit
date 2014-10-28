@@ -43,6 +43,7 @@ public class AlephUser implements Serializable {
 	private List<UserPrivilege> userPrivileges;
 	private UserFiscalAccountSummary userFiscalAccountSummary;
 	private UserPrivilege userPrivilege;
+	private int balanceMinorUnit;
 
 	public AlephUser() {
 		requestedItems = new ArrayList<RequestedItem>();
@@ -270,8 +271,18 @@ public class AlephUser implements Serializable {
 	 */
 	public void setAccountBalance(String balance) {
 		AccountBalance accountBallance = new AccountBalance();
-		accountBallance.setMonetaryValue(new BigDecimal(balance));
+
+		balanceMinorUnit = balance.split("\\.")[1].length();
+
+		String balanceValue = balance.split("\\.")[0];
+
+		accountBallance.setMonetaryValue(new BigDecimal(balanceValue));
+
 		userFiscalAccountSummary.setAccountBalance(accountBallance);
+	}
+
+	public int getBalanceMinorUnit() {
+		return balanceMinorUnit;
 	}
 
 	/**
@@ -417,7 +428,7 @@ public class AlephUser implements Serializable {
 			userPrivilege = new UserPrivilege();
 
 		userPrivilege.setValidToDate(AlephUtil.parseGregorianCalendarFromAlephDate(validToDateParsed));
-		
+
 		if (userPrivilege.getUserPrivilegeDescription() != null && userPrivilege.getValidFromDate() != null)
 			userPrivileges.add(userPrivilege);
 	}
@@ -427,7 +438,7 @@ public class AlephUser implements Serializable {
 			userPrivilege = new UserPrivilege();
 
 		userPrivilege.setValidFromDate(AlephUtil.parseGregorianCalendarFromAlephDate(validFromDateParsed));
-		
+
 		if (userPrivilege.getUserPrivilegeDescription() != null && userPrivilege.getValidToDate() != null)
 			userPrivileges.add(userPrivilege);
 	}
