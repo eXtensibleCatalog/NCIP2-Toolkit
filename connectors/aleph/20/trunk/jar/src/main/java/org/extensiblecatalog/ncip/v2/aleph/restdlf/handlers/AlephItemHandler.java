@@ -158,7 +158,7 @@ public class AlephItemHandler extends DefaultHandler {
 			this.holdQueueLengthDesired = holdQueueLnegthDesired;
 			this.itemDesrciptionDesired = itemDesrciptionDesired;
 		} else if (requireAtLeastOneService) {
-			throw new AlephException("No service desired. Please supply at least one service you wish to use.");
+			throw new AlephException("Instance of class AlephItemHandler cannot be created with no service desired. Please supply at least one service you wish to use.");
 		}
 		localTimeZone = TimeZone.getTimeZone("ECT");
 	}
@@ -242,13 +242,13 @@ public class AlephItemHandler extends DefaultHandler {
 
 					if (loanedItems == null)
 						loanedItems = new ArrayList<LoanedItem>();
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_DUE_DATE_NODE)) {
+				} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE+"|"+AlephConstants.Z36H_DUE_DATE_NODE)) {
 					dueDateReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_LOAN_DATE_NODE)) {
+				} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE+"|"+AlephConstants.Z36H_LOAN_DATE_NODE)) {
 					loanDateReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE)) {
+				} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE+"|"+AlephConstants.Z36H_ITEM_SEQUENCE_NODE)) {
 					itemSequenceReached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_NUMBER_NODE)) {
+				} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE+"|"+AlephConstants.Z36H_NUMBER_NODE)) {
 					loanNumberReached = true;
 				}
 			} else if (holdRequestsHandling) { // Handling requests XML output
@@ -392,23 +392,27 @@ public class AlephItemHandler extends DefaultHandler {
 						currentLoanedItem.setItemId(itemId);
 					}
 					currentLoanedItem.setBibliographicDescription(bibliographicDescription);
+					
+					if (currentLoanedItem.getDateDue() == null)
+						currentLoanedItem.setIndeterminateLoanPeriodFlag(true);
+					
 					loanedItems.add(currentLoanedItem);
+					itemIdNotFound = false;
 					bibliographicDescription = new BibliographicDescription();
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_DUE_DATE_NODE) && dueDateReached) {
+				} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE+"|"+AlephConstants.Z36H_DUE_DATE_NODE) && dueDateReached) {
 					dueDateReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_LOAN_DATE_NODE) && loanDateReached) {
+				} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE+"|"+AlephConstants.Z36H_LOAN_DATE_NODE) && loanDateReached) {
 					loanDateReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
+				} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE+"|"+AlephConstants.Z36H_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
 					itemIdNotFound = true;
 					itemSequenceReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z36_NUMBER_NODE) && loanNumberReached) {
+				} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE+"|"+AlephConstants.Z36H_NUMBER_NODE) && loanNumberReached) {
 					loanNumberReached = false;
 				}
 			} else if (holdRequestsHandling) {
 				if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 					if (!itemIdNotFound) {
 						ItemId itemId = new ItemId();
-						// FIXME: Remove hard-coded MZK01 after are reparations done
 						itemId.setItemIdentifierValue(bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence);
 						itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 						currentRequestedItem.setItemId(itemId);
@@ -574,7 +578,7 @@ public class AlephItemHandler extends DefaultHandler {
 
 					loanDateReached = false;
 				} else if (loanNumberReached) {
-					loanNumber = new String(ch, start, length);					
+					loanNumber = new String(ch, start, length);
 					loanNumberReached = false;
 				}
 			} else if (holdRequestsHandling) {
@@ -644,7 +648,7 @@ public class AlephItemHandler extends DefaultHandler {
 				} else if (requestTypeReached) {
 					RequestType requestType = null;
 					String parsedValue = new String(ch, start, length);
-					if (parsedValue == "30") // TODO: Add remaining request types
+					if (parsedValue == "30") // TODO: Add remaining request types - better FIXME move to AlephUtil
 						requestType = Version1RequestType.LOAN;
 					else
 						requestType = Version1RequestType.ESTIMATE; // FIXME: Put here better default value

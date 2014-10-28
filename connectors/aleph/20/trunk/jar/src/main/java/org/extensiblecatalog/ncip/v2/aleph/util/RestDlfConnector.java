@@ -292,12 +292,15 @@ public class RestDlfConnector extends AlephMediator {
 		URL loansHistoryUrl = null;
 		if (loanedItemsDesired) {
 			atLeastOneDesired = true;
-			loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
-					.addRequest("view", "full").toURL();
-			
-			if (loanedItemsDesiredOnly)
+			if (!loanedItemsDesiredOnly) {
+				// If there is not history expected, parse regular loans
+				loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
+						.addRequest("view", "full").toURL();
+
+			} else {
 				loansHistoryUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
-				.addRequest("view", "full").addRequest("type", "history").toURL();
+						.addRequest("view", "full").addRequest("type", "history").toURL();
+			}
 		}
 
 		URL requestsUrl = null;
@@ -327,7 +330,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			InputSource streamSource;
 
-			if (loansUrl != null || requestsUrl != null) {
+			if (loansUrl != null || loansHistoryUrl != null || requestsUrl != null) {
 
 				AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, false, false, false, false, false).parseLoansOrRequests();
 
@@ -338,9 +341,10 @@ public class RestDlfConnector extends AlephMediator {
 					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
 				}
 				if (loansHistoryUrl != null) {
-					streamSource = new InputSource(loansUrl.openStream());
+					streamSource = new InputSource(loansHistoryUrl.openStream());
+					itemHandler.setLoansHandlingNow();
 					parser.parse(streamSource, itemHandler);
-					alephUser.addLoanedItems(itemHandler.getListOfLoanedItems());
+					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
 				}
 				if (requestsUrl != null) {
 					streamSource = new InputSource(requestsUrl.openStream());

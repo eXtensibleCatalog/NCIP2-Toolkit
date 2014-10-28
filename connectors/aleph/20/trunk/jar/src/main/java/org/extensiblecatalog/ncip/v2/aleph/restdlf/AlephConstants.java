@@ -20,7 +20,7 @@ public class AlephConstants {
 	public static final SimpleDateFormat ALEPH_HOUR_FORMATTER = new SimpleDateFormat("HHmm");
 
 	public static final String DUE_DATE_NODE = "due-date";
-	
+
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
 	public static final String Z13_AUTHOR_NODE = "z13-author";
 	public static final String Z13_TITLE_NODE = "z13-title";
@@ -28,7 +28,7 @@ public class AlephConstants {
 	public static final String Z13_ISBN_NODE = "z13-isbn-issn";
 	public static final String Z13_NODE = "z13";
 	public static final String Z13_DOC_NUMBER_NODE = "z13-doc-number";
-	
+
 	public static final String Z37_NODE = "z37";
 	public static final String Z37_DOC_NUMBER_NODE = "z37-doc-number";
 	public static final String Z37_ITEM_SEQUENCE_NODE = "z37-item-sequence";
@@ -45,12 +45,6 @@ public class AlephConstants {
 	public static final String Z37_PRIORITY_NODE = "z37-priority";
 	public static final String Z37_STATUS_NODE = "z37-status";
 
-	public static final String Z36_NODE = "z36";
-	public static final String Z36_DOC_NUMBER_NODE = "z36-doc-number";
-	public static final String Z36_ITEM_SEQUENCE_NODE = "z36-item-sequence";
-	public static final String Z36_MATERIAL_NODE = "z36-material";
-	public static final String Z36_SUB_LIBRARY_NODE = "z36-sub-library";
-
 	// circ status
 	public static final String HOLD_REQUEST_NODE = "hold-request";
 	public static final String CIRC_STATUS_NODE = "circ-status";
@@ -58,14 +52,25 @@ public class AlephConstants {
 	public static final String DUE_HOUR_NODE = "due-hour";
 	public static final String SUB_LIBRARY_NODE = "sub-library";
 	public static final String LOCATION_NODE = "location";
+
+	public static final String Z36_NODE = "z36";
 	public static final String Z36_ID_NODE = "z36-id";
 	public static final String Z36_STATUS_NODE = "z36-status";
+	public static final String Z36_NUMBER_NODE = "z36-number";
+	public static final String Z36_MATERIAL_NODE = "z36-material";
 	public static final String Z36_DUE_DATE_NODE = "z36-due-date";
 	public static final String Z36_LOAN_DATE_NODE = "z36-loan-date";
+	public static final String Z36_DOC_NUMBER_NODE = "z36-doc-number";
+	public static final String Z36_SUB_LIBRARY_NODE = "z36-sub-library";
 	public static final String Z36_RECALL_DATE_NODE = "z36-recall-date";
+	public static final String Z36_ITEM_SEQUENCE_NODE = "z36-item-sequence";
 	public static final String Z36_RECALL_DUE_DATE_NODE = "z36-recall-due-date";
-	public static final String Z36_NUMBER_NODE = "z36-number";
-	
+
+	public static final String Z36H_NUMBER_NODE = "z36h-number";
+	public static final String Z36H_DUE_DATE_NODE = "z36h-due-date";
+	public static final String Z36H_LOAN_DATE_NODE = "z36h-loan-date";
+	public static final String Z36H_ITEM_SEQUENCE_NODE = "z36h-item-sequence";
+
 	public static final String Z30_NODE = "z30";
 	public static final String Z30_DOC_NUMBER_NODE = "z30-doc-number";
 	public static final String Z30_ITEM_SEQUENCE_NODE = "z30-item-sequence";
@@ -81,7 +86,7 @@ public class AlephConstants {
 	public static final String Z30_CALL_NUMBER_2_TYPE_NODE = "z30-call-no-2-type";
 	public static final String Z30_CALL_NUMBER_2_NODE = "z30-call-no-2";
 	public static final String Z30_COPY_ID_NODE = "z30-copy-id";
-	
+
 	public static final String NEW_DUE_DATE_NODE = "new-due-date";
 
 	// get fine data
@@ -89,9 +94,8 @@ public class AlephConstants {
 	public static final String Z31_FINE_STATUS_NODE = "z31-status";
 	public static final String Z31_CREDIT_DEBIT_NODE = "z31-credit-debit";
 	public static final String Z31_NET_SUM_NODE = "z31-net-sum";
-	
+
 	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
-	
 
 	public static final String Z31_NODE = "z31";
 	public static final String Z31_FINE_ACCRUAL_DATE_NODE = "z31-date";
@@ -364,7 +368,7 @@ public class AlephConstants {
 	public static final String AGENCY_UNSTRUCTURED_ADDRESS = "AgencyUnstructuredAddress";
 	public static final String AGENCY_TRANSLATED_NAME = "AgencyTranslatedName";
 	public static final String NCIP_TOOLKIT_VERSION = "NCIPToolkitVersion";
-	
+
 	public static final String XSERVER_NAME = "AlephXServerName";
 	public static final String XSERVER_PORT = "AlephXServerPort";
 	public static final String XSERVER_SUFFIX = "AlephXServerSuffix";
@@ -384,12 +388,12 @@ public class AlephConstants {
 	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
 
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname
-	
+
 	// Item Restrictions of MZK's Aleph ILS here:
 	public static final String ITEM_STATUS_TO_THE_MUSIC_CORNER_ONLY_4F = "To The Music Corner only (4F)";
 	public static final String ITEM_STATUS_REFERENCE_ONLY_SPN_2F = "Reference only (SPN 2F)";
 	public static final String ITEM_STATUS_REFERENCE_ONLY_ST_4F = "Reference only (ST 4F)";
-	public static final String ITEM_STATUS_REFERENCE_SHELF= "Reference shelf";
+	public static final String ITEM_STATUS_REFERENCE_SHELF = "Reference shelf";
 	public static final String ITEM_STATUS_REFERENCE_ONLY = "Reference only";
 	public static final String ITEM_STATUS_IN_HOUSE_LOAN = "In house loan";
 	public static final String ITEM_STATUS_STUDY_ROOM = "Study room";
@@ -398,19 +402,19 @@ public class AlephConstants {
 	public static final String ITEM_STATUS_LONG_TERM_LOAN = "Long-term loan";
 	public static final String ITEM_STATUS_MONTH = "Month";
 	public static final String ITEM_STATUS_WEEK = "Week";
-		
+
 	public static final String ITEM_STATUS_14_DAYS = "14 days";
-	public static final String ITEM_STATUS_7_DAYS= "7 days";
-	public static final String ITEM_STATUS_2_HOURS = "2 hours";	
-	
-	public static final String ITEM_STATUS_IN_HOUSE_ILL= "In-house ILL";
+	public static final String ITEM_STATUS_7_DAYS = "7 days";
+	public static final String ITEM_STATUS_2_HOURS = "2 hours";
+
+	public static final String ITEM_STATUS_IN_HOUSE_ILL = "In-house ILL";
 	public static final String ITEM_STATUS_CHECK_OUT_ILL = "Check out ILL";
-	
+
 	public static final String ITEM_STATUS_ITEM_UNDER_CLAIN = "Item under claim";
 	public static final String ITEM_STATUS_CURRENT_YEAR_2 = "Current Year 2";
 	public static final String ITEM_STATUS_NOT_PUBLISHED = "Not published";
 	public static final String ITEM_STATUS_INVESTIGATED = "Investigated";
-	public static final String ITEM_STATUS_CURRENT_YEAR= "Current Year";
+	public static final String ITEM_STATUS_CURRENT_YEAR = "Current Year";
 	public static final String ITEM_STATUS_NOT_FOUND_1 = "Not found 1";
 	public static final String ITEM_STATUS_NOT_FOUND_2 = "Not found 2";
 	public static final String ITEM_STATUS_NOT_FOUND_3 = "Not found 3";
@@ -419,7 +423,6 @@ public class AlephConstants {
 	public static final String ITEM_STATUS_BINDING_2 = "Binding 2";
 	public static final String ITEM_STATUS_RETRO = "Retro";
 
-	
 	// Item Restriction's HashMap keys
 	public static final String ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY = "Library only";
 	public static final String ITEM_RESTRICTION_LOAN_PERIOD = "Loan Period";
