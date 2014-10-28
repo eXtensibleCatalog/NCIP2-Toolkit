@@ -20,6 +20,7 @@ public class AlephConstants {
 	public static final SimpleDateFormat ALEPH_HOUR_FORMATTER = new SimpleDateFormat("HHmm");
 
 	public static final String DUE_DATE_NODE = "due-date";
+	public static final String OPEN_SUM_NODE = "open-sum";
 
 	public static final String Z13_BIB_ID_NODE = "z13-doc-number";
 	public static final String Z13_AUTHOR_NODE = "z13-author";
@@ -91,9 +92,11 @@ public class AlephConstants {
 
 	// get fine data
 	public static final String Z31_FINE_DATE_NODE = "z31-date";
+	public static final String Z31_FINE_SUM_NODE = "z31-sum";
 	public static final String Z31_FINE_STATUS_NODE = "z31-status";
 	public static final String Z31_CREDIT_DEBIT_NODE = "z31-credit-debit";
 	public static final String Z31_NET_SUM_NODE = "z31-net-sum";
+	public static final String Z31_DESCRIPTION = "z31-description";
 
 	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
 

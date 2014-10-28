@@ -10,6 +10,7 @@ import org.xml.sax.SAXException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -44,6 +45,8 @@ public class AlephUser implements Serializable {
 	private UserFiscalAccountSummary userFiscalAccountSummary;
 	private UserPrivilege userPrivilege;
 	private int balanceMinorUnit;
+	private UserFiscalAccount userFiscalAccount;
+	private List<AccountDetails> accountDetails;
 
 	public AlephUser() {
 		requestedItems = new ArrayList<RequestedItem>();
@@ -52,7 +55,11 @@ public class AlephUser implements Serializable {
 		userAddrInfos = new ArrayList<UserAddressInformation>();
 		userIds = new ArrayList<UserId>();
 		userPrivileges = new ArrayList<UserPrivilege>();
+		
 		userFiscalAccountSummary = new UserFiscalAccountSummary();
+		userFiscalAccount = new UserFiscalAccount();
+		accountDetails = new ArrayList<AccountDetails>();
+		
 		nameInfo = new NameInformation();
 	}
 
@@ -270,15 +277,56 @@ public class AlephUser implements Serializable {
 	 * @param balance
 	 */
 	public void setAccountBalance(String balance) {
-		AccountBalance accountBallance = new AccountBalance();
+		AccountBalance accountBalance = new AccountBalance();
 
 		balanceMinorUnit = balance.split("\\.")[1].length();
 
 		String balanceValue = balance.split("\\.")[0];
+		
+		balanceValue = balanceValue.replace(" ", "");
 
-		accountBallance.setMonetaryValue(new BigDecimal(balanceValue));
+		accountBalance.setMonetaryValue(new BigDecimal(balanceValue));
 
-		userFiscalAccountSummary.setAccountBalance(accountBallance);
+		userFiscalAccountSummary.setAccountBalance(accountBalance);
+		userFiscalAccount.setAccountBalance(accountBalance);
+	}
+
+	public void addAccountDetails(String accrualDateParsed, String value, String description) throws SAXException {
+		AccountDetails details = new AccountDetails();
+
+		GregorianCalendar accrualDate = AlephUtil.parseGregorianCalendarFromAlephDate(accrualDateParsed);
+		details.setAccrualDate(accrualDate);
+
+		FiscalTransactionInformation fiscalTransactionInformation = new FiscalTransactionInformation();
+
+		value = value.replaceAll("\\(|\\)", "");
+		value = value.split("\\.")[0];
+
+		Amount amount = new Amount();
+		amount.setMonetaryValue(new BigDecimal(value));
+
+		fiscalTransactionInformation.setAmount(amount);
+
+		FiscalTransactionType fiscalTransactionType = Version1FiscalTransactionType.FINE;
+		fiscalTransactionInformation.setFiscalTransactionType(fiscalTransactionType);
+
+		FiscalActionType fiscalActionType = Version1FiscalActionType.PAYMENT;
+		fiscalTransactionInformation.setFiscalActionType(fiscalActionType);
+		
+		fiscalTransactionInformation.setFiscalTransactionDescription(description);
+
+		details.setFiscalTransactionInformation(fiscalTransactionInformation);
+
+		accountDetails.add(details);
+	}
+
+	public List<UserFiscalAccount> getUserFiscalAccounts() {
+		List<UserFiscalAccount> userFiscalAccounts = new ArrayList<UserFiscalAccount>();
+
+		userFiscalAccount.setAccountDetails(accountDetails);
+		userFiscalAccounts.add(userFiscalAccount);
+		
+		return userFiscalAccounts;
 	}
 
 	public int getBalanceMinorUnit() {
@@ -483,4 +531,7 @@ public class AlephUser implements Serializable {
 			this.loanedItems = loanedItems;
 	}
 
+	public void setUserFiscalAccount(UserFiscalAccount userFiscalAccount) {
+		this.userFiscalAccount = userFiscalAccount;
+	}
 }

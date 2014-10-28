@@ -9,6 +9,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,26 +131,36 @@ public class AlephLookupUserService implements LookupUserService {
 			boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
 
 			if (userFiscalAccountDesired) {
-				// Note that summary is enough for our purposes
-
-				List<UserFiscalAccount> userFiscalAccounts = new ArrayList<UserFiscalAccount>();
-				UserFiscalAccount userFiscalAccount = new UserFiscalAccount();
-
-				UserFiscalAccountSummary ufas = alephUser.getUserFiscalAccountSummary();				
-				AccountBalance accountBalance = ufas.getAccountBalance();
+				List<UserFiscalAccount> userFiscalAccounts = alephUser.getUserFiscalAccounts();
 
 				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), alephUser.getBalanceMinorUnit());
-				accountBalance.setCurrencyCode(currencyCode);
-				
-				userFiscalAccount.setAccountBalance(accountBalance);
 
-				userFiscalAccounts.add(userFiscalAccount);
+				// Update Currency Code
+				for (UserFiscalAccount userFiscalAccount : userFiscalAccounts) {
+					AccountBalance accountBalance = userFiscalAccount.getAccountBalance();
+
+					if (accountBalance == null) {
+						accountBalance = new AccountBalance();
+						accountBalance.setMonetaryValue(new BigDecimal("0"));
+					}
+					accountBalance.setCurrencyCode(currencyCode);
+					userFiscalAccount.setAccountBalance(accountBalance);
+
+					List<AccountDetails> accountDetails = userFiscalAccount.getAccountDetails();
+
+					for (AccountDetails details : accountDetails) {
+						FiscalTransactionInformation fiscalTransactionInformation = details.getFiscalTransactionInformation();
+
+						Amount amount = fiscalTransactionInformation.getAmount();
+						amount.setCurrencyCode(currencyCode);
+
+						fiscalTransactionInformation.setAmount(amount);
+
+						details.setFiscalTransactionInformation(fiscalTransactionInformation);
+					}
+				}
+
 				responseData.setUserFiscalAccounts(userFiscalAccounts);
-
-
-				responseData.setUserFiscalAccountSummary(ufas);
-				ufas.setAccountBalance(accountBalance);
-				// Aleph is capable of returning detailed transactions
 			}
 
 			if (requestedItemsDesired) {

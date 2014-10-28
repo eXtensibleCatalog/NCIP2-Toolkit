@@ -283,9 +283,7 @@ public class RestDlfConnector extends AlephMediator {
 		URL circulationsUrl = null;
 		if (userFiscalAccountDesired) {
 			atLeastOneDesired = true;
-			// TODO: Ask librarian if amount is enough, or would be better detailed transactions overview
-			// If not, use this sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/cash?view=full
-			circulationsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement).toURL();
+			circulationsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, "cash").addRequest("view", "full").toURL();
 		}
 
 		URL loansUrl = null;
