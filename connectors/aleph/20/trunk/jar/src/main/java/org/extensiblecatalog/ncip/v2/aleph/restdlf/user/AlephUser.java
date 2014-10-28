@@ -285,7 +285,7 @@ public class AlephUser implements Serializable {
 		
 		balanceValue = balanceValue.replace(" ", "");
 
-		accountBalance.setMonetaryValue(new BigDecimal(balanceValue));
+		accountBalance.setMonetaryValue(new BigDecimal(balanceValue).multiply(new BigDecimal(100)));
 
 		userFiscalAccountSummary.setAccountBalance(accountBalance);
 		userFiscalAccount.setAccountBalance(accountBalance);
@@ -303,7 +303,7 @@ public class AlephUser implements Serializable {
 		value = value.split("\\.")[0];
 
 		Amount amount = new Amount();
-		amount.setMonetaryValue(new BigDecimal(value));
+		amount.setMonetaryValue(new BigDecimal(value).multiply(new BigDecimal(100)));
 
 		fiscalTransactionInformation.setAmount(amount);
 

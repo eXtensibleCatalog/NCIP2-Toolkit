@@ -423,8 +423,7 @@ public class AlephUtil {
 
 			try {
 				loanDate.setTime(AlephConstants.ALEPH_DATE_FORMATTER.parse(alephDateParsed));
-				if (AlephUtil.inDaylightTime())
-					loanDate.add(Calendar.HOUR_OF_DAY, 2);
+				loanDate.add(Calendar.HOUR_OF_DAY, 2);
 			} catch (ParseException e) {
 				throw new SAXException(e);
 			}
