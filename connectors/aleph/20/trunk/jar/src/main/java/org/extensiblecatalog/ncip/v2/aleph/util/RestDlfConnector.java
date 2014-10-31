@@ -25,6 +25,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.*;
 import org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements.MandatedAction;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.HandlerBase;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -226,10 +227,6 @@ public class RestDlfConnector extends AlephMediator {
 	public AlephItem lookupItem(String alephItemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
 			throws ParserConfigurationException, IOException, SAXException, AlephException {
 
-		/*
-		 * Input could be something like this: MZK01000000421-000010 What we need is: MZK01000000421/items/MZK50000000421000010
-		 */
-
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
@@ -307,7 +304,7 @@ public class RestDlfConnector extends AlephMediator {
 		URL requestsUrl = null;
 		if (requestedItemsDesired) {
 			atLeastOneDesired = true;
-			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/bookings?view=full
+			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full
 			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
 					.addRequest("view", "full").toURL();
 		}
@@ -331,9 +328,9 @@ public class RestDlfConnector extends AlephMediator {
 
 			InputSource streamSource;
 
-			if (loansUrl != null || loansHistoryUrl != null || requestsUrl != null) {
+			if (loansUrl != null || loansHistoryUrl != null) {
 
-				AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, false, false, false, false, false).parseLoansOrRequests();
+				AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, false, false, false, false, false);
 
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());
@@ -347,12 +344,15 @@ public class RestDlfConnector extends AlephMediator {
 					parser.parse(streamSource, itemHandler);
 					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
 				}
-				if (requestsUrl != null) {
-					streamSource = new InputSource(requestsUrl.openStream());
-					itemHandler.setRequestsHandlingNow();
-					parser.parse(streamSource, itemHandler);
-					alephUser.setRequestedItems(itemHandler.getListOfRequestedItems());
-				}
+				
+			}
+			if (requestsUrl != null) {
+				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler();
+				
+				streamSource = new InputSource(requestsUrl.openStream());
+				parser.parse(streamSource, requestItemHandler);
+				
+				alephUser.setRequestedItems(requestItemHandler.getRequestedItems());
 			}
 
 			userHandler.setAlephUser(alephUser);

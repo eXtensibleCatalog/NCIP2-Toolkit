@@ -22,20 +22,26 @@ public class AlephRequestHandler extends DefaultHandler {
 	private AlephRequestItem requestItem;
 	private String itemIdToLookFor;
 	private String requestLink;
+	private boolean statusReached = false;
 	private boolean parsingRequest = false;
 	private boolean holdRequestFound = false;
-	private boolean requestNumberReached = false;
-	private boolean hourPlacedReached = false;
-	private boolean earliestDateNeededReached = false;
-	private boolean needBeforeDateReached = false;
-	private boolean datePlacedReached = false;
-	private boolean pickupLocationReached = false;
-	private boolean pickupExpiryDateReached = false;
-	private boolean requestTypeReached = false;
 	private boolean pickupDateReached = false;
-	private boolean statusReached = false;
+	private boolean hourPlacedReached = false;
+	private boolean datePlacedReached = false;
+	private boolean requestTypeReached = false;
+	private boolean requestNumberReached = false;
+	private boolean needBeforeDateReached = false;
+	private boolean pickupLocationReached = false;
 	private boolean holdQueueLengthReached = false;
+	private boolean pickupExpiryDateReached = false;
+	private boolean earliestDateNeededReached = false;
 
+	/**
+	 * This class is used to work with single request. To parse more requests use {@link AlephRequestItemHandler}.
+	 * 
+	 * @param itemIdToLookFor
+	 * @param requestItem
+	 */
 	public AlephRequestHandler(String itemIdToLookFor, AlephRequestItem requestItem) {
 		this.itemIdToLookFor = itemIdToLookFor;
 		this.requestItem = requestItem;
