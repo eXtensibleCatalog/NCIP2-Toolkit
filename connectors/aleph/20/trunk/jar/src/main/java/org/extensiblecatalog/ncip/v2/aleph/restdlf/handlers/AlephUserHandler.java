@@ -112,7 +112,7 @@ public class AlephUserHandler extends DefaultHandler {
 			netSumReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_FINE_DATE_NODE) && userFiscalAccountDesired) {
 			fineDateReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION) && userFiscalAccountDesired) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION_NODE) && userFiscalAccountDesired) {
 			descriptionReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && userFiscalAccountDesired) {
 			String type = attributes.getValue(AlephConstants.TYPE_NODE_ATTR);
@@ -155,7 +155,7 @@ public class AlephUserHandler extends DefaultHandler {
 			netSumReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_FINE_DATE_NODE) && fineDateReached) {
 			fineDateReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION) && descriptionReached) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION_NODE) && descriptionReached) {
 			fineDescription = "";
 			descriptionReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE)) {
