@@ -104,7 +104,8 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	 * Example URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds?view=full
 	 * 
 	 */
-	public AlephRequestItemHandler() {
+	public AlephRequestItemHandler(String bibLibrary) {
+		this.bibLibrary = bibLibrary;
 	}
 
 	/**

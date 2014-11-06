@@ -31,7 +31,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  */
 public class AlephItemHandler extends DefaultHandler {
-	// FIXME: Move human not readable operations to AlephUtil
 
 	private List<AlephItem> listOfItems;
 	private AlephItem currentAlephItem;
@@ -78,21 +77,7 @@ public class AlephItemHandler extends DefaultHandler {
 
 	// Variables for parsing loans & requests
 	private BibliographicDescription bibliographicDescription;
-	private TimeZone localTimeZone;
-	private boolean parsingLoansOrRequests = false;
 	private boolean loansHandling = false;
-	private boolean holdRequestsHandling = false;
-	private boolean hourPlacedReached = false;
-	private boolean earliestDateNeededReached = false;
-	private boolean needBeforeDateReached = false;
-	private boolean datePlacedReached = false;
-	private boolean pickupLocationReached = false;
-	private boolean pickupExpiryDateReached = false;
-	private boolean reminderLevelReached = false;
-	private boolean requestIdReached = false;
-	private boolean requestTypeReached = false;
-	private boolean pickupDateReached = false;
-	private boolean statusReached = false;
 	private boolean dueDateReached = false;
 	private boolean loanDateReached = false;
 	private boolean itemStatusReached = false;
@@ -105,8 +90,6 @@ public class AlephItemHandler extends DefaultHandler {
 		bibliographicDescription = new BibliographicDescription();
 		loansHandling = true;
 	}
-
-	// End of FIXME
 
 	/**
 	 * @return the listOfItems
@@ -145,7 +128,6 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (requireAtLeastOneService) {
 			throw new AlephException("Instance of class AlephItemHandler cannot be created with no service desired. Please supply at least one service you wish to use.");
 		}
-		localTimeZone = TimeZone.getTimeZone("ECT");
 	}
 
 	@Override
@@ -222,19 +204,19 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
 				materialReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-					currentLoanedItem = new LoanedItem();
+				currentLoanedItem = new LoanedItem();
 
-					if (loanedItems == null)
-						loanedItems = new ArrayList<LoanedItem>();
-				} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE)) {
-					dueDateReached = true;
-				} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE)) {
-					loanDateReached = true;
-				} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE + "|" + AlephConstants.Z36H_ITEM_SEQUENCE_NODE)) {
-					itemSequenceReached = true;
-				} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE)) {
-					loanNumberReached = true;
-				
+				if (loanedItems == null)
+					loanedItems = new ArrayList<LoanedItem>();
+			} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE)) {
+				dueDateReached = true;
+			} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE)) {
+				loanDateReached = true;
+			} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE + "|" + AlephConstants.Z36H_ITEM_SEQUENCE_NODE)) {
+				itemSequenceReached = true;
+			} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE)) {
+				loanNumberReached = true;
+
 			}
 		}
 	}
@@ -402,6 +384,8 @@ public class AlephItemHandler extends DefaultHandler {
 				secondCallNoType = new String(ch, start, length);
 				secondCallNoTypeReached = false;
 			} else if (secondCallNoReached) {
+				// Our Aleph ILS has specific settings - when 9 is set as call no. type, then parse it instead of the first.
+				// Note that NCIP doesn't allow transfer of two call numbers.
 				if (secondCallNoType != null && !secondCallNoType.equalsIgnoreCase("9"))
 					currentAlephItem.setCallNumber(new String(ch, start, length));
 				else if (secondCallNoType == null)

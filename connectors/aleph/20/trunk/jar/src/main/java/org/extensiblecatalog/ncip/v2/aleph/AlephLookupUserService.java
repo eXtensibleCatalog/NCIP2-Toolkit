@@ -27,8 +27,7 @@ public class AlephLookupUserService implements LookupUserService {
 
 	@Override
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
-		// TODO: Think about forwarding password in encrypted format ({@link Version1AuthenticationDataFormatType.APPLICATION_AUTH_POLICY_XML})
-
+	
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
@@ -56,9 +55,6 @@ public class AlephLookupUserService implements LookupUserService {
 		if (initData.getAuthenticationInputs().size() > 0 && password == null) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Password is undefined.");
 		}
-
-		// ResponseElementControl can regulate output
-		List<ResponseElementControl> responseElementControls = initData.getResponseElementControls();
 
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		if (initiationHeader != null) {
@@ -126,9 +122,9 @@ public class AlephLookupUserService implements LookupUserService {
 
 		if (alephUser != null) {
 			responseData.setUserId(initData.getUserId());
-			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions -> Cash
-			boolean requestedItemsDesired = initData.getRequestedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/ ??? FIXME
-			boolean loanedItemsDesired = initData.getLoanedItemsDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/loans?view=full
+			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); 
+			boolean requestedItemsDesired = initData.getRequestedItemsDesired(); 
+			boolean loanedItemsDesired = initData.getLoanedItemsDesired(); 
 
 			if (userFiscalAccountDesired) {
 				List<UserFiscalAccount> userFiscalAccounts = alephUser.getUserFiscalAccounts();
@@ -174,9 +170,9 @@ public class AlephLookupUserService implements LookupUserService {
 			}
 			// User optional fields:
 			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
-			boolean nameInformationDesired = initData.getNameInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
-			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address
-			boolean userIdDesired = initData.getUserIdDesired(); // http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/patronInformation/address - > Mandatory address 1
+			boolean nameInformationDesired = initData.getNameInformationDesired(); 
+			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+			boolean userIdDesired = initData.getUserIdDesired();
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
 			UserOptionalFields uof = new UserOptionalFields();

@@ -347,7 +347,7 @@ public class RestDlfConnector extends AlephMediator {
 				
 			}
 			if (requestsUrl != null) {
-				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler();
+				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary);
 				
 				streamSource = new InputSource(requestsUrl.openStream());
 				parser.parse(streamSource, requestItemHandler);
@@ -440,7 +440,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		streamSource = new InputSource(httpCon.getInputStream());
 
-		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler();
+		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary);
 		parser.parse(streamSource, requestItemHandler);
 
 		if (!requestItemHandler.returnedError()) {
@@ -515,7 +515,7 @@ public class RestDlfConnector extends AlephMediator {
 		// Parse sequence number
 		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement).toURL();
 
-		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler().parseSequenceNumber(itemId);
+		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary).parseSequenceNumber(itemId);
 
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
 		parser.parse(streamSource, requestItemHandler);
