@@ -35,7 +35,7 @@ public class AlephLoanHandler extends DefaultHandler {
 	private String status;
 	private String replyText;
 	private String itemSequenceNumber;
-	
+
 	private boolean loanFound = false;
 	private boolean renewable;
 	private boolean docNoReached;
@@ -181,7 +181,14 @@ public class AlephLoanHandler extends DefaultHandler {
 
 				// Create loan identifier from admLibrary & loanNumber
 				ItemId itemId = new ItemId();
-				itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
+
+				if (renewable) {
+					// Loan number is needed to apply RenewItemService
+					itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
+				} else {
+					// This will be significant for loaned items marked as not renewable
+					itemId.setItemIdentifierValue("-1");
+				}
 				itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 				currentLoanedItem.setItemId(itemId);
 			}
