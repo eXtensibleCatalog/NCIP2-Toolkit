@@ -105,8 +105,6 @@
 				<exclusion>
 					<groupId>commons-logging</groupId>
 					<artifactId>commons-logging</artifactId>
-						<source>${javaVersion}</source>
-						<target>${javaVersion}</target>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -152,12 +150,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<encoding>UTF-8</encoding>
-					</configuration>
-				</plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
 						<encoding>UTF-8</encoding>
