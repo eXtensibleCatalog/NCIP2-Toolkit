@@ -14,6 +14,7 @@
 	<properties>
 		<javaVersion>1.6</javaVersion>
 		<mavenVersion>2.0.9</mavenVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<mavenMaxVersion>2.3</mavenMaxVersion>
 		<highJavaVersion>6.0</highJavaVersion> <!-- The 1.4 = 2.4; 1.5 = 5.0; 1.6 = 6.0 -->
 	</properties>
@@ -81,6 +82,7 @@
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
+						<encoding>UTF-8</encoding>
 						<source>${javaVersion}</source>
 						<target>${javaVersion}</target>
 					</configuration>
