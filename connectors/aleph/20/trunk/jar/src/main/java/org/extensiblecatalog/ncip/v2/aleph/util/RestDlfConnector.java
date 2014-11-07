@@ -330,19 +330,17 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (loansUrl != null || loansHistoryUrl != null) {
 
-				AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, false, false, false, false, false);
+				AlephLoanHandler loanHandler = new AlephLoanHandler();
 
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());
-					itemHandler.setLoansHandlingNow();
-					parser.parse(streamSource, itemHandler);
-					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
+					parser.parse(streamSource, loanHandler);
+					alephUser.setLoanedItems(loanHandler.getListOfLoanedItems());
 				}
 				if (loansHistoryUrl != null) {
 					streamSource = new InputSource(loansHistoryUrl.openStream());
-					itemHandler.setLoansHandlingNow();
-					parser.parse(streamSource, itemHandler);
-					alephUser.setLoanedItems(itemHandler.getListOfLoanedItems());
+					parser.parse(streamSource, loanHandler);
+					alephUser.setLoanedItems(loanHandler.getListOfLoanedItems());
 				}
 				
 			}
@@ -691,7 +689,6 @@ public class RestDlfConnector extends AlephMediator {
 
 				streamSource = new InputSource(loanLink.openStream());
 
-				loanHandler.setParsingLoans();
 				parser.parse(streamSource, loanHandler);
 
 				boolean nameInformationDesired = initData.getNameInformationDesired();

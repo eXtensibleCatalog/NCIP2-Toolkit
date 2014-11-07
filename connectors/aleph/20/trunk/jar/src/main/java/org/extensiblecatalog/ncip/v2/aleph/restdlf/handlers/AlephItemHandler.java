@@ -1,24 +1,11 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.TimeZone;
-import java.util.spi.TimeZoneNameProvider;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.service.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -41,7 +28,6 @@ public class AlephItemHandler extends DefaultHandler {
 	private String itemSequence;
 	private String itemDocNumber;
 	private String bibLibrary;
-	private String loanNumber;
 	private boolean itemIdNotFound;
 
 	// Required to decide whether is set second call number the one we need
@@ -75,21 +61,7 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean secondCallNoTypeReached = false;
 	private boolean secondCallNoReached = false;
 
-	// Variables for parsing loans & requests
-	private BibliographicDescription bibliographicDescription;
-	private boolean loansHandling = false;
-	private boolean dueDateReached = false;
-	private boolean loanDateReached = false;
 	private boolean itemStatusReached = false;
-	private boolean loanNumberReached = false;
-
-	private List<LoanedItem> loanedItems;
-	private LoanedItem currentLoanedItem;
-
-	public void setLoansHandlingNow() {
-		bibliographicDescription = new BibliographicDescription();
-		loansHandling = true;
-	}
 
 	/**
 	 * @return the listOfItems
@@ -132,7 +104,7 @@ public class AlephItemHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (!loansHandling) {
+		
 			if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 				secondCallNoType = null;
 				currentAlephItem = new AlephItem();
@@ -186,46 +158,13 @@ public class AlephItemHandler extends DefaultHandler {
 					bibDocNoReached = true;
 				}
 			}
-		} else {
-			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
-				authorReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE)) {
-				isbnReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
-				titleReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
-				publisherReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
-				itemDocNoReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE)) {
-				bibDocNoReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
-				agencyReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
-				materialReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-				currentLoanedItem = new LoanedItem();
-
-				if (loanedItems == null)
-					loanedItems = new ArrayList<LoanedItem>();
-			} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE)) {
-				dueDateReached = true;
-			} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE)) {
-				loanDateReached = true;
-			} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE + "|" + AlephConstants.Z36H_ITEM_SEQUENCE_NODE)) {
-				itemSequenceReached = true;
-			} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE)) {
-				loanNumberReached = true;
-
-			}
-		}
+		
 	}
 
 	// END OF PARSING START ELEMENT
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (!loansHandling) {
 			if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 				if (!itemIdNotFound) {
 					itemSequence = itemSequence.trim().replace(".", "");
@@ -287,70 +226,12 @@ public class AlephItemHandler extends DefaultHandler {
 					bibDocNoReached = false;
 				}
 			}
-		} else {
-			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
-				authorReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
-				isbnReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
-				titleReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
-				publisherReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemDocNoReached) {
-				itemIdNotFound = true;
-				itemDocNoReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && bibDocNoReached) {
-				itemIdNotFound = true;
-				bibDocNoReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
-				itemIdNotFound = true;
-				agencyReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
-				materialReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-				if (!itemIdNotFound) {
-					// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
-					List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
-					BibliographicItemId bibliographicItemId = new BibliographicItemId();
-					String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence;
-					bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
-					bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
-					bibliographicItemIds.add(bibliographicItemId);
-					bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
-
-					// Create loan identifier from admLibrary & loanNumber
-					ItemId itemId = new ItemId();
-					itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
-					itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-					currentLoanedItem.setItemId(itemId);
-				}
-				currentLoanedItem.setBibliographicDescription(bibliographicDescription);
-
-				if (currentLoanedItem.getDateDue() == null)
-					currentLoanedItem.setIndeterminateLoanPeriodFlag(true);
-
-				loanedItems.add(currentLoanedItem);
-				itemIdNotFound = false;
-				bibliographicDescription = new BibliographicDescription();
-			} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE) && dueDateReached) {
-				dueDateReached = false;
-			} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE) && loanDateReached) {
-				loanDateReached = false;
-			} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE + "|" + AlephConstants.Z36H_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
-				itemIdNotFound = true;
-				itemSequenceReached = false;
-			} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE) && loanNumberReached) {
-				loanNumberReached = false;
-			}
-
-		}
 	}
 
 	// END OF PARSING END ELEMENT
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
-		if (!loansHandling) {
 			if (circulationStatusReached) {
 				currentAlephItem.setCirculationStatus(new String(ch, start, length));
 				circulationStatusReached = false;
@@ -427,62 +308,7 @@ public class AlephItemHandler extends DefaultHandler {
 					bibDocNoReached = false;
 				}
 			}
-		} else {
-			if (materialReached) {
-				String mediumTypeParsed = new String(ch, start, length);
-				MediumType mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
-				bibliographicDescription.setMediumType(mediumType);
-				materialReached = false;
-			} else if (authorReached) {
-				bibliographicDescription.setAuthor(new String(ch, start, length));
-				authorReached = false;
-			} else if (isbnReached) {
-				bibliographicDescription.setBibliographicLevel(null);
-				isbnReached = false;
-			} else if (titleReached) {
-				bibliographicDescription.setTitle(new String(ch, start, length));
-				titleReached = false;
-			} else if (publisherReached) {
-				bibliographicDescription.setPublisher(new String(ch, start, length));
-				publisherReached = false;
-			} else if (itemDocNoReached) {
-				itemDocNumber = new String(ch, start, length);
-				itemDocNoReached = false;
-			} else if (bibDocNoReached) {
-				String parsedBibId = new String(ch, start, length);
-				bibDocNumber = parsedBibId;
-				bibDocNoReached = false;
-			} else if (itemSequenceReached) {
-				itemSequence = new String(ch, start, length);
-				itemSequenceReached = false;
-			} else if (agencyReached) {
-				agencyId = new String(ch, start, length);
-				agencyReached = false;
-			} else if (dueDateReached) {
-				String dateDueParsed = new String(ch, start, length);
-				GregorianCalendar dateDue = AlephUtil.parseGregorianCalendarFromAlephDate(dateDueParsed);
-
-				currentLoanedItem.setDateDue(dateDue);
-
-				dueDateReached = false;
-			} else if (loanDateReached) {
-				String loanDateParsed = new String(ch, start, length);
-				GregorianCalendar loanDate = AlephUtil.parseGregorianCalendarFromAlephDate(loanDateParsed);
-
-				currentLoanedItem.setDateCheckedOut(loanDate);
-
-				loanDateReached = false;
-			} else if (loanNumberReached) {
-				loanNumber = new String(ch, start, length);
-				loanNumberReached = false;
-
-			}
-		}
 	}
 
 	// END OF PARSING CHARACTERS INSIDE ELEMENTS
-
-	public List<LoanedItem> getListOfLoanedItems() {
-		return loanedItems;
-	}
 }
