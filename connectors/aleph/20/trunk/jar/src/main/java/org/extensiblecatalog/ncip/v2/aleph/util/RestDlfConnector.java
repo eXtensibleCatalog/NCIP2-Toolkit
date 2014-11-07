@@ -330,7 +330,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (loansUrl != null || loansHistoryUrl != null) {
 
-				AlephLoanHandler loanHandler = new AlephLoanHandler();
+				AlephLoanHandler loanHandler = new AlephLoanHandler(bibLibrary);
 
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());

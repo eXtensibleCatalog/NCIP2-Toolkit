@@ -82,7 +82,8 @@ public class AlephLoanHandler extends DefaultHandler {
 	/**
 	 * This initializes SAX parser for parsing loans.
 	 */
-	public AlephLoanHandler() {
+	public AlephLoanHandler(String bibLibrary) {
+		this.bibLibrary = bibLibrary;
 		bibliographicDescription = new BibliographicDescription();
 	}
 
@@ -111,6 +112,17 @@ public class AlephLoanHandler extends DefaultHandler {
 
 			if (loanedItems == null)
 				loanedItems = new ArrayList<LoanedItem>();
+			
+			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+			if (link != null && itemIdToLookFor != null && link.indexOf(itemIdToLookFor) > -1) {
+				loanLink = link;
+				loanFound = true;
+			}
+			String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
+			if (renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
+				renewable = true;
+			} else
+				renewable = false;
 		} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE)) {
 			dueDateReached = true;
 		} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE)) {
@@ -119,17 +131,6 @@ public class AlephLoanHandler extends DefaultHandler {
 			itemSequenceReached = true;
 		} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE)) {
 			loanNumberReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
-			if (link != null && link.indexOf(itemIdToLookFor) > -1) {
-				loanLink = link;
-				loanFound = true;
-				String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
-				if (renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
-					renewable = true;
-				} else
-					renewable = false;
-			}
 		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
 			replyCodeReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
