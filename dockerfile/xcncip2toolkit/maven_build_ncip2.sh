@@ -4,4 +4,4 @@ mvn install
 mvn install -Dmaven.test.skip
 
 cd ../../connectors/aleph/20/trunk
-mvn install
+mvn install -Dmaven.test.skip

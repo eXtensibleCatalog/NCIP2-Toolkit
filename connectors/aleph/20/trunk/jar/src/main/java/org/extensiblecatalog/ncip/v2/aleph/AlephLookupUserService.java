@@ -52,7 +52,7 @@ public class AlephLookupUserService implements LookupUserService {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
 		}
 
-		if (initData.getAuthenticationInputs().size() > 0 && password == null) {
+		if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password == null) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Password is undefined.");
 		}
 
