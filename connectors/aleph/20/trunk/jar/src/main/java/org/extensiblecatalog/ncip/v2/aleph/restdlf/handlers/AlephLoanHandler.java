@@ -66,7 +66,8 @@ public class AlephLoanHandler extends DefaultHandler {
 	private String itemDocNumber;
 	private String bibLibrary;
 	private String loanNumber;
-	private boolean itemIdNotFound;
+	private boolean itemFullIdFound;
+	private boolean parsingRenewabilityOnly = false;
 
 	/**
 	 * This constructor is used to initialize parser for outputs of successful renewals.
@@ -77,6 +78,8 @@ public class AlephLoanHandler extends DefaultHandler {
 	public AlephLoanHandler(String itemIdToLookFor, AlephRenewItem renewItem) {
 		this.itemIdToLookFor = itemIdToLookFor;
 		this.renewItem = renewItem;
+
+		parsingRenewabilityOnly = true;
 	}
 
 	/**
@@ -85,6 +88,10 @@ public class AlephLoanHandler extends DefaultHandler {
 	public AlephLoanHandler(String bibLibrary) {
 		this.bibLibrary = bibLibrary;
 		bibliographicDescription = new BibliographicDescription();
+
+		// Expect there will be data needed to construct Item Id (item doc no., item bib doc no. & agency id)
+		// If one of these is not found, then this boolean is set to false
+		itemFullIdFound = true;
 	}
 
 	@Override
@@ -112,7 +119,7 @@ public class AlephLoanHandler extends DefaultHandler {
 
 			if (loanedItems == null)
 				loanedItems = new ArrayList<LoanedItem>();
-			
+
 			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
 			if (link != null && itemIdToLookFor != null && link.indexOf(itemIdToLookFor) > -1) {
 				loanLink = link;
@@ -159,54 +166,60 @@ public class AlephLoanHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
 			publisherReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemDocNoReached) {
-			itemIdNotFound = true;
+			itemFullIdFound = false;
 			itemDocNoReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && bibDocNoReached) {
-			itemIdNotFound = true;
+			itemFullIdFound = false;
 			bibDocNoReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
-			itemIdNotFound = true;
+			itemFullIdFound = false;
 			agencyReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 			materialReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-			if (!itemIdNotFound) {
-				// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
-				List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
-				BibliographicItemId bibliographicItemId = new BibliographicItemId();
-				String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence;
-				bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
-				bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
-				bibliographicItemIds.add(bibliographicItemId);
-				bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
+			if (!parsingRenewabilityOnly) {
+				if (itemFullIdFound) {
+					// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
+					List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
+					BibliographicItemId bibliographicItemId = new BibliographicItemId();
+					String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence;
+					bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
+					bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
+					bibliographicItemIds.add(bibliographicItemId);
+					bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
 
-				// Create loan identifier from admLibrary & loanNumber
-				ItemId itemId = new ItemId();
+					// Create loan identifier from admLibrary & loanNumber
+					ItemId itemId = new ItemId();
 
-				if (renewable) {
-					// Loan number is needed to apply RenewItemService
-					itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
-				} else {
-					// This will be significant for loaned items marked as not renewable
-					itemId.setItemIdentifierValue("-1");
+					if (renewable) {
+						// Loan number is needed to apply RenewItemService
+						itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
+					} else {
+						// This will be significant for loaned items marked as not renewable
+						itemId.setItemIdentifierValue("-1");
+					}
+					itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+					currentLoanedItem.setItemId(itemId);
 				}
-				itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-				currentLoanedItem.setItemId(itemId);
+
+				currentLoanedItem.setBibliographicDescription(bibliographicDescription);
+
+				if (currentLoanedItem.getDateDue() == null)
+					currentLoanedItem.setIndeterminateLoanPeriodFlag(true);
+
+				loanedItems.add(currentLoanedItem);
+
+				// Again, expect there will be found full item id next time
+				itemFullIdFound = true;
+
+				bibliographicDescription = new BibliographicDescription();
 			}
-			currentLoanedItem.setBibliographicDescription(bibliographicDescription);
-
-			if (currentLoanedItem.getDateDue() == null)
-				currentLoanedItem.setIndeterminateLoanPeriodFlag(true);
-
-			loanedItems.add(currentLoanedItem);
-			itemIdNotFound = false;
-			bibliographicDescription = new BibliographicDescription();
 		} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE) && dueDateReached) {
 			dueDateReached = false;
 		} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE) && loanDateReached) {
 			loanDateReached = false;
 		} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE + "|" + AlephConstants.Z36H_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
-			itemIdNotFound = true;
+			itemFullIdFound = true;
 			itemSequenceReached = false;
 		} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE) && loanNumberReached) {
 			loanNumberReached = false;
