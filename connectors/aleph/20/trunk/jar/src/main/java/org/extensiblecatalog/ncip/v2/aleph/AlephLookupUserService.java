@@ -27,7 +27,7 @@ public class AlephLookupUserService implements LookupUserService {
 
 	@Override
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
-	
+
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
@@ -122,9 +122,9 @@ public class AlephLookupUserService implements LookupUserService {
 
 		if (alephUser != null) {
 			responseData.setUserId(initData.getUserId());
-			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired(); 
-			boolean requestedItemsDesired = initData.getRequestedItemsDesired(); 
-			boolean loanedItemsDesired = initData.getLoanedItemsDesired(); 
+			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+			boolean requestedItemsDesired = initData.getRequestedItemsDesired();
+			boolean loanedItemsDesired = initData.getLoanedItemsDesired();
 
 			if (userFiscalAccountDesired) {
 				List<UserFiscalAccount> userFiscalAccounts = alephUser.getUserFiscalAccounts();
@@ -170,7 +170,7 @@ public class AlephLookupUserService implements LookupUserService {
 			}
 			// User optional fields:
 			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
-			boolean nameInformationDesired = initData.getNameInformationDesired(); 
+			boolean nameInformationDesired = initData.getNameInformationDesired();
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
 			boolean userIdDesired = initData.getUserIdDesired();
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();

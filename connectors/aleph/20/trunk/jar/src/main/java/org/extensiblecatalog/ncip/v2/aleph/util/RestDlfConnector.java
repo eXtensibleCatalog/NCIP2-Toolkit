@@ -342,14 +342,14 @@ public class RestDlfConnector extends AlephMediator {
 					parser.parse(streamSource, loanHandler);
 					alephUser.setLoanedItems(loanHandler.getListOfLoanedItems());
 				}
-				
+
 			}
 			if (requestsUrl != null) {
 				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary);
-				
+
 				streamSource = new InputSource(requestsUrl.openStream());
 				parser.parse(streamSource, requestItemHandler);
-				
+
 				alephUser.setRequestedItems(requestItemHandler.getRequestedItems());
 			}
 
@@ -362,7 +362,7 @@ public class RestDlfConnector extends AlephMediator {
 			}
 			if (cashUrl != null) {
 				streamSource = new InputSource(cashUrl.openStream());
-				
+
 				parser.parse(streamSource, userHandler);
 			}
 			if (circulationsUrl != null) {
@@ -671,7 +671,10 @@ public class RestDlfConnector extends AlephMediator {
 
 			String desiredDueDate = AlephUtil.convertToAlephDate(initData.getDesiredDateDue());
 
-			String XMLRequest = "<z36-due-date>" + desiredDueDate + "</z36-due-date>";
+			String XMLRequest = "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" 
+					+ "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" 
+					+ desiredDueDate
+					+ "</z36-due-date></z36></loan></get-pat-loan>";
 
 			HttpURLConnection httpCon = (HttpURLConnection) loanLink.openConnection();
 			httpCon.setDoOutput(true);

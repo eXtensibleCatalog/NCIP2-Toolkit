@@ -126,7 +126,7 @@ public class AlephLoanHandler extends DefaultHandler {
 				loanFound = true;
 			}
 			String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
-			if (renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
+			if (renewAttr != null && renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
 				renewable = true;
 			} else
 				renewable = false;
