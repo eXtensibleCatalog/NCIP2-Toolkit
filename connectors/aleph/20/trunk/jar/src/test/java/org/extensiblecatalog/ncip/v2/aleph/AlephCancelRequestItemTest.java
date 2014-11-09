@@ -11,10 +11,10 @@ public class AlephCancelRequestItemTest extends TestCase {
 	public void testPerformService() throws ServiceException {
 		AlephCancelRequestItemService service = new AlephCancelRequestItemService();
 		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();
-		
+
 		CancelRequestItemInitiationData initData = new CancelRequestItemInitiationData();
 		CancelRequestItemResponseData responseData = new CancelRequestItemResponseData();
-		
+
 		// Input:
 		AgencyId agencyId = new AgencyId("MZK");
 		String itemIdVal = "MZK01001424423-MZK50001464126000010";
@@ -34,7 +34,7 @@ public class AlephCancelRequestItemTest extends TestCase {
 
 		initData.setRequestType(Version1RequestType.HOLD);
 		initData.setRequestScopeType(Version1RequestScopeType.ITEM);
-		
+
 		initData.setAuthenticationInputDesired(true);
 		initData.setBlockOrTrapDesired(true);
 		initData.setDateOfBirthDesired(true);
@@ -48,7 +48,7 @@ public class AlephCancelRequestItemTest extends TestCase {
 		initData.setCirculationStatusDesired(true);
 		initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
-		
+
 		// Output:
 		String author = "Antonín, Robert,";
 		String isbn = "978-80-7289-609-7 (brož.)";
@@ -65,13 +65,13 @@ public class AlephCancelRequestItemTest extends TestCase {
 		String privilegeDesc = "04 - S";
 
 		String blockOrTrapType = "Dlouhodobě nevrácená publikace";
-		
+
 		responseData = service.performService(initData, null, serviceManager);
 
 		assertEquals("Unexpected presence of ns1:Problem element in CancelRequestItemTest.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
-		
+
 		assertEquals("Unexpected UserId returned.", userIdVal, responseData.getUserId().getUserIdentifierValue());
-		assertEquals("Unexpected ItemId returned." ,itemIdVal, responseData.getItemId().getItemIdentifierValue());
+		assertEquals("Unexpected ItemId returned.", itemIdVal, responseData.getItemId().getItemIdentifierValue());
 
 		if (serviceManager.iofDesiredForCanReqItem()) {
 			assertEquals("Item ID Incorrect", itemIdVal, responseData.getItemId().getItemIdentifierValue());
@@ -97,7 +97,6 @@ public class AlephCancelRequestItemTest extends TestCase {
 			assertEquals("Unexpected privilege description returned", privilegeDesc, responseData.getUserOptionalFields().getUserPrivilege(0).getUserPrivilegeDescription());
 			assertEquals("Unexpected BlockOrTrapType returned.", blockOrTrapType, responseData.getUserOptionalFields().getBlockOrTrap(0).getBlockOrTrapType().getValue());
 		}
-		
-		
+
 	}
 }

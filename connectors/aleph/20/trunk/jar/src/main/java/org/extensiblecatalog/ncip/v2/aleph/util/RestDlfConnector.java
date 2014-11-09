@@ -131,19 +131,39 @@ public class RestDlfConnector extends AlephMediator {
 		recordPathElement = AlephConstants.PARAM_RECORD;
 
 	}
-	
+
+	/**
+	 * Returns value from toolkit.properties, where is set whether to include UserOptionalFields on RequestItemService output or no.
+	 * 
+	 * @return
+	 */
 	public boolean uofDesiredForReqItem() {
 		return uofDesiredWithinRequestItem;
 	}
-	
+
+	/**
+	 * Returns value from toolkit.properties, where is set whether to include ItemOptionalFields on RequestItemService output or no.
+	 * 
+	 * @return
+	 */
 	public boolean iofDesiredForReqItem() {
 		return iofDesiredWithinRequestItem;
 	}
-	
+
+	/**
+	 * Returns value from toolkit.properties, where is set whether to include UserOptionalFields on CancelRequestItemService output or no.
+	 * 
+	 * @return
+	 */
 	public boolean uofDesiredForCanReqItem() {
 		return uofDesiredWithinCancelRequestItem;
 	}
-	
+
+	/**
+	 * Returns value from toolkit.properties, where is set whether to include ItemOptionalFields on CancelRequestItemService output or no.
+	 * 
+	 * @return
+	 */
 	public boolean iofDesiredForCanReqItem() {
 		return iofDesiredWithinCancelRequestItem;
 	}
@@ -687,9 +707,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			String desiredDueDate = AlephUtil.convertToAlephDate(initData.getDesiredDateDue());
 
-			String XMLRequest = "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" 
-					+ "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" 
-					+ desiredDueDate
+			String XMLRequest = "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" + "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" + desiredDueDate
 					+ "</z36-due-date></z36></loan></get-pat-loan>";
 
 			HttpURLConnection httpCon = (HttpURLConnection) loanLink.openConnection();

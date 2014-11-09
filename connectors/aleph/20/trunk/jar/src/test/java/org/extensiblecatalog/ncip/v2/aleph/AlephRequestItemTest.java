@@ -83,9 +83,9 @@ public class AlephRequestItemTest extends TestCase {
 		responseData = service.performService(initData, null, serviceManager);
 
 		assertEquals("Unexpected presence of ns1:Problem element in RequestItemTest.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
-		
+
 		assertEquals("Unexpected UserId returned.", userIdVal, responseData.getUserId().getUserIdentifierValue());
-		assertEquals("Unexpected ItemId returned." ,itemIdVal, responseData.getItemId().getItemIdentifierValue());
+		assertEquals("Unexpected ItemId returned.", itemIdVal, responseData.getItemId().getItemIdentifierValue());
 
 		assertEquals("Unexpected length of RequestIdentifierValue returned.", requestIdentifierLength, responseData.getRequestId().getRequestIdentifierValue().length());
 		assertEquals("Unexpected RequestType returned.", Version1RequestType.HOLD.getValue(), responseData.getRequestType().getValue());
