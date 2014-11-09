@@ -16,6 +16,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephLocalization;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.service.*;
@@ -334,18 +335,16 @@ public class AlephUtil {
 
 	public static MediumType detectMediumType(String mediumTypeParsed) {
 		MediumType mediumType = null;
-		// TODO: Create localized external settings
-		// Kniha = Czech localized name of book
-		// Vazan. ser. = of magazine
-		if (mediumTypeParsed.equalsIgnoreCase("Kniha") || mediumTypeParsed.equalsIgnoreCase("Mapa") || mediumTypeParsed.equalsIgnoreCase("Grafika"))
+
+		if (mediumTypeParsed.matches(AlephLocalization.BOOK + "|" + AlephLocalization.GRAPHICS + "|" + AlephLocalization.MAP))
 			mediumType = Version1MediumType.BOOK;
-		else if (mediumTypeParsed.equalsIgnoreCase("Vazan. ser.") || mediumTypeParsed.equalsIgnoreCase("Seriál"))
+		else if (mediumTypeParsed.matches(AlephLocalization.MAGAZINE1 + "|" + AlephLocalization.MAGAZINE2))
 			mediumType = Version1MediumType.MAGAZINE;
-		else if (mediumTypeParsed.equalsIgnoreCase("Kompaktní disk")) {
+		else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.COMPACT_DISC))
 			mediumType = Version1MediumType.CD_ROM;
-		} else if (mediumTypeParsed.equalsIgnoreCase("Audiokazeta")) {
+		else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.AUDIO_TAPE))
 			mediumType = Version1MediumType.AUDIO_TAPE;
-		} else {
+		else {
 			try {
 				Version1MediumType.loadAll();
 				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeParsed);

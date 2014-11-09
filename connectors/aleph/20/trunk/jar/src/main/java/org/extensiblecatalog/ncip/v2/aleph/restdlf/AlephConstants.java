@@ -12,7 +12,7 @@ public class AlephConstants {
 	// Both Aleph (RESTful APIs & X-Services) nodes:
 	public static final String Z304_NODE = "z304";
 	public static final String Z304_DATE_TO_NODE = "z304-date-to";
-	public static final String Z304_EMAIL_NODE = "z304-email-address";	
+	public static final String Z304_EMAIL_NODE = "z304-email-address";
 	public static final String Z304_DATE_FROM_NODE = "z304-date-from";
 	public static final String Z304_ADDRESS_1_NODE = "z304-address-1";
 	public static final String Z304_ADDRESS_2_NODE = "z304-address-2";
@@ -25,14 +25,14 @@ public class AlephConstants {
 	public static final String Z304_TELEPHONE_3_NODE = "z304-telephone-3";
 	public static final String Z304_TELEPHONE_4_NODE = "z304-telephone-4";
 	public static final String Z304_TELEPHONE_5_NODE = "z304-telephone-5";
-	
-	//XML Aleph RESTful APIs Nodes:
+
+	// XML Aleph RESTful APIs Nodes:
 	public static final String NOTE_NODE = "note";
 	public static final String ERROR_NODE = "error";
 	public static final String REPLY_NODE = "reply";
 	public static final String TOTAL_NODE = "total";
 	public static final String STATUS_NODE = "status";
-	public static final String FINE_ITEM_NODE = "fine";	
+	public static final String FINE_ITEM_NODE = "fine";
 	public static final String LOAN_ITEM_NODE = "loan";
 	public static final String BALANCE_NODE = "balance";
 	public static final String LOCATION_NODE = "location";
@@ -82,7 +82,7 @@ public class AlephConstants {
 	public static final String Z31_FINE_ACCRUAL_DATE_NODE = "z31-date";
 	public static final String Z31_DESCRIPTION_NODE = "z31-description";
 	public static final String Z31_CREDIT_DEBIT_NODE = "z31-credit-debit";
-	
+
 	public static final String Z37_NODE = "z37";
 	public static final String Z37_STATUS_NODE = "z37-status";
 	public static final String Z37_PRIORITY_NODE = "z37-priority";
@@ -98,7 +98,7 @@ public class AlephConstants {
 	public static final String Z37_REQUEST_NUMBER_NODE = "z37-request-number";
 	public static final String Z37_PICKUP_LOCATION_NODE = "z37-pickup-location";
 	public static final String Z37_END_REQUEST_DATE_NODE = "z37-end-request-date";
-	
+
 	public static final String Z36_NODE = "z36";
 	public static final String Z36_ID_NODE = "z36-id";
 	public static final String Z36_STATUS_NODE = "z36-status";
@@ -111,12 +111,12 @@ public class AlephConstants {
 	public static final String Z36_RECALL_DATE_NODE = "z36-recall-date";
 	public static final String Z36_ITEM_SEQUENCE_NODE = "z36-item-sequence";
 	public static final String Z36_RECALL_DUE_DATE_NODE = "z36-recall-due-date";
-	
+
 	public static final String Z36H_NUMBER_NODE = "z36h-number";
 	public static final String Z36H_DUE_DATE_NODE = "z36h-due-date";
 	public static final String Z36H_LOAN_DATE_NODE = "z36h-loan-date";
 	public static final String Z36H_ITEM_SEQUENCE_NODE = "z36h-item-sequence";
-	
+
 	// XML Aleph X-Services nodes:
 	public static final String SESSION_ID_NODE = "session-id";
 	public static final String ITEM_DATA_NODE = "item-data";
@@ -153,7 +153,7 @@ public class AlephConstants {
 	public static final String Z303_DELINQUENCY_1_UPDATE_DATE_NODE = "z303-delinq-1-update-date";
 	public static final String Z303_DELINQUENCY_2_UPDATE_DATE_NODE = "z303-delinq-2-update-date";
 	public static final String Z303_DELINQUENCY_3_UPDATE_DATE_NODE = "z303-delinq-3-update-date";
-		
+
 	public static final String Z305_NODE = "z305";
 	public static final String Z305_BOR_TYPE_NODE = "z305-bor-type";
 	public static final String Z305_FIELD_NOTE_1_NODE = "z305-field-1";
@@ -173,8 +173,8 @@ public class AlephConstants {
 	public static final String Z305_DELINQUENCY_1_UPDATE_DATE_NODE = "z305-delinq-1-update-date";
 	public static final String Z305_DELINQUENCY_2_UPDATE_DATE_NODE = "z305-delinq-2-update-date";
 	public static final String Z305_DELINQUENCY_3_UPDATE_DATE_NODE = "z305-delinq-3-update-date";
-	
-	//XML Attributes:
+
+	// XML Attributes:
 	public static final String ID_NODE_ATTR = "id";
 	public static final String TAG_ATTRIBUTE = "tag";
 	public static final String HREF_NODE_ATTR = "href";
@@ -183,8 +183,8 @@ public class AlephConstants {
 	public static final String LABEL_ATTRIBUTE = "label";
 	public static final String RENEW_NODE_ATTR = "renew";
 	public static final String DELETE_NODE_ATTR = "delete";
-	
-	//XML Attribute values:
+
+	// XML Attribute values:
 	public static final String BIB_ID_NODE_ATTR_VALUE = "b";
 	public static final String MEDIUM_LABEL_ATTR_VALUE = "m";
 	public static final String AVAILABLE_CODE_ATTR_VALUE = "e";
@@ -192,8 +192,8 @@ public class AlephConstants {
 	public static final String AVAILABLE_TAG_ATTR_VALUE = "AVA";
 	public static final String CALL_NUMBER_LABEL1_ATTR_VALUE = "h";
 	public static final String CALL_NUMBER_LABEL2_ATTR_VALUE = "i";
-	
-	//XML Node IDs:
+
+	// XML Node IDs:
 	public static final String ISBN_NODE_ID = "020";
 	public static final String TITLE_NODE_ID = "245";
 	public static final String AUTHOR_NODE_ID = "100";
@@ -204,7 +204,7 @@ public class AlephConstants {
 	public static final String DESCRIPTION1_NODE_ID = "300";
 	public static final String DESCRIPTION2_NODE_ID = "500";
 	public static final String ELECTRONIC_RESOURCE_NODE_ID = "856";
-	
+
 	// get alephitem data for a fine
 	public static final String FINE_DEBIT = "D";
 	public static final String FINE_CREDIT = "C";
@@ -240,7 +240,6 @@ public class AlephConstants {
 	public static final String LOAN_DUE_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String FINE_ACCRUAL_DATE_FORMAT = "MM/dd/yyyy";
 	public static final String CIRC_STATUS_DUE_DATE_FORMAT = "MM/dd/yy";
-
 
 	// Aleph XServices http params & GET request params:
 	public static final String ALEPHAPI_BOR_AUTH = "bor-auth";
@@ -298,7 +297,6 @@ public class AlephConstants {
 	public static final String USER_HOLDS_PARTIAL_DATA = "P";
 	public static final String QUEUE_NODE = "queue";
 
-
 	// RESTful APIs http params:
 	public static final String ITEM_PATH_ELEMENT = "record";
 	public static final String USER_PATH_ELEMENT = "patron";
@@ -309,7 +307,7 @@ public class AlephConstants {
 	public static final String REST_DLF_SUFFIX = "RestDlfSuffix";
 	public static final String AUTH_DATA_FORMAT_TYPE = "AuthDataFormatType";
 	public static final String USER_REGISTRATION_LINK = "UserRegistrationLink";
-	
+
 	public static final String AGENCY_UNSTRUCTURED_ADDRESS = "AgencyUnstructuredAddress";
 	public static final String AGENCY_TRANSLATED_NAME = "AgencyTranslatedName";
 	public static final String NCIP_TOOLKIT_VERSION = "NCIPToolkitVersion";
@@ -321,14 +319,14 @@ public class AlephConstants {
 	public static final String DEFAULT_AGENCY = "DefaultAgency";
 	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
 	public static final String ALEPH_ADMINISTRATIVE_LIBRARY = "AlephAdmLibrary";
-	
+
 	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
 	public static final String INCLUDE_ITEM_INFO_IN_REQUEST_ITEM = "IncludeItemInfoInRequestItemService";
 	public static final String INCLUDE_USER_INFO_IN_REQUEST_ITEM = "IncludeUserInfoInRequestItemService";
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
 	public static final String INCLUDE_ITEM_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeItemInfoInCancelRequestItemService";
 	public static final String INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeUserInfoInCancelRequestItemService";
-	
+
 	public static final String UNIQUE_ITEM_ID_SEPARATOR = "-";
 	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
 	public static final String UNSTRUCTURED_NAME_SEPARATOR = ", ";
@@ -374,7 +372,7 @@ public class AlephConstants {
 	// Item restrictions:
 	public static final String ITEM_RESTRICTION_LOAN_PERIOD = "Loan Period";
 	public static final String ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY = "Library only";
-	
+
 	// Error messages for X-Services failures:
 	public static final String ERROR_UNKNOWN_AGENCY = "Unknown agency";
 	public static final String ERROR_BOR_ID_MISSING = "bor_id must be provided";
@@ -426,7 +424,7 @@ public class AlephConstants {
 	public static enum MessageTypes {
 		LOOKUP, UPDATE, NOTIFICATION
 	}
-	
+
 	public static enum Availability {
 		UNKNOWN, NOT_AVAILABLE, POSSIBLY_AVAILABLE, AVAILABLE, DOESNT_EXIST, DOESNT_EXIST_REMOVED_MANUALLY
 	}
