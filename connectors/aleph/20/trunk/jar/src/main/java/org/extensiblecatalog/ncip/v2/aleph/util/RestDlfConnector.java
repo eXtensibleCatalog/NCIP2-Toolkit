@@ -39,10 +39,6 @@ public class RestDlfConnector extends AlephMediator {
 	protected AlephConfiguration alephConfig = null;
 	public boolean echoParticularProblemsToLUIS;
 	private boolean requiredAtLeastOneService;
-	private boolean iofDesiredWithinRequestItem;
-	private boolean uofDesiredWithinRequestItem;
-	private boolean iofDesiredWithinCancelRequestItem;
-	private boolean uofDesiredWithinCancelRequestItem;
 
 	private String defaultAgency;
 	private String agencyAddress;
@@ -99,11 +95,7 @@ public class RestDlfConnector extends AlephMediator {
 			authDataFormatType = alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE);
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
-			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
-			iofDesiredWithinRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_ITEM_INFO_IN_REQUEST_ITEM));
-			uofDesiredWithinRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_USER_INFO_IN_REQUEST_ITEM));
-			iofDesiredWithinCancelRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_ITEM_INFO_IN_CANCEL_REQUEST_ITEM));
-			uofDesiredWithinCancelRequestItem = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM));
+			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));			
 
 			parser = SAXParserFactory.newInstance().newSAXParser();
 
@@ -130,42 +122,6 @@ public class RestDlfConnector extends AlephMediator {
 		registrationElement = AlephConstants.PARAM_REGISTRATION;
 		recordPathElement = AlephConstants.PARAM_RECORD;
 
-	}
-
-	/**
-	 * Returns value from toolkit.properties, where is set whether to include UserOptionalFields on RequestItemService output or no.
-	 * 
-	 * @return
-	 */
-	public boolean uofDesiredForReqItem() {
-		return uofDesiredWithinRequestItem;
-	}
-
-	/**
-	 * Returns value from toolkit.properties, where is set whether to include ItemOptionalFields on RequestItemService output or no.
-	 * 
-	 * @return
-	 */
-	public boolean iofDesiredForReqItem() {
-		return iofDesiredWithinRequestItem;
-	}
-
-	/**
-	 * Returns value from toolkit.properties, where is set whether to include UserOptionalFields on CancelRequestItemService output or no.
-	 * 
-	 * @return
-	 */
-	public boolean uofDesiredForCanReqItem() {
-		return uofDesiredWithinCancelRequestItem;
-	}
-
-	/**
-	 * Returns value from toolkit.properties, where is set whether to include ItemOptionalFields on CancelRequestItemService output or no.
-	 * 
-	 * @return
-	 */
-	public boolean iofDesiredForCanReqItem() {
-		return iofDesiredWithinCancelRequestItem;
 	}
 
 	public String getDefaultAgency() {
@@ -422,112 +378,90 @@ public class RestDlfConnector extends AlephMediator {
 			return null;
 	}
 
-	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException, ServiceException {
 
-		// Let requesting application know it is impossible to return response with multiple item ids, ergo it is not possible to accept more than one request at once
-		// Another problem is Aleph can't actually return one request Id for separate requests.
-		if (initData.getItemIds().size() > 1) {
-			throw new IOException("Aleph cannot process more requests at once, please supply these in a row.");
-		}
-
-		String alephItemId = initData.getItemId(0).getItemIdentifierValue();
-
-		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
-		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
-
-		if (!validateRecordId(recordId) || !validateItemId(itemId)) {
-			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
-		}
-
-		AlephRequestItem requestItem = new AlephRequestItem();
-
-		String pickupLocation = initData.getPickupLocation().getValue();
-
-		String needBeforeDate = AlephUtil.convertToAlephDate(initData.getNeedBeforeDate());
-		String earliestDateNeeded = AlephUtil.convertToAlephDate(initData.getEarliestDateNeeded());
-
+		List<ItemId> itemIds = initData.getItemIds();
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		// Build e.g. this: MZK50001365071000010
-		// String alephItemId = admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber;
+		AlephRequestItem requestItem = new AlephRequestItem();
+		String alephItemId;
+		for (ItemId itemId : itemIds) {
+			alephItemId = itemId.getItemIdentifierValue();
+			if (alephItemId != "") {
+				String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
+				String itemIdVal = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		// We need to put HTML PUT request to e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/record/MZK01001330134/holds/MZK50001365071000010
-		URL holdUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, recordPathElement, recordId, holdsElement, itemId).toURL();
-
-		String firstNote = null;
-		// Our own testing identifier system (Moravian Library's)
-		if (patronId.equalsIgnoreCase("700") || true) {
-			firstNote = "dg";
-		}
-
-		String XMLRequest = new XMLBuilder().setParent("hold-request-parameters").setPickupLocation(pickupLocation).setLastInterestDate(needBeforeDate)
-				.setStartInterestDate(earliestDateNeeded).setFirstNote(firstNote).setRush("N").toString();
-
-		InputSource streamSource;
-		HttpURLConnection httpCon = (HttpURLConnection) holdUrl.openConnection();
-		httpCon.setDoOutput(true);
-		httpCon.setRequestMethod("PUT");
-
-		OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
-		outWriter.write(XMLRequest);
-		outWriter.close();
-
-		streamSource = new InputSource(httpCon.getInputStream());
-
-		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary);
-		parser.parse(streamSource, requestItemHandler);
-
-		if (!requestItemHandler.returnedError()) {
-			requestItem.setRequestType(initData.getRequestType());
-			requestItem.setRequestScopeType(initData.getRequestScopeType());
-
-			// Parse sequence number
-			URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
-					.toURL();
-
-			streamSource = new InputSource(holdsUrl.openStream());
-			parser.parse(streamSource, requestItemHandler.parseSequenceNumber(itemId));
-
-			String seqNumber = requestItemHandler.getSequenceNumber();
-
-			// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
-			URL requestsUrl = new URLBuilder().setBase(serverName, serverPort)
-					.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement, itemId + seqNumber).toURL();
-
-			streamSource = new InputSource(requestsUrl.openStream());
-			parser.parse(streamSource, requestItemHandler);
-
-			RequestId requestId = new RequestId();
-			requestId.setRequestIdentifierValue(requestItemHandler.getRequestId());
-			requestItem.setRequestId(requestId);
-
-			if (uofDesiredWithinRequestItem) {
-				LookupUserInitiationData userInitData = new LookupUserInitiationData();
-				userInitData.setNameInformationDesired(true);
-				userInitData.setUserAddressInformationDesired(true);
-				userInitData.setUserIdDesired(true);
-				userInitData.setUserPrivilegeDesired(true);
-				userInitData.setBlockOrTrapDesired(true);
-
-				AlephUser user = lookupUser(patronId, userInitData);
-				requestItem.setUserOptionalFields(user.getUserOptionalFields());
-			}
-
-			if (iofDesiredWithinRequestItem) {
-				AlephItem item = lookupItem(alephItemId, true, true, true, true);
-				if (item.getAgency() == null) {
-					item.setAgency(defaultAgency);
+				if (!validateRecordId(recordId) || !validateItemId(itemIdVal)) {
+					throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 				}
-				requestItem.setItemOptionalFields(item.getItemOptionalFields());
-			}
 
-		} else {
-			Problem problem = new Problem();
-			problem.setProblemDetail(requestItemHandler.getNoteValue());
-			problem.setProblemValue(requestItemHandler.getReplyText());
-			problem.setProblemType(new ProblemType("Aleph returned error while processing the request. See details below."));
-			requestItem.setProblem(problem);
+				String pickupLocation = initData.getPickupLocation().getValue();
+
+				String needBeforeDate = AlephUtil.convertToAlephDate(initData.getNeedBeforeDate());
+				String earliestDateNeeded = AlephUtil.convertToAlephDate(initData.getEarliestDateNeeded());
+
+				// Build e.g. this: MZK50001365071000010
+				// String alephItemId = admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber;
+
+				// We need to put HTML PUT request to e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/record/MZK01001330134/holds/MZK50001365071000010
+				URL holdUrl = new URLBuilder().setBase(serverName, serverPort)
+						.setPath(serverSuffix, userPathElement, patronId, recordPathElement, recordId, holdsElement, itemIdVal).toURL();
+
+				String firstNote = null;
+				// Our own testing identifier system (Moravian Library's)
+				if (patronId.equalsIgnoreCase("700") || true) {
+					firstNote = "dg";
+				}
+
+				String XMLRequest = new XMLBuilder().setParent("hold-request-parameters").setPickupLocation(pickupLocation).setLastInterestDate(needBeforeDate)
+						.setStartInterestDate(earliestDateNeeded).setFirstNote(firstNote).setRush("N").toString();
+
+				InputSource streamSource;
+				HttpURLConnection httpCon = (HttpURLConnection) holdUrl.openConnection();
+				httpCon.setDoOutput(true);
+				httpCon.setRequestMethod("PUT");
+
+				OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
+				outWriter.write(XMLRequest);
+				outWriter.close();
+
+				streamSource = new InputSource(httpCon.getInputStream());
+
+				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary);
+				parser.parse(streamSource, requestItemHandler);
+
+				if (!requestItemHandler.returnedError()) {
+					requestItem.setRequestType(initData.getRequestType());
+					requestItem.setRequestScopeType(initData.getRequestScopeType());
+
+					// Parse sequence number
+					URL holdsUrl = new URLBuilder().setBase(serverName, serverPort)
+							.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement).toURL();
+
+					streamSource = new InputSource(holdsUrl.openStream());
+					parser.parse(streamSource, requestItemHandler.parseSequenceNumber(itemIdVal));
+
+					String seqNumber = requestItemHandler.getSequenceNumber();
+
+					// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
+					URL requestsUrl = new URLBuilder().setBase(serverName, serverPort)
+							.setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement, itemIdVal + seqNumber).toURL();
+
+					streamSource = new InputSource(requestsUrl.openStream());
+					parser.parse(streamSource, requestItemHandler);
+
+					requestItem.addRequestId(requestItemHandler.getRequestId());
+
+				} else {
+					Problem problem = new Problem();
+					problem.setProblemDetail(requestItemHandler.getNoteValue());
+					problem.setProblemValue(requestItemHandler.getReplyText());
+					problem.setProblemType(new ProblemType("Aleph returned error while processing the request. See details below."));
+					requestItem.setProblem(problem);
+				}
+			}
 		}
+
 		return requestItem;
 	}
 
@@ -570,27 +504,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			parser.parse(streamSource, requestItemHandler);
 
-			if (!requestItemHandler.returnedError()) {
-				if (uofDesiredWithinCancelRequestItem) {
-					LookupUserInitiationData userInitData = new LookupUserInitiationData();
-					userInitData.setNameInformationDesired(true);
-					userInitData.setUserAddressInformationDesired(true);
-					userInitData.setUserIdDesired(true);
-					userInitData.setUserPrivilegeDesired(true);
-					userInitData.setBlockOrTrapDesired(true);
-
-					AlephUser user = lookupUser(patronId, userInitData);
-					requestItem.setUserOptionalFields(user.getUserOptionalFields());
-				}
-
-				if (iofDesiredWithinCancelRequestItem) {
-					AlephItem item = lookupItem(alephItemId, true, true, true, true);
-					if (item.getAgency() == null) {
-						item.setAgency(defaultAgency);
-					}
-					requestItem.setItemOptionalFields(item.getItemOptionalFields());
-				}
-			} else {
+			if (requestItemHandler.returnedError()) {
 				Problem problem = new Problem();
 				problem.setProblemValue(requestItemHandler.getReplyText());
 				problem.setProblemType(new ProblemType("Aleph returned error while processing cancel request. See details below."));

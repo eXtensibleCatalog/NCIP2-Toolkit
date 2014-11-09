@@ -54,26 +54,7 @@ public class AlephRequestHandler extends DefaultHandler {
 		parsingRequest = true;
 		return this;
 	}
-/*		responseData.setRequestScopeType(requestItem.getRequestScopeType());
-		responseData.setRequestType(requestItem.getRequestType());
-		responseData.setRequestId(requestItem.getRequestId());
-		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		responseData.setUserOptionalFields(requestItem.getUserOptionalFields()); 
-
-		// Not implemented services, most of them probably even not implementable
-		responseData.setDateAvailable(requestItem.getDateAvailable());
-		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		responseData.setShippingInformation(requestItem.getShippingInformation());
-		responseData.setAcknowledgedFeeAmount(requestItem.getAcknowledgedFeeAmout());
-		responseData.setDateOfUserRequest(requestItem.getDateOfUserRequest());
-		responseData.setEarliestDateNeeded(requestItem.getEarliestDateNeeded());
-		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		responseData.setNeedBeforeDate(requestItem.getNeedBeforeDate());
-		responseData.setPaidFeeAmount(requestItem.getPaidFeeAmount());
-		responseData.setPickupDate(requestItem.getHoldPickupDate());
-		responseData.setPickupExpiryDate(requestItem.getPickupExpiryDate());
-		responseData.setPickupLocation(requestItem.getPickupLocation());
-		responseData.setRequestStatusType(requestItem.getRequestStatusType());*/
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (parsingRequest) {

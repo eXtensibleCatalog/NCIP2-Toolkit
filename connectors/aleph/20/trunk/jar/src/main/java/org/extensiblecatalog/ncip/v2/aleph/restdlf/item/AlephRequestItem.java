@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.service.*;
 
 public class AlephRequestItem implements Serializable {
@@ -102,6 +103,17 @@ public class AlephRequestItem implements Serializable {
 	 */
 	public void setRequestId(RequestId requestId) {
 		this.requestId = requestId;
+	}
+
+	public void addRequestId(String requestId) {
+		if (this.requestId != null) {
+			// This appends REQUEST_ID_DELIMITER = ";" to current identifier value & adds another request id to the end
+			this.requestId.setRequestIdentifierValue(this.requestId.getRequestIdentifierValue() + AlephConstants.REQUEST_ID_DELIMITER + requestId);
+		} else {
+			RequestId reqId = new RequestId();
+			reqId.setRequestIdentifierValue(requestId);
+			this.requestId = reqId;
+		}
 	}
 
 	/**

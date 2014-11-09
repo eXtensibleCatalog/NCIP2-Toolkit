@@ -62,35 +62,35 @@ public class AlephLookupRequestService implements LookupRequestService {
 
 		} catch (IOException ie) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing IOException error"));
+			p.setProblemType(new ProblemType("Processing IOException error."));
 			p.setProblemDetail(ie.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (SAXException se) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing SAXException error"));
+			p.setProblemType(new ProblemType("Processing SAXException error."));
 			p.setProblemDetail(se.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (AlephException ae) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing AlephException error"));
+			p.setProblemType(new ProblemType("Processing AlephException error."));
 			p.setProblemDetail(ae.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (ParserConfigurationException pce) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing ParserConfigurationException error"));
+			p.setProblemType(new ProblemType("Processing ParserConfigurationException error."));
 			p.setProblemDetail(pce.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (Exception e) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Unknown procesing exception error"));
+			p.setProblemType(new ProblemType("Unknown processing exception error."));
 			p.setProblemDetail(e.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
@@ -19,16 +20,10 @@ public class AlephRequestItemService implements RequestItemService {
 
 		RequestItemResponseData responseData = new RequestItemResponseData();
 
-		String itemId = initData.getItemId(0).getItemIdentifierValue();
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		if (patronId == null || itemId == null) {
-			if (patronId == null && itemId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item and User Id are undefined.");
-			else if (itemId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item Id is undefined.");
-			else if (patronId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
+		if (patronId == "") {
+			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is empty.");
 		}
 
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
@@ -67,35 +62,35 @@ public class AlephRequestItemService implements RequestItemService {
 
 		} catch (IOException ie) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing IOException error"));
+			p.setProblemType(new ProblemType("Processing IOException error."));
 			p.setProblemDetail(ie.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (SAXException se) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing SAXException error"));
+			p.setProblemType(new ProblemType("Processing SAXException error."));
 			p.setProblemDetail(se.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (AlephException ae) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing AlephException error"));
+			p.setProblemType(new ProblemType("Processing AlephException error."));
 			p.setProblemDetail(ae.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (ParserConfigurationException pce) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing ParserConfigurationException error"));
+			p.setProblemType(new ProblemType("Processing ParserConfigurationException error."));
 			p.setProblemDetail(pce.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (Exception e) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Unknown procesing exception error"));
+			p.setProblemType(new ProblemType("Unknown processing exception error."));
 			p.setProblemDetail(e.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
@@ -108,13 +103,30 @@ public class AlephRequestItemService implements RequestItemService {
 	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, AlephRequestItem requestItem) {
 
 		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId(0)); // TODO: Implement request of multiple items
+		if (initData.getItemIds().size() > 1) {
+			// If there was more than one requested item, then merge all item identifier's values into one because responseData does not support
+			// multiple ItemIds
+			String joinedItemIds = "";
+			int itemIdsSize = initData.getItemIds().size();
+			for (int i = 0; i < itemIdsSize; i++) {
+				if (i != itemIdsSize - 1) {
+					joinedItemIds += initData.getItemId(i).getItemIdentifierValue() + AlephConstants.REQUEST_ID_DELIMITER;
+				} else
+					joinedItemIds += initData.getItemId(i).getItemIdentifierValue();
+			}
+			ItemId itemId = new ItemId();
+			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+			itemId.setItemIdentifierValue(joinedItemIds);
+			responseData.setItemId(itemId);
+		} else
+			responseData.setItemId(initData.getItemId(0));
+
 		responseData.setRequestScopeType(requestItem.getRequestScopeType());
 		responseData.setRequestType(requestItem.getRequestType());
 		responseData.setRequestId(requestItem.getRequestId());
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo()); 
+		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
 
 		// Not implemented services, most of them probably even not implementable in Aleph logic
 		responseData.setDateAvailable(requestItem.getDateAvailable());

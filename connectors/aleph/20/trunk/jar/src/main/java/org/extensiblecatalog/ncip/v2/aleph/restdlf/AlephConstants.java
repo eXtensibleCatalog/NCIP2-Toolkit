@@ -328,6 +328,7 @@ public class AlephConstants {
 	public static final String INCLUDE_ITEM_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeItemInfoInCancelRequestItemService";
 	public static final String INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeUserInfoInCancelRequestItemService";
 
+	public static final String REQUEST_ID_DELIMITER = ";";
 	public static final String UNIQUE_ITEM_ID_SEPARATOR = "-";
 	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
 	public static final String UNSTRUCTURED_NAME_SEPARATOR = ", ";
