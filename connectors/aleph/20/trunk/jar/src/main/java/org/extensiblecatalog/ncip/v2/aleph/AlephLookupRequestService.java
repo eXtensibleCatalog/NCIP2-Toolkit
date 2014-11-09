@@ -62,28 +62,28 @@ public class AlephLookupRequestService implements LookupRequestService {
 
 		} catch (IOException ie) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing IOException error"));
+			p.setProblemType(new ProblemType("Processing IOException error"));
 			p.setProblemDetail(ie.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (SAXException se) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing SAXException error"));
+			p.setProblemType(new ProblemType("Processing SAXException error"));
 			p.setProblemDetail(se.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (AlephException ae) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing AlephException error"));
+			p.setProblemType(new ProblemType("Processing AlephException error"));
 			p.setProblemDetail(ae.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
 			responseData.setProblems(problems);
 		} catch (ParserConfigurationException pce) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing ParserConfigurationException error"));
+			p.setProblemType(new ProblemType("Processing ParserConfigurationException error"));
 			p.setProblemDetail(pce.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);

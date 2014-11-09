@@ -150,7 +150,7 @@ public class VoyagerLookupItemService implements LookupItemService {
 			}
         } catch (ILSException e) {
         	Problem p = new Problem();
-			p.setProblemType(new SchemeValuePair("Procesing error"));
+			p.setProblemType(new SchemeValuePair("Processing error"));
 			p.setProblemDetail(e.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);

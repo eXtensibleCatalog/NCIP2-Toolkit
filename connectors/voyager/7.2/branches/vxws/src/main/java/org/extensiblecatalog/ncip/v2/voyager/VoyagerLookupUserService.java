@@ -245,7 +245,7 @@ public class VoyagerLookupUserService implements LookupUserService {
 			}
 		} catch (ILSException e) {
 			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Procesing error"));
+			p.setProblemType(new ProblemType("Processing error"));
 			p.setProblemDetail(e.getMessage());
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(p);
