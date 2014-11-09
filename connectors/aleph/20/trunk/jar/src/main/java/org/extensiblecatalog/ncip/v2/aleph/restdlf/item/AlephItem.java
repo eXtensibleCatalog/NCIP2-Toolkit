@@ -83,7 +83,7 @@ public class AlephItem implements Serializable {
 	private String copyNumber;
 	private boolean exists = true;
 	private String seqNumber;
-	
+
 	private List<String> itemRestrictions;
 
 	public AlephItem() {
@@ -498,11 +498,11 @@ public class AlephItem implements Serializable {
 	public String getItemSeqNumber() {
 		return itemSeqNumber;
 	}
-	
+
 	public void setSeqNumber(String seqNumber) {
 		this.seqNumber = seqNumber;
 	}
-	
+
 	public String getSeqNumber() {
 		return seqNumber;
 	}
@@ -739,7 +739,6 @@ public class AlephItem implements Serializable {
 		itemRestrictions.add(itemRestriction);
 	}
 
-
 	public List<String> getItemRestrictions() {
 		return itemRestrictions;
 	}
@@ -932,8 +931,5 @@ public class AlephItem implements Serializable {
 		iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
 		return iof;
 	}
-
-
-
 
 }

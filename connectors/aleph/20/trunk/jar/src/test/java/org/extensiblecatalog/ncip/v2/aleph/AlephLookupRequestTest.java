@@ -87,7 +87,7 @@ public class AlephLookupRequestTest extends TestCase {
 
 		responseData = service.performService(initData, null, serviceManager);
 
-		assertEquals("Unexpected presence of ns1:Problem element in RequestItemTest.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
+		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
 
 		assertEquals("Unexpected UserId returned.", userIdVal, responseData.getUserId().getUserIdentifierValue());
 		assertEquals("Unexpected ItemId returned.", itemIdVal, responseData.getItemId().getItemIdentifierValue());

@@ -86,7 +86,7 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 
 		requestItemResponseData = requestItemService.performService(requestItemInitData, null, serviceManager);
 
-		assertEquals("Unexpected presence of ns1:Problem element in RequestItemTest.", true, requestItemResponseData.getProblems() == null
+		assertEquals("Unexpected presence of ns1:Problem element.", true, requestItemResponseData.getProblems() == null
 				|| requestItemResponseData.getProblems().get(0) == null);
 
 		assertEquals("Unexpected UserId returned.", userIdVal, requestItemResponseData.getUserId().getUserIdentifierValue());
