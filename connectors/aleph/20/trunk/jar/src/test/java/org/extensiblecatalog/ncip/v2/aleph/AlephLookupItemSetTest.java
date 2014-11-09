@@ -17,24 +17,33 @@ public class AlephLookupItemSetTest extends TestCase {
 
 		// Inputs:
 		String agency = "MZK";
-		String bibRecIds[] = { "MZK01000000421", "MZK01000062021", "MZK01000000425" };
+		String bibRecIds[] = { "MZK01000000421", "MZK01000062021", "MZK01000000425", "MZK01000385610" };
 
 		// Outputs:
-		String[] isbns = { "80-900870-1-9", "0-13-914622-9", "80-85605-77-5" };
-		String[] authors = { "Malinová, Libuše", "Brammer, Lawrence M.", "Elman, Jiří" };
-		String[] publishers = { "EPA,", "Prentice-Hall,", "Victoria Publishing," };
+		String[] isbns = { "80-900870-1-9", "0-13-914622-9", "80-85605-77-5", "261H001467" };
+
+		String[] authors = { "Malinová, Libuše", "Brammer, Lawrence M.", "Elman, Jiří", "Náhoda (hudební skupina)" };
+
+		String[] publishers = { "EPA,", "Prentice-Hall,", "Victoria Publishing,", "Studio ASD," };
+
 		String[] titles = { "Anglicko-český a česko-anglický elektrotechnický a elektronický slovník / Sest. aut. kol. pod",
 				"Therapeutic psychology : fundamentals of counseling and psychotherapy / Lawrence M. Brammer, Everett",
-				"Anglicko-český ekonomický slovník : Ekonomie, právo, výpočetní technika. [2.] M-Z / ..., Kam" };
-		String[] mediumTypes = { "Book", "Book", "Book" };
+				"Anglicko-český ekonomický slovník : Ekonomie, právo, výpočetní technika. [2.] M-Z / ..., Kam", "Náhoda [zvukový záznam] / Náhoda " };
 
-		String[][] callN0s = { { "621.3 ANG" }, { "PK-0083.568" }, { "2-0997.767,2", "2-0997.767,2" } };
+		String[] mediumTypes = { Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(),
+				Version1MediumType.AUDIO_TAPE.getValue() };
+
+		String[][] callN0s = { { "621.3 ANG" }, { "PK-0083.568" }, { "2-0997.767,2", "2-0997.767,2" }, { "KZ-0001.436" } };
+
 		String[][] itemIds = { { "MZK01000000421-MZK50000000421000010" }, { "MZK01000062021-MZK50000062021000010" },
-				{ "MZK01000000425-MZK50000000425000020", "MZK01000000425-MZK50000000425000030" } };
-		String[][] barcodes = { { "2610002885" }, { "3119972468" }, { "2610007443", "2610008987" } };
+				{ "MZK01000000425-MZK50000000425000020", "MZK01000000425-MZK50000000425000030" }, { "MZK01000385610-MZK50000385610000010" } };
+
+		String[][] barcodes = { { "2610002885" }, { "3119972468" }, { "2610007443", "2610008987" }, { "261H001467" } };
+
 		String[][] itemRestrictions = { { "In Library Use Only" }, { "Limited Circulation, Normal Loan Period" },
-				{ "In Library Use Only", "Limited Circulation, Normal Loan Period" } };
-		String[][] numberOfPieces = { { "1" }, { "1" }, { "2", "2" } };
+				{ "In Library Use Only", "Limited Circulation, Normal Loan Period" }, { "Supervision Required" } };
+
+		String[][] numberOfPieces = { { "1" }, { "1" }, { "2", "2" }, { "1" } };
 
 		LookupItemSetInitiationData initData = new LookupItemSetInitiationData();
 

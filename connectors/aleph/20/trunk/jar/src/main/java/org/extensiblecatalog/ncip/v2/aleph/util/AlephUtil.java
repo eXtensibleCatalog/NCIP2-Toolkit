@@ -249,7 +249,16 @@ public class AlephUtil {
 		boolean isLoanPeriodRestrictionType = itemRestrictionClasses.get(AlephConstants.ITEM_RESTRICTION_LOAN_PERIOD).contains(itemRestriction);
 
 		if (isLibraryOnlyRestrictionType) {
-			itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
+
+			if (itemRestriction.equals(AlephConstants.ITEM_STATUS_TO_THE_MUSIC_CORNER_ONLY_4F))
+				itemUseRestrictionType = Version1ItemUseRestrictionType.SUPERVISION_REQUIRED;
+
+			else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_REFERENCE_ONLY_SPN_2F))
+				itemUseRestrictionType = Version1ItemUseRestrictionType.USE_ONLY_IN_CONTROLLED_ACCESS;
+
+			else
+				itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
+
 		} else if (isLoanPeriodRestrictionType) {
 
 			if (itemRestriction.equals(AlephConstants.ITEM_STATUS_LONG_TERM_LOAN))
@@ -334,6 +343,8 @@ public class AlephUtil {
 			mediumType = Version1MediumType.MAGAZINE;
 		else if (mediumTypeParsed.equalsIgnoreCase("Kompaktní disk")) {
 			mediumType = Version1MediumType.CD_ROM;
+		} else if (mediumTypeParsed.equalsIgnoreCase("Audiokazeta")) {
+			mediumType = Version1MediumType.AUDIO_TAPE;
 		} else {
 			try {
 				Version1MediumType.loadAll();

@@ -280,11 +280,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
-								// Set next item token
-								ItemToken itemToken = new ItemToken();
+								
+								ItemToken itemToken = new ItemToken();								
 								itemToken.setBibliographicId(id);
 								itemToken.setItemId(alephItem.getItemId());
+								
 								int newToken = random.nextInt();
+								
 								itemToken.setNextToken(Integer.toString(newToken));
 								tokens.put(Integer.toString(newToken), itemToken);
 
@@ -301,20 +303,20 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							bibInformation.setProblems(problems);
 
+							// Note that Problem elements within <ns1:BibInformation> is also considered as one item forwarded
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
 
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
-								// Set next item token
+								
 								ItemToken itemToken = new ItemToken();
-
 								itemToken.setBibliographicId(id);
 
 								int newToken = random.nextInt();
+								
 								itemToken.setNextToken(Integer.toString(newToken));
-
 								tokens.put(Integer.toString(newToken), itemToken);
 
 								responseData.setNextItemToken(Integer.toString(newToken));
@@ -396,7 +398,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		} else {
 			Problem problem = new Problem();
 			problem.setProblemType(new ProblemType("Unknown Problem"));
-			problem.setProblemValue("Toolkit passed through empty response data.");
+			problem.setProblemValue("Toolkit passed through empty initiation data.");
 			List<Problem> problems = new ArrayList<Problem>();
 			problems.add(problem);
 			responseData.setProblems(problems);
@@ -503,7 +505,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
 		for (AlephItem item : alephItems) {
 
-			if (maximumItemsCount == 0 || maximumItemsCount > itemsForwarded) {
+			if (maximumItemsCount == 0 || itemsForwarded < maximumItemsCount) {
 				ItemOptionalFields iof = new ItemOptionalFields();
 
 				if (initData.getBibliographicDescriptionDesired()) {
