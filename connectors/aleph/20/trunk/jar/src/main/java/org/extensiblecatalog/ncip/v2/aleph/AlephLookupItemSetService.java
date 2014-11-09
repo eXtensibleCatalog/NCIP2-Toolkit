@@ -27,6 +27,7 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -97,7 +98,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		ItemToken nextItemToken = null;
 		// remove any bib ids from bibIds list that may have already been processed
 		if (token != null) {
-			// FIXME: Implement parsing tokens, which points into bibliographic record to specific bibliographic item id
 			// In case maximum items returned was reached while parsing one bibliographic Id with a lot alephItems inside
 			nextItemToken = tokens.get(token);
 			if (nextItemToken != null) {
@@ -111,7 +111,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				}
 
 				// Remove token from memory hashmap
-				// TODO: Create expiration function
 				tokens.remove(token);
 			} else {
 				Problem problem = new Problem();
@@ -126,7 +125,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		}
 
-		// TODO: Which can be parsed from rest-dlf & which need x-services?
 		boolean getCurrentBorrower = initData.getCurrentBorrowerDesired();
 		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
 		boolean getItemUseRestrictionType = initData.getItemUseRestrictionTypeDesired();
@@ -134,8 +132,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
 		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
 		boolean getElectronicResource = initData.getElectronicResourceDesired();
-		boolean getLocation = initData.getLocationDesired(); // FIXME
-		// EOF TODO;
+		boolean getLocation = initData.getLocationDesired();
 
 		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 		boolean getCircStatus = initData.getCirculationStatusDesired();
@@ -280,13 +277,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
-								
-								ItemToken itemToken = new ItemToken();								
+
+								ItemToken itemToken = new ItemToken();
 								itemToken.setBibliographicId(id);
 								itemToken.setItemId(alephItem.getItemId());
-								
+
 								int newToken = random.nextInt();
-								
+
 								itemToken.setNextToken(Integer.toString(newToken));
 								tokens.put(Integer.toString(newToken), itemToken);
 
@@ -310,12 +307,12 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
 							if (maximumItemsCount == itemsForwarded && !isLast) {
-								
+
 								ItemToken itemToken = new ItemToken();
 								itemToken.setBibliographicId(id);
 
 								int newToken = random.nextInt();
-								
+
 								itemToken.setNextToken(Integer.toString(newToken));
 								tokens.put(Integer.toString(newToken), itemToken);
 
@@ -458,6 +455,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			itemDescription.setCallNumber(alephItem.getCallNumber());
 			itemDescription.setCopyNumber(alephItem.getCopyNumber());
 			itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
+			if (alephItem.getDescription() != null) {
+				HoldingsInformation holdingsInformation = new HoldingsInformation();
+				holdingsInformation.setUnstructuredHoldingsData(alephItem.getDescription());
+				itemDescription.setHoldingsInformation(holdingsInformation);
+			}
 			iof.setItemDescription(itemDescription);
 		}
 		if (initData.getItemUseRestrictionTypeDesired()) {
@@ -532,6 +534,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					itemDescription.setCallNumber(item.getCallNumber());
 					itemDescription.setCopyNumber(item.getCopyNumber());
 					itemDescription.setNumberOfPieces(item.getNumberOfPieces());
+					if (item.getDescription() != null) {
+						HoldingsInformation holdingsInformation = new HoldingsInformation();
+						holdingsInformation.setUnstructuredHoldingsData(item.getDescription());
+						itemDescription.setHoldingsInformation(holdingsInformation);
+					}
 					iof.setItemDescription(itemDescription);
 				}
 				if (initData.getItemUseRestrictionTypeDesired()) {
