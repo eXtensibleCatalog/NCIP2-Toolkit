@@ -46,6 +46,7 @@ public class AlephConstants {
 	public static final String HOLD_REQUEST_NODE = "hold-request";
 	public static final String NEW_DUE_DATE_NODE = "new-due-date";
 	public static final String PATRON_BLOCK_NODE = "patron-block";
+	public static final String HOLD_REQUESTS_NODE = "hold-requests";
 	public static final String CONSORTIAL_BLOCK_NODE = "consortial-block";
 	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
 

@@ -33,7 +33,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private String itemSequence;
 	private String itemDocNumber;
 	private String bibLibrary;
-	private String loanNumber;
 	private boolean itemIdNotFound;
 
 	private BibliographicDescription bibliographicDescription = new BibliographicDescription();
@@ -55,9 +54,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private boolean requestNumberReached = false;
 	private boolean parsingSequenceNumber = false;
 	private boolean holdRequestFound = false;
-	private boolean parsingLoansOrRequests = false;
-	private boolean loansHandling = false;
-	private boolean holdRequestsHandling = false;
 	private boolean hourPlacedReached = false;
 	private boolean earliestDateNeededReached = false;
 	private boolean needBeforeDateReached = false;
@@ -69,30 +65,16 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private boolean requestTypeReached = false;
 	private boolean pickupDateReached = false;
 	private boolean statusReached = false;
-	private boolean dueDateReached = false;
-	private boolean loanDateReached = false;
-	private boolean itemStatusReached = false;
 	private boolean holdQueueLengthReached = false;
 	private boolean itemSequenceReached = false;
-	private boolean loanNumberReached = false;
-	private boolean circulationStatusReached = false;
-	private boolean itemDesrciptionReached = false;
 	private boolean authorReached = false;
 	private boolean isbnReached = false;
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
 	private boolean bibDocNoReached = false;
 	private boolean itemDocNoReached = false;
-	private boolean locationReached = false;
-	private boolean openDateReached = false;
-	private boolean callNoReached = false;
-	private boolean copyNoReached = false;
 	private boolean materialReached = false;
-	private boolean barcodeReached = false;
 	private boolean agencyReached = false;
-	private boolean collectionReached = false;
-	private boolean secondCallNoTypeReached = false;
-	private boolean secondCallNoReached = false;
 
 	private List<RequestedItem> requestedItems;
 	private RequestedItem currentRequestedItem;
@@ -192,7 +174,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 						deletable = true;
 					} else
 						deletable = false;
-					parsingSequenceNumber = false;
 				}
 			}
 		}
@@ -267,7 +248,10 @@ public class AlephRequestItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 				materialReached = false;
 			}
-		} else { // nothing
+		} else {
+			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUESTS_NODE)) {
+				parsingSequenceNumber = false;
+			}
 		}
 	}
 
