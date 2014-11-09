@@ -59,7 +59,7 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		requestItemInitData.setEarliestDateNeeded(now);
 		requestItemInitData.setNeedBeforeDate(now);
 		requestItemInitData.setPickupExpiryDate(now);
-		
+
 		requestItemInitData.setRequestType(Version1RequestType.HOLD);
 		requestItemInitData.setRequestScopeType(Version1RequestScopeType.ITEM);
 
@@ -94,7 +94,6 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 
 		assertEquals("Unexpected length of RequestIdentifierValue returned.", requestIdentifierLength, requestItemResponseData.getRequestId().getRequestIdentifierValue().length());
 
-		
 		assertEquals("Unexpected RequestType returned.", Version1RequestType.HOLD.getValue(), requestItemResponseData.getRequestType().getValue());
 		assertEquals("Unexpected RequestScopeType retuned.", Version1RequestScopeType.ITEM.getValue(), requestItemResponseData.getRequestScopeType().getValue());
 
@@ -122,7 +121,8 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 
 			assertEquals("Unexpected privilege description returned", privilegeDesc, requestItemResponseData.getUserOptionalFields().getUserPrivilege(0)
 					.getUserPrivilegeDescription());
-			assertEquals("Unexpected BlockOrTrapType returned.", firstBlockOrTrapType, requestItemResponseData.getUserOptionalFields().getBlockOrTrap(0).getBlockOrTrapType().getValue());
+			assertEquals("Unexpected BlockOrTrapType returned.", firstBlockOrTrapType, requestItemResponseData.getUserOptionalFields().getBlockOrTrap(0).getBlockOrTrapType()
+					.getValue());
 		}
 
 		//
