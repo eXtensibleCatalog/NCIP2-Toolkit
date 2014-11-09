@@ -109,15 +109,15 @@ public class AlephRequestItemService implements RequestItemService {
 	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, AlephRequestItem requestItem) {
 
 		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId(0)); // TODO: Figure out why initiation data can have multiple itemId, but response don't
+		responseData.setItemId(initData.getItemId(0)); // TODO: Implement request of multiple items
 		responseData.setRequestScopeType(requestItem.getRequestScopeType());
 		responseData.setRequestType(requestItem.getRequestType());
 		responseData.setRequestId(requestItem.getRequestId());
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo()); //TODO: Ask librarian when this service costs something & where to find those values 
+		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo()); 
 
-		// Not implemented services, most of them probably even not implementable
+		// Not implemented services, most of them probably even not implementable in Aleph logic
 		responseData.setDateAvailable(requestItem.getDateAvailable());
 		responseData.setHoldPickupDate(requestItem.getHoldPickupDate());
 		responseData.setHoldQueueLength(requestItem.getHoldQueueLength());

@@ -316,7 +316,7 @@ public class AlephItem implements Serializable {
 	 */
 	public void setCirculationStatus(String circulationStatus) {
 		this.circulationStatus = new CirculationStatus(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus);
-		if (!circulationStatus.matches("On Shelf|Requested"))
+		if (!circulationStatus.matches("On Shelf|Requested|Processing"))
 			try {
 				this.setDateAvailablePickup(circulationStatus);
 			} catch (ParseException e) {

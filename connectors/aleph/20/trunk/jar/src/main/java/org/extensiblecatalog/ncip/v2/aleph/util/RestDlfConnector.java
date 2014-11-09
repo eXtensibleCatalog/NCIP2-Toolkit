@@ -131,6 +131,22 @@ public class RestDlfConnector extends AlephMediator {
 		recordPathElement = AlephConstants.PARAM_RECORD;
 
 	}
+	
+	public boolean uofDesiredForReqItem() {
+		return uofDesiredWithinRequestItem;
+	}
+	
+	public boolean iofDesiredForReqItem() {
+		return iofDesiredWithinRequestItem;
+	}
+	
+	public boolean uofDesiredForCanReqItem() {
+		return uofDesiredWithinCancelRequestItem;
+	}
+	
+	public boolean iofDesiredForCanReqItem() {
+		return iofDesiredWithinCancelRequestItem;
+	}
 
 	public String getDefaultAgency() {
 		return defaultAgency;
