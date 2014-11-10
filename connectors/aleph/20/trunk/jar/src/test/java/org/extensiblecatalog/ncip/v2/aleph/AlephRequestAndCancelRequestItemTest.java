@@ -26,7 +26,7 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		// Input:
 
 		AgencyId agencyId = new AgencyId("MZK");
-		
+
 		// Test multiple Requests
 		String[] itemIdVals = { "MZK01001333770-MZK50001370317000010", "MZK01001333770-MZK50001370317000040", "MZK01001333770-MZK50001370317000050" };
 		String userIdVal = "701";
@@ -136,8 +136,8 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 
 			cancelRequestItemResponseData = cancelRequestItemService.performService(cancelRequestItemInitData, null, serviceManager);
 
-			assertEquals("Unexpected presence of ns1:Problem element in CancelRequestItemTest.", true, cancelRequestItemResponseData.getProblems() == null
-					|| cancelRequestItemResponseData.getProblems().get(0) == null);
+			assertEquals("Unexpected presence of ns1:Problem element in CancelRequestItemTest. Was testing on " + itemIdVal + " itemId.", true,
+					cancelRequestItemResponseData.getProblems() == null || cancelRequestItemResponseData.getProblems().get(0) == null);
 
 			assertEquals("Unexpected UserId returned.", userIdVal, cancelRequestItemResponseData.getUserId().getUserIdentifierValue());
 			assertEquals("Unexpected ItemId returned.", itemIdVal, cancelRequestItemResponseData.getItemId().getItemIdentifierValue());

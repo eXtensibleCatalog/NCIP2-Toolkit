@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,26 +21,8 @@ public class AlephRequestItemService implements RequestItemService {
 
 		RequestItemResponseData responseData = new RequestItemResponseData();
 
-		String patronId = initData.getUserId().getUserIdentifierValue();
-
-		if (patronId == "") {
+		if (initData.getUserId().getUserIdentifierValue().isEmpty()) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is empty.");
-		}
-
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
 		}
 
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
@@ -48,17 +31,17 @@ public class AlephRequestItemService implements RequestItemService {
 		try {
 			requestItem = alephRemoteServiceManager.requestItem(initData);
 
-			if (requestItem.getProblem() != null || requestItem == null) {
-				List<Problem> problems = new ArrayList<Problem>();
-				if (requestItem != null)
-					problems.add(requestItem.getProblem());
-				else
-					throw new AlephException("Unknown request item returned by connector.");
-				responseData.setProblems(problems);
-				responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
-				responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
+			if (requestItem != null) {
+				if (requestItem.getProblem() != null) {
+					List<Problem> problems = Arrays.asList(requestItem.getProblem());
+
+					responseData.setProblems(problems);
+					responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
+					responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
+				} else
+					updateResponseData(responseData, initData, requestItem);
 			} else
-				updateResponseData(responseData, initData, requestItem);
+				throw new AlephException("Unknown request item returned by connector.");
 
 		} catch (IOException ie) {
 			Problem p = new Problem();
@@ -101,6 +84,22 @@ public class AlephRequestItemService implements RequestItemService {
 	}
 
 	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, AlephRequestItem requestItem) {
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
 
 		responseData.setUserId(initData.getUserId());
 		if (initData.getItemIds().size() > 1) {
