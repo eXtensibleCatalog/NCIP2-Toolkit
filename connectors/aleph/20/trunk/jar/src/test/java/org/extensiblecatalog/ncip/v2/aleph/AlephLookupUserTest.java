@@ -45,7 +45,7 @@ public class AlephLookupUserTest extends TestCase {
 		String electronicAddress = "test@mzk.cz";
 		String privilegeDesc = "04 - S";
 
-		String blockOrTrapType = "Dlouhodobě nevrácená publikace";
+		//String blockOrTrapType = "Dlouhodobě nevrácená publikace";
 		
 		responseData = service.performService(initData, null, serviceManager);
 
@@ -63,6 +63,6 @@ public class AlephLookupUserTest extends TestCase {
 				.getUserAddressInformation(1).getElectronicAddress().getElectronicAddressData());
 
 		assertEquals("Unexpected privilege description returned", privilegeDesc, responseData.getUserOptionalFields().getUserPrivilege(0).getUserPrivilegeDescription());
-		assertEquals("Unexpected BlockOrTrapType returned.", blockOrTrapType, responseData.getUserOptionalFields().getBlockOrTrap(0).getBlockOrTrapType().getValue());
+		//assertEquals("Unexpected BlockOrTrapType returned.", blockOrTrapType, responseData.getUserOptionalFields().getBlockOrTrap(0).getBlockOrTrapType().getValue());
 	}
 }

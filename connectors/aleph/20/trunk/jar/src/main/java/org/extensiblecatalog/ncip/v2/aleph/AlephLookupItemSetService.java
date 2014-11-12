@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,12 +84,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			try {
 				maximumItemsCount = Integer.parseInt(initData.getMaximumItemsCount().toString());
 			} catch (Exception e) {
-				List<Problem> problems = new ArrayList<Problem>();
-				Problem problem = new Problem();
-				problem.setProblemDetail(e.getMessage());
-				problem.setProblemType(new ProblemType("Maximum items count is not in parseable format."));
-				problems.add(problem);
-				responseData.setProblems(problems);
+				Problem problem = new Problem(new ProblemType("Maximum items count is not in parseable format."), null, e.getMessage());
+				responseData.setProblems(Arrays.asList(problem));
 				return responseData;
 			}
 
@@ -113,12 +110,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				// Remove token from memory hashmap
 				tokens.remove(token);
 			} else {
-				Problem problem = new Problem();
-				problem.setProblemType(new ProblemType("Invalid NextItemToken"));
-				problem.setProblemValue("Recieved token: " + token);
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(problem);
-				responseData.setProblems(problems);
+				Problem problem = new Problem(new ProblemType("Invalid NextItemToken"), null, "Recieved token: " + token);
+				responseData.setProblems(Arrays.asList(problem));
 				return responseData;
 			}
 			log.debug("after removing already processed Bib ids =" + bibIds);
@@ -225,7 +218,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							List<Problem> problems = new ArrayList<Problem>();
 							problems.add(p);
 
-							bibInformation.setProblems(problems);
+							bibInformation.setProblems(Arrays.asList(p));
 
 							bibInformations.add(bibInformation);
 							itemsForwarded++;
@@ -298,7 +291,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							List<Problem> problems = new ArrayList<Problem>();
 							problems.add(p);
 
-							bibInformation.setProblems(problems);
+							bibInformation.setProblems(Arrays.asList(p));
 
 							// Note that Problem elements within <ns1:BibInformation> is also considered as one item forwarded
 							bibInformations.add(bibInformation);
@@ -328,48 +321,28 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						bibInformations.add(bibInformation);
 					}
 				} catch (IOException ie) {
-					Problem p = new Problem();
-					p.setProblemType(new ProblemType("Processing IOException error."));
-					p.setProblemDetail(ie.getMessage());
-					List<Problem> problems = new ArrayList<Problem>();
-					problems.add(p);
+					Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+					bibInformation.setProblems(Arrays.asList(p));
 
-					bibInformation.setProblems(problems);
 					bibInformations.add(bibInformation);
 				} catch (ParserConfigurationException pce) {
-					Problem p = new Problem();
-					p.setProblemType(new ProblemType("Processing ParserConfigurationException error."));
-					p.setProblemDetail(pce.getMessage());
-					List<Problem> problems = new ArrayList<Problem>();
-					problems.add(p);
+					Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+					bibInformation.setProblems(Arrays.asList(p));
 
-					bibInformation.setProblems(problems);
 					bibInformations.add(bibInformation);
 				} catch (SAXException se) {
-					Problem p = new Problem();
-					p.setProblemType(new ProblemType("Processing SAXException error."));
-					p.setProblemDetail(se.getMessage());
-					List<Problem> problems = new ArrayList<Problem>();
-					problems.add(p);
+					Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+					bibInformation.setProblems(Arrays.asList(p));
 
-					bibInformation.setProblems(problems);
 					bibInformations.add(bibInformation);
 				} catch (AlephException ae) {
-					Problem p = new Problem();
-					p.setProblemType(new ProblemType("Processing AlephException error."));
-					p.setProblemDetail(ae.getMessage());
-					List<Problem> problems = new ArrayList<Problem>();
-					problems.add(p);
+					Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+					bibInformation.setProblems(Arrays.asList(p));
 
-					bibInformation.setProblems(problems);
 					bibInformations.add(bibInformation);
 				} catch (Exception e) {
-					Problem p = new Problem();
-					p.setProblemType(new ProblemType("Unknown processing exception error."));
-					p.setProblemDetail(e.getMessage());
-					List<Problem> problems = new ArrayList<Problem>();
-					problems.add(p);
-					responseData.setProblems(problems);
+					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+					responseData.setProblems(Arrays.asList(p));
 				}
 
 			}
@@ -393,12 +366,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			}
 
 		} else {
-			Problem problem = new Problem();
-			problem.setProblemType(new ProblemType("Unknown Problem"));
-			problem.setProblemValue("Toolkit passed through empty initiation data.");
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(problem);
-			responseData.setProblems(problems);
+			Problem problem = new Problem(new ProblemType("Unknown Problem"), null, "Toolkit passed through empty initiation data.");
+			responseData.setProblems(Arrays.asList(problem));
 			return responseData;
 		}
 

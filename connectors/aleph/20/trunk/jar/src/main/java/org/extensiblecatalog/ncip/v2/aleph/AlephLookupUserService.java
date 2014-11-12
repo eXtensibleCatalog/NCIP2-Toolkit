@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -76,14 +77,18 @@ public class AlephLookupUserService implements LookupUserService {
 			AlephUser alephUser = null;
 			try {
 				alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (AlephException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
+			} catch (MalformedURLException mue) {
+				Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (IOException ie) {
+				Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (SAXException se) {
+				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (AlephException ae) {
+				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+				responseData.setProblems(Arrays.asList(p));
 			}
 
 			updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
@@ -105,14 +110,18 @@ public class AlephLookupUserService implements LookupUserService {
 
 				responseData.setUserId(userId);
 
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException e) {
-				e.printStackTrace();
+			} catch (IOException ie) {
+				Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (SAXException se) {
+				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException ae) {
+				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (ParserConfigurationException pce) {
+				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				responseData.setProblems(Arrays.asList(p));
 			}
 		}
 		return responseData;

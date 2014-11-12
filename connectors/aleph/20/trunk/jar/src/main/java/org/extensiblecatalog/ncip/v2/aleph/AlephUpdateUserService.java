@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -66,40 +67,20 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 				responseData.setUserId(id);
 			}
 		} catch (IOException ie) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing IOException error."));
-			p.setProblemDetail(ie.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (SAXException se) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing SAXException error."));
-			p.setProblemDetail(se.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (AlephException ae) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing AlephException error."));
-			p.setProblemDetail(ae.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (ParserConfigurationException pce) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing ParserConfigurationException error."));
-			p.setProblemDetail(pce.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (Exception e) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Unknown processing exception error."));
-			p.setProblemDetail(e.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		}
 
 		return responseData;

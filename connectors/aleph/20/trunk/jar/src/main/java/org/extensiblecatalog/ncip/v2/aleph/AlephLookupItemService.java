@@ -38,6 +38,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.GregorianCalendar;
@@ -112,50 +113,28 @@ public class AlephLookupItemService implements LookupItemService {
 					getItemDescription);
 
 			// update NCIP response data with aleph item data
-			if (alephItem == null) {
-				Problem p = new Problem();
-				p.setProblemType(Version1LookupItemProcessingError.UNKNOWN_ITEM);
-				p.setProblemDetail("Item " + initData.getItemId().getItemIdentifierValue() + " you are searching for doesn't exists.");
-				List<Problem> problems = new ArrayList<Problem>();
-				problems.add(p);
-				responseData.setProblems(problems);
-			} else
+			if (alephItem != null) {
 				updateResponseData(initData, responseData, alephItem);
+			} else {
+				Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
+				responseData.setProblems(Arrays.asList(p));
+			}
+
 		} catch (IOException ie) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing IOException error."));
-			p.setProblemDetail(ie.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
-		} catch (ParserConfigurationException pce) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing ParserConfigurationException error."));
-			p.setProblemDetail(pce.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (SAXException se) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing SAXException error."));
-			p.setProblemDetail(se.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (AlephException ae) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Processing AlephException error."));
-			p.setProblemDetail(ae.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+			responseData.setProblems(Arrays.asList(p));
+		} catch (ParserConfigurationException pce) {
+			Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		} catch (Exception e) {
-			Problem p = new Problem();
-			p.setProblemType(new ProblemType("Unknown processing exception error."));
-			p.setProblemDetail(e.getMessage());
-			List<Problem> problems = new ArrayList<Problem>();
-			problems.add(p);
-			responseData.setProblems(problems);
+			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 		}
 
 		return responseData;
@@ -164,12 +143,12 @@ public class AlephLookupItemService implements LookupItemService {
 	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
 		if (responseData != null && alephItem != null) {
 
-			//TODO: include circulation status to response even if there is hold pickup date set
+			// TODO: include circulation status to response even if there is hold pickup date set
 			ItemTransaction itemTransaction = AlephUtil.getItemTransaction(alephItem);
 
 			ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
 
-			if (initData.getBibliographicDescriptionDesired()) { 
+			if (initData.getBibliographicDescriptionDesired()) {
 				iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 			}
 
