@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 
 public class AlephLookupItemSetTest extends TestCase {
 
+	//FIXME: Add nextitemtoken test!
 	public void testPerformService() throws ServiceException {
 		AlephLookupItemSetService service = new AlephLookupItemSetService();
 
