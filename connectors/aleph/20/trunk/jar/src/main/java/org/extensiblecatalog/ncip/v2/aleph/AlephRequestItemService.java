@@ -19,17 +19,18 @@ public class AlephRequestItemService implements RequestItemService {
 	@Override
 	public RequestItemResponseData performService(RequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		RequestItemResponseData responseData = new RequestItemResponseData();
-
-		if (initData.getUserId().getUserIdentifierValue().isEmpty()) {
+		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
+		
+		if (userIdIsEmpty) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is empty.");
 		}
 
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		AlephRequestItem requestItem = null;
+		final RequestItemResponseData responseData = new RequestItemResponseData();
+
 		try {
-			requestItem = alephRemoteServiceManager.requestItem(initData);
+			AlephRequestItem requestItem = alephRemoteServiceManager.requestItem(initData);
 
 			if (requestItem.getProblem() == null) {
 				updateResponseData(responseData, initData, requestItem);
@@ -76,21 +77,22 @@ public class AlephRequestItemService implements RequestItemService {
 			responseData.setResponseHeader(responseHeader);
 		}
 
-		responseData.setUserId(initData.getUserId());
 		if (initData.getItemIds().size() > 1) {
 			// If there was more than one requested item, then merge all item identifier's values into one because responseData does not support
 			// multiple ItemIds
-			String joinedItemIds = "";
+			StringBuilder joinedItemIds = new StringBuilder();
 			int itemIdsSize = initData.getItemIds().size();
 			for (int i = 0; i < itemIdsSize; i++) {
-				if (i != itemIdsSize - 1) {
-					joinedItemIds += initData.getItemId(i).getItemIdentifierValue() + AlephConstants.REQUEST_ID_DELIMITER;
-				} else
-					joinedItemIds += initData.getItemId(i).getItemIdentifierValue();
+				if (i == itemIdsSize - 1) {
+					joinedItemIds.append(initData.getItemId(i).getItemIdentifierValue());
+				} else {
+					joinedItemIds.append(initData.getItemId(i).getItemIdentifierValue());
+					joinedItemIds.append(AlephConstants.REQUEST_ID_DELIMITER);
+				}
 			}
 			ItemId itemId = new ItemId();
 			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-			itemId.setItemIdentifierValue(joinedItemIds);
+			itemId.setItemIdentifierValue(joinedItemIds.toString());
 			responseData.setItemId(itemId);
 		} else
 			responseData.setItemId(initData.getItemId(0));
@@ -108,5 +110,6 @@ public class AlephRequestItemService implements RequestItemService {
 		responseData.setHoldQueueLength(requestItem.getHoldQueueLength());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
 		responseData.setShippingInformation(requestItem.getShippingInformation());
+		responseData.setUserId(initData.getUserId());
 	}
 }

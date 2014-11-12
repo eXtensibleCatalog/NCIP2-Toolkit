@@ -1,9 +1,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -18,46 +16,29 @@ public class AlephLookupRequestService implements LookupRequestService {
 	@Override
 	public LookupRequestResponseData performService(LookupRequestInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
 			throws ServiceException {
-		LookupRequestResponseData responseData = new LookupRequestResponseData();
-		String itemId = initData.getItemId().getItemIdentifierValue();
-		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		if (patronId == null || itemId == null) {
-			if (patronId == null && itemId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item nor User Id is undefined.");
-			else if (itemId == null)
+		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
+		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
+
+		if (itemIdIsEmpty || userIdIsEmpty) {
+			if (itemIdIsEmpty)
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
-						"Item Id is undefined. Cannot cancel request for unknown item. Also Request Id is not supported by this service.");
-			else if (patronId == null)
+						"Item Id is undefined. Cannot lookup request for an unknown item. Note that Request Id is also not supported by this service.");
+			else
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Cannot lookup request with unknown user.");
-		}
-
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
 		}
 
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		AlephRequestItem requestItem = null;
-		try {
-			requestItem = alephRemoteServiceManager.lookupRequest(initData);
+		final LookupRequestResponseData responseData = new LookupRequestResponseData();
 
-			if (requestItem.getProblem() != null) {
-				responseData.setProblems(Arrays.asList(requestItem.getProblem()));
-			} else
+		try {
+			AlephRequestItem requestItem = alephRemoteServiceManager.lookupRequest(initData);
+
+			if (requestItem.getProblem() == null) {
 				updateResponseData(responseData, initData, requestItem);
+			} else
+				responseData.setProblems(Arrays.asList(requestItem.getProblem()));
 
 		} catch (IOException ie) {
 			Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
@@ -79,6 +60,23 @@ public class AlephLookupRequestService implements LookupRequestService {
 	}
 
 	private void updateResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, AlephRequestItem requestItem) {
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
+
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());
 		responseData.setRequestScopeType(requestItem.getRequestScopeType());
@@ -87,7 +85,7 @@ public class AlephLookupRequestService implements LookupRequestService {
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
 
-		// Not implemented services, most of them probably even not implementable
+		// Not yet implemented services
 		responseData.setDateAvailable(requestItem.getDateAvailable());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
 		responseData.setShippingInformation(requestItem.getShippingInformation());

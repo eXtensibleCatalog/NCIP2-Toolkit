@@ -23,12 +23,11 @@ public class AlephUserHandler extends DefaultHandler {
 	private String address;
 	private AgencyId agencyId;
 	private String city;
-	private String privileges;
 	private String fineDate;
 	private String fineSum;
 	private String fineDescription;
-	private String validToDateParsed;
 	private List<BlockOrTrap> blockOrTraps;
+	
 	private boolean nameInformationDesired;
 	private boolean userIdDesired;
 	private boolean userAddressInformationDesired;
@@ -63,13 +62,13 @@ public class AlephUserHandler extends DefaultHandler {
 	 * @throws AlephException
 	 */
 	public AlephUserHandler(LookupUserInitiationData initData) throws AlephException {
-		this.blockOrTrapDesired = initData.getBlockOrTrapDesired();
-		this.nameInformationDesired = initData.getNameInformationDesired();
-		this.userIdDesired = initData.getUserIdDesired();
-		this.userAddressInformationDesired = initData.getUserAddressInformationDesired();
-		this.userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
-		this.userPrivilegeDesired = initData.getUserPrivilegeDesired();
-		this.blockOrTraps = new ArrayList<BlockOrTrap>();
+		blockOrTrapDesired = initData.getBlockOrTrapDesired();
+		nameInformationDesired = initData.getNameInformationDesired();
+		userIdDesired = initData.getUserIdDesired();
+		userAddressInformationDesired = initData.getUserAddressInformationDesired();
+		userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+		userPrivilegeDesired = initData.getUserPrivilegeDesired();
+		blockOrTraps = new ArrayList<BlockOrTrap>();
 	}
 
 	public void setAlephUser(AlephUser alephUser) {

@@ -1,6 +1,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
@@ -37,29 +38,10 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 
 	@Override
 	public LookupAgencyResponseData performService(LookupAgencyInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
-		LookupAgencyResponseData responseData = new LookupAgencyResponseData();
 
-		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
+		boolean agencyIdIsEmpty = initData.getAgencyId().getValue().isEmpty();
 
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
-		}
-
-		String agencyId = initData.getAgencyId().getValue();
-
-		if (agencyId == null) {
+		if (agencyIdIsEmpty) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "You have not supplied your agency id.");
 		}
 
@@ -89,24 +71,36 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 			}
 		}
 
+		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
+
+		final LookupAgencyResponseData responseData = new LookupAgencyResponseData();
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
+
 		String localAgencyId = alephSvcMgr.getDefaultAgency();
 		String registrationLink = alephSvcMgr.getRegistrationLink();
 
-		if (getAgencyAddressInformation) {
-			List<AgencyAddressInformation> agencyAddressInformations = new ArrayList<AgencyAddressInformation>();
-			
-			agencyAddressInformations.add(alephSvcMgr.getAgencyPhysicalAddressInformation());
-			
-			responseData.setAgencyAddressInformations(agencyAddressInformations);
-		}
+		if (getAgencyAddressInformation)
+			responseData.setAgencyAddressInformations(Arrays.asList(alephSvcMgr.getAgencyPhysicalAddressInformation()));
 
-		if (getOrganizationNameInformation) {
-			List<OrganizationNameInformation> organizationNameInformations = alephSvcMgr.getOrganizationNameInformations();
-			responseData.setOrganizationNameInformations(organizationNameInformations);
-		}
+		if (getOrganizationNameInformation)
+			responseData.setOrganizationNameInformations(alephSvcMgr.getOrganizationNameInformations());
 
 		if (getAuthenticationPrompt) {
-			List<AuthenticationPrompt> authenticationPrompts = new ArrayList<AuthenticationPrompt>();
 			AuthenticationPrompt authenticationPrompt = new AuthenticationPrompt();
 
 			PromptOutput promptOutput = new PromptOutput();
@@ -128,21 +122,16 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 			authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
 			promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);
 
-			AuthenticationInputType authenticationInputType;
-
 			String authenticationInputTypeScheme = Version1AuthenticationInputType.VERSION_1_AUTHENTICATION_INPUT_TYPE;
 			String authenticationInputTypeValue = ""; // This AuthenticationInput is used to forward user registration link.
 
-			authenticationInputType = new AuthenticationInputType(authenticationInputTypeScheme, authenticationInputTypeValue);
-			promptInput.setAuthenticationInputType(authenticationInputType);
+			promptInput.setAuthenticationInputType(new AuthenticationInputType(authenticationInputTypeScheme, authenticationInputTypeValue));
 
 			authenticationPrompt.setPromptInput(promptInput);
-			authenticationPrompts.add(authenticationPrompt);
-			responseData.setAuthenticationPrompts(authenticationPrompts);
+			responseData.setAuthenticationPrompts(Arrays.asList(authenticationPrompt));
 		}
 		responseData.setAgencyId(alephSvcMgr.toAgencyId(localAgencyId));
 
-		responseData.setVersion("someversion");
 		return responseData;
 	}
 

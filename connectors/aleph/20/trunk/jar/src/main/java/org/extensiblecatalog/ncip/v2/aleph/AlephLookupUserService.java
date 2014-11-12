@@ -29,9 +29,6 @@ public class AlephLookupUserService implements LookupUserService {
 	@Override
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		final LookupUserResponseData responseData = new LookupUserResponseData();
-		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
-
 		String patronId = null;
 		String password = null;
 		boolean authenticateOnly = false;
@@ -49,29 +46,17 @@ public class AlephLookupUserService implements LookupUserService {
 			authenticateOnly = true;
 		}
 
-		if (patronId == null) {
+		if (patronId.isEmpty()) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
 		}
 
-		if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password == null) {
+		if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty()) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Password is undefined.");
 		}
 
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
-		}
+		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+
+		final LookupUserResponseData responseData = new LookupUserResponseData();
 
 		if (!authenticateOnly) {
 			AlephUser alephUser = null;
@@ -130,7 +115,25 @@ public class AlephLookupUserService implements LookupUserService {
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser, AlephRemoteServiceManager svcMgr) {
 
 		if (alephUser != null) {
+
+			InitiationHeader initiationHeader = initData.getInitiationHeader();
+			if (initiationHeader != null) {
+				ResponseHeader responseHeader = new ResponseHeader();
+				if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+					responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+					responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+				}
+				if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+					responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+					responseHeader.setToSystemId(initiationHeader.getToSystemId());
+					if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+						responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+				}
+				responseData.setResponseHeader(responseHeader);
+			}
+
 			responseData.setUserId(initData.getUserId());
+
 			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
 			boolean requestedItemsDesired = initData.getRequestedItemsDesired();
 			boolean loanedItemsDesired = initData.getLoanedItemsDesired();
@@ -168,15 +171,12 @@ public class AlephLookupUserService implements LookupUserService {
 				responseData.setUserFiscalAccounts(userFiscalAccounts);
 			}
 
-			if (requestedItemsDesired) {
-				List<RequestedItem> requestedItems = alephUser.getRequestedItems();
-				responseData.setRequestedItems(requestedItems);
-			}
+			if (requestedItemsDesired)
+				responseData.setRequestedItems(alephUser.getRequestedItems());
 
-			if (loanedItemsDesired) {
-				List<LoanedItem> loanedItems = alephUser.getLoanedItems();
-				responseData.setLoanedItems(loanedItems);
-			}
+			if (loanedItemsDesired)
+				responseData.setLoanedItems(alephUser.getLoanedItems());
+
 			// User optional fields:
 			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 			boolean nameInformationDesired = initData.getNameInformationDesired();
@@ -188,32 +188,27 @@ public class AlephLookupUserService implements LookupUserService {
 			boolean includeUserOptionalFields = false;
 
 			if (blockOrTrapDesired) {
-				List<BlockOrTrap> blockOrTraps = alephUser.getBlockOrTraps();
-				uof.setBlockOrTraps(blockOrTraps);
+				uof.setBlockOrTraps(alephUser.getBlockOrTraps());
 				includeUserOptionalFields = true;
 			}
 
 			if (nameInformationDesired) {
-				NameInformation nameInfo = alephUser.getNameInformation();
-				uof.setNameInformation(nameInfo);
+				uof.setNameInformation(alephUser.getNameInformation());
 				includeUserOptionalFields = true;
 			}
 
 			if (userAddressInformationDesired) {
-				List<UserAddressInformation> userAddrInfos = alephUser.getUserAddressInformations();
-				uof.setUserAddressInformations(userAddrInfos);
+				uof.setUserAddressInformations(alephUser.getUserAddressInformations());
 				includeUserOptionalFields = true;
 			}
 
 			if (userIdDesired) {
-				List<UserId> userIds = alephUser.getUserIds();
-				uof.setUserIds(userIds);
+				uof.setUserIds(alephUser.getUserIds());
 				includeUserOptionalFields = true;
 			}
 
 			if (userPrivilegeDesired) {
-				List<UserPrivilege> userPrivileges = alephUser.getUserPrivileges();
-				uof.setUserPrivileges(userPrivileges);
+				uof.setUserPrivileges(alephUser.getUserPrivileges());
 				includeUserOptionalFields = true;
 			}
 

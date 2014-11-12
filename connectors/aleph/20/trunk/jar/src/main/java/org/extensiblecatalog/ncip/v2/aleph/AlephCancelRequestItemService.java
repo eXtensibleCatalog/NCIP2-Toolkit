@@ -30,46 +30,28 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 	public CancelRequestItemResponseData performService(CancelRequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
 			throws ServiceException {
 
-		CancelRequestItemResponseData responseData = new CancelRequestItemResponseData();
-		String itemId = initData.getItemId().getItemIdentifierValue();
-		String patronId = initData.getUserId().getUserIdentifierValue();
+		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
+		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
 
-		if (patronId == null || itemId == null) {
-			if (patronId == null && itemId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item nor User Id is undefined.");
-			else if (itemId == null)
+		if (itemIdIsEmpty || userIdIsEmpty) {
+			if (itemIdIsEmpty)
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
 						"Item Id is undefined. Cannot cancel request for unknown item. Also Request Id is not supported by this service.");
-			else if (patronId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Cannot cancel request of unknown user.");
-		}
-
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
+			else
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Cannot lookup request with unknown user.");
 		}
 
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		AlephRequestItem requestItem = null;
-		try {
-			requestItem = alephRemoteServiceManager.cancelRequestItem(initData);
+		final CancelRequestItemResponseData responseData = new CancelRequestItemResponseData();
 
-			if (requestItem.getProblem() != null) {
-				responseData.setProblems(Arrays.asList(requestItem.getProblem()));
-			} else
+		try {
+			AlephRequestItem requestItem = alephRemoteServiceManager.cancelRequestItem(initData);
+
+			if (requestItem.getProblem() == null) {
 				updateResponseData(responseData, initData, requestItem);
+			} else
+				responseData.setProblems(Arrays.asList(requestItem.getProblem()));
 
 		} catch (IOException ie) {
 			Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
@@ -91,6 +73,23 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 	}
 
 	private void updateResponseData(CancelRequestItemResponseData responseData, CancelRequestItemInitiationData initData, AlephRequestItem requestItem) {
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
+
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());
 		responseData.setRequestId(requestItem.getRequestId());

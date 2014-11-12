@@ -75,7 +75,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	public LookupItemSetResponseData performService(LookupItemSetInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
 			throws ServiceException {
 		Date sService = new Date();
-		LookupItemSetResponseData responseData = new LookupItemSetResponseData();
+		final LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
 
 		itemsForwarded = 0;
@@ -118,26 +118,16 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		}
 
-		boolean getCurrentBorrower = initData.getCurrentBorrowerDesired();
-		boolean getCurrentRequesters = initData.getCurrentRequestersDesired();
-		boolean getItemUseRestrictionType = initData.getItemUseRestrictionTypeDesired();
-		boolean getPhysicalCondition = initData.getPhysicalConditionDesired();
-		boolean getSecurityMarker = initData.getSecurityMarkerDesired();
-		boolean getSensitizationFlag = initData.getSensitizationFlagDesired();
-		boolean getElectronicResource = initData.getElectronicResourceDesired();
-		boolean getLocation = initData.getLocationDesired();
-
-		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-		boolean getCircStatus = initData.getCirculationStatusDesired();
-		boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-		boolean getItemDescription = initData.getItemDescriptionDesired();
-
 		List<BibInformation> bibInformations = new ArrayList<BibInformation>();
 
 		if (bibIds != null && bibIds.size() > 0) {
+			
+			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+			
 			for (BibliographicId bibId : bibIds) {
 				BibInformation bibInformation = new BibInformation();
 
+				
 				try {
 					if (bibId.getBibliographicRecordId() != null) {
 
@@ -146,7 +136,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 						bibInformation.setBibliographicId(bibId);
 
-						List<AlephItem> alephItems = alephSvcMgr.lookupItems(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+						List<AlephItem> alephItems = alephSvcMgr.lookupItems(id, initData);
 						if (alephItems != null) {
 							int foundPieces = alephItems.size();
 
@@ -246,7 +236,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						String id = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
 						bibInformation.setBibliographicId(bibId);
 
-						AlephItem alephItem = alephSvcMgr.lookupItem(id, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+						AlephItem alephItem = alephSvcMgr.lookupItem(id, initData);
 						if (alephItem != null) {
 
 							AgencyId suppliedAgencyId;

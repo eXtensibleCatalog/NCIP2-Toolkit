@@ -28,46 +28,27 @@ public class AlephRenewItemService implements RenewItemService {
 	@Override
 	public RenewItemResponseData performService(RenewItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		RenewItemResponseData responseData = new RenewItemResponseData();
+		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
+		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
 
-		String itemId = initData.getItemId().getItemIdentifierValue();
-		String patronId = initData.getUserId().getUserIdentifierValue();
-
-		if (patronId == null || itemId == null) {
-			if (patronId == null && itemId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item and User Id are undefined.");
-			else if (itemId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item Id is undefined.");
-			else if (patronId == null)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
-		}
-
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
+		if (itemIdIsEmpty || userIdIsEmpty) {
+			if (itemIdIsEmpty)
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item Id is undefined. Cannot renew unknown item.");
+			else
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Cannot renew item loaned by unknown user.");
 		}
 
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		AlephRenewItem renewItem = null;
-		try {
-			renewItem = alephRemoteServiceManager.renewItem(initData);
+		final RenewItemResponseData responseData = new RenewItemResponseData();
 
-			if (renewItem.getProblem() != null) {
-				responseData.setProblems(Arrays.asList(renewItem.getProblem()));
-			} else
+		try {
+			AlephRenewItem renewItem = alephRemoteServiceManager.renewItem(initData);
+
+			if (renewItem.getProblem() == null) {
 				updateResponseData(responseData, initData, renewItem);
+			} else
+				responseData.setProblems(Arrays.asList(renewItem.getProblem()));
 
 		} catch (IOException ie) {
 			Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
@@ -90,11 +71,28 @@ public class AlephRenewItemService implements RenewItemService {
 	}
 
 	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, AlephRenewItem renewItem) {
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
+
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());
 		responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo()); // TODO: Ask librarian when this service costs something & where to find those values
+		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo());
 		responseData.setDateDue(renewItem.getDateDue());
 		responseData.setDateForReturn(renewItem.getDateForReturn());
 		responseData.setPending(renewItem.getPending());

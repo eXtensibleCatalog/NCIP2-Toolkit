@@ -95,7 +95,7 @@ public class RestDlfConnector extends AlephMediator {
 			authDataFormatType = alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE);
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
-			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));			
+			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
 
 			parser = SAXParserFactory.newInstance().newSAXParser();
 
@@ -185,8 +185,7 @@ public class RestDlfConnector extends AlephMediator {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public List<AlephItem> lookupItems(String recordId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
-			throws ParserConfigurationException, IOException, SAXException, AlephException {
+	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
 
 		if (!validateRecordId(recordId)) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
@@ -196,12 +195,23 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
+		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, initData);
 
 		parser.parse(streamSource, itemHandler);
 
 		return itemHandler.getListOfItems();
 
+	}
+
+	public List<AlephItem> lookupItems(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
+		LIinitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
+		LIinitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
+		LIinitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
+		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
+		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
+		LIinitData.setLocationDesired(initData.getLocationDesired());
+		return lookupItems(id, LIinitData);
 	}
 
 	/**
@@ -216,8 +226,9 @@ public class RestDlfConnector extends AlephMediator {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public AlephItem lookupItem(String alephItemId, boolean bibliographicDescription, boolean circulationStatus, boolean holdQueueLength, boolean itemDesrciption)
-			throws ParserConfigurationException, IOException, SAXException, AlephException {
+	public AlephItem lookupItem(LookupItemInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+
+		String alephItemId = initData.getItemId().getItemIdentifierValue();
 
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
@@ -230,11 +241,38 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, bibliographicDescription, circulationStatus, holdQueueLength, itemDesrciption);
+		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, initData);
 
 		parser.parse(streamSource, itemHandler);
 
 		return itemHandler.getAlephItem();
+	}
+
+	public AlephItem lookupItem(String alephItemId, boolean getBibDescription, boolean getCircStatus, boolean getHoldQueueLength, boolean getItemDescription)
+			throws ParserConfigurationException, IOException, SAXException, AlephException {
+		LookupItemInitiationData initData = new LookupItemInitiationData();
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue(alephItemId);
+		initData.setItemId(itemId);
+		initData.setBibliographicDescriptionDesired(getBibDescription);
+		initData.setCirculationStatusDesired(getCircStatus);
+		initData.setHoldQueueLengthDesired(getHoldQueueLength);
+		initData.setItemDescriptionDesired(getItemDescription);
+		return lookupItem(initData);
+	}
+
+	public AlephItem lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue(id);
+		LIinitData.setItemId(itemId);
+		LIinitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
+		LIinitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
+		LIinitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
+		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
+		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
+		LIinitData.setLocationDesired(initData.getLocationDesired());
+		return lookupItem(LIinitData);
 	}
 
 	/**
@@ -259,6 +297,7 @@ public class RestDlfConnector extends AlephMediator {
 		boolean atLeastOneDesired = false;
 
 		// If there are only loanedItems desired, that means to include loans history to output
+		// Better suggestions how to forward loaned items history, please send to kozlovsky@mzk.cz
 		boolean loanedItemsDesiredOnly = loanedItemsDesired
 				&& !(blockOrTrapDesired || nameInformationDesired || requestedItemsDesired || userAddressInformationDesired || userFiscalAccountDesired || userIdDesired || userPrivilegeDesired);
 

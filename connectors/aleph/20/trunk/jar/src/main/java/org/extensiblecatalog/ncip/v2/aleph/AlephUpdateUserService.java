@@ -17,10 +17,6 @@ import org.xml.sax.SAXException;
 public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationData, UpdateUserResponseData> {
 
 	public UpdateUserResponseData performService(UpdateUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
-		// TODO: Think about forwarding password in encrypted format ({@link Version1AuthenticationDataFormatType.APPLICATION_AUTH_POLICY_XML})
-
-		final UpdateUserResponseData responseData = new UpdateUserResponseData();
-		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
 		String patronId = null;
 		String password = null;
@@ -33,31 +29,17 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			}
 		}
 
-		if (patronId == null || password == null) {
-			String details = patronId == null ? "Username" : "Password" + " is missing.";
+		if (patronId.isEmpty() || password.isEmpty()) {
+			String details = patronId.isEmpty() ? "Username" : "Password" + " is missing.";
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Please supply both authentication inputs of user. " + details);
 		}
 
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
-			responseData.setResponseHeader(responseHeader);
-		}
-
-		AlephUser alephUser = null;
-
+		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+		
+		final UpdateUserResponseData responseData = new UpdateUserResponseData();
+		
 		try {
-			alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
+			AlephUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
 			if (alephUser == null)
 				throw new AlephException("alephUser returned by responder is null");
 			else {
@@ -83,6 +65,23 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			responseData.setProblems(Arrays.asList(p));
 		}
 
+
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
+				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
+		
 		return responseData;
 	}
 

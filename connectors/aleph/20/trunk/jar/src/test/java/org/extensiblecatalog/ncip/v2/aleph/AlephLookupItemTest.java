@@ -37,6 +37,7 @@ public class AlephLookupItemTest extends TestCase {
 		initData.setCurrentRequestersDesired(true);
 		initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
+		initData.setLocationDesired(true);
 
 		ItemId itemId = new ItemId();
 		itemId.setAgencyId(new AgencyId(holdingAgencyId));
