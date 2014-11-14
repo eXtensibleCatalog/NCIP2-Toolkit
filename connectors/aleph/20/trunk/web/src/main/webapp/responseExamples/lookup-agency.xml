@@ -1,0 +1,29 @@
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+   <ns1:LookupAgencyResponse>
+      <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyelementtype/agencyelementtype.scm">MZK</ns1:AgencyId>
+      <ns1:OrganizationNameInformation>
+         <ns1:OrganizationNameType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/organizationnametype/organizationnametype.scm">Translated Name</ns1:OrganizationNameType>
+         <ns1:OrganizationName>Moravian Library</ns1:OrganizationName>
+      </ns1:OrganizationNameInformation>
+      <ns1:AgencyAddressInformation>
+         <ns1:AgencyAddressRoleType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/agencyaddressroletype/agencyaddressroletype.scm">Official</ns1:AgencyAddressRoleType>
+         <ns1:PhysicalAddress>
+            <ns1:UnstructuredAddress>
+               <ns1:UnstructuredAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+               <ns1:UnstructuredAddressData>Kounicova 65a, 601 87 Brno</ns1:UnstructuredAddressData>
+            </ns1:UnstructuredAddress>
+            <ns1:PhysicalAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Street Address</ns1:PhysicalAddressType>
+         </ns1:PhysicalAddress>
+      </ns1:AgencyAddressInformation>
+      <ns1:AuthenticationPrompt>
+         <ns1:PromptOutput>
+            <ns1:AuthenticationPromptData>https://www.mzk.cz/predregistrace</ns1:AuthenticationPromptData>
+            <ns1:AuthenticationPromptType ns1:Scheme="">User Registration Link</ns1:AuthenticationPromptType>
+         </ns1:PromptOutput>
+         <ns1:PromptInput>
+            <ns1:AuthenticationInputType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/authenticationinputtype/authenticationinputtype.scm"/>
+            <ns1:AuthenticationDataFormatType ns1:Scheme="http://www.iana.org/assignments/media-types">text/plain</ns1:AuthenticationDataFormatType>
+         </ns1:PromptInput>
+      </ns1:AuthenticationPrompt>
+   </ns1:LookupAgencyResponse>
+</ns1:NCIPMessage>

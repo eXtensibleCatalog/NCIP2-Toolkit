@@ -1,0 +1,87 @@
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+   <ns1:LookupRequestResponse>
+      <ns1:RequestId>
+         <ns1:RequestIdentifierValue>005056681</ns1:RequestIdentifierValue>
+      </ns1:RequestId>
+      <ns1:ItemId>
+         <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
+         <ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+         <ns1:ItemIdentifierValue>MZK01000065021-MZK50000065021000010</ns1:ItemIdentifierValue>
+      </ns1:ItemId>
+      <ns1:UserId>
+         <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
+         <ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
+         <ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+      </ns1:UserId>
+      <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Estimate</ns1:RequestType>
+      <ns1:RequestScopeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/requestscopetype.scm">Item</ns1:RequestScopeType>
+      <ns1:RequestStatusType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requeststatustype/requeststatustype.scm">In Process</ns1:RequestStatusType>
+      <ns1:EarliestDateNeeded>2014-10-22T22:00:00Z</ns1:EarliestDateNeeded>
+      <ns1:NeedBeforeDate>2015-10-22T22:00:00Z</ns1:NeedBeforeDate>
+      <ns1:PickupLocation>Loan Department - Ground floor</ns1:PickupLocation>
+      <ns1:DateOfUserRequest>2014-10-23T15:44:00Z</ns1:DateOfUserRequest>
+      <ns1:ItemOptionalFields>
+         <ns1:BibliographicDescription>
+            <ns1:BibliographicItemId>
+               <ns1:BibliographicItemIdentifier>2610034811</ns1:BibliographicItemIdentifier>
+               <ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">Legal Deposit Number</ns1:BibliographicItemIdentifierCode>
+            </ns1:BibliographicItemId>
+            <ns1:Publisher>Dům techniky ČSVTS,</ns1:Publisher>
+            <ns1:Title>Aktiv revizních techniků elektrických zařízení</ns1:Title>
+            <ns1:MediumType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm">Book</ns1:MediumType>
+         </ns1:BibliographicDescription>
+         <ns1:HoldQueueLength>1</ns1:HoldQueueLength>
+         <ns1:ItemDescription>
+            <ns1:CallNumber>2-0805.673</ns1:CallNumber>
+            <ns1:ItemDescriptionLevel ns1:Scheme="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">1996</ns1:ItemDescriptionLevel>
+         </ns1:ItemDescription>
+         <ns1:Location>
+            <ns1:LocationType ns1:Scheme="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">Permanent</ns1:LocationType>
+            <ns1:LocationName>
+               <ns1:LocationNameInstance>
+                  <ns1:LocationNameLevel>2</ns1:LocationNameLevel>
+                  <ns1:LocationNameValue>Stock / within 1 hour</ns1:LocationNameValue>
+               </ns1:LocationNameInstance>
+            </ns1:LocationName>
+         </ns1:Location>
+      </ns1:ItemOptionalFields>
+      <ns1:UserOptionalFields>
+         <ns1:NameInformation>
+            <ns1:PersonalNameInformation>
+               <ns1:StructuredPersonalUserName>
+                  <ns1:Surname>Pokus1 Přijmení</ns1:Surname>
+               </ns1:StructuredPersonalUserName>
+            </ns1:PersonalNameInformation>
+         </ns1:NameInformation>
+         <ns1:UserAddressInformation>
+            <ns1:UserAddressRoleType ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Ship To</ns1:UserAddressRoleType>
+            <ns1:PhysicalAddress>
+               <ns1:StructuredAddress>
+                  <ns1:Street>Trvalá ulice 123</ns1:Street>
+                  <ns1:Locality>Trvalé</ns1:Locality>
+                  <ns1:PostalCode>12345 </ns1:PostalCode>
+               </ns1:StructuredAddress>
+               <ns1:PhysicalAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Postal Address</ns1:PhysicalAddressType>
+            </ns1:PhysicalAddress>
+         </ns1:UserAddressInformation>
+         <ns1:UserAddressInformation>
+            <ns1:UserAddressRoleType ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Notice</ns1:UserAddressRoleType>
+            <ns1:ElectronicAddress>
+               <ns1:ElectronicAddressType ns1:Scheme="http://www.iana.org/assignments/uri-schemes">mailserver</ns1:ElectronicAddressType>
+               <ns1:ElectronicAddressData>test@mzk.cz</ns1:ElectronicAddressData>
+            </ns1:ElectronicAddress>
+         </ns1:UserAddressInformation>
+         <ns1:UserPrivilege>
+            <ns1:AgencyId>MZK</ns1:AgencyId>
+            <ns1:AgencyUserPrivilegeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm">MZK type</ns1:AgencyUserPrivilegeType>
+            <ns1:ValidFromDate>2010-08-30T00:00:00Z</ns1:ValidFromDate>
+            <ns1:ValidToDate>2099-12-31T01:00:00Z</ns1:ValidToDate>
+            <ns1:UserPrivilegeDescription>04 - S</ns1:UserPrivilegeDescription>
+         </ns1:UserPrivilege>
+         <ns1:UserId>
+            <ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Barcode</ns1:UserIdentifierType>
+            <ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+         </ns1:UserId>
+      </ns1:UserOptionalFields>
+   </ns1:LookupRequestResponse>
+</ns1:NCIPMessage>
