@@ -1,9 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephLocalization;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
@@ -40,6 +36,7 @@ public class AlephUtil {
 		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_REFERENCE_SHELF);
 		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_STUDY_ROOM);
 		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_IN_HOUSE_ILL);
+		inLibraryUseOnly.add(AlephConstants.ITEM_STATUS_RETRO);
 		itemRestrictionClasses.put(AlephConstants.ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY, inLibraryUseOnly);
 
 		// Define & add list of item statuses defining restrictions of type 'Loan Period'
@@ -257,6 +254,8 @@ public class AlephUtil {
 			else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_REFERENCE_ONLY_SPN_2F))
 				itemUseRestrictionType = Version1ItemUseRestrictionType.USE_ONLY_IN_CONTROLLED_ACCESS;
 
+			else if (itemRestriction.equals(AlephConstants.ITEM_STATUS_RETRO))
+				itemUseRestrictionType = Version1ItemUseRestrictionType.NOT_FOR_LOAN;
 			else
 				itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
 
