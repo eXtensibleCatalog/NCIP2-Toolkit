@@ -4,18 +4,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
@@ -27,10 +22,10 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
+import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
@@ -46,7 +41,6 @@ import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
@@ -349,8 +343,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					}
 					break;
 				}
-				
-				// TODO: Implement ItemIds 
+
+				// TODO: Implement ItemIds
 
 				bibInformations.add(bibInformation);
 			}
@@ -403,7 +397,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			iof.setCirculationStatus(alephItem.getCirculationStatus());
 		if (initData.getItemDescriptionDesired()) {
 			ItemDescription itemDescription = new ItemDescription();
-			itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
+			if (alephItem.getDescription() != null)
+				itemDescription.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, alephItem.getDescription()));
 			itemDescription.setCallNumber(alephItem.getCallNumber());
 			itemDescription.setCopyNumber(alephItem.getCopyNumber());
 			itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
@@ -482,7 +477,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					iof.setCirculationStatus(item.getCirculationStatus());
 				if (initData.getItemDescriptionDesired()) {
 					ItemDescription itemDescription = new ItemDescription();
-					itemDescription.setItemDescriptionLevel(Version1ItemDescriptionLevel.ITEM);
+					if (item.getDescription() != null)
+						itemDescription.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, item.getDescription()));
 					itemDescription.setCallNumber(item.getCallNumber());
 					itemDescription.setCopyNumber(item.getCopyNumber());
 					itemDescription.setNumberOfPieces(item.getNumberOfPieces());

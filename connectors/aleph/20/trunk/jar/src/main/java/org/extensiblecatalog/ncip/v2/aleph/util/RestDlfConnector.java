@@ -214,18 +214,6 @@ public class RestDlfConnector extends AlephMediator {
 		return lookupItems(id, LIinitData);
 	}
 
-	/**
-	 * @param alephItemId
-	 * @param bibliographicDescription
-	 * @param circulationStatus
-	 * @param holdQueueLength
-	 * @param itemDesrciption
-	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws AlephException
-	 */
 	public AlephItem lookupItem(LookupItemInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
 
 		String alephItemId = initData.getItemId().getItemIdentifierValue();
@@ -248,6 +236,18 @@ public class RestDlfConnector extends AlephMediator {
 		return itemHandler.getAlephItem();
 	}
 
+	/**
+	 * @param alephItemId
+	 * @param bibliographicDescription
+	 * @param circulationStatus
+	 * @param holdQueueLength
+	 * @param itemDesrciption
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws AlephException
+	 */
 	public AlephItem lookupItem(String alephItemId, boolean getBibDescription, boolean getCircStatus, boolean getHoldQueueLength, boolean getItemDescription)
 			throws ParserConfigurationException, IOException, SAXException, AlephException {
 		LookupItemInitiationData initData = new LookupItemInitiationData();
