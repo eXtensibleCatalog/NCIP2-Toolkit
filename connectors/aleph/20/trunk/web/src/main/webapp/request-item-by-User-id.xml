@@ -22,26 +22,5 @@
         <ns1:NeedBeforeDate>2014-09-17T00:00:00</ns1:NeedBeforeDate>
         <ns1:PickupLocation>MZK </ns1:PickupLocation>
         <ns1:PickupExpiryDate>2014-09-30T00:00:00</ns1:PickupExpiryDate>
-        
-        <ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Bibliographic Description</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Hold Queue Length</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Circulation Status</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Electronic Resource</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Use Restriction Type</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Location</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Physical Condition</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Security Marker</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Description</ns1:ItemElementType>
-		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Sensitization Flag</ns1:ItemElementType>
-		
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Authentication Input</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Block Or Trap</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Date Of Birth</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Address Information</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Language</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Privilege</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Id</ns1:UserElementType>
-		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Previous User Id</ns1:UserElementType>
     </ns1:RequestItem>
 </ns1:NCIPMessage>
