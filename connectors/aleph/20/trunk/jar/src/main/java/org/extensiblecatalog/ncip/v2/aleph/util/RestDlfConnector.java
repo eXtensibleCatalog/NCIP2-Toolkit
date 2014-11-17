@@ -3,11 +3,8 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
@@ -21,11 +18,8 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.*;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
-import org.extensiblecatalog.ncip.v2.aleph.util.*;
-import org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements.MandatedAction;
 import org.extensiblecatalog.ncip.v2.common.*;
 import org.extensiblecatalog.ncip.v2.service.*;
-import org.xml.sax.HandlerBase;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -55,7 +49,6 @@ public class RestDlfConnector extends AlephMediator {
 	private String itemPathElement;
 	private String userPathElement;
 	private String itemsElement;
-	private String patronElement;
 
 	private int bibIdLength;
 	private int sequenceNumberLength;

@@ -39,7 +39,6 @@ public class AlephLoanHandler extends DefaultHandler {
 	private boolean loanFound = false;
 	private boolean renewable;
 	private boolean docNoReached;
-	private boolean itemSeqReached;
 	private boolean returnedOkResponseCode;
 	private boolean replyCodeReached;
 	private boolean replyTextReached;
@@ -62,7 +61,6 @@ public class AlephLoanHandler extends DefaultHandler {
 
 	private String agencyId;
 	private String bibDocNumber;
-	private String itemSequence;
 	private String itemDocNumber;
 	private String bibLibrary;
 	private String loanNumber;
@@ -87,7 +85,6 @@ public class AlephLoanHandler extends DefaultHandler {
 	 */
 	public AlephLoanHandler(String bibLibrary) {
 		this.bibLibrary = bibLibrary;
-		bibliographicDescription = new BibliographicDescription();
 
 		// Expect there will be data needed to construct Item Id (item doc no., item bib doc no. & agency id)
 		// If one of these is not found, then this boolean is set to false
@@ -115,6 +112,7 @@ public class AlephLoanHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
 			materialReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
+			bibliographicDescription = new BibliographicDescription();
 			currentLoanedItem = new LoanedItem();
 
 			if (loanedItems == null)
@@ -155,8 +153,8 @@ public class AlephLoanHandler extends DefaultHandler {
 
 		if (qName.equalsIgnoreCase(AlephConstants.Z36_DOC_NUMBER_NODE) && docNoReached) {
 			docNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSeqReached) {
-			itemSeqReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
+			itemSequenceReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 			authorReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
@@ -182,7 +180,7 @@ public class AlephLoanHandler extends DefaultHandler {
 					// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
 					List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
 					BibliographicItemId bibliographicItemId = new BibliographicItemId();
-					String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequence;
+					String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequenceNumber;
 					bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
 					bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
 					bibliographicItemIds.add(bibliographicItemId);
@@ -242,9 +240,9 @@ public class AlephLoanHandler extends DefaultHandler {
 		if (docNoReached) {
 			docNumber = new String(ch, start, length);
 			docNoReached = false;
-		} else if (itemSeqReached) {
+		} else if (itemSequenceReached) {
 			itemSequenceNumber = new String(ch, start, length);
-			itemSeqReached = false;
+			itemSequenceReached = false;
 		} else if (materialReached) {
 			String mediumTypeParsed = new String(ch, start, length);
 			MediumType mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
@@ -269,9 +267,6 @@ public class AlephLoanHandler extends DefaultHandler {
 			String parsedBibId = new String(ch, start, length);
 			bibDocNumber = parsedBibId;
 			bibDocNoReached = false;
-		} else if (itemSequenceReached) {
-			itemSequence = new String(ch, start, length);
-			itemSequenceReached = false;
 		} else if (agencyReached) {
 			agencyId = new String(ch, start, length);
 			agencyReached = false;
