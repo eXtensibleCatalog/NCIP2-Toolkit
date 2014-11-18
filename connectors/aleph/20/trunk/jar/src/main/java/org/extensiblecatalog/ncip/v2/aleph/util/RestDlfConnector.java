@@ -28,12 +28,15 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 public class RestDlfConnector extends AlephMediator {
-
+	//FIXME: Refactor me.
+	
 	private static final long serialVersionUID = -4425639616999642735L;
+	
 	protected AlephConfiguration alephConfig = null;
+	
 	public boolean echoParticularProblemsToLUIS;
 	private boolean requiredAtLeastOneService;
-
+	
 	private String defaultAgency;
 	private String agencyAddress;
 	private String agencyName;
@@ -50,9 +53,13 @@ public class RestDlfConnector extends AlephMediator {
 	private String userPathElement;
 	private String itemsElement;
 
+	private int maxItemPreparationTimeDelay;
+	
 	private int bibIdLength;
 	private int sequenceNumberLength;
+	
 	private SAXParser parser;
+	
 	private String patronInfoElement;
 	private String addressElement;
 	private String circActionsElement;
@@ -86,6 +93,8 @@ public class RestDlfConnector extends AlephMediator {
 			agencyName = alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME);
 			userRegistrationLink = alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK);
 			authDataFormatType = alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE);
+			
+			maxItemPreparationTimeDelay = Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY));
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
 			requiredAtLeastOneService = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.REQUIRE_AT_LEAST_ONE_SERVICE));
@@ -139,6 +148,17 @@ public class RestDlfConnector extends AlephMediator {
 
 	public String getAuthDataFormatType() {
 		return authDataFormatType;
+	}
+	
+	/**
+	 * Returns number of days needed to prepare an item in a library.
+	 * <br />
+	 * It's number can be set in toolkit.properties
+	 * 
+	 * @return daysToPrepareItemToLoan
+	 */
+	public int getMaxItemPreparationTimeDelay() {
+		return maxItemPreparationTimeDelay;
 	}
 
 	public AgencyId toAgencyId(String agencyId) {

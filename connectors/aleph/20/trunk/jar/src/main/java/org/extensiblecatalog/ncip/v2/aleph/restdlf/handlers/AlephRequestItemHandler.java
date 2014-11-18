@@ -124,7 +124,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE)) {
 				earliestDateNeededReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE)) {
-				needBeforeDateReached = true;
+				pickupExpiryDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE)) {
 				itemSequenceReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE)) {
@@ -132,7 +132,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE)) {
 				pickupLocationReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE)) {
-				pickupExpiryDateReached = true;
+				needBeforeDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE)) {
 				reminderLevelReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
@@ -208,16 +208,16 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				itemIdNotFound = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE) && earliestDateNeededReached) {
 				earliestDateNeededReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && needBeforeDateReached) {
-				needBeforeDateReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && pickupExpiryDateReached) {
+				pickupExpiryDateReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
 				itemSequenceReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
 				holdQueueLengthReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && pickupLocationReached) {
 				pickupLocationReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && pickupExpiryDateReached) {
-				pickupExpiryDateReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && needBeforeDateReached) {
+				needBeforeDateReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE) && reminderLevelReached) {
 				reminderLevelReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestIdReached) {

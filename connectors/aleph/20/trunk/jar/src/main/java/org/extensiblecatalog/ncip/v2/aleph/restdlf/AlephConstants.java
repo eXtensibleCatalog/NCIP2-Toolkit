@@ -321,13 +321,11 @@ public class AlephConstants {
 	public static final String BIBLIOGRAPHIC_LIBRARY = "AlephBibLibrary";
 	public static final String ALEPH_ADMINISTRATIVE_LIBRARY = "AlephAdmLibrary";
 
+	public static final String MAX_ITEM_PREPARATION_TIME_DELAY = "MaxItemPreparationTimeDelay";
+	
 	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
-	public static final String INCLUDE_ITEM_INFO_IN_REQUEST_ITEM = "IncludeItemInfoInRequestItemService";
-	public static final String INCLUDE_USER_INFO_IN_REQUEST_ITEM = "IncludeUserInfoInRequestItemService";
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
-	public static final String INCLUDE_ITEM_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeItemInfoInCancelRequestItemService";
-	public static final String INCLUDE_USER_INFO_IN_CANCEL_REQUEST_ITEM = "IncludeUserInfoInCancelRequestItemService";
-
+	
 	public static final char REQUEST_ID_DELIMITER = ';';
 	
 	public static final String UNIQUE_ITEM_ID_SEPARATOR = "-";
