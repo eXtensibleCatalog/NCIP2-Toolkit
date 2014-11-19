@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -18,6 +19,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
@@ -35,8 +37,8 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private String bibLibrary;
 	private boolean itemIdNotFound;
 
-	private BibliographicDescription bibliographicDescription = new BibliographicDescription();
-	private TimeZone localTimeZone = TimeZone.getTimeZone("ECT");;
+	private BibliographicDescription bibliographicDescription;
+	private TimeZone localTimeZone = TimeZone.getTimeZone("ECT");
 
 	private String replyCode;
 	private String replyText;
@@ -64,7 +66,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private boolean requestIdReached = false;
 	private boolean requestTypeReached = false;
 	private boolean pickupDateReached = false;
-	private boolean statusReached = false;
+	private boolean z37statusReached = false;
 	private boolean holdQueueLengthReached = false;
 	private boolean itemSequenceReached = false;
 	private boolean authorReached = false;
@@ -75,6 +77,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private boolean itemDocNoReached = false;
 	private boolean materialReached = false;
 	private boolean agencyReached = false;
+	private boolean statusReached = false;
 
 	private List<RequestedItem> requestedItems;
 	private RequestedItem currentRequestedItem;
@@ -88,6 +91,11 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	 */
 	public AlephRequestItemHandler(String bibLibrary) {
 		this.bibLibrary = bibLibrary;
+		bibliographicDescription = new BibliographicDescription();
+	}
+
+	public AlephRequestItemHandler() throws AlephException {
+		throw new AlephException("Cannot initialize requestItemHandler without bibliographic library.");
 	}
 
 	/**
@@ -142,6 +150,8 @@ public class AlephRequestItemHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
 				pickupDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
+				z37statusReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
 				statusReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 				authorReached = true;
@@ -226,7 +236,9 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				requestTypeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
 				pickupDateReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && statusReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && z37statusReached) {
+				z37statusReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
 				statusReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 				authorReached = false;
@@ -353,14 +365,19 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				currentRequestedItem.setPickupDate(pickupDate);
 
 				pickupDateReached = false;
-			} else if (statusReached) {
+			} else if (z37statusReached) {
 				String parsedStatus = new String(ch, start, length);
 				RequestStatusType requestStatusType;
-				if (parsedStatus == "S")
+				if (parsedStatus == "S") {
 					requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
-				else
+				} else {
 					requestStatusType = Version1RequestStatusType.IN_PROCESS;
+				}
 				currentRequestedItem.setRequestStatusType(requestStatusType);
+				z37statusReached = false;
+			} else if (statusReached) {
+				String parsedStatus = new String(ch, start, length);
+				bibliographicDescription.setSponsoringBody(parsedStatus);
 				statusReached = false;
 			} else if (materialReached) {
 				String mediumTypeParsed = new String(ch, start, length);

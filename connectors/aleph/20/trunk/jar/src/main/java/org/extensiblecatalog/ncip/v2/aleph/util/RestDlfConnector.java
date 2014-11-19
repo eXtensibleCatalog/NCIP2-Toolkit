@@ -5,6 +5,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,15 +30,15 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 public class RestDlfConnector extends AlephMediator {
-	//FIXME: Refactor me.
-	
+	// FIXME: Refactor me.
+
 	private static final long serialVersionUID = -4425639616999642735L;
-	
+
 	protected AlephConfiguration alephConfig = null;
-	
+
 	public boolean echoParticularProblemsToLUIS;
 	private boolean requiredAtLeastOneService;
-	
+
 	private String defaultAgency;
 	private String agencyAddress;
 	private String agencyName;
@@ -54,12 +56,12 @@ public class RestDlfConnector extends AlephMediator {
 	private String itemsElement;
 
 	private int maxItemPreparationTimeDelay;
-	
+
 	private int bibIdLength;
 	private int sequenceNumberLength;
-	
+
 	private SAXParser parser;
-	
+
 	private String patronInfoElement;
 	private String addressElement;
 	private String circActionsElement;
@@ -93,7 +95,7 @@ public class RestDlfConnector extends AlephMediator {
 			agencyName = alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME);
 			userRegistrationLink = alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK);
 			authDataFormatType = alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE);
-			
+
 			maxItemPreparationTimeDelay = Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY));
 
 			echoParticularProblemsToLUIS = Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS));
@@ -149,10 +151,9 @@ public class RestDlfConnector extends AlephMediator {
 	public String getAuthDataFormatType() {
 		return authDataFormatType;
 	}
-	
+
 	/**
-	 * Returns number of days needed to prepare an item in a library.
-	 * <br />
+	 * Returns number of days needed to prepare an item in a library. <br />
 	 * It's number can be set in toolkit.properties
 	 * 
 	 * @return daysToPrepareItemToLoan
@@ -394,7 +395,18 @@ public class RestDlfConnector extends AlephMediator {
 				streamSource = new InputSource(requestsUrl.openStream());
 				parser.parse(streamSource, requestItemHandler);
 
-				alephUser.setRequestedItems(requestItemHandler.getRequestedItems());
+				List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
+
+				for (RequestedItem requestedItem : requestedItems) {
+					// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
+					GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
+					
+					pickupDate.add(Calendar.DAY_OF_MONTH, maxItemPreparationTimeDelay);
+					
+					requestedItem.setPickupDate(pickupDate);
+				}
+
+				alephUser.setRequestedItems(requestedItems);
 			}
 
 			userHandler.setAlephUser(alephUser);
