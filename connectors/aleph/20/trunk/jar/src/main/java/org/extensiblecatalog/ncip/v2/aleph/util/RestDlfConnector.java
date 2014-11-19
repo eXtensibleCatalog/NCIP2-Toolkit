@@ -399,10 +399,12 @@ public class RestDlfConnector extends AlephMediator {
 
 				if (maxItemPreparationTimeDelay != 0)
 					for (RequestedItem requestedItem : requestedItems) {
-						// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
-						GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
-						pickupDate.add(Calendar.DAY_OF_MONTH, maxItemPreparationTimeDelay);
-						requestedItem.setPickupDate(pickupDate);
+						if (requestedItem.getDatePlaced() != null) {
+							// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
+							GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
+							pickupDate.add(Calendar.DAY_OF_MONTH, maxItemPreparationTimeDelay);
+							requestedItem.setPickupDate(pickupDate);
+						}
 					}
 
 				alephUser.setRequestedItems(requestedItems);
@@ -609,7 +611,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		if (requestHandler.requestWasFound() && requestHandler.getRequestLink() != null) {
 
-			if (maxItemPreparationTimeDelay != 0) {
+			if (maxItemPreparationTimeDelay != 0 && requestItem.getDatePlaced() != null) {
 				GregorianCalendar pickupDate = (GregorianCalendar) requestItem.getDatePlaced().clone();
 				pickupDate.add(Calendar.DAY_OF_MONTH, maxItemPreparationTimeDelay);
 				requestItem.setPickupDate(pickupDate);
