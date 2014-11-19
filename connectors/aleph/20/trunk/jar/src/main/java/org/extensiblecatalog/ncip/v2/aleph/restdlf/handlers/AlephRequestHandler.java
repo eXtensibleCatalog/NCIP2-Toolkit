@@ -24,6 +24,7 @@ public class AlephRequestHandler extends DefaultHandler {
 	private String requestLink;
 	private boolean statusReached = false;
 	private boolean parsingRequest = false;
+	private boolean z37statusReached = false;
 	private boolean holdRequestFound = false;
 	private boolean pickupDateReached = false;
 	private boolean hourPlacedReached = false;
@@ -79,8 +80,10 @@ public class AlephRequestHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
 				pickupDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
+				z37statusReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
 				statusReached = true;
-			}
+			} 
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
@@ -116,9 +119,11 @@ public class AlephRequestHandler extends DefaultHandler {
 				requestTypeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
 				pickupDateReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && statusReached) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && z37statusReached) {
+				z37statusReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
 				statusReached = false;
-			}
+			} 
 		}
 	}
 
@@ -144,13 +149,13 @@ public class AlephRequestHandler extends DefaultHandler {
 						e.printStackTrace();
 					}
 
-					requestItem.setDateOfUserRequest(datePlaced);
+					requestItem.setDatePlaced(datePlaced);
 				}
 				datePlacedReached = false;
 			} else if (hourPlacedReached) {
 				String hourPlacedParsed = new String(ch, start, length);
 				if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar datePlaced = requestItem.getDateOfUserRequest();
+					GregorianCalendar datePlaced = requestItem.getDatePlaced();
 					GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
 
 					try {
@@ -162,7 +167,7 @@ public class AlephRequestHandler extends DefaultHandler {
 					datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
 					datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
 
-					requestItem.setDateOfUserRequest(datePlaced);
+					requestItem.setDatePlaced(datePlaced);
 				}
 				hourPlacedReached = false;
 			} else if (earliestDateNeededReached) {
@@ -245,7 +250,7 @@ public class AlephRequestHandler extends DefaultHandler {
 					requestItem.setHoldPickupDate(pickupDate);
 				}
 				pickupDateReached = false;
-			} else if (statusReached) {
+			} else if (z37statusReached) {
 				String parsedStatus = new String(ch, start, length);
 				RequestStatusType requestStatusType;
 				if (parsedStatus == "S")
@@ -253,8 +258,12 @@ public class AlephRequestHandler extends DefaultHandler {
 				else
 					requestStatusType = Version1RequestStatusType.IN_PROCESS;
 				requestItem.setRequestStatusType(requestStatusType);
+				z37statusReached = false;
+			} else if (statusReached) {
+				String parsedStatus = new String(ch, start, length);
+				requestItem.setSponsoringBody(parsedStatus);
 				statusReached = false;
-			}
+			} 
 
 		}
 	}

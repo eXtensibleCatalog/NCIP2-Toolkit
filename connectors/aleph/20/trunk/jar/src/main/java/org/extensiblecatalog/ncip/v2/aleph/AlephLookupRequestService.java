@@ -2,6 +2,8 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -85,17 +87,16 @@ public class AlephLookupRequestService implements LookupRequestService {
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
 
-		// Not yet implemented services
 		responseData.setDateAvailable(requestItem.getDateAvailable());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
 		responseData.setShippingInformation(requestItem.getShippingInformation());
 		responseData.setAcknowledgedFeeAmount(requestItem.getAcknowledgedFeeAmout());
-		responseData.setDateOfUserRequest(requestItem.getDateOfUserRequest());
+		responseData.setDateOfUserRequest(requestItem.getDatePlaced());
 		responseData.setEarliestDateNeeded(requestItem.getEarliestDateNeeded());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
 		responseData.setNeedBeforeDate(requestItem.getNeedBeforeDate());
 		responseData.setPaidFeeAmount(requestItem.getPaidFeeAmount());
-		responseData.setPickupDate(requestItem.getHoldPickupDate());
+		responseData.setPickupDate(requestItem.getPickupDate());
 		responseData.setPickupExpiryDate(requestItem.getPickupExpiryDate());
 		responseData.setPickupLocation(requestItem.getPickupLocation());
 		responseData.setRequestStatusType(requestItem.getRequestStatusType());

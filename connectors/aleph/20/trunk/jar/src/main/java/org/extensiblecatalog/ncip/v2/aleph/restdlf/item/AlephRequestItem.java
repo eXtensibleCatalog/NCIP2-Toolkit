@@ -45,6 +45,10 @@ public class AlephRequestItem implements Serializable {
 
 	private PickupLocation pickupLocation;
 
+	private String sponsoringBody;
+
+	private GregorianCalendar pickupDate;
+
 	/**
 	 * @return the problem
 	 */
@@ -306,11 +310,11 @@ public class AlephRequestItem implements Serializable {
 		this.acknowledgedFeeAmount = acknowledgedFeeAmount;
 	}
 
-	public GregorianCalendar getDateOfUserRequest() {
+	public GregorianCalendar getDatePlaced() {
 		return dateOfUserRequest;
 	}
 
-	public void setDateOfUserRequest(GregorianCalendar dateOfUserRequest) {
+	public void setDatePlaced(GregorianCalendar dateOfUserRequest) {
 		this.dateOfUserRequest = dateOfUserRequest;
 	}
 
@@ -360,6 +364,22 @@ public class AlephRequestItem implements Serializable {
 
 	public void setRequestStatusType(RequestStatusType requestStatusType) {
 		this.requestStatusType = requestStatusType;
+	}
+
+	public void setSponsoringBody(String parsedStatus) {
+		this.sponsoringBody = parsedStatus;
+	}
+
+	public String getSponsoringBody() {
+		return sponsoringBody;
+	}
+	
+	public void setPickupDate(GregorianCalendar pickupDate){
+		this.pickupDate = pickupDate;
+	}
+
+	public GregorianCalendar getPickupDate() {
+		return pickupDate;
 	}
 
 }
