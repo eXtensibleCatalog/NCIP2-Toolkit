@@ -27,7 +27,7 @@
             <ns1:CallNumber>2-1254.177</ns1:CallNumber>
          </ns1:ItemDescription>
          <ns1:Location>
-            <ns1:LocationType ns1:Scheme="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">Permanent</ns1:LocationType>
+            <ns1:LocationType ns1:Scheme="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">Permanent Location</ns1:LocationType>
             <ns1:LocationName>
                <ns1:LocationNameInstance>
                   <ns1:LocationNameLevel>2</ns1:LocationNameLevel>

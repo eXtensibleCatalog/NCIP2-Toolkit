@@ -133,7 +133,7 @@ public class AlephUtil {
 
 		location = new Location();
 		location.setLocationName(locationName);
-		location.setLocationType(new LocationType(AlephConstants.DEFAULT_SCHEME, AlephConstants.LOCATION_TYPE_PERMANENT));
+		location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
 		return location;
 	}
 
@@ -219,7 +219,7 @@ public class AlephUtil {
 			locationName.setLocationNameInstances(locationNameInstances);
 
 			location.setLocationName(locationName);
-			location.setLocationType(new LocationType(AlephConstants.DEFAULT_SCHEME, AlephConstants.LOCATION_TYPE_PERMANENT));
+			location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
 
 			locations.add(location);
 			iof.setLocations(locations);
