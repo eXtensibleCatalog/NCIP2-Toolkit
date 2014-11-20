@@ -30,7 +30,7 @@ public class AlephLookupItemTest extends TestCase {
 		String publisher = "EPA,";
 		String location = "Science, Technology and Medicine / 6th Floor";
 		String medium = "Book";
-		String circulationStatus = Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue();
+		String circulationStatus = Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue();
 
 		LookupItemInitiationData initData = new LookupItemInitiationData();
 		initData.setBibliographicDescriptionDesired(true);

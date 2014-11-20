@@ -46,9 +46,9 @@ public class AlephLookupItemSetTest extends TestCase {
 
 		String[][] numberOfPieces = { { "1" }, { "1" }, { "2", "2" }, { "1" } };
 
-		String[][] circStatuses = { { Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() }, { Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() },
-				{ Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue(), Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() },
-				{ Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() } };
+		String[][] circStatuses = { { Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() }, { Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() },
+				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(), Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() },
+				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() } };
 
 		LookupItemSetInitiationData initData = new LookupItemSetInitiationData();
 
