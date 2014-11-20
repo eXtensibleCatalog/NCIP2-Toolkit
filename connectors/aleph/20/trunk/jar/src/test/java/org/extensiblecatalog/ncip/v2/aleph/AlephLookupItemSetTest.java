@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 
 public class AlephLookupItemSetTest extends TestCase {
 
-	//FIXME: Add nextitemtoken test!
+	// FIXME: Add nextitemtoken test!
 	public void testPerformService() throws ServiceException {
 		AlephLookupItemSetService service = new AlephLookupItemSetService();
 
@@ -45,6 +45,10 @@ public class AlephLookupItemSetTest extends TestCase {
 				{ "In Library Use Only", "Limited Circulation, Normal Loan Period" }, { "Supervision Required" } };
 
 		String[][] numberOfPieces = { { "1" }, { "1" }, { "2", "2" }, { "1" } };
+
+		String[][] circStatuses = { { Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() }, { Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() },
+				{ Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue(), Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() },
+				{ Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue() } };
 
 		LookupItemSetInitiationData initData = new LookupItemSetInitiationData();
 
@@ -87,6 +91,7 @@ public class AlephLookupItemSetTest extends TestCase {
 			for (int j = 0; j < holdSet.getItemInformations().size(); j++) {
 				ItemInformation itemInfo = holdSet.getItemInformation(j);
 
+				assertEquals("Unexpected Circulation Status returned", circStatuses[i][j], itemInfo.getItemOptionalFields().getCirculationStatus().getValue());
 				assertEquals("Unexpected Accession Number returned. (Aleph Item Id)", itemIds[i][j], itemInfo.getItemId().getItemIdentifierValue());
 				assertEquals("Unexpected Barcode returned. (Legal Deposit Number)", barcodes[i][j], itemInfo.getItemOptionalFields().getBibliographicDescription()
 						.getBibliographicItemId(0).getBibliographicItemIdentifier());

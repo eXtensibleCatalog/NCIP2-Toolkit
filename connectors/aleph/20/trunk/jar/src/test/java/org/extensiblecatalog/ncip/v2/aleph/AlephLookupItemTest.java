@@ -9,6 +9,7 @@ import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 
 public class AlephLookupItemTest extends TestCase {
 
@@ -29,6 +30,7 @@ public class AlephLookupItemTest extends TestCase {
 		String publisher = "EPA,";
 		String location = "Science, Technology and Medicine / 6th Floor";
 		String medium = "Book";
+		String circulationStatus = Version1CirculationStatus.AVAILABLE_FOR_PICKUP.getValue();
 
 		LookupItemInitiationData initData = new LookupItemInitiationData();
 		initData.setBibliographicDescriptionDesired(true);
@@ -54,6 +56,7 @@ public class AlephLookupItemTest extends TestCase {
 		assertEquals("Call number incorrect", callNumber, responseData.getItemOptionalFields().getItemDescription().getCallNumber());
 		assertEquals("Location incorrect", location, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstances().get(1)
 				.getLocationNameValue());
+		assertEquals("Circulation status incorrect", circulationStatus, responseData.getItemOptionalFields().getCirculationStatus().getValue());
 		assertEquals("Medium incorrect", medium, responseData.getItemOptionalFields().getBibliographicDescription().getMediumType().getValue());
 		assertEquals("Publisher incorrect", publisher, responseData.getItemOptionalFields().getBibliographicDescription().getPublisher());
 		assertEquals("Title incorrect", title, responseData.getItemOptionalFields().getBibliographicDescription().getTitle());

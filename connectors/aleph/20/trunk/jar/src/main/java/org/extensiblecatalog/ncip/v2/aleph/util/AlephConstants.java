@@ -58,7 +58,6 @@ public class AlephConstants extends org.extensiblecatalog.ncip.v2.aleph.restdlf.
     public static final String CONFIG_ALEPH_CIRC_STATUS_AVAILABLE = "AlephCircStatusAvailable";
     public static final String CONFIG_ALEPH_CIRC_STATUS_POSSIBLY_AVAILABLE = "AlephCircStatusPossiblyAvailable";
     public static final String CONFIG_ALEPH_CIRC_STATUS_NOT_AVAILABLE = "AlephCircStatusNotAvailable";
-    public static final String ON_SHELF = "On Shelf";
     
     /**
      * Location Type Enum, Defined in the Schema

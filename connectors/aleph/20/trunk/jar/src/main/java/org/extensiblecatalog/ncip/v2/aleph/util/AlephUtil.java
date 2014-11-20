@@ -140,9 +140,7 @@ public class AlephUtil {
 	public static ItemOptionalFields getItemOptionalFields(AlephItem alephItem) {
 		ItemOptionalFields iof = new ItemOptionalFields();
 		if (alephItem.getCirculationStatus() != null) {
-			if (alephItem.getCirculationStatus().getValue().equalsIgnoreCase(AlephConstants.ON_SHELF)) {
-				iof.setCirculationStatus(alephItem.getCirculationStatus());
-			}
+			iof.setCirculationStatus(alephItem.getCirculationStatus());
 		}
 
 		if (alephItem.getElectronicResource() != null) {
@@ -449,7 +447,8 @@ public class AlephUtil {
 				circulationStatus = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
 			} else if (circulationStatusVal.equalsIgnoreCase(AlephConstants.CIRC_STATUS_REQUESTED)) {
 				circulationStatus = Version1CirculationStatus.ON_LOAN;
-			} else //Status = processing
+			} else
+				// Status = processing
 				circulationStatus = Version1CirculationStatus.IN_PROCESS;
 
 		} else
