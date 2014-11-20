@@ -43,7 +43,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private String replyCode;
 	private String replyText;
 	private String noteValue;
-	private String requestId;
+	private String requestIdVal;
 	private String sequenceNumber;
 	private String itemIdToLookForSeqNumber;
 
@@ -63,7 +63,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private boolean pickupLocationReached = false;
 	private boolean pickupExpiryDateReached = false;
 	private boolean reminderLevelReached = false;
-	private boolean requestIdReached = false;
 	private boolean requestTypeReached = false;
 	private boolean pickupDateReached = false;
 	private boolean z37statusReached = false;
@@ -143,8 +142,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				needBeforeDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE)) {
 				reminderLevelReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
-				requestIdReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE)) {
 				requestTypeReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
@@ -230,8 +227,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				needBeforeDateReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE) && reminderLevelReached) {
 				reminderLevelReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestIdReached) {
-				requestIdReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE) && requestTypeReached) {
 				requestTypeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
@@ -284,7 +279,12 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				noteValue = new String(ch, start, length);
 				noteReached = false;
 			} else if (requestNumberReached) {
-				requestId = new String(ch, start, length);
+				requestIdVal = new String(ch, start, length);
+
+				RequestId requestId = new RequestId();
+				requestId.setRequestIdentifierValue(requestIdVal);
+				currentRequestedItem.setRequestId(requestId);
+				
 				requestNumberReached = false;
 			} else if (datePlacedReached) {
 				String datePlacedParsed = new String(ch, start, length);
@@ -344,11 +344,6 @@ public class AlephRequestItemHandler extends DefaultHandler {
 			} else if (reminderLevelReached) {
 				currentRequestedItem.setReminderLevel(new BigDecimal(new String(ch, start, length)));
 				reminderLevelReached = false;
-			} else if (requestIdReached) {
-				RequestId requestId = new RequestId();
-				requestId.setRequestIdentifierValue(new String(ch, start, length));
-				currentRequestedItem.setRequestId(requestId);
-				requestIdReached = false;
 			} else if (requestTypeReached) {
 				RequestType requestType = null;
 				String parsedValue = new String(ch, start, length);
@@ -456,7 +451,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	 * @return
 	 */
 	public String getRequestId() {
-		return requestId;
+		return requestIdVal;
 	}
 
 	/**
