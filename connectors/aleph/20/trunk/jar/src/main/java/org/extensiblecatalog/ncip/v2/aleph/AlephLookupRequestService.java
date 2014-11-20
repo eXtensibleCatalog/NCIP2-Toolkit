@@ -2,8 +2,6 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -24,8 +22,9 @@ public class AlephLookupRequestService implements LookupRequestService {
 
 		if (itemIdIsEmpty || userIdIsEmpty) {
 			if (itemIdIsEmpty)
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
-						"Item Id is undefined. Cannot lookup request for an unknown item. Note that Request Id is also not supported by this service.");
+				throw new ServiceException(
+						ServiceError.UNSUPPORTED_REQUEST,
+						"Item Id is undefined. Cannot lookup request for an unknown item. Note that Request Id is also not supported by this service. It's because Aleph cannot search for an request without the knowledge of UserId.");
 			else
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Cannot lookup request with unknown user.");
 		}
