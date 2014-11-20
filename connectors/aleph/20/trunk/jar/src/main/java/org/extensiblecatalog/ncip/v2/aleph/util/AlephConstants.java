@@ -75,8 +75,6 @@ public class AlephConstants extends org.extensiblecatalog.ncip.v2.aleph.restdlf.
 	 * not yet supported in database, item table only has perm and temp
      */
     public static final String LOCATION_TYPE_CURRENT = "Current";
-    
-    public static final String CIRC_STATUS_CHECKED_OUT = "A";
 
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 

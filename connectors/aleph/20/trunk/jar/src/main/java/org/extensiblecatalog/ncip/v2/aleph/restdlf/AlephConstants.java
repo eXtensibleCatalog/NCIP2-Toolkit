@@ -222,8 +222,6 @@ public class AlephConstants {
 	public static final String NO = "N";
 	public static final String YES = "Y";
 
-	public static final String CIRC_STATUS_CHECKED_OUT = "A";
-
 	// Values lengths:
 	public static final int BIB_ID_LENGTH = 9;
 	public static final int SEQ_NUMBER_LENGTH = 4;
@@ -369,6 +367,11 @@ public class AlephConstants {
 	public static final String ITEM_STATUS_NOT_PUBLISHED = "Not published";
 	public static final String ITEM_STATUS_CURRENT_YEAR_2 = "Current Year 2";
 	public static final String ITEM_STATUS_ITEM_UNDER_CLAIN = "Item under claim";
+	
+	//Aleph circulation statuses:
+	public static final String CIRC_STATUS_ON_SHELF = "On Shelf";
+	public static final String CIRC_STATUS_REQUESTED = "Requested";
+	public static final String CIRC_STATUS_PROCESSING = "Processing";
 
 	// Item restrictions:
 	public static final String ITEM_RESTRICTION_LOAN_PERIOD = "Loan Period";

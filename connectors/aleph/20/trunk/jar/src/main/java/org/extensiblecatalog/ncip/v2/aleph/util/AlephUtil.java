@@ -441,4 +441,19 @@ public class AlephUtil {
 		} else
 			return null;
 	}
+
+	public static CirculationStatus parseCirculationStatus(String circulationStatusVal) {
+		CirculationStatus circulationStatus;
+		if (circulationStatusVal.matches(AlephConstants.CIRC_STATUS_ON_SHELF + "|" + AlephConstants.CIRC_STATUS_REQUESTED + "|" + AlephConstants.CIRC_STATUS_PROCESSING)) {
+			if (circulationStatusVal.equalsIgnoreCase(AlephConstants.CIRC_STATUS_ON_SHELF)) {
+				circulationStatus = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
+			} else if (circulationStatusVal.equalsIgnoreCase(AlephConstants.CIRC_STATUS_REQUESTED)) {
+				circulationStatus = Version1CirculationStatus.ON_LOAN;
+			} else //Status = processing
+				circulationStatus = Version1CirculationStatus.IN_PROCESS;
+
+		} else
+			circulationStatus = Version1CirculationStatus.AVAILABLE_ON_SHELF;
+		return circulationStatus;
+	}
 }
