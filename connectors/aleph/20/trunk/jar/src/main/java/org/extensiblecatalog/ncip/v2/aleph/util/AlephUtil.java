@@ -444,7 +444,7 @@ public class AlephUtil {
 		CirculationStatus circulationStatus;
 		if (circulationStatusVal.matches(AlephConstants.CIRC_STATUS_ON_SHELF + "|" + AlephConstants.CIRC_STATUS_REQUESTED + "|" + AlephConstants.CIRC_STATUS_PROCESSING)) {
 			if (circulationStatusVal.equalsIgnoreCase(AlephConstants.CIRC_STATUS_ON_SHELF)) {
-				circulationStatus = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
+				circulationStatus = Version1CirculationStatus.AVAILABLE_ON_SHELF;
 			} else if (circulationStatusVal.equalsIgnoreCase(AlephConstants.CIRC_STATUS_REQUESTED)) {
 				circulationStatus = Version1CirculationStatus.ON_LOAN;
 			} else
@@ -452,7 +452,7 @@ public class AlephUtil {
 				circulationStatus = Version1CirculationStatus.IN_PROCESS;
 
 		} else
-			circulationStatus = Version1CirculationStatus.AVAILABLE_ON_SHELF;
+			circulationStatus = Version1CirculationStatus.CIRCULATION_STATUS_UNDEFINED;
 		return circulationStatus;
 	}
 }
