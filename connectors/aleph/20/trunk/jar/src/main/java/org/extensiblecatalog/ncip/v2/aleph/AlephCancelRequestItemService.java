@@ -30,8 +30,8 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 	public CancelRequestItemResponseData performService(CancelRequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
 			throws ServiceException {
 
-		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
-		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
+		boolean itemIdIsEmpty = initData.getItemId() == null || initData.getItemId().getItemIdentifierValue().isEmpty();
+		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 
 		if (itemIdIsEmpty || userIdIsEmpty) {
 			if (itemIdIsEmpty)

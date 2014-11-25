@@ -19,7 +19,7 @@ public class AlephRequestItemService implements RequestItemService {
 	@Override
 	public RequestItemResponseData performService(RequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
+		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 		
 		if (userIdIsEmpty) {
 			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is empty.");

@@ -28,8 +28,8 @@ public class AlephRenewItemService implements RenewItemService {
 	@Override
 	public RenewItemResponseData performService(RenewItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
-		boolean userIdIsEmpty = initData.getUserId().getUserIdentifierValue().isEmpty();
+		boolean itemIdIsEmpty = initData.getItemId() == null || initData.getItemId().getItemIdentifierValue().isEmpty();
+		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 
 		if (itemIdIsEmpty || userIdIsEmpty) {
 			if (itemIdIsEmpty)
