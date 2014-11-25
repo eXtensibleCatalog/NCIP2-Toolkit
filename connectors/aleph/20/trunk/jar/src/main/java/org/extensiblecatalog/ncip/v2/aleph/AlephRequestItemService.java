@@ -65,8 +65,15 @@ public class AlephRequestItemService implements RequestItemService {
 		if (initiationHeader != null) {
 			ResponseHeader responseHeader = new ResponseHeader();
 			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+				// Reverse From/To AgencyId because of the request was processed (return to initiator)
+				ToAgencyId toAgencyId = new ToAgencyId();
+				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+				
+				FromAgencyId fromAgencyId = new FromAgencyId();
+				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
+				
+				responseHeader.setFromAgencyId(fromAgencyId);
+				responseHeader.setToAgencyId(toAgencyId);
 			}
 			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
 				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());

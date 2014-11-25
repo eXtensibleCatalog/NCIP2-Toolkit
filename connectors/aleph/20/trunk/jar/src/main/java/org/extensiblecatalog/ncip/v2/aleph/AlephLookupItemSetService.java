@@ -22,8 +22,10 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -36,10 +38,12 @@ import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemDescriptionLevel;
@@ -355,6 +359,29 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		if (responseData.getProblems() == null || responseData.getProblem(0) == null)
 			responseData.setBibInformations(bibInformations);
+		
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				// Reverse From/To AgencyId because of the request was processed (return to initiator)
+				ToAgencyId toAgencyId = new ToAgencyId();
+				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+				
+				FromAgencyId fromAgencyId = new FromAgencyId();
+				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
+				
+				responseHeader.setFromAgencyId(fromAgencyId);
+				responseHeader.setToAgencyId(toAgencyId);
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
 
 		return responseData;
 	}

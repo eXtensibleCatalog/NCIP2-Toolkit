@@ -24,7 +24,7 @@ public class AlephLookupRequestService implements LookupRequestService {
 			if (itemIdIsEmpty)
 				throw new ServiceException(
 						ServiceError.UNSUPPORTED_REQUEST,
-						"Item Id is undefined. Cannot lookup request for an unknown item. Note that Request Id is also not supported by this service. It's because Aleph cannot search for an request without the knowledge of UserId.");
+						"Item Id is undefined. Cannot lookup request for an unknown item. Note that Request Id is not supported by this service because Aleph cannot search for an request without the knowledge of UserId.");
 			else
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined. Cannot lookup request with unknown user.");
 		}
@@ -66,8 +66,15 @@ public class AlephLookupRequestService implements LookupRequestService {
 		if (initiationHeader != null) {
 			ResponseHeader responseHeader = new ResponseHeader();
 			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				responseHeader.setFromAgencyId(initiationHeader.getFromAgencyId());
-				responseHeader.setToAgencyId(initiationHeader.getToAgencyId());
+				// Reverse From/To AgencyId because of the request was processed (return to initiator)
+				ToAgencyId toAgencyId = new ToAgencyId();
+				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+				
+				FromAgencyId fromAgencyId = new FromAgencyId();
+				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
+				
+				responseHeader.setFromAgencyId(fromAgencyId);
+				responseHeader.setToAgencyId(toAgencyId);
 			}
 			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
 				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());

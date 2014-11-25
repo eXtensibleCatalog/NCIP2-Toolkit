@@ -85,6 +85,29 @@ public class AlephLookupItemService implements LookupItemService {
 
 	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, AlephItem alephItem) throws ServiceException {
 
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		if (initiationHeader != null) {
+			ResponseHeader responseHeader = new ResponseHeader();
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				// Reverse From/To AgencyId because of the request was processed (return to initiator)
+				ToAgencyId toAgencyId = new ToAgencyId();
+				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+				
+				FromAgencyId fromAgencyId = new FromAgencyId();
+				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
+				
+				responseHeader.setFromAgencyId(fromAgencyId);
+				responseHeader.setToAgencyId(toAgencyId);
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+			responseData.setResponseHeader(responseHeader);
+		}
+		
 		if (alephItem.getDateAvailablePickup() != null) {
 			GregorianCalendar gc = new GregorianCalendar();
 			gc.setTime(alephItem.getDateAvailablePickup());
