@@ -11,17 +11,39 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.AccountBalance;
+import org.extensiblecatalog.ncip.v2.service.AccountDetails;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.Amount;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
+import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
+import org.extensiblecatalog.ncip.v2.service.LookupUserService;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
 import org.xml.sax.SAXException;
 
 public class AlephLookupUserService implements LookupUserService {
@@ -123,10 +145,10 @@ public class AlephLookupUserService implements LookupUserService {
 					// Reverse From/To AgencyId because of the request was processed (return to initiator)
 					ToAgencyId toAgencyId = new ToAgencyId();
 					toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-					
+
 					FromAgencyId fromAgencyId = new FromAgencyId();
 					fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-					
+
 					responseHeader.setFromAgencyId(fromAgencyId);
 					responseHeader.setToAgencyId(toAgencyId);
 				}

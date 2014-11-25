@@ -1,15 +1,13 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemService;
@@ -23,7 +21,6 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemElementType;
 import org.xml.sax.SAXException;
 
 public class AlephCancelRequestItemService implements CancelRequestItemService {
@@ -83,10 +80,10 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-				
+
 				FromAgencyId fromAgencyId = new FromAgencyId();
 				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-				
+
 				responseHeader.setFromAgencyId(fromAgencyId);
 				responseHeader.setToAgencyId(toAgencyId);
 			}

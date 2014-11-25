@@ -267,7 +267,8 @@ public class AlephUtil {
 
 			else
 				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_SHORT_LOAN_PERIOD;
-		}
+		} else
+			itemUseRestrictionType = (Version1ItemUseRestrictionType) new ItemUseRestrictionType("undefined", itemRestriction);
 
 		return itemUseRestrictionType;
 	}
@@ -342,12 +343,7 @@ public class AlephUtil {
 		else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.AUDIO_TAPE))
 			mediumType = Version1MediumType.AUDIO_TAPE;
 		else {
-			try {
-				Version1MediumType.loadAll();
-				mediumType = MediumType.find(Version1MediumType.VERSION_1_MEDIUM_TYPE, mediumTypeParsed);
-			} catch (ServiceException e) {
-				e.printStackTrace();
-			}
+			mediumType = new MediumType("undefined", mediumTypeParsed);
 		}
 		return mediumType;
 	}
@@ -452,7 +448,7 @@ public class AlephUtil {
 				circulationStatus = Version1CirculationStatus.IN_PROCESS;
 
 		} else
-			circulationStatus = Version1CirculationStatus.CIRCULATION_STATUS_UNDEFINED;
+			circulationStatus = new CirculationStatus("undefined", circulationStatusVal);
 		return circulationStatus;
 	}
 }

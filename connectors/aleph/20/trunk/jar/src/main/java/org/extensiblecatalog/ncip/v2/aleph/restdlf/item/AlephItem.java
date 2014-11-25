@@ -1,16 +1,5 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf.item;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants.Availability;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
-import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -19,6 +8,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants.Availability;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 
 /**
  * An item returned from Aleph
@@ -85,6 +83,7 @@ public class AlephItem implements Serializable {
 	private String seqNumber;
 
 	private List<String> itemRestrictions;
+	private boolean translate;
 
 	public AlephItem() {
 		borrowingUsers = new ArrayList<AlephUser>();
@@ -924,6 +923,15 @@ public class AlephItem implements Serializable {
 		ItemOptionalFields iof = AlephUtil.getItemOptionalFields(this);
 		iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
 		return iof;
+	}
+
+	public AlephItem seTtranslate(boolean translate) {
+		this.translate = translate;
+		return this;
+	}
+
+	public boolean translate() {
+		return translate;
 	}
 
 }

@@ -8,12 +8,6 @@
 
 package org.extensiblecatalog.ncip.v2.aleph;
 
-import org.extensiblecatalog.ncip.v2.service.*;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -21,6 +15,26 @@ import java.util.GregorianCalendar;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
+import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.LookupItemService;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
 /**
@@ -92,10 +106,10 @@ public class AlephLookupItemService implements LookupItemService {
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-				
+
 				FromAgencyId fromAgencyId = new FromAgencyId();
 				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-				
+
 				responseHeader.setFromAgencyId(fromAgencyId);
 				responseHeader.setToAgencyId(toAgencyId);
 			}
@@ -107,7 +121,7 @@ public class AlephLookupItemService implements LookupItemService {
 			}
 			responseData.setResponseHeader(responseHeader);
 		}
-		
+
 		if (alephItem.getDateAvailablePickup() != null) {
 			GregorianCalendar gc = new GregorianCalendar();
 			gc.setTime(alephItem.getDateAvailablePickup());
@@ -117,7 +131,7 @@ public class AlephLookupItemService implements LookupItemService {
 		}
 
 		responseData.setItemId(initData.getItemId());
-		
+
 		ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
 
 		if (initData.getBibliographicDescriptionDesired()) {

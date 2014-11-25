@@ -82,9 +82,8 @@ public class URLBuilder {
 				sb.append("=");
 				sb.append(entry.getValue());
 
-				if (remaining > 1) {
+				if (--remaining >= 1) {
 					sb.append("&");
-					remaining--;
 				}
 			}
 		}

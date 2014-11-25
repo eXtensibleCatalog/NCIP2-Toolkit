@@ -8,20 +8,28 @@
 
 package org.extensiblecatalog.ncip.v2.aleph;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
-import org.extensiblecatalog.ncip.v2.service.*;
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRenewItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RenewItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.RenewItemService;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.xml.sax.SAXException;
 
 public class AlephRenewItemService implements RenewItemService {
 
@@ -79,10 +87,10 @@ public class AlephRenewItemService implements RenewItemService {
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-				
+
 				FromAgencyId fromAgencyId = new FromAgencyId();
 				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-				
+
 				responseHeader.setFromAgencyId(fromAgencyId);
 				responseHeader.setToAgencyId(toAgencyId);
 			}

@@ -6,9 +6,21 @@ import java.util.Arrays;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestResponseData;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestService;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.xml.sax.SAXException;
 
 public class AlephLookupRequestService implements LookupRequestService {
@@ -69,10 +81,10 @@ public class AlephLookupRequestService implements LookupRequestService {
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-				
+
 				FromAgencyId fromAgencyId = new FromAgencyId();
 				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-				
+
 				responseHeader.setFromAgencyId(fromAgencyId);
 				responseHeader.setToAgencyId(toAgencyId);
 			}

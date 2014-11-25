@@ -1,29 +1,18 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyElementType;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.ApplicationProfileSupportedType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationPrompt;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationPromptType;
-import org.extensiblecatalog.ncip.v2.service.ConsortiumAgreement;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyService;
-import org.extensiblecatalog.ncip.v2.service.OrganizationNameInformation;
-import org.extensiblecatalog.ncip.v2.service.Problem;
-import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.PromptInput;
 import org.extensiblecatalog.ncip.v2.service.PromptOutput;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
@@ -84,10 +73,10 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-				
+
 				FromAgencyId fromAgencyId = new FromAgencyId();
 				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-				
+
 				responseHeader.setFromAgencyId(fromAgencyId);
 				responseHeader.setToAgencyId(toAgencyId);
 			}

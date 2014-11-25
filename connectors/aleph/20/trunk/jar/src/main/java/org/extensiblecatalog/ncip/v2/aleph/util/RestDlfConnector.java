@@ -204,8 +204,12 @@ public class RestDlfConnector extends AlephMediator {
 		if (!validateRecordId(recordId)) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
 		}
+		String appProfileType = null;
+		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
+			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full").toURL();
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full")
+				.addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -239,7 +243,12 @@ public class RestDlfConnector extends AlephMediator {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, itemId).toURL();
+		String appProfileType = null;
+		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
+			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
+
+		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, itemId)
+				.addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -315,6 +324,10 @@ public class RestDlfConnector extends AlephMediator {
 		boolean loanedItemsDesiredOnly = loanedItemsDesired
 				&& !(blockOrTrapDesired || nameInformationDesired || requestedItemsDesired || userAddressInformationDesired || userFiscalAccountDesired || userIdDesired || userPrivilegeDesired);
 
+		String appProfileType = null;
+		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
+			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
+
 		// Create URL request only if specified service was desired
 		URL addressUrl = null;
 		if (nameInformationDesired || userIdDesired || userAddressInformationDesired || userPrivilegeDesired) {
@@ -338,11 +351,11 @@ public class RestDlfConnector extends AlephMediator {
 			if (!loanedItemsDesiredOnly) {
 				// If there is not history expected, parse regular loans
 				loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
-						.addRequest("view", "full").toURL();
+						.addRequest("view", "full").addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
 
 			} else {
 				loansHistoryUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
-						.addRequest("view", "full").addRequest("type", "history").toURL();
+						.addRequest("view", "full").addRequest("type", "history").addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
 			}
 		}
 
@@ -351,7 +364,7 @@ public class RestDlfConnector extends AlephMediator {
 			atLeastOneDesired = true;
 			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full
 			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
-					.addRequest("view", "full").toURL();
+					.addRequest("view", "full").addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
 		}
 
 		URL blocksOrTrapsUrl = null;
@@ -603,7 +616,12 @@ public class RestDlfConnector extends AlephMediator {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement).toURL();
+		String appProfileType = null;
+		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
+			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
+
+		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
+				.addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
 
 		AlephRequestHandler requestHandler = new AlephRequestHandler(itemId, requestItem);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());

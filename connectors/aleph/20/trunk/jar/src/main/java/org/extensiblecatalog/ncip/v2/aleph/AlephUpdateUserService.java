@@ -1,17 +1,29 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.NCIPService;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.UpdateUserResponseData;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
 import org.xml.sax.SAXException;
 
 public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationData, UpdateUserResponseData> {
@@ -35,16 +47,16 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 		}
 
 		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
-		
+
 		final UpdateUserResponseData responseData = new UpdateUserResponseData();
-		
+
 		try {
 			AlephUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
 			if (alephUser == null)
 				throw new AlephException("alephUser returned by responder is null");
 			else {
 				UserId id = new UserId();
-				String username = alephUser.getUsername(); 
+				String username = alephUser.getUsername();
 				id.setUserIdentifierValue(username);
 				responseData.setUserId(id);
 			}
@@ -65,7 +77,6 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			responseData.setProblems(Arrays.asList(p));
 		}
 
-
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		if (initiationHeader != null) {
 			ResponseHeader responseHeader = new ResponseHeader();
@@ -73,10 +84,10 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
-				
+
 				FromAgencyId fromAgencyId = new FromAgencyId();
 				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-				
+
 				responseHeader.setFromAgencyId(fromAgencyId);
 				responseHeader.setToAgencyId(toAgencyId);
 			}
@@ -88,7 +99,7 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			}
 			responseData.setResponseHeader(responseHeader);
 		}
-		
+
 		return responseData;
 	}
 
