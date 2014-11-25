@@ -83,8 +83,17 @@ public class AlephLookupRequestTest extends TestCase {
 		String electronicAddress = "test@mzk.cz";
 		String privilegeDesc = "04 - S";
 
-		//String blockOrTrapType = "Dlouhodobě nevrácená publikace";
-
+		InitiationHeader initiationHeader = new InitiationHeader();
+		
+		ToAgencyId toAgencyId = new ToAgencyId();
+		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+				
+		FromAgencyId fromAgencyId = new FromAgencyId();
+		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+		
+		initiationHeader.setFromAgencyId(fromAgencyId);
+		initiationHeader.setToAgencyId(toAgencyId);
+		initData.setInitiationHeader(initiationHeader);
 		responseData = service.performService(initData, null, serviceManager);
 
 		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
@@ -118,6 +127,7 @@ public class AlephLookupRequestTest extends TestCase {
 				.getUserAddressInformation(1).getElectronicAddress().getElectronicAddressData());
 
 		assertEquals("Unexpected privilege description returned", privilegeDesc, responseData.getUserOptionalFields().getUserPrivilege(0).getUserPrivilegeDescription());
-		//assertEquals("Unexpected BlockOrTrapType returned.", blockOrTrapType, responseData.getUserOptionalFields().getBlockOrTrap(0).getBlockOrTrapType().getValue());
+		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 	}
 }

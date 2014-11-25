@@ -68,6 +68,18 @@ public class AlephLookupItemSetTest extends TestCase {
 		initData.setItemUseRestrictionTypeDesired(true);
 		initData.setLocationDesired(true);
 		initData.setSensitizationFlagDesired(true);
+		
+		InitiationHeader initiationHeader = new InitiationHeader();
+		
+		ToAgencyId toAgencyId = new ToAgencyId();
+		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+				
+		FromAgencyId fromAgencyId = new FromAgencyId();
+		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+		
+		initiationHeader.setFromAgencyId(fromAgencyId);
+		initiationHeader.setToAgencyId(toAgencyId);
+		initData.setInitiationHeader(initiationHeader);
 
 		LookupItemSetResponseData responseData = service.performService(initData, null, serviceManager);
 
@@ -76,7 +88,8 @@ public class AlephLookupItemSetTest extends TestCase {
 		String fName = "";
 		assertEquals(fName, fName, fName);
 		assertEquals("Responder did not return all items", true, responseData.getBibInformations().size() == bibIdsCount ? true : responseData.getNextItemToken() != null);
-
+		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 		for (int i = 0; i < bibIdsCount; i++) {
 			HoldingsSet holdSet = responseData.getBibInformation(i).getHoldingsSet(0);
 

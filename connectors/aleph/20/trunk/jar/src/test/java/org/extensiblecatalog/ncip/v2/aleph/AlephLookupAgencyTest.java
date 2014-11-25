@@ -14,9 +14,10 @@ public class AlephLookupAgencyTest extends TestCase {
 
 		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();
 		LookupAgencyInitiationData initData = new LookupAgencyInitiationData();
-
+		
 		// Input:
 		AgencyId agencyId = new AgencyId("MZK");
+		
 		List<AgencyElementType> agencyElementTypes = new ArrayList<AgencyElementType>();
 
 		agencyElementTypes.add(Version1AgencyElementType.AGENCY_ADDRESS_INFORMATION);
@@ -28,6 +29,18 @@ public class AlephLookupAgencyTest extends TestCase {
 
 		initData.setAgencyElementTypes(agencyElementTypes);
 		initData.setAgencyId(agencyId);
+
+		InitiationHeader initiationHeader = new InitiationHeader();
+		
+		ToAgencyId toAgencyId = new ToAgencyId();
+		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+				
+		FromAgencyId fromAgencyId = new FromAgencyId();
+		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+		
+		initiationHeader.setFromAgencyId(fromAgencyId);
+		initiationHeader.setToAgencyId(toAgencyId);
+		initData.setInitiationHeader(initiationHeader);
 
 		// Output:
 
@@ -45,5 +58,7 @@ public class AlephLookupAgencyTest extends TestCase {
 				.getUnstructuredAddress().getUnstructuredAddressData());
 		assertEquals("Unexpected Registration Link via ns1:PromtOutput->ns1:AuthenticationPromptData returned.", registrationLink, responseData.getAuthenticationPrompts().get(0)
 				.getPromptOutput().getAuthenticationPromptData());
+		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 	}
 }

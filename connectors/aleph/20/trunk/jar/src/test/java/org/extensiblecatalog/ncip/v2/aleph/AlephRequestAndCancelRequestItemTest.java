@@ -73,6 +73,18 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		requestItemInitData.setRequestType(Version1RequestType.HOLD);
 		requestItemInitData.setRequestScopeType(Version1RequestScopeType.ITEM);
 
+		InitiationHeader initiationHeader = new InitiationHeader();
+		
+		ToAgencyId toAgencyId = new ToAgencyId();
+		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+				
+		FromAgencyId fromAgencyId = new FromAgencyId();
+		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+		
+		initiationHeader.setFromAgencyId(fromAgencyId);
+		initiationHeader.setToAgencyId(toAgencyId);
+		requestItemInitData.setInitiationHeader(initiationHeader);
+
 		int itemIdsCount = requestItemInitData.getItemIds().size();
 		// Ouput:
 
@@ -83,6 +95,9 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		assertEquals("Unexpected presence of ns1:Problem element.", true, requestItemResponseData.getProblems() == null || requestItemResponseData.getProblems().get(0) == null);
 
 		assertEquals("Unexpected UserId returned.", userIdVal, requestItemResponseData.getUserId().getUserIdentifierValue());
+
+		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), requestItemResponseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), requestItemResponseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 
 		// This is what we are expecting on output ... merged itemIds because responseData of request item doesn't support multiple item ids
 		String joinedItemIds = "";
@@ -134,8 +149,12 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 			cancelRequestItemInitData.setElectronicResourceDesired(true);
 			cancelRequestItemInitData.setHoldQueueLengthDesired(true);
 
+			cancelRequestItemInitData.setInitiationHeader(initiationHeader);
+
 			cancelRequestItemResponseData = cancelRequestItemService.performService(cancelRequestItemInitData, null, serviceManager);
 
+			assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), cancelRequestItemResponseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+			assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), cancelRequestItemResponseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 			assertEquals("Unexpected presence of ns1:Problem element in CancelRequestItemTest. Was testing on " + itemIdVal + " itemId.", true,
 					cancelRequestItemResponseData.getProblems() == null || cancelRequestItemResponseData.getProblems().get(0) == null);
 

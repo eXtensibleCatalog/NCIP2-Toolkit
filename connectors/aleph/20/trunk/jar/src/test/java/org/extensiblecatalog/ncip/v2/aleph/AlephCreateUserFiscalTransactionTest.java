@@ -44,7 +44,18 @@ public class AlephCreateUserFiscalTransactionTest extends TestCase {
 		fiscalTransactionInformation.setPaymentMethodType(Version1PaymentMethodType.BANK_DRAFT);
 
 		initData.setFiscalTransactionInformation(fiscalTransactionInformation);
-
+		
+		InitiationHeader initiationHeader = new InitiationHeader();
+		
+		ToAgencyId toAgencyId = new ToAgencyId();
+		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+				
+		FromAgencyId fromAgencyId = new FromAgencyId();
+		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+		
+		initiationHeader.setFromAgencyId(fromAgencyId);
+		initiationHeader.setToAgencyId(toAgencyId);
+		initData.setInitiationHeader(initiationHeader);
 		// Output:
 
 		int fiscalTranIdValLength = 27;
@@ -57,5 +68,7 @@ public class AlephCreateUserFiscalTransactionTest extends TestCase {
 		assertEquals("Unexpected AgencyId returned.", agencyId.getValue(), responseData.getFiscalTransactionReferenceId().getAgencyId().getValue());
 		assertEquals("Unexpected length of FiscalTransactionIdentifierValue returned.", fiscalTranIdValLength, responseData.getFiscalTransactionReferenceId()
 				.getFiscalTransactionIdentifierValue().length());
+		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 	}
 }
