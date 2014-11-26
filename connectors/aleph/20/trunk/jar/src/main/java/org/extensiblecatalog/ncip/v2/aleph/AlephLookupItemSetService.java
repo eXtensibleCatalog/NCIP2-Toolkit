@@ -65,16 +65,18 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	public LookupItemSetResponseData performService(LookupItemSetInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
 			throws ServiceException {
 
-		itemsForwarded = 0;
-		maximumItemsCount = 0;
 		if (initData.getMaximumItemsCount() != null)
 			try {
 				maximumItemsCount = initData.getMaximumItemsCount().intValueExact();
 			} catch (Exception e) {
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "MaximumItemsCount element is not in correct format. " + e.getMessage());
 			}
+		else
+			maximumItemsCount = 0;
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
+		List<ItemId> itemIds = initData.getItemIds();
+
 		String token = initData.getNextItemToken();
 		ItemToken nextItemToken = null;
 		// remove any bib ids from bibIds list that may have already been processed
@@ -82,13 +84,22 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			// In case maximum items returned was reached while parsing one bibliographic Id with a lot alephItems inside
 			nextItemToken = tokens.get(token);
 			if (nextItemToken != null) {
-				int index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
-				if (index > -1) {
-					// remove the ones already processed
-					if (nextItemToken.isRecordId() && !nextItemToken.doneWithRecordId())
-						bibIds.subList(0, index).clear();
-					else
-						bibIds.subList(0, ++index).clear();
+				int index;
+				if (bibIds.size() > 0) {
+					index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
+					if (index > -1) {
+						// remove the ones already processed
+						if (nextItemToken.isRecordId() && !nextItemToken.doneWithRecordId())
+							bibIds.subList(0, index).clear();
+						else
+							bibIds.subList(0, ++index).clear();
+					}
+				} else {
+					index = getItemIdIndex(itemIds, nextItemToken.getBibliographicId());
+					if (index > -1) {
+						// remove the ones already processed
+						itemIds.subList(0, ++index).clear();
+					}
 				}
 
 				// Remove token from memory hashmap
@@ -101,12 +112,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		wantSeeAllProblems = alephSvcMgr.echoParticularProblemsToLUIS;
 
 		final LookupItemSetResponseData responseData = new LookupItemSetResponseData();
+		itemsForwarded = 0;
 
 		List<BibInformation> bibInformations = new ArrayList<BibInformation>();
 
-		if (bibIds != null && bibIds.size() > 0) {
+		boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 
-			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
+		if (bibIds != null && bibIds.size() > 0) {
 
 			for (BibliographicId bibId : bibIds) {
 				BibInformation bibInformation = new BibInformation();
@@ -144,14 +156,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 								item.setNumberOfPieces(new BigDecimal(foundPieces));
 							}
 
-							AgencyId suppliedAgencyId;
+							AgencyId suppliedAgencyId = null;
 							if (getBibDescription) {
-								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getFromAgencyId() == null)
+								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
 									suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 								else
-									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
-							} else
-								suppliedAgencyId = null;
+									suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
+							}
 
 							List<HoldingsSet> holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, initData);
 
@@ -199,7 +210,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							bibInformation.setProblems(Arrays.asList(p));
 
 							bibInformations.add(bibInformation);
-							itemsForwarded++;
+							++itemsForwarded;
 
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 
@@ -238,23 +249,20 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						AlephItem alephItem = alephSvcMgr.lookupItem(id, initData);
 						if (alephItem != null) {
 
-							AgencyId suppliedAgencyId;
+							AgencyId suppliedAgencyId = null;
 							if (getBibDescription) {
-								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getFromAgencyId() == null)
+								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
 									suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 								else
-									suppliedAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId();
-							} else
-								suppliedAgencyId = null;
+									suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
+							}
 
 							HoldingsSet holdingsSet = parseHoldingsSet(alephItem, suppliedAgencyId, initData);
 
-							List<HoldingsSet> holdingsSets = new ArrayList<HoldingsSet>();
-							holdingsSets.add(holdingsSet);
-							bibInformation.setHoldingsSets(holdingsSets);
+							bibInformation.setHoldingsSets(Arrays.asList(holdingsSet));
 
 							bibInformations.add(bibInformation);
-							itemsForwarded++;
+							++itemsForwarded;
 
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
@@ -279,7 +287,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							// Note that Problem elements within <ns1:BibInformation> is also considered as one item forwarded
 							bibInformations.add(bibInformation);
-							itemsForwarded++;
+							++itemsForwarded;
 
 							boolean isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 							// Do not create NextItemToken if this is last item desired
@@ -303,6 +311,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						bibInformation.setProblems(ServiceHelper.generateProblems(Version1GeneralProcessingError.NEEDED_DATA_MISSING, "BibliographicItemId/RecordId", null,
 								"BibliographicItemId/RecordId was not properly set."));
 						bibInformations.add(bibInformation);
+						++itemsForwarded;
 					}
 				} catch (IOException ie) {
 					Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
@@ -334,7 +343,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		} else if (initData.getItemIds() != null && initData.getItemIds().size() > 0) {
 
-			for (ItemId itemId : initData.getItemIds()) {
+			for (ItemId itemId : itemIds) {
 				String id = itemId.getItemIdentifierValue();
 				BibInformation bibInformation = new BibInformation();
 
@@ -344,12 +353,96 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						bibInformation.setProblems(Arrays.asList(problem));
 						bibInformations.add(bibInformation);
 					}
-					break;
+				} else {
+					try {
+						AlephItem alephItem = alephSvcMgr.lookupItem(id, initData);
+
+						bibInformation.setBibliographicId(createBibliographicId(id));
+
+						if (alephItem != null) {
+
+							AgencyId suppliedAgencyId = null;
+
+							if (getBibDescription) {
+								if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
+									suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+								else
+									suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
+							}
+
+							HoldingsSet holdingsSet = parseHoldingsSet(alephItem, suppliedAgencyId, initData);
+
+							bibInformation.setHoldingsSets(Arrays.asList(holdingsSet));
+
+							bibInformations.add(bibInformation);
+							++itemsForwarded;
+
+							boolean isLast = itemIds.get(itemIds.size() - 1).equals(itemId);
+							// Do not create NextItemToken if this is last item desired
+							if (maximumItemsCount == itemsForwarded && !isLast) {
+
+								ItemToken itemToken = new ItemToken();
+								itemToken.setBibliographicId(id);
+
+								int newToken = random.nextInt();
+
+								itemToken.setNextToken(Integer.toString(newToken));
+								tokens.put(Integer.toString(newToken), itemToken);
+
+								responseData.setNextItemToken(Integer.toString(newToken));
+								break;
+							}
+						} else if (wantSeeAllProblems) {
+							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exists.");
+
+							bibInformation.setProblems(Arrays.asList(p));
+
+							// Note that Problem elements within <ns1:BibInformation> is also considered as one item forwarded
+							bibInformations.add(bibInformation);
+							++itemsForwarded;
+
+							boolean isLast = itemIds.get(itemIds.size() - 1).equals(itemId);
+							// Do not create NextItemToken if this is last item desired
+							if (maximumItemsCount == itemsForwarded && !isLast) {
+
+								ItemToken itemToken = new ItemToken();
+								itemToken.setBibliographicId(id);
+
+								int newToken = random.nextInt();
+
+								itemToken.setNextToken(Integer.toString(newToken));
+								tokens.put(Integer.toString(newToken), itemToken);
+
+								responseData.setNextItemToken(Integer.toString(newToken));
+								break;
+							}
+						}
+					} catch (IOException ie) {
+						Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+						bibInformation.setProblems(Arrays.asList(p));
+
+						bibInformations.add(bibInformation);
+					} catch (ParserConfigurationException pce) {
+						Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+						bibInformation.setProblems(Arrays.asList(p));
+
+						bibInformations.add(bibInformation);
+					} catch (SAXException se) {
+						Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+						bibInformation.setProblems(Arrays.asList(p));
+
+						bibInformations.add(bibInformation);
+					} catch (AlephException ae) {
+						Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+						bibInformation.setProblems(Arrays.asList(p));
+
+						bibInformations.add(bibInformation);
+					} catch (Exception e) {
+						Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+						responseData.setProblems(Arrays.asList(p));
+						break;
+					}
 				}
-
-				// TODO: Implement ItemIds
-
-				bibInformations.add(bibInformation);
 			}
 
 		} else {
@@ -383,6 +476,17 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		}
 
 		return responseData;
+	}
+
+	private BibliographicId createBibliographicId(String id) {
+		BibliographicId bibliographicId = new BibliographicId();
+		BibliographicItemId bibliographicItemId = new BibliographicItemId();
+
+		bibliographicItemId.setBibliographicItemIdentifier(id);
+		bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+
+		bibliographicId.setBibliographicItemId(bibliographicItemId);
+		return bibliographicId;
 	}
 
 	/**
@@ -534,7 +638,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				info.setItemOptionalFields(iof);
 
 				itemInfoList.add(info);
-				itemsForwarded++;
+				++itemsForwarded;
 			} else
 				break;
 		}
@@ -576,6 +680,15 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			}
 		}
 
+		return -1;
+	}
+
+	private int getItemIdIndex(List<ItemId> itemIds, String itemId) {
+		for (int i = 0; i < itemIds.size(); i++) {
+			if (itemIds.get(i).getItemIdentifierValue().equalsIgnoreCase(itemId)) {
+				return i;
+			}
+		}
 		return -1;
 	}
 }

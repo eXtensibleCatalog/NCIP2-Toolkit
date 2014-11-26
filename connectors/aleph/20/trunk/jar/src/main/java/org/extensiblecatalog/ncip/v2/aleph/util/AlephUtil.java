@@ -108,10 +108,12 @@ public class AlephUtil {
 
 		if (alephItem.getMediumType() != null) {
 			MediumType mediumType;
+			
 			if (!alephItem.getLocalizationDesired())
 				mediumType = AlephUtil.detectMediumType(alephItem.getMediumType());
 			else
 				mediumType = new MediumType("localized", alephItem.getMediumType());
+			
 			bibliographicDescription.setMediumType(mediumType);
 		}
 		if (alephItem.getPublisher() != null) {
