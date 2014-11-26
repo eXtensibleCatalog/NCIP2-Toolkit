@@ -1,18 +1,14 @@
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemService;
+import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
+import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
-import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
-import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemService;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 
 /**
  * AlephRemoteServiceManager just extends AlephMediator to interface with Aleph X-Services for fulfilling NCIP requests

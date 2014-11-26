@@ -6,7 +6,22 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AcknowledgedFeeAmount;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.PaidFeeAmount;
+import org.extensiblecatalog.ncip.v2.service.PickupLocation;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
+import org.extensiblecatalog.ncip.v2.service.RequestScopeType;
+import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.RequestType;
+import org.extensiblecatalog.ncip.v2.service.RequiredFeeAmount;
+import org.extensiblecatalog.ncip.v2.service.ShippingInformation;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 
 public class AlephRequestItem implements Serializable {
 
@@ -373,8 +388,8 @@ public class AlephRequestItem implements Serializable {
 	public String getSponsoringBody() {
 		return sponsoringBody;
 	}
-	
-	public void setPickupDate(GregorianCalendar pickupDate){
+
+	public void setPickupDate(GregorianCalendar pickupDate) {
 		this.pickupDate = pickupDate;
 	}
 

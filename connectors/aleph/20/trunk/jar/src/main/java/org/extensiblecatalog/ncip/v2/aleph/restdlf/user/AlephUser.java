@@ -1,17 +1,42 @@
 package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.service.*;
-import org.xml.sax.SAXException;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.service.AccountBalance;
+import org.extensiblecatalog.ncip.v2.service.AccountDetails;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
+import org.extensiblecatalog.ncip.v2.service.Amount;
+import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
+import org.extensiblecatalog.ncip.v2.service.FiscalActionType;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionType;
+import org.extensiblecatalog.ncip.v2.service.LoanedItem;
+import org.extensiblecatalog.ncip.v2.service.NameInformation;
+import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
+import org.extensiblecatalog.ncip.v2.service.RequestedItem;
+import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
+import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
+import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
+import org.extensiblecatalog.ncip.v2.service.UserFiscalAccountSummary;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
+import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1FiscalActionType;
+import org.extensiblecatalog.ncip.v2.service.Version1FiscalTransactionType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
+import org.xml.sax.SAXException;
 
 /**
  * A user that exists within Aleph. This is most likely returned by the authenticate or lookup methods within the AlephAPI class
@@ -290,40 +315,38 @@ public class AlephUser implements Serializable {
 		userFiscalAccountSummary.setAccountBalance(accountBalance);
 		userFiscalAccount.setAccountBalance(accountBalance);
 	}
-	
-
 
 	public void setCashTypeNote(String noteValue) {
 		// Parsed text example:
 		// Please note that there is an additional accrued overdue items fine of: 35.00.
-		
+
 		// AccrualDate will be today
 		GregorianCalendar accrualDate = new GregorianCalendar();
 
 		FiscalTransactionInformation fiscalTransactionInformation = new FiscalTransactionInformation();
-		
+
 		String[] values = noteValue.split(" ");
-		
-		String value = values[values.length - 1].split("\\.")[0];		
+
+		String value = values[values.length - 1].split("\\.")[0];
 		values = null;
-		
+
 		Amount amount = new Amount();
 		amount.setMonetaryValue(new BigDecimal(value).multiply(new BigDecimal(100)));
 
 		fiscalTransactionInformation.setAmount(amount);
-		
+
 		FiscalTransactionType fiscalTransactionType = Version1FiscalTransactionType.SERVICE_CHARGE;
 		fiscalTransactionInformation.setFiscalTransactionType(fiscalTransactionType);
 
 		FiscalActionType fiscalActionType = Version1FiscalActionType.PENALTY;
 		fiscalTransactionInformation.setFiscalActionType(fiscalActionType);
-		
+
 		fiscalTransactionInformation.setFiscalTransactionDescription(noteValue);
-		
+
 		AccountDetails details = new AccountDetails();
 		details.setAccrualDate(accrualDate);
 		details.setFiscalTransactionInformation(fiscalTransactionInformation);
-		
+
 		accountDetails.add(details);
 	}
 
