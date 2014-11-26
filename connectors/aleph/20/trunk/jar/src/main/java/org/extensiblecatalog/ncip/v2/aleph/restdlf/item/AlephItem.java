@@ -83,7 +83,8 @@ public class AlephItem implements Serializable {
 	private String seqNumber;
 
 	private List<String> itemRestrictions;
-	private boolean translate;
+
+	private boolean localizationDesired = false;
 
 	public AlephItem() {
 		borrowingUsers = new ArrayList<AlephUser>();
@@ -925,13 +926,12 @@ public class AlephItem implements Serializable {
 		return iof;
 	}
 
-	public AlephItem seTtranslate(boolean translate) {
-		this.translate = translate;
-		return this;
+	public void setLocalizationDesired(boolean localizationDesired) {
+		this.localizationDesired = localizationDesired;
 	}
 
-	public boolean translate() {
-		return translate;
+	public boolean getLocalizationDesired() {
+		return localizationDesired;
 	}
 
 }

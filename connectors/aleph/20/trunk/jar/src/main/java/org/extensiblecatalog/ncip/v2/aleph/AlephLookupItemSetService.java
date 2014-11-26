@@ -47,7 +47,6 @@ import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
@@ -328,6 +327,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				} catch (Exception e) {
 					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
 					responseData.setProblems(Arrays.asList(p));
+					break;
 				}
 
 			}
@@ -442,9 +442,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 				for (String itemRestriction : alephItem.getItemRestrictions()) {
 
-					Version1ItemUseRestrictionType itemUseRestrictionTypeScheme = AlephUtil.parseItemUseRestrictionType(itemRestriction);
-
-					ItemUseRestrictionType itemUseRestrictionType = itemUseRestrictionTypeScheme;
+					ItemUseRestrictionType itemUseRestrictionType = AlephUtil.parseItemUseRestrictionType(itemRestriction);
 
 					if (itemUseRestrictionType != null)
 						itemUseRestrictionTypes.add(itemUseRestrictionType);
@@ -522,9 +520,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 						for (String itemRestriction : item.getItemRestrictions()) {
 
-							Version1ItemUseRestrictionType itemUseRestrictionTypeScheme = AlephUtil.parseItemUseRestrictionType(itemRestriction);
-
-							ItemUseRestrictionType itemUseRestrictionType = itemUseRestrictionTypeScheme;
+							ItemUseRestrictionType itemUseRestrictionType = AlephUtil.parseItemUseRestrictionType(itemRestriction);
 
 							if (itemUseRestrictionType != null)
 								itemUseRestrictionTypes.add(itemUseRestrictionType);

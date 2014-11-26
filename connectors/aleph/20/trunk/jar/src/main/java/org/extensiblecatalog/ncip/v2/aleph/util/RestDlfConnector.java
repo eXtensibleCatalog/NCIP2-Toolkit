@@ -10,6 +10,11 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephItemHandler;
@@ -17,17 +22,44 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephLoanHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephUserHandler;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.*;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.*;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
-import org.extensiblecatalog.ncip.v2.common.*;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRenewItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
+import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
+import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
+import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.ApplicationProfileSupportedType;
+import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
+import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.ConsortiumAgreement;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.OrganizationNameInformation;
+import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RequestedItem;
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
+import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
+import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
+import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 public class RestDlfConnector extends AlephMediator {
 	// FIXME: Refactor me.
@@ -209,7 +241,7 @@ public class RestDlfConnector extends AlephMediator {
 			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full")
-				.addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
+				.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -229,6 +261,7 @@ public class RestDlfConnector extends AlephMediator {
 		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
 		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
 		LIinitData.setLocationDesired(initData.getLocationDesired());
+		LIinitData.setInitiationHeader(initData.getInitiationHeader());
 		return lookupItems(id, LIinitData);
 	}
 
@@ -248,7 +281,7 @@ public class RestDlfConnector extends AlephMediator {
 			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
 		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement, itemId)
-				.addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
+				.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -257,31 +290,6 @@ public class RestDlfConnector extends AlephMediator {
 		parser.parse(streamSource, itemHandler);
 
 		return itemHandler.getAlephItem();
-	}
-
-	/**
-	 * @param alephItemId
-	 * @param bibliographicDescription
-	 * @param circulationStatus
-	 * @param holdQueueLength
-	 * @param itemDesrciption
-	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws AlephException
-	 */
-	public AlephItem lookupItem(String alephItemId, boolean getBibDescription, boolean getCircStatus, boolean getHoldQueueLength, boolean getItemDescription)
-			throws ParserConfigurationException, IOException, SAXException, AlephException {
-		LookupItemInitiationData initData = new LookupItemInitiationData();
-		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierValue(alephItemId);
-		initData.setItemId(itemId);
-		initData.setBibliographicDescriptionDesired(getBibDescription);
-		initData.setCirculationStatusDesired(getCircStatus);
-		initData.setHoldQueueLengthDesired(getHoldQueueLength);
-		initData.setItemDescriptionDesired(getItemDescription);
-		return lookupItem(initData);
 	}
 
 	public AlephItem lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
@@ -351,11 +359,12 @@ public class RestDlfConnector extends AlephMediator {
 			if (!loanedItemsDesiredOnly) {
 				// If there is not history expected, parse regular loans
 				loansUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
-						.addRequest("view", "full").addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
+						.addRequest("view", "full").addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
 
 			} else {
 				loansHistoryUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, loansElement)
-						.addRequest("view", "full").addRequest("type", "history").addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
+						.addRequest("view", "full").addRequest("type", "history").addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType)
+						.toURL();
 			}
 		}
 
@@ -364,7 +373,7 @@ public class RestDlfConnector extends AlephMediator {
 			atLeastOneDesired = true;
 			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full
 			requestsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
-					.addRequest("view", "full").addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
+					.addRequest("view", "full").addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
 		}
 
 		URL blocksOrTrapsUrl = null;
@@ -390,6 +399,9 @@ public class RestDlfConnector extends AlephMediator {
 
 				AlephLoanHandler loanHandler = new AlephLoanHandler(bibLibrary);
 
+				if (appProfileType != null && !appProfileType.isEmpty())
+					loanHandler.setLocalizationDesired(true);
+
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());
 					parser.parse(streamSource, loanHandler);
@@ -404,6 +416,9 @@ public class RestDlfConnector extends AlephMediator {
 			}
 			if (requestsUrl != null) {
 				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(bibLibrary);
+
+				if (appProfileType != null && !appProfileType.isEmpty())
+					requestItemHandler.setLocalizationDesired(true);
 
 				streamSource = new InputSource(requestsUrl.openStream());
 				parser.parse(streamSource, requestItemHandler);
@@ -621,7 +636,7 @@ public class RestDlfConnector extends AlephMediator {
 			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
 		URL holdsUrl = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, userPathElement, patronId, circActionsElement, requestsElement, holdsElement)
-				.addRequest("lang", appProfileType == null ? "en" : appProfileType).toURL();
+				.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
 
 		AlephRequestHandler requestHandler = new AlephRequestHandler(itemId, requestItem);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
@@ -651,6 +666,10 @@ public class RestDlfConnector extends AlephMediator {
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 
+			InitiationHeader initiationHeader = new InitiationHeader();
+			ApplicationProfileType applicationProfileType = new ApplicationProfileType("", appProfileType);
+			initiationHeader.setApplicationProfileType(applicationProfileType);
+
 			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
 				LookupUserInitiationData userInitData = new LookupUserInitiationData();
 				userInitData.setNameInformationDesired(nameInformationDesired);
@@ -658,6 +677,8 @@ public class RestDlfConnector extends AlephMediator {
 				userInitData.setUserIdDesired(userIdDesired);
 				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
 				userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
+
+				userInitData.setInitiationHeader(initiationHeader);
 
 				AlephUser user = lookupUser(patronId, userInitData);
 				requestItem.setUserOptionalFields(user.getUserOptionalFields());
@@ -669,7 +690,20 @@ public class RestDlfConnector extends AlephMediator {
 			boolean getItemDescription = initData.getItemDescriptionDesired();
 
 			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
-				AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+
+				LookupItemInitiationData LIinitData = new LookupItemInitiationData();
+				ItemId LIitemId = new ItemId();
+				LIitemId.setItemIdentifierValue(alephItemId);
+
+				LIinitData.setInitiationHeader(initiationHeader);
+
+				LIinitData.setItemId(LIitemId);
+				LIinitData.setBibliographicDescriptionDesired(getBibDescription);
+				LIinitData.setCirculationStatusDesired(getCircStatus);
+				LIinitData.setHoldQueueLengthDesired(getHoldQueueLength);
+				LIinitData.setItemDescriptionDesired(getItemDescription);
+
+				AlephItem item = lookupItem(LIinitData);
 				if (item == null)
 					throw new AlephException("Unknown itemId passed.");
 				if (item.getAgency() == null) {
@@ -729,6 +763,13 @@ public class RestDlfConnector extends AlephMediator {
 
 			if (loanHandler.actionSucceeded()) {
 
+				String appProfileType = null;
+				if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
+					appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
+
+				if (appProfileType != null && !appProfileType.isEmpty())
+					loanHandler.setLocalizationDesired(true);
+
 				streamSource = new InputSource(loanLink.openStream());
 
 				parser.parse(streamSource, loanHandler);
@@ -739,6 +780,10 @@ public class RestDlfConnector extends AlephMediator {
 				boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 				boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 
+				InitiationHeader initiationHeader = new InitiationHeader();
+				ApplicationProfileType applicationProfileType = new ApplicationProfileType("", appProfileType);
+				initiationHeader.setApplicationProfileType(applicationProfileType);
+
 				if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
 					LookupUserInitiationData userInitData = new LookupUserInitiationData();
 					userInitData.setNameInformationDesired(nameInformationDesired);
@@ -746,6 +791,8 @@ public class RestDlfConnector extends AlephMediator {
 					userInitData.setUserIdDesired(userIdDesired);
 					userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
 					userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
+
+					userInitData.setInitiationHeader(initiationHeader);
 
 					AlephUser user = lookupUser(patronId, userInitData);
 					renewItem.setUserOptionalFields(user.getUserOptionalFields());
@@ -759,7 +806,19 @@ public class RestDlfConnector extends AlephMediator {
 				if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
 					String alephItemId = AlephUtil.buildAlephItemId(bibLibrary, admLibrary, loanHandler.getDocNumber(), loanHandler.getItemSequenceNumber());
 
-					AlephItem item = lookupItem(alephItemId, getBibDescription, getCircStatus, getHoldQueueLength, getItemDescription);
+					LookupItemInitiationData LIinitData = new LookupItemInitiationData();
+					ItemId itemId = new ItemId();
+					itemId.setItemIdentifierValue(alephItemId);
+
+					LIinitData.setInitiationHeader(initiationHeader);
+
+					LIinitData.setItemId(itemId);
+					LIinitData.setBibliographicDescriptionDesired(getBibDescription);
+					LIinitData.setCirculationStatusDesired(getCircStatus);
+					LIinitData.setHoldQueueLengthDesired(getHoldQueueLength);
+					LIinitData.setItemDescriptionDesired(getItemDescription);
+
+					AlephItem item = lookupItem(LIinitData);
 					if (item.getAgency() == null) {
 						item.setAgency(defaultAgency);
 					}

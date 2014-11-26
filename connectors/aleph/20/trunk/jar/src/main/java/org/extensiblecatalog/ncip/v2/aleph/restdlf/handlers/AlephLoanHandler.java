@@ -67,6 +67,8 @@ public class AlephLoanHandler extends DefaultHandler {
 	private boolean itemFullIdFound;
 	private boolean parsingRenewabilityOnly = false;
 
+	private boolean localizationDesired = false;
+
 	/**
 	 * This constructor is used to initialize parser for outputs of successful renewals.
 	 * 
@@ -245,7 +247,12 @@ public class AlephLoanHandler extends DefaultHandler {
 			itemSequenceReached = false;
 		} else if (materialReached) {
 			String mediumTypeParsed = new String(ch, start, length);
-			MediumType mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
+			MediumType mediumType;
+			if (!localizationDesired)
+				mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
+			else
+				mediumType = new MediumType("localized", mediumTypeParsed);
+
 			bibliographicDescription.setMediumType(mediumType);
 			materialReached = false;
 		} else if (authorReached) {
@@ -344,5 +351,13 @@ public class AlephLoanHandler extends DefaultHandler {
 
 	public List<LoanedItem> getListOfLoanedItems() {
 		return loanedItems;
+	}
+
+	public void setLocalizationDesired(boolean localizationDesired) {
+		this.localizationDesired = localizationDesired;
+	}
+
+	public boolean getLocalizationDesired() {
+		return localizationDesired;
 	}
 }

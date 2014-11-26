@@ -19,7 +19,6 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
@@ -77,6 +76,8 @@ public class AlephRequestItemHandler extends DefaultHandler {
 	private boolean materialReached = false;
 	private boolean agencyReached = false;
 	private boolean statusReached = false;
+
+	private boolean localizationDesired = false;
 
 	private List<RequestedItem> requestedItems;
 	private RequestedItem currentRequestedItem;
@@ -284,7 +285,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				RequestId requestId = new RequestId();
 				requestId.setRequestIdentifierValue(requestIdVal);
 				currentRequestedItem.setRequestId(requestId);
-				
+
 				requestNumberReached = false;
 			} else if (datePlacedReached) {
 				String datePlacedParsed = new String(ch, start, length);
@@ -376,7 +377,12 @@ public class AlephRequestItemHandler extends DefaultHandler {
 				statusReached = false;
 			} else if (materialReached) {
 				String mediumTypeParsed = new String(ch, start, length);
-				MediumType mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
+				MediumType mediumType;
+				if (!localizationDesired)
+					mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
+				else
+					mediumType = new MediumType("localized", mediumTypeParsed);
+
 				bibliographicDescription.setMediumType(mediumType);
 				materialReached = false;
 			} else if (authorReached) {
@@ -478,5 +484,13 @@ public class AlephRequestItemHandler extends DefaultHandler {
 
 	public List<RequestedItem> getRequestedItems() {
 		return requestedItems;
+	}
+
+	public void setLocalizationDesired(boolean localizationDesired) {
+		this.localizationDesired = localizationDesired;
+	}
+
+	public boolean getLocalizationDesired() {
+		return localizationDesired;
 	}
 }

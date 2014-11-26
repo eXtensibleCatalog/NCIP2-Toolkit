@@ -63,8 +63,9 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean collectionReached = false;
 	private boolean secondCallNoTypeReached = false;
 	private boolean secondCallNoReached = false;
-
 	private boolean itemStatusReached = false;
+
+	private boolean localizationDesired = false;
 
 	/**
 	 * @return the listOfItems
@@ -105,6 +106,13 @@ public class AlephItemHandler extends DefaultHandler {
 		if (requireAtLeastOneService && !bibDescriptionDesired && !circulationStatusDesired && !holdQueueLengthDesired && !itemDesrciptionDesired) {
 			throw new AlephException("Instance of class AlephItemHandler cannot be created with no service desired. Please supply at least one service you wish to use.");
 		}
+
+		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null) {
+			String localization = initData.getInitiationHeader().getApplicationProfileType().getValue();
+
+			if (localization != null && !localization.isEmpty())
+				localizationDesired = true;
+		}
 	}
 
 	@Override
@@ -113,6 +121,9 @@ public class AlephItemHandler extends DefaultHandler {
 		if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 			secondCallNoType = null;
 			currentAlephItem = new AlephItem();
+
+			currentAlephItem.setLocalizationDesired(localizationDesired);
+
 			currentAlephItem.setLink(attributes.getValue(AlephConstants.HREF_NODE_ATTR));
 			if (listOfItems == null)
 				listOfItems = new ArrayList<AlephItem>();

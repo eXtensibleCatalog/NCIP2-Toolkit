@@ -11,11 +11,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephLocalization;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
+import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
+import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
+import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
+import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
+import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
+import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
+import org.extensiblecatalog.ncip.v2.service.ItemDescription;
+import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.Location;
+import org.extensiblecatalog.ncip.v2.service.LocationName;
+import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
+import org.extensiblecatalog.ncip.v2.service.MediumType;
+import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
+import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
+import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.xml.sax.SAXException;
 
 public class AlephUtil {
@@ -79,7 +107,11 @@ public class AlephUtil {
 		}
 
 		if (alephItem.getMediumType() != null) {
-			MediumType mediumType = AlephUtil.detectMediumType(alephItem.getMediumType());
+			MediumType mediumType;
+			if (!alephItem.getLocalizationDesired())
+				mediumType = AlephUtil.detectMediumType(alephItem.getMediumType());
+			else
+				mediumType = new MediumType("localized", alephItem.getMediumType());
 			bibliographicDescription.setMediumType(mediumType);
 		}
 		if (alephItem.getPublisher() != null) {
@@ -175,9 +207,7 @@ public class AlephUtil {
 
 			for (String itemRestriction : alephItem.getItemRestrictions()) {
 
-				Version1ItemUseRestrictionType itemUseRestrictionTypeScheme = parseItemUseRestrictionType(itemRestriction);
-
-				ItemUseRestrictionType itemUseRestrictionType = itemUseRestrictionTypeScheme;
+				ItemUseRestrictionType itemUseRestrictionType = parseItemUseRestrictionType(itemRestriction);
 
 				if (itemUseRestrictionType != null)
 					itemUseRestrictionTypes.add(itemUseRestrictionType);
@@ -235,8 +265,8 @@ public class AlephUtil {
 		return iof;
 	}
 
-	public static Version1ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
-		Version1ItemUseRestrictionType itemUseRestrictionType = null;
+	public static ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
+		ItemUseRestrictionType itemUseRestrictionType = null;
 
 		if (!itemRestrictionClassesInitialized)
 			initializeItemRestrictionClasses();
@@ -268,7 +298,7 @@ public class AlephUtil {
 			else
 				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_SHORT_LOAN_PERIOD;
 		} else
-			itemUseRestrictionType = (Version1ItemUseRestrictionType) new ItemUseRestrictionType("undefined", itemRestriction);
+			itemUseRestrictionType = new ItemUseRestrictionType("localized", itemRestriction);
 
 		return itemUseRestrictionType;
 	}
@@ -334,6 +364,7 @@ public class AlephUtil {
 	public static MediumType detectMediumType(String mediumTypeParsed) {
 		MediumType mediumType = null;
 
+		// FIXME: Find out Aleph non-localized values & change these AlephLocalization.SOMETHING to AlephConstants.SOMETHING ...
 		if (mediumTypeParsed.matches(AlephLocalization.BOOK + "|" + AlephLocalization.GRAPHICS + "|" + AlephLocalization.MAP))
 			mediumType = Version1MediumType.BOOK;
 		else if (mediumTypeParsed.matches(AlephLocalization.MAGAZINE1 + "|" + AlephLocalization.MAGAZINE2))
@@ -343,7 +374,7 @@ public class AlephUtil {
 		else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.AUDIO_TAPE))
 			mediumType = Version1MediumType.AUDIO_TAPE;
 		else {
-			mediumType = new MediumType("undefined", mediumTypeParsed);
+			mediumType = new MediumType("localized", mediumTypeParsed);
 		}
 		return mediumType;
 	}
@@ -448,7 +479,7 @@ public class AlephUtil {
 				circulationStatus = Version1CirculationStatus.IN_PROCESS;
 
 		} else
-			circulationStatus = new CirculationStatus("undefined", circulationStatusVal);
+			circulationStatus = new CirculationStatus("localized", circulationStatusVal);
 		return circulationStatus;
 	}
 }
