@@ -1,5 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import junit.framework.TestCase;
 
 public class AlephLookupItemSetTest extends TestCase {
 
-	// FIXME: Add nextitemtoken test!
+	// FIXME: lookupItemSet with only ItemIds set ...
 	public void testPerformService() throws ServiceException {
 		AlephLookupItemSetService service = new AlephLookupItemSetService();
 
@@ -19,6 +20,9 @@ public class AlephLookupItemSetTest extends TestCase {
 		// Inputs:
 		String agency = "MZK";
 		String bibRecIds[] = { "MZK01000000421", "MZK01000062021", "MZK01000000425", "MZK01000385610" };
+		int bibIdsCount = bibRecIds.length;
+
+		int maximumItemsCount = 0;
 
 		// Outputs:
 		String[] isbns = { "80-900870-1-9", "0-13-914622-9", "80-85605-77-5", "261H001467" };
@@ -50,74 +54,138 @@ public class AlephLookupItemSetTest extends TestCase {
 				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(), Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() },
 				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() } };
 
-		LookupItemSetInitiationData initData = new LookupItemSetInitiationData();
+		while (++maximumItemsCount <= bibIdsCount) {
+			
+			int itemsParsedInInnerWhileCycle;
 
-		List<BibliographicId> bibliographicIds = createBibRecordIdList(agency, bibRecIds);
+			int processedItemInfos = 0;
+			int processedBibInfos = 0;
+			boolean maxReachedWithinItemInfos = false;
+			boolean maxReachedWithinBibInfos = false;
 
-		int bibIdsCount = bibliographicIds.size();
+			boolean nextItemTokenIsNull = true;
+			String parsedNextItemToken = null;
+			
+			LookupItemSetInitiationData initData = new LookupItemSetInitiationData();
 
-		initData.setBibliographicIds(bibliographicIds);
+			List<BibliographicId> bibliographicIds = createBibRecordIdList(agency, bibRecIds);
 
-		initData.setBibliographicDescriptionDesired(true);
-		initData.setCirculationStatusDesired(true);
-		initData.setCurrentBorrowerDesired(true);
-		initData.setCurrentRequestersDesired(true);
-		initData.setElectronicResourceDesired(true);
-		initData.setHoldQueueLengthDesired(true);
-		initData.setItemDescriptionDesired(true);
-		initData.setItemUseRestrictionTypeDesired(true);
-		initData.setLocationDesired(true);
-		initData.setSensitizationFlagDesired(true);
-		
-		InitiationHeader initiationHeader = new InitiationHeader();
-		
-		ToAgencyId toAgencyId = new ToAgencyId();
-		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
-				
-		FromAgencyId fromAgencyId = new FromAgencyId();
-		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
-		
-		initiationHeader.setFromAgencyId(fromAgencyId);
-		initiationHeader.setToAgencyId(toAgencyId);
-		initData.setInitiationHeader(initiationHeader);
+			initData.setBibliographicIds(bibliographicIds);
 
-		LookupItemSetResponseData responseData = service.performService(initData, null, serviceManager);
+			initData.setBibliographicDescriptionDesired(true);
+			initData.setCirculationStatusDesired(true);
+			initData.setCurrentBorrowerDesired(true);
+			initData.setCurrentRequestersDesired(true);
+			initData.setElectronicResourceDesired(true);
+			initData.setHoldQueueLengthDesired(true);
+			initData.setItemDescriptionDesired(true);
+			initData.setItemUseRestrictionTypeDesired(true);
+			initData.setLocationDesired(true);
+			initData.setSensitizationFlagDesired(true);
 
-		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
+			InitiationHeader initiationHeader = new InitiationHeader();
 
-		String fName = "";
-		assertEquals(fName, fName, fName);
-		assertEquals("Responder did not return all items", true, responseData.getBibInformations().size() == bibIdsCount ? true : responseData.getNextItemToken() != null);
-		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
-		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
-		for (int i = 0; i < bibIdsCount; i++) {
-			HoldingsSet holdSet = responseData.getBibInformation(i).getHoldingsSet(0);
+			ToAgencyId toAgencyId = new ToAgencyId();
+			toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
 
-			assertEquals("Returned bibliographicRecordIdentifies doesn't equal to input.", bibRecIds[i], responseData.getBibInformation(i).getBibliographicId()
-					.getBibliographicRecordId().getBibliographicRecordIdentifier());
-			assertEquals("Unexpected Author returned.", authors[i], holdSet.getBibliographicDescription().getAuthor());
-			assertEquals("Unexpected ISBN returned.", isbns[i], holdSet.getBibliographicDescription().getBibliographicItemId(0).getBibliographicItemIdentifier());
-			assertEquals("Unexpected Publisher returned.", publishers[i], holdSet.getBibliographicDescription().getPublisher());
-			assertEquals("Unexpected Title returned.", titles[i], holdSet.getBibliographicDescription().getTitle());
-			assertEquals("Unexpected MediumType returned.", mediumTypes[i], holdSet.getBibliographicDescription().getMediumType().getValue());
+			FromAgencyId fromAgencyId = new FromAgencyId();
+			fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
 
-			for (int j = 0; j < holdSet.getItemInformations().size(); j++) {
-				ItemInformation itemInfo = holdSet.getItemInformation(j);
+			initiationHeader.setFromAgencyId(fromAgencyId);
+			initiationHeader.setToAgencyId(toAgencyId);
+			initData.setInitiationHeader(initiationHeader);
 
-				assertEquals("Unexpected Circulation Status returned", circStatuses[i][j], itemInfo.getItemOptionalFields().getCirculationStatus().getValue());
-				assertEquals("Unexpected Accession Number returned. (Aleph Item Id)", itemIds[i][j], itemInfo.getItemId().getItemIdentifierValue());
-				assertEquals("Unexpected Barcode returned. (Legal Deposit Number)", barcodes[i][j], itemInfo.getItemOptionalFields().getBibliographicDescription()
-						.getBibliographicItemId(0).getBibliographicItemIdentifier());
-				assertEquals("Unexpected Item Use Restriction Type returned.", itemRestrictions[i][j], itemInfo.getItemOptionalFields().getItemUseRestrictionType(0).getValue());
-				assertEquals("Unexpected Call number returned.", callN0s[i][j], itemInfo.getItemOptionalFields().getItemDescription().getCallNumber());
-				assertEquals("Unexpected Number of pieces returned.", numberOfPieces[i][j], itemInfo.getItemOptionalFields().getItemDescription().getNumberOfPieces().toString());
-			}
+			initData.setMaximumItemsCount(new BigDecimal(maximumItemsCount));
+			parsedNextItemToken = null;
+			initData.setNextItemToken(parsedNextItemToken);
 
+			do {
+
+				itemsParsedInInnerWhileCycle = 0;
+
+				if (parsedNextItemToken != null)
+					initData.setNextItemToken(parsedNextItemToken);
+
+				LookupItemSetResponseData responseData = service.performService(initData, null, serviceManager);
+
+				nextItemTokenIsNull = responseData.getNextItemToken() == null;
+
+				if (!nextItemTokenIsNull)
+					parsedNextItemToken = responseData.getNextItemToken();
+
+				assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
+
+				String fName = "";
+				assertEquals(fName, fName, fName);
+				assertEquals("Responder did not return all items", true, responseData.getBibInformations().size() == bibliographicIds.size() ? true : !nextItemTokenIsNull);
+				assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
+				assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
+
+				for (int i = 0; i < bibliographicIds.size(); i++) {
+
+					HoldingsSet holdSet = responseData.getBibInformation(i).getHoldingsSet(0);
+
+					assertEquals("Returned bibliographicRecordIdentifies doesn't equal to input.", bibRecIds[processedBibInfos], responseData.getBibInformation(i)
+							.getBibliographicId().getBibliographicRecordId().getBibliographicRecordIdentifier());
+					assertEquals("Unexpected Author returned.", authors[processedBibInfos], holdSet.getBibliographicDescription().getAuthor());
+					assertEquals("Unexpected ISBN returned.", isbns[processedBibInfos], holdSet.getBibliographicDescription().getBibliographicItemId(0)
+							.getBibliographicItemIdentifier());
+					assertEquals("Unexpected Publisher returned.", publishers[processedBibInfos], holdSet.getBibliographicDescription().getPublisher());
+					assertEquals("Unexpected Title returned.", titles[processedBibInfos], holdSet.getBibliographicDescription().getTitle());
+					assertEquals("Unexpected MediumType returned.", mediumTypes[processedBibInfos], holdSet.getBibliographicDescription().getMediumType().getValue());
+
+					for (int j = 0; j < holdSet.getItemInformations().size(); j++) {
+
+						// bibIds.subList(0, 1).clear();
+						ItemInformation itemInfo = holdSet.getItemInformation(j);
+
+						assertEquals("Unexpected Circulation Status returned", circStatuses[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
+								.getCirculationStatus().getValue());
+						assertEquals("Unexpected Accession Number returned. (Aleph Item Id)", itemIds[processedBibInfos][processedItemInfos], itemInfo.getItemId()
+								.getItemIdentifierValue());
+						assertEquals("Unexpected Barcode returned. (Legal Deposit Number)", barcodes[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
+								.getBibliographicDescription().getBibliographicItemId(0).getBibliographicItemIdentifier());
+						assertEquals("Unexpected Item Use Restriction Type returned.", itemRestrictions[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
+								.getItemUseRestrictionType(0).getValue());
+						assertEquals("Unexpected Call number returned.", callN0s[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields().getItemDescription()
+								.getCallNumber());
+						assertEquals("Unexpected Number of pieces returned.", numberOfPieces[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
+								.getItemDescription().getNumberOfPieces().toString());
+
+						++processedItemInfos;
+						++itemsParsedInInnerWhileCycle;
+
+						if (processedItemInfos == itemIds[processedBibInfos].length)
+							processedItemInfos = 0;
+						else {
+							maxReachedWithinItemInfos = processedItemInfos == maximumItemsCount;
+
+							if (maxReachedWithinItemInfos) {
+								maxReachedWithinItemInfos = false;
+								break;
+							}
+						}
+					}
+					if (!maxReachedWithinItemInfos) {
+
+						if (processedItemInfos == 0)
+							++processedBibInfos;
+
+						maxReachedWithinBibInfos = itemsParsedInInnerWhileCycle == maximumItemsCount;
+
+						if (maxReachedWithinBibInfos) {
+							maxReachedWithinBibInfos = false;
+							break;
+						}
+
+					} else
+						break;
+				}
+			} while (processedBibInfos != bibIdsCount);
 		}
-
 	}
 
-	List<BibliographicId> createBibRecordIdList(String agency, String... bibIdValue) {
+	private List<BibliographicId> createBibRecordIdList(String agency, String... bibIdValue) {
 		List<BibliographicId> bibliographicIds = new ArrayList<BibliographicId>();
 		AgencyId agencyId = new AgencyId(agency);
 
