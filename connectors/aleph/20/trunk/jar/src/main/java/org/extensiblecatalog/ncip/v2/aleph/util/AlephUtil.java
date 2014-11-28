@@ -24,6 +24,8 @@ import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
@@ -32,9 +34,12 @@ import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
@@ -483,5 +488,34 @@ public class AlephUtil {
 		} else
 			circulationStatus = new CirculationStatus("localized", circulationStatusVal);
 		return circulationStatus;
+	}
+
+	public static ResponseHeader reverseInitiationHeader(LookupItemSetInitiationData initData) {
+		
+		InitiationHeader initiationHeader = initData.getInitiationHeader();
+		ResponseHeader responseHeader = null;
+		
+		if (initiationHeader != null) {
+			responseHeader = new ResponseHeader();
+			
+			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
+				// Reverse From/To AgencyId because of the request was processed (return to initiator)
+				ToAgencyId toAgencyId = new ToAgencyId();
+				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+
+				FromAgencyId fromAgencyId = new FromAgencyId();
+				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
+
+				responseHeader.setFromAgencyId(fromAgencyId);
+				responseHeader.setToAgencyId(toAgencyId);
+			}
+			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
+				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
+				responseHeader.setToSystemId(initiationHeader.getToSystemId());
+				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
+			}
+		}
+		return responseHeader;
 	}
 }
