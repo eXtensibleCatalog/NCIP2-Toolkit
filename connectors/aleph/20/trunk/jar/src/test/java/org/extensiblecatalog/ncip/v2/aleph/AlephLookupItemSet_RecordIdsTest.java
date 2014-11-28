@@ -9,9 +9,8 @@ import org.extensiblecatalog.ncip.v2.service.*;
 
 import junit.framework.TestCase;
 
-public class AlephLookupItemSetTest extends TestCase {
+public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
-	// FIXME: lookupItemSet with only ItemIds set ...
 	public void testPerformService() throws ServiceException {
 		AlephLookupItemSetService service = new AlephLookupItemSetService();
 

@@ -205,7 +205,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							}
 
 						} else if (wantSeeAllProblems) {
-							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exists.");
+							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exist.");
 
 							bibInformation.setProblems(Arrays.asList(p));
 
@@ -281,7 +281,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 								break;
 							}
 						} else if (wantSeeAllProblems) {
-							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exists.");
+							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exist.");
 
 							bibInformation.setProblems(Arrays.asList(p));
 
@@ -393,7 +393,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 								break;
 							}
 						} else if (wantSeeAllProblems) {
-							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exists.");
+							Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + id + ", you are searching for, does not exist.");
 
 							bibInformation.setProblems(Arrays.asList(p));
 

@@ -2,24 +2,26 @@
 <ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
 	ns1:version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
 	<ns1:LookupItemSet>
-		<ns1:BibliographicId>
-			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>MZK01001276830-MZK50001311815000020</ns1:BibliographicItemIdentifier>
-				<ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">URI</ns1:BibliographicItemIdentifierCode>
-			</ns1:BibliographicItemId>
-		</ns1:BibliographicId>
-		<ns1:BibliographicId>
-			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>MZK01000000425-MZK50000000425000020</ns1:BibliographicItemIdentifier>
-				<ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">URI</ns1:BibliographicItemIdentifierCode>
-			</ns1:BibliographicItemId>
-		</ns1:BibliographicId>
-		<ns1:BibliographicId>
-			<ns1:BibliographicItemId>
-				<ns1:BibliographicItemIdentifier>MZK01000000425-MZK50000000425000050</ns1:BibliographicItemIdentifier>
-				<ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">URI</ns1:BibliographicItemIdentifierCode>
-			</ns1:BibliographicItemId>
-		</ns1:BibliographicId>
+		<ns1:ItemId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
+			<ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+			<ns1:ItemIdentifierValue>MZK01000000421-MZK50000000421000010</ns1:ItemIdentifierValue>
+		</ns1:ItemId>
+		<ns1:ItemId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
+			<ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+			<ns1:ItemIdentifierValue>MZK01000062021-MZK50000062021000010</ns1:ItemIdentifierValue>
+		</ns1:ItemId>
+		<ns1:ItemId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
+			<ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+			<ns1:ItemIdentifierValue>MZK01000000425-MZK50000000425000020</ns1:ItemIdentifierValue>
+		</ns1:ItemId>
+		<ns1:ItemId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>
+			<ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+			<ns1:ItemIdentifierValue>MZK01000000425-MZK50000000425000030</ns1:ItemIdentifierValue>
+		</ns1:ItemId>
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Bibliographic Description</ns1:ItemElementType>
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Hold Queue Length</ns1:ItemElementType>
 		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Circulation Status</ns1:ItemElementType>
