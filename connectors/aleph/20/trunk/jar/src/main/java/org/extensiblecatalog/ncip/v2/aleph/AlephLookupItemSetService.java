@@ -85,7 +85,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			nextItemToken = tokens.get(token);
 			if (nextItemToken != null) {
 				int index;
-				if (bibIds.size() > 0) {
+				if (bibIds != null && bibIds.size() > 0) {
 					index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
 					if (index > -1) {
 						// remove the ones already processed

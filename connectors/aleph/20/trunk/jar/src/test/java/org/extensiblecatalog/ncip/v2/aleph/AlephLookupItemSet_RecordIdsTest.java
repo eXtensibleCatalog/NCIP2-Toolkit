@@ -53,21 +53,40 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(), Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() },
 				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() } };
 
+		LookupItemSetResponseData responseData;
+		LookupItemSetInitiationData initData;
+		
+		List<BibliographicId> bibliographicIds;
+		
+		int processedItemInfos, processedBibInfos, itemsParsedInInnerWhileCycle;
+		boolean maxReachedWithinItemInfos, maxReachedWithinBibInfos, nextItemTokenIsNull;
+		String parsedNextItemToken;
+		HoldingsSet holdSet;
+		ItemInformation itemInfo;
+		
+		InitiationHeader initiationHeader = new InitiationHeader();
+
+		ToAgencyId toAgencyId = new ToAgencyId();
+		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+
+		FromAgencyId fromAgencyId = new FromAgencyId();
+		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+
+		initiationHeader.setFromAgencyId(fromAgencyId);
+		initiationHeader.setToAgencyId(toAgencyId);
+		
 		while (++maximumItemsCount <= bibIdsCount) {
+			processedItemInfos = 0;
+			processedBibInfos = 0;
+			maxReachedWithinItemInfos = false;
+			maxReachedWithinBibInfos = false;
+
+			nextItemTokenIsNull = true;
+			parsedNextItemToken = null;
 			
-			int itemsParsedInInnerWhileCycle;
+			initData = new LookupItemSetInitiationData();
 
-			int processedItemInfos = 0;
-			int processedBibInfos = 0;
-			boolean maxReachedWithinItemInfos = false;
-			boolean maxReachedWithinBibInfos = false;
-
-			boolean nextItemTokenIsNull = true;
-			String parsedNextItemToken = null;
-			
-			LookupItemSetInitiationData initData = new LookupItemSetInitiationData();
-
-			List<BibliographicId> bibliographicIds = createBibRecordIdList(agency, bibRecIds);
+			bibliographicIds = createBibRecordIdList(agency, bibRecIds);
 
 			initData.setBibliographicIds(bibliographicIds);
 
@@ -82,16 +101,6 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 			initData.setLocationDesired(true);
 			initData.setSensitizationFlagDesired(true);
 
-			InitiationHeader initiationHeader = new InitiationHeader();
-
-			ToAgencyId toAgencyId = new ToAgencyId();
-			toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
-
-			FromAgencyId fromAgencyId = new FromAgencyId();
-			fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
-
-			initiationHeader.setFromAgencyId(fromAgencyId);
-			initiationHeader.setToAgencyId(toAgencyId);
 			initData.setInitiationHeader(initiationHeader);
 
 			initData.setMaximumItemsCount(new BigDecimal(maximumItemsCount));
@@ -105,7 +114,7 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 				if (parsedNextItemToken != null)
 					initData.setNextItemToken(parsedNextItemToken);
 
-				LookupItemSetResponseData responseData = service.performService(initData, null, serviceManager);
+				responseData = service.performService(initData, null, serviceManager);
 
 				nextItemTokenIsNull = responseData.getNextItemToken() == null;
 
@@ -122,7 +131,7 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
 				for (int i = 0; i < bibliographicIds.size(); i++) {
 
-					HoldingsSet holdSet = responseData.getBibInformation(i).getHoldingsSet(0);
+					holdSet = responseData.getBibInformation(i).getHoldingsSet(0);
 
 					assertEquals("Returned bibliographicRecordIdentifies doesn't equal to input.", bibRecIds[processedBibInfos], responseData.getBibInformation(i)
 							.getBibliographicId().getBibliographicRecordId().getBibliographicRecordIdentifier());
@@ -135,8 +144,7 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
 					for (int j = 0; j < holdSet.getItemInformations().size(); j++) {
 
-						// bibIds.subList(0, 1).clear();
-						ItemInformation itemInfo = holdSet.getItemInformation(j);
+						itemInfo = holdSet.getItemInformation(j);
 
 						assertEquals("Unexpected Circulation Status returned", circStatuses[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
 								.getCirculationStatus().getValue());
