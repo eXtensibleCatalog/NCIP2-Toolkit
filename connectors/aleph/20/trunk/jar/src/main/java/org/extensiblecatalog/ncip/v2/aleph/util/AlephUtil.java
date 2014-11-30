@@ -34,8 +34,8 @@ import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
+import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
@@ -113,12 +113,12 @@ public class AlephUtil {
 
 		if (alephItem.getMediumType() != null) {
 			MediumType mediumType;
-			
+
 			if (!alephItem.getLocalizationDesired())
 				mediumType = AlephUtil.detectMediumType(alephItem.getMediumType());
 			else
 				mediumType = new MediumType("localized", alephItem.getMediumType());
-			
+
 			bibliographicDescription.setMediumType(mediumType);
 		}
 		if (alephItem.getPublisher() != null) {
@@ -490,14 +490,14 @@ public class AlephUtil {
 		return circulationStatus;
 	}
 
-	public static ResponseHeader reverseInitiationHeader(LookupItemSetInitiationData initData) {
-		
+	public static ResponseHeader reverseInitiationHeader(NCIPInitiationData initData) {
+
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
 		ResponseHeader responseHeader = null;
-		
+
 		if (initiationHeader != null) {
 			responseHeader = new ResponseHeader();
-			
+
 			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
 				// Reverse From/To AgencyId because of the request was processed (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();

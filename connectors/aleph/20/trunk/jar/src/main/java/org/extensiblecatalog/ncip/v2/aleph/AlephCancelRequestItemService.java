@@ -8,11 +8,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemService;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
-import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
@@ -20,7 +19,6 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.xml.sax.SAXException;
 
 public class AlephCancelRequestItemService implements CancelRequestItemService {
@@ -53,7 +51,7 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 				responseData.setProblems(Arrays.asList(requestItem.getProblem()));
 
 		} catch (IOException ie) {
-			Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+			Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 			responseData.setProblems(Arrays.asList(p));
 		} catch (SAXException se) {
 			Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
@@ -73,28 +71,10 @@ public class AlephCancelRequestItemService implements CancelRequestItemService {
 
 	private void updateResponseData(CancelRequestItemResponseData responseData, CancelRequestItemInitiationData initData, AlephRequestItem requestItem) {
 
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				// Reverse From/To AgencyId because of the request was processed (return to initiator)
-				ToAgencyId toAgencyId = new ToAgencyId();
-				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
 
-				FromAgencyId fromAgencyId = new FromAgencyId();
-				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-
-				responseHeader.setFromAgencyId(fromAgencyId);
-				responseHeader.setToAgencyId(toAgencyId);
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
+		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
-		}
 
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());

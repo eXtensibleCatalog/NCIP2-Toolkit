@@ -217,35 +217,27 @@ public class RestDlfConnector extends AlephMediator {
 		return validateRecordId(alephLoanId);
 	}
 
-	/**
-	 * Looks up item with desired services in following order:
-	 * 
-	 * @param recordId
-	 * @param bibliographicDescription
-	 * @param circulationStatus
-	 * @param holdQueueLength
-	 * @param itemDesrciption
-	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws AlephException
-	 */
-	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData lookupItemInitData) throws ParserConfigurationException, IOException, SAXException, AlephException {
 
 		if (!validateRecordId(recordId)) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
 		}
 		String appProfileType = null;
-		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
-			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
+		if (lookupItemInitData.getInitiationHeader() != null && lookupItemInitData.getInitiationHeader().getApplicationProfileType() != null)
+			appProfileType = lookupItemInitData.getInitiationHeader().getApplicationProfileType().getValue();
 
-		URL url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full")
+		URL url;
+		InputSource streamSource;
+
+		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, lookupItemInitData);
+
+		// If there is maximumItemsCount set, then parse only URLs of items about to be parsed
+		// Else parse all at once with "view=full" GET request
+
+		url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full")
 				.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
 
-		InputSource streamSource = new InputSource(url.openStream());
-
-		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, initData);
+		streamSource = new InputSource(url.openStream());
 
 		parser.parse(streamSource, itemHandler);
 
@@ -253,16 +245,16 @@ public class RestDlfConnector extends AlephMediator {
 
 	}
 
-	public List<AlephItem> lookupItems(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
-		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
-		LIinitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
-		LIinitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
-		LIinitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
-		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
-		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
-		LIinitData.setLocationDesired(initData.getLocationDesired());
-		LIinitData.setInitiationHeader(initData.getInitiationHeader());
-		return lookupItems(id, LIinitData);
+	public List<AlephItem> lookupItems(String id, LookupItemSetInitiationData luisInitData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+		LookupItemInitiationData lookupItemInitData = new LookupItemInitiationData();
+		lookupItemInitData.setBibliographicDescriptionDesired(luisInitData.getBibliographicDescriptionDesired());
+		lookupItemInitData.setCirculationStatusDesired(luisInitData.getCirculationStatusDesired());
+		lookupItemInitData.setHoldQueueLengthDesired(luisInitData.getHoldQueueLengthDesired());
+		lookupItemInitData.setItemDescriptionDesired(luisInitData.getItemDescriptionDesired());
+		lookupItemInitData.setItemUseRestrictionTypeDesired(luisInitData.getItemUseRestrictionTypeDesired());
+		lookupItemInitData.setLocationDesired(luisInitData.getLocationDesired());
+		lookupItemInitData.setInitiationHeader(luisInitData.getInitiationHeader());
+		return lookupItems(id, lookupItemInitData);
 	}
 
 	public AlephItem lookupItem(LookupItemInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
@@ -308,8 +300,8 @@ public class RestDlfConnector extends AlephMediator {
 
 	/**
 	 * @param patronId
-	 * @param initData
-	 * @return
+	 * @param {@link LookupUserInitiationData} initData
+	 * @return {@link AlephUser}
 	 * @throws AlephException
 	 * @throws IOException
 	 * @throws SAXException

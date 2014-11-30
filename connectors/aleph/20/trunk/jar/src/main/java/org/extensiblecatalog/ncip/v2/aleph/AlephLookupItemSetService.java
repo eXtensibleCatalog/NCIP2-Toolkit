@@ -50,6 +50,7 @@ import org.xml.sax.SAXException;
 public class AlephLookupItemSetService implements LookupItemSetService {
 
 	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
+
 	private List<BibInformation> bibInformations;
 	private Random random = new Random();
 
@@ -95,6 +96,14 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		return responseData;
 	}
 
+	/**
+	 * Sets {@link LookupItemSetResponseData} with desired values. *
+	 * 
+	 * @param initData
+	 * @param responseData
+	 * @param alephSvcMgr
+	 * @param nextItemToken
+	 */
 	private void parseBibIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
@@ -312,7 +321,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					++itemsForwarded;
 				}
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (ParserConfigurationException pce) {
@@ -337,6 +346,14 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 	}
 
+	/**
+	 * Sets {@link LookupItemSetResponseData} with desired values.
+	 * 
+	 * @param initData
+	 * @param responseData
+	 * @param alephSvcMgr
+	 * @param nextItemToken
+	 */
 	private void parseItemIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
 		List<ItemId> itemIds = initData.getItemIds();
@@ -428,7 +445,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					}
 				}
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (ParserConfigurationException pce) {
@@ -462,7 +479,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 * @param getCircStatus
 	 * @param getHoldQueueLength
 	 * @param getItemDescription
-	 * @return
+	 * @return {@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}
 	 */
 	private HoldingsSet parseHoldingsSet(AlephItem alephItem, AgencyId suppliedAgencyId, LookupItemSetInitiationData initData) {
 		HoldingsSet holdingsSet = new HoldingsSet();
@@ -520,7 +537,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		}
 
 		info.setItemOptionalFields(iof);
-		
+
 		holdingsSet.setItemInformations(Arrays.asList(info));
 
 		return holdingsSet;
@@ -536,7 +553,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 * @param getCircStatus
 	 * @param getHoldQueueLength
 	 * @param getItemDescription
-	 * @return
+	 * @return List<{@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}>
 	 */
 	private List<HoldingsSet> parseHoldingsSets(List<AlephItem> alephItems, AgencyId suppliedAgencyId, LookupItemSetInitiationData initData) {
 
@@ -609,17 +626,26 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		return Arrays.asList(holdingsSet);
 	}
 
-	private ItemToken parseItemToken(String token, List<BibliographicId> bibIds, List<ItemId> itemIds) throws ServiceException {
+	/**
+	 * Returns ItemToken stored in static HashMap, associated with {@link String} tokenKey.<br />
+	 * If passed tokenKey is empty or null, null will be returned.
+	 * 
+	 * @param tokenKey
+	 * @param bibIds
+	 * @param itemIds
+	 * @return {@link org.extensiblecatalog.ncip.v2.aleph.util.ItemToken}
+	 * @throws ServiceException
+	 */
+	private ItemToken parseItemToken(String tokenKey, List<BibliographicId> bibIds, List<ItemId> itemIds) throws ServiceException {
 		ItemToken nextItemToken = null;
-		if (token != null) {
-			// In case maximum items returned was reached while parsing one bibliographic Id with a lot alephItems inside
-			nextItemToken = tokens.get(token);
+		if (tokenKey != null && !tokenKey.isEmpty()) {
+			nextItemToken = tokens.get(tokenKey);
 			if (nextItemToken != null) {
 				int index;
 				if (bibIds != null && bibIds.size() > 0) {
 					index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
 					if (index > -1) {
-						// remove the ones already processed
+						// We can't remove bibId, which is not completely processed due to MaximumItemsCount
 						if (nextItemToken.isRecordId() && !nextItemToken.doneWithRecordId())
 							bibIds.subList(0, index).clear();
 						else
@@ -628,19 +654,24 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				} else if (itemIds != null && itemIds.size() > 0) {
 					index = getItemIdIndex(itemIds, nextItemToken.getBibliographicId());
 					if (index > -1) {
-						// remove the ones already processed
 						itemIds.subList(0, ++index).clear();
 					}
 				}
 
-				// Remove token from memory hashmap
-				tokens.remove(token);
+				tokens.remove(tokenKey);
 			} else
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Invalid NextItemToken: " + token);
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Invalid NextItemToken: " + tokenKey);
 		}
 		return nextItemToken;
 	}
 
+	/**
+	 * Zero (0) means there was no MaximumItemsCount element set in initiation message.
+	 * 
+	 * @param initData
+	 * @return {@link Integer}
+	 * @throws ServiceException
+	 */
 	private int parseMaximumItemsCount(LookupItemSetInitiationData initData) throws ServiceException {
 		if (initData.getMaximumItemsCount() != null)
 			try {
@@ -681,6 +712,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		iof.setBibliographicDescription(bibDesc);
 	}
 
+	/**
+	 * Returns -1 if in passed list of BibliographicIds was not found specified bibId.
+	 * 
+	 * @param bibIds
+	 * @param bibId
+	 * @return {@link Integer}
+	 */
 	private int getBibIdIndex(List<BibliographicId> bibIds, String bibId) {
 
 		for (int i = 0; i < bibIds.size(); i++) {
@@ -699,6 +737,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		return -1;
 	}
 
+	/**
+	 * Returns -1 if in passed list of ItemIds was not found specified itemId.
+	 * 
+	 * @param itemIds
+	 * @param itemId
+	 * @return {@link Integer}
+	 */
 	private int getItemIdIndex(List<ItemId> itemIds, String itemId) {
 		for (int i = 0; i < itemIds.size(); i++) {
 			if (itemIds.get(i).getItemIdentifierValue().equalsIgnoreCase(itemId)) {

@@ -19,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
@@ -26,8 +27,6 @@ import org.extensiblecatalog.ncip.v2.service.Amount;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
 import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
-import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserService;
@@ -38,7 +37,6 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
@@ -88,7 +86,7 @@ public class AlephLookupUserService implements LookupUserService {
 				Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 			} catch (SAXException se) {
 				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
@@ -118,7 +116,7 @@ public class AlephLookupUserService implements LookupUserService {
 				responseData.setUserId(userId);
 
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), null, ie.getMessage());
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 			} catch (SAXException se) {
 				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
@@ -138,28 +136,10 @@ public class AlephLookupUserService implements LookupUserService {
 
 		if (alephUser != null) {
 
-			InitiationHeader initiationHeader = initData.getInitiationHeader();
-			if (initiationHeader != null) {
-				ResponseHeader responseHeader = new ResponseHeader();
-				if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-					// Reverse From/To AgencyId because of the request was processed (return to initiator)
-					ToAgencyId toAgencyId = new ToAgencyId();
-					toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+			ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
 
-					FromAgencyId fromAgencyId = new FromAgencyId();
-					fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-
-					responseHeader.setFromAgencyId(fromAgencyId);
-					responseHeader.setToAgencyId(toAgencyId);
-				}
-				if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-					responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-					responseHeader.setToSystemId(initiationHeader.getToSystemId());
-					if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-						responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-				}
+			if (responseHeader != null)
 				responseData.setResponseHeader(responseHeader);
-			}
 
 			responseData.setUserId(initData.getUserId());
 

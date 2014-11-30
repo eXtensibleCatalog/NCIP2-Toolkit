@@ -19,10 +19,10 @@ import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 
 /**
- * An item returned from Aleph
+ * An item returned from Aleph.
  * 
- * @author Rick Johnson (NDU)
- *
+ * @author Rick Johnson (NDU) & Jiří Kozlovský (MZK)
+ * 
  */
 public class AlephItem implements Serializable {
 

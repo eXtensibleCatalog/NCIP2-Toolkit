@@ -3,13 +3,12 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.util.Arrays;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationPrompt;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationPromptType;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
-import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyService;
@@ -20,7 +19,6 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationDataFormatType;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
@@ -66,28 +64,10 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 
 		final LookupAgencyResponseData responseData = new LookupAgencyResponseData();
 
-		InitiationHeader initiationHeader = initData.getInitiationHeader();
-		if (initiationHeader != null) {
-			ResponseHeader responseHeader = new ResponseHeader();
-			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				// Reverse From/To AgencyId because of the request was processed (return to initiator)
-				ToAgencyId toAgencyId = new ToAgencyId();
-				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
+		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
 
-				FromAgencyId fromAgencyId = new FromAgencyId();
-				fromAgencyId.setAgencyIds(initiationHeader.getToAgencyId().getAgencyIds());
-
-				responseHeader.setFromAgencyId(fromAgencyId);
-				responseHeader.setToAgencyId(toAgencyId);
-			}
-			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
-				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
-				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
-					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
-			}
+		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
-		}
 
 		String localAgencyId = alephSvcMgr.getDefaultAgency();
 		String registrationLink = alephSvcMgr.getRegistrationLink();
