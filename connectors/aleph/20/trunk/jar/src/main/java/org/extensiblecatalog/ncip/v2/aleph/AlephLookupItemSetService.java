@@ -51,13 +51,19 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
-	private List<BibInformation> bibInformations;
 	private Random random = new Random();
 
-	private boolean wantSeeAllProblems;
+	private String newTokenKey = null;
+
+	private List<BibInformation> bibInformations;
+
+	private boolean isLast;
 
 	private int maximumItemsCount;
+
 	private int itemsForwarded;
+
+	private ItemToken nextItemToken;
 
 	@Override
 	public LookupItemSetResponseData performService(LookupItemSetInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
@@ -65,10 +71,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		maximumItemsCount = parseMaximumItemsCount(initData);
 
-		ItemToken nextItemToken = parseItemToken(initData.getNextItemToken(), initData.getBibliographicIds(), initData.getItemIds());
+		nextItemToken = parseItemToken(initData.getNextItemToken(), initData.getBibliographicIds(), initData.getItemIds());
 
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
-		wantSeeAllProblems = alephSvcMgr.echoParticularProblemsToLUIS;
+
 		bibInformations = new ArrayList<BibInformation>();
 		itemsForwarded = 0;
 
@@ -106,6 +112,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 */
 	private void parseBibIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
+		boolean wantSeeAllProblems = alephSvcMgr.echoParticularProblemsToLUIS;
+
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
 
 		BibInformation bibInformation;
@@ -115,11 +123,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		List<HoldingsSet> holdingSets;
 
-		boolean isLast;
-
 		String id;
 
 		for (BibliographicId bibId : bibIds) {
+
+			isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 
 			try {
 				if (bibId.getBibliographicRecordId() != null) {
@@ -139,25 +147,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 					bibInformation = new BibInformation();
 
-					alephItems = alephSvcMgr.lookupItems(id, initData);
-					int totalItemsParsed = alephItems.size();
+					alephItems = alephSvcMgr.lookupItems(id, initData, this);
 
 					bibInformation.setBibliographicId(bibId);
 
 					if (alephItems != null && alephItems.size() > 0) {
-						BigDecimal foundPieces = new BigDecimal(alephItems.size());
-
-						// FIXME: NextItemToken should be implemented inside parser considering limited memory
-						if (nextItemToken != null) {
-							if (nextItemToken.isRecordId() && !nextItemToken.doneWithRecordId()) {
-								alephItems.subList(0, nextItemToken.getNoOfDoneItemIds()).clear();
-								nextItemToken.setDoneWithRecordId(true);
-							}
-						}
-
-						for (AlephItem item : alephItems) {
-							item.setNumberOfPieces(foundPieces);
-						}
 
 						AgencyId suppliedAgencyId = null;
 						if (initData.getBibliographicDescriptionDesired()) {
@@ -171,41 +165,13 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 						bibInformation.setHoldingsSets(holdingSets);
 
-						int itemsBeingForwarded = holdingSets.get(0).getItemInformations().size();
+						bibInformations.add(bibInformation);
 
-						if (itemsBeingForwarded > 0) {
-
-							bibInformations.add(bibInformation);
-
-							// It is important to let token create even if the bibId is last of all desired bibIds in case of not all children items can be forwarded due to maximumItemsCount
-							isLast = bibIds.get(bibIds.size() - 1).equals(bibId) && itemsBeingForwarded == totalItemsParsed;
-
-							// Do not create NextItemToken if this is last item desired
-							if (maximumItemsCount == itemsForwarded && !isLast) {
-								// Set next item token
-								ItemToken itemToken = new ItemToken();
-
-								itemToken.setBibliographicId(id);
-								// itemToken.setItemId(alephItems.get(itemsCount - 1).getItemId());
-								itemToken.setIsRecordId(true);
-
-								if (itemsBeingForwarded == alephItems.size())
-									itemToken.setDoneWithRecordId(true);
-								else {
-									if (nextItemToken == null)
-										itemToken.setNoOfDoneItemIds(itemsBeingForwarded);
-									else
-										itemToken.setNoOfDoneItemIds(itemsBeingForwarded + nextItemToken.getNoOfDoneItemIds());
-								}
-
-								int newToken = random.nextInt();
-
-								itemToken.setNextToken(Integer.toString(newToken));
-								tokens.put(Integer.toString(newToken), itemToken);
-
-								responseData.setNextItemToken(Integer.toString(newToken));
-								break;
-							}
+						// Note that newTokenKey is always null until it is set from RestDlfConnector (lookupItems method)
+						if (newTokenKey != null) {
+							responseData.setNextItemToken(newTokenKey);
+							newTokenKey = null;
+							break;
 						}
 
 					} else if (wantSeeAllProblems) {
@@ -216,10 +182,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
-						isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
-
 						// Do not create NextItemToken if this is last item desired
-						if (maximumItemsCount == itemsForwarded && !isLast) {
+						boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
+
+						if (createNextItemToken) {
 							// Set next item token
 							ItemToken itemToken = new ItemToken();
 
@@ -270,9 +236,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
-						isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 						// Do not create NextItemToken if this is last item desired
-						if (maximumItemsCount == itemsForwarded && !isLast) {
+						boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
+
+						if (createNextItemToken) {
 
 							ItemToken itemToken = new ItemToken();
 							itemToken.setBibliographicId(id);
@@ -295,9 +262,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
-						isLast = bibIds.get(bibIds.size() - 1).equals(bibId);
 						// Do not create NextItemToken if this is last item desired
-						if (maximumItemsCount == itemsForwarded && !isLast) {
+						boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
+
+						if (createNextItemToken) {
 
 							ItemToken itemToken = new ItemToken();
 							itemToken.setBibliographicId(id);
@@ -356,6 +324,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 */
 	private void parseItemIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
+		boolean wantSeeAllProblems = alephSvcMgr.echoParticularProblemsToLUIS;
+
 		List<ItemId> itemIds = initData.getItemIds();
 
 		BibInformation bibInformation;
@@ -364,9 +334,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		List<HoldingsSet> holdingsSets;
 
-		boolean isLast;
-
 		for (ItemId itemId : itemIds) {
+
+			isLast = itemIds.get(itemIds.size() - 1).equals(itemId);
+
 			String id = itemId.getItemIdentifierValue();
 
 			if (id.isEmpty()) {
@@ -404,9 +375,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					bibInformations.add(bibInformation);
 					++itemsForwarded;
 
-					isLast = itemIds.get(itemIds.size() - 1).equals(itemId);
 					// Do not create NextItemToken if this is last item desired
-					if (maximumItemsCount == itemsForwarded && !isLast) {
+					boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
+
+					if (createNextItemToken) {
 
 						ItemToken itemToken = new ItemToken();
 						itemToken.setBibliographicId(id);
@@ -428,9 +400,10 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					bibInformations.add(bibInformation);
 					++itemsForwarded;
 
-					isLast = itemIds.get(itemIds.size() - 1).equals(itemId);
 					// Do not create NextItemToken if this is last item desired
-					if (maximumItemsCount == itemsForwarded && !isLast) {
+					boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
+
+					if (createNextItemToken) {
 
 						ItemToken itemToken = new ItemToken();
 						itemToken.setBibliographicId(id);
@@ -561,65 +534,61 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
 		for (AlephItem item : alephItems) {
 
-			if (maximumItemsCount == 0 || itemsForwarded < maximumItemsCount) {
-				ItemOptionalFields iof = new ItemOptionalFields();
+			ItemOptionalFields iof = new ItemOptionalFields();
 
-				if (initData.getBibliographicDescriptionDesired()) {
-					BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
-					holdingsSet.setBibliographicDescription(bDesc);
+			if (initData.getBibliographicDescriptionDesired()) {
+				BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
+				holdingsSet.setBibliographicDescription(bDesc);
+			}
+
+			addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+
+			ItemInformation info = new ItemInformation();
+
+			ItemId itemId = new ItemId();
+			itemId.setItemIdentifierValue(item.getItemId());
+			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+			info.setItemId(itemId);
+
+			if (initData.getHoldQueueLengthDesired())
+				iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
+			if (initData.getCirculationStatusDesired())
+				iof.setCirculationStatus(item.getCirculationStatus());
+			if (initData.getItemDescriptionDesired()) {
+				ItemDescription itemDescription = new ItemDescription();
+				if (item.getDescription() != null)
+					itemDescription.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, item.getDescription()));
+				itemDescription.setCallNumber(item.getCallNumber());
+				itemDescription.setCopyNumber(item.getCopyNumber());
+				itemDescription.setNumberOfPieces(item.getNumberOfPieces());
+				if (item.getDescription() != null) {
+					HoldingsInformation holdingsInformation = new HoldingsInformation();
+					holdingsInformation.setUnstructuredHoldingsData(item.getDescription());
+					itemDescription.setHoldingsInformation(holdingsInformation);
 				}
+				iof.setItemDescription(itemDescription);
+			}
+			if (initData.getItemUseRestrictionTypeDesired()) {
+				if (item.getItemRestrictions().size() > 0) {
 
-				addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+					List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
 
-				ItemInformation info = new ItemInformation();
+					for (String itemRestriction : item.getItemRestrictions()) {
 
-				ItemId itemId = new ItemId();
-				itemId.setItemIdentifierValue(item.getItemId());
-				itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-				info.setItemId(itemId);
+						ItemUseRestrictionType itemUseRestrictionType = AlephUtil.parseItemUseRestrictionType(itemRestriction);
 
-				if (initData.getHoldQueueLengthDesired())
-					iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
-				if (initData.getCirculationStatusDesired())
-					iof.setCirculationStatus(item.getCirculationStatus());
-				if (initData.getItemDescriptionDesired()) {
-					ItemDescription itemDescription = new ItemDescription();
-					if (item.getDescription() != null)
-						itemDescription.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, item.getDescription()));
-					itemDescription.setCallNumber(item.getCallNumber());
-					itemDescription.setCopyNumber(item.getCopyNumber());
-					itemDescription.setNumberOfPieces(item.getNumberOfPieces());
-					if (item.getDescription() != null) {
-						HoldingsInformation holdingsInformation = new HoldingsInformation();
-						holdingsInformation.setUnstructuredHoldingsData(item.getDescription());
-						itemDescription.setHoldingsInformation(holdingsInformation);
+						if (itemUseRestrictionType != null)
+							itemUseRestrictionTypes.add(itemUseRestrictionType);
 					}
-					iof.setItemDescription(itemDescription);
+
+					if (itemUseRestrictionTypes.size() > 0)
+						iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
 				}
-				if (initData.getItemUseRestrictionTypeDesired()) {
-					if (item.getItemRestrictions().size() > 0) {
+			}
 
-						List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+			info.setItemOptionalFields(iof);
 
-						for (String itemRestriction : item.getItemRestrictions()) {
-
-							ItemUseRestrictionType itemUseRestrictionType = AlephUtil.parseItemUseRestrictionType(itemRestriction);
-
-							if (itemUseRestrictionType != null)
-								itemUseRestrictionTypes.add(itemUseRestrictionType);
-						}
-
-						if (itemUseRestrictionTypes.size() > 0)
-							iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-					}
-				}
-
-				info.setItemOptionalFields(iof);
-
-				itemInfoList.add(info);
-				++itemsForwarded;
-			} else
-				break;
+			itemInfoList.add(info);
 		}
 		holdingsSet.setItemInformations(itemInfoList);
 
@@ -751,5 +720,38 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			}
 		}
 		return -1;
+	}
+
+	public int getItemsForwarded() {
+		return itemsForwarded;
+	}
+
+	public void setItemsForwarded(int itemsForwarded) {
+		this.itemsForwarded = itemsForwarded;
+	}
+
+	/**
+	 * Returns private {@link Integer} of parsed maximumItemsCount which is set to 0 if was not specified on input.
+	 * 
+	 * @return {@link Integer} maximumItemsCount
+	 */
+	public int getMaximumItemsCount() {
+		return maximumItemsCount;
+	}
+
+	public void addItemToken(String key, ItemToken token) {
+		tokens.put(key, token);
+	}
+
+	public ItemToken getNextItemToken() {
+		return nextItemToken;
+	}
+
+	public void setNewTokenKey(String newTokenKey) {
+		this.newTokenKey = newTokenKey;
+	}
+
+	public boolean isLastDesiredId() {
+		return isLast;
 	}
 }

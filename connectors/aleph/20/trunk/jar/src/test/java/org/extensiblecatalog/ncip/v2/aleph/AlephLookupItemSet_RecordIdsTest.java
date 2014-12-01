@@ -4,10 +4,23 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.*;
-
 import junit.framework.TestCase;
+
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemInformation;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 
 public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
@@ -55,15 +68,15 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
 		LookupItemSetResponseData responseData;
 		LookupItemSetInitiationData initData;
-		
+
 		List<BibliographicId> bibliographicIds;
-		
+
 		int processedItemInfos, processedBibInfos, itemsParsedInInnerWhileCycle;
 		boolean maxReachedWithinItemInfos, maxReachedWithinBibInfos, nextItemTokenIsNull;
 		String parsedNextItemToken;
 		HoldingsSet holdSet;
 		ItemInformation itemInfo;
-		
+
 		InitiationHeader initiationHeader = new InitiationHeader();
 
 		ToAgencyId toAgencyId = new ToAgencyId();
@@ -74,7 +87,7 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
 		initiationHeader.setFromAgencyId(fromAgencyId);
 		initiationHeader.setToAgencyId(toAgencyId);
-		
+
 		while (++maximumItemsCount <= bibIdsCount) {
 			processedItemInfos = 0;
 			processedBibInfos = 0;
@@ -83,7 +96,7 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 
 			nextItemTokenIsNull = true;
 			parsedNextItemToken = null;
-			
+
 			initData = new LookupItemSetInitiationData();
 
 			bibliographicIds = createBibRecordIdList(agency, bibRecIds);

@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,7 +14,7 @@ public class URLBuilder {
 	String[] path;
 	String base;
 	String port;
-	
+
 	public URLBuilder setPath(String... path) {
 		this.path = path;
 		return this;
@@ -25,7 +26,7 @@ public class URLBuilder {
 		secured = isSecured;
 		return this;
 	}
-	
+
 	/**
 	 * By default is built not secure connection You should call this function only if you want to establish secured connection (https URL prefix)
 	 * 
@@ -55,15 +56,29 @@ public class URLBuilder {
 		return this;
 	}
 
+	public URLBuilder parseLink(String link) {
+		String[] linkParts = link.split("/");
+		String[] serverAndPort = linkParts[2].split(":");
+		String port = null;
+
+		if (serverAndPort.length == 2)
+			port = serverAndPort[1];
+
+		this.setBase(serverAndPort[0], port == null || port.isEmpty() ? "80" : port, linkParts[0].contains("https"));
+
+		this.setPath(Arrays.copyOfRange(linkParts, 3, linkParts.length));
+		return this;
+	}
+
 	public URL toURL() throws MalformedURLException {
 		StringBuilder sb = new StringBuilder();
-		
+
 		if (secured == false) {
 			sb.append("http://");
 		} else {
 			sb.append("https://");
 		}
-		
+
 		sb.append(base);
 		sb.append(":");
 		sb.append(port);
@@ -73,7 +88,7 @@ public class URLBuilder {
 			sb.append(folder);
 		}
 
-		if (params != null && ! params.isEmpty()) {
+		if (params != null && !params.isEmpty()) {
 			int remaining = params.size();
 			sb.append("?");
 			for (Entry<String, String> entry : params.entrySet()) {

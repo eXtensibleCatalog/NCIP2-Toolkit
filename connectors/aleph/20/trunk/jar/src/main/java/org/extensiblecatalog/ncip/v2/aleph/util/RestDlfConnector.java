@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,11 +10,13 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
@@ -21,6 +24,7 @@ import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephLoanHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephRequestItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephURLsHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRenewItem;
@@ -67,6 +71,8 @@ public class RestDlfConnector extends AlephMediator {
 	private static final long serialVersionUID = -4425639616999642735L;
 
 	protected AlephConfiguration alephConfig = null;
+
+	private Random random = new Random();
 
 	public boolean echoParticularProblemsToLUIS;
 	private boolean requiredAtLeastOneService;
@@ -217,7 +223,8 @@ public class RestDlfConnector extends AlephMediator {
 		return validateRecordId(alephLoanId);
 	}
 
-	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData lookupItemInitData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData lookupItemInitData, AlephLookupItemSetService service) throws ParserConfigurationException,
+			IOException, SAXException, AlephException {
 
 		if (!validateRecordId(recordId)) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
@@ -231,21 +238,87 @@ public class RestDlfConnector extends AlephMediator {
 
 		AlephItemHandler itemHandler = new AlephItemHandler(bibLibrary, requiredAtLeastOneService, lookupItemInitData);
 
-		// If there is maximumItemsCount set, then parse only URLs of items about to be parsed
+		// If there is maximumItemsCount set, then parse only URLs in range of maxItemsCount
 		// Else parse all at once with "view=full" GET request
 
-		url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full")
-				.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+		if (service.getMaximumItemsCount() != 0) {
 
-		streamSource = new InputSource(url.openStream());
+			ItemToken nextItemToken = service.getNextItemToken();
 
-		parser.parse(streamSource, itemHandler);
+			int startFrom = (nextItemToken != null && nextItemToken.getBibliographicId().equalsIgnoreCase(recordId)) ? nextItemToken.getNoOfDoneItemIds() : 0;
+			int maxLinks = service.getMaximumItemsCount() - service.getItemsForwarded();
 
+			AlephURLsHandler urlsHandler = new AlephURLsHandler(startFrom, maxLinks);
+
+			url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).toURL();
+
+			streamSource = new InputSource(url.openStream());
+
+			parser.parse(streamSource, urlsHandler);
+
+			if (urlsHandler.haveParsedMax()) {
+				// Just create NextItemToken & continue
+
+				// It is important to let token create even if the bibId is last of all desired bibIds in case of not all children items can be forwarded due to maximumItemsCount
+
+				// Do not create NextItemToken if this is last item desired
+				boolean createNewItemToken = !urlsHandler.haveParsedAll() || urlsHandler.haveParsedAll() && !service.isLastDesiredId();
+
+				if (createNewItemToken) {
+					// Set next item token
+					ItemToken itemToken = new ItemToken();
+
+					itemToken.setBibliographicId(recordId);
+					// itemToken.setItemId(alephItems.get(itemsCount - 1).getItemId());
+					itemToken.setIsRecordId(true);
+
+					if (urlsHandler.haveParsedAll())
+						itemToken.setDoneWithRecordId(true);
+					else {
+						itemToken.setNoOfDoneItemIds(urlsHandler.getNextLinkIndex());
+					}
+
+					String tokenKey = Integer.toString(random.nextInt());
+
+					itemToken.setNextToken(tokenKey);
+
+					service.addItemToken(tokenKey, itemToken);
+
+					service.setNewTokenKey(tokenKey);
+
+				}
+			}
+
+			service.setItemsForwarded(service.getItemsForwarded() + urlsHandler.getLinks().size());
+
+			BigDecimal totalNumberOfPieces = new BigDecimal(urlsHandler.getTotalItemsCount());
+
+			for (String link : urlsHandler.getLinks()) {
+
+				url = new URLBuilder().parseLink(link).addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+
+				streamSource = new InputSource(url.openStream());
+
+				parser.parse(streamSource, itemHandler);
+
+				itemHandler.getAlephItem().setNumberOfPieces(totalNumberOfPieces);
+			}
+
+		} else {
+
+			url = new URLBuilder().setBase(serverName, serverPort).setPath(serverSuffix, itemPathElement, recordId, itemsElement).addRequest("view", "full")
+					.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+
+			streamSource = new InputSource(url.openStream());
+
+			parser.parse(streamSource, itemHandler);
+		}
 		return itemHandler.getListOfItems();
 
 	}
 
-	public List<AlephItem> lookupItems(String id, LookupItemSetInitiationData luisInitData) throws ParserConfigurationException, IOException, SAXException, AlephException {
+	public List<AlephItem> lookupItems(String id, LookupItemSetInitiationData luisInitData, AlephLookupItemSetService service) throws ParserConfigurationException, IOException,
+			SAXException, AlephException {
 		LookupItemInitiationData lookupItemInitData = new LookupItemInitiationData();
 		lookupItemInitData.setBibliographicDescriptionDesired(luisInitData.getBibliographicDescriptionDesired());
 		lookupItemInitData.setCirculationStatusDesired(luisInitData.getCirculationStatusDesired());
@@ -254,7 +327,7 @@ public class RestDlfConnector extends AlephMediator {
 		lookupItemInitData.setItemUseRestrictionTypeDesired(luisInitData.getItemUseRestrictionTypeDesired());
 		lookupItemInitData.setLocationDesired(luisInitData.getLocationDesired());
 		lookupItemInitData.setInitiationHeader(luisInitData.getInitiationHeader());
-		return lookupItems(id, lookupItemInitData);
+		return lookupItems(id, lookupItemInitData, service);
 	}
 
 	public AlephItem lookupItem(LookupItemInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {

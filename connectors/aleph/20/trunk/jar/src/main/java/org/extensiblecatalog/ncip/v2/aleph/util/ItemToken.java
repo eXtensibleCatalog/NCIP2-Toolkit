@@ -71,11 +71,11 @@ public class ItemToken {
 	}
 
 	/**
-	 * In case there have not been completely listed all items within record ID, we have to continue listing those.
-	 * <br /><br />
-	 *  If <b>all of those item IDs were already listed to output</b>, this method returns "true" thus appropriate ItemToken can be deleted.
-	 *  <br /><br />
-	 *  Otherwise it means there is more items to be returned additionally.
+	 * In case there have not been completely listed all items within record ID, we have to continue listing those. <br />
+	 * <br />
+	 * If <b>all of those item IDs were already listed to output</b>, this method returns "true" thus appropriate ItemToken can be deleted. <br />
+	 * <br />
+	 * Otherwise it means there is more items to be returned additionally.
 	 */
 	public boolean doneWithRecordId() {
 		return doneWithRecordId;
