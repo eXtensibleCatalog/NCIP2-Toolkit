@@ -1,11 +1,11 @@
-package org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers;
+package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

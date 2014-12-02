@@ -1,12 +1,16 @@
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
+import java.util.Date;
+
 /**
- * Represents last returned item
+ * Represents last returned item.
  * 
- * @author SharmilaR
+ * @author SharmilaR & Jiří Kozlovský (MZK)
  *
  */
 public class ItemToken {
+
+	private long timeCreated;
 
 	private String bibliographicId;
 
@@ -20,7 +24,13 @@ public class ItemToken {
 
 	private boolean doneWithRecordId = false;
 
+	private boolean expired = false;
+
 	private int numberOfDoneItemIds = 0;
+
+	public ItemToken() {
+		timeCreated = new Date().getTime();
+	}
 
 	public String getBibliographicId() {
 		return bibliographicId;
@@ -83,6 +93,18 @@ public class ItemToken {
 
 	public void setDoneWithRecordId(boolean doneWithRecordId) {
 		this.doneWithRecordId = doneWithRecordId;
+	}
+
+	public long getTimeCreated() {
+		return timeCreated;
+	}
+
+	public boolean isExpired() {
+		return expired;
+	}
+
+	public void setExpired() {
+		expired = true;
 	}
 
 	public String toString() {

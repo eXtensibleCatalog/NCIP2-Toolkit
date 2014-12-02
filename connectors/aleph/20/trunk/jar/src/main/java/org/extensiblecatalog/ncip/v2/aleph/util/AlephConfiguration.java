@@ -6,12 +6,12 @@ import org.extensiblecatalog.ncip.v2.common.ConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 
 public class AlephConfiguration implements ConnectorConfiguration {
-	
+
 	private DefaultConnectorConfiguration delegate = null;
 
-    public AlephConfiguration(DefaultConnectorConfiguration delegate) {
-        this.delegate = delegate;
-    }
+	public AlephConfiguration(DefaultConnectorConfiguration delegate) {
+		this.delegate = delegate;
+	}
 
 	public String[] getArray(String key) {
 		String value = delegate.getProperty(key);
@@ -44,7 +44,7 @@ public class AlephConfiguration implements ConnectorConfiguration {
 
 	@Override
 	public void setAppName(String appName) {
-		delegate.setAppName(appName);	
+		delegate.setAppName(appName);
 	}
 
 	@Override
@@ -56,5 +56,5 @@ public class AlephConfiguration implements ConnectorConfiguration {
 	public void setComponentClassName(String componentClassName) {
 		delegate.setComponentClassName(componentClassName);
 	}
-	
+
 }

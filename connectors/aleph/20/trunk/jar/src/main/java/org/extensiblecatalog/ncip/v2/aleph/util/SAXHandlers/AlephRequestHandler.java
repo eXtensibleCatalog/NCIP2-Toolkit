@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers;
+package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -7,10 +7,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.PickupLocation;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
+import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.RequestType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -50,12 +55,12 @@ public class AlephRequestHandler extends DefaultHandler {
 		alephHourFormatter = new SimpleDateFormat("HHmm");
 		localTimeZone = TimeZone.getTimeZone("ECT");
 	}
-	
+
 	public AlephRequestHandler setParsingRequests() {
 		parsingRequest = true;
 		return this;
 	}
-	
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (parsingRequest) {
@@ -83,7 +88,7 @@ public class AlephRequestHandler extends DefaultHandler {
 				z37statusReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
 				statusReached = true;
-			} 
+			}
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
@@ -123,7 +128,7 @@ public class AlephRequestHandler extends DefaultHandler {
 				z37statusReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
 				statusReached = false;
-			} 
+			}
 		}
 	}
 
@@ -263,7 +268,7 @@ public class AlephRequestHandler extends DefaultHandler {
 				String parsedStatus = new String(ch, start, length);
 				requestItem.setSponsoringBody(parsedStatus);
 				statusReached = false;
-			} 
+			}
 
 		}
 	}

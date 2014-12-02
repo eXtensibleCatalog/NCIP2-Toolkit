@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers;
+package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import java.util.ArrayList;
 import java.util.List;

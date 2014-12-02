@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -523,22 +524,52 @@ public class AlephUtil {
 		return responseHeader;
 	}
 
-	private boolean isCorrectRecordId(String recordId, int bibLibLength) {
+	public static boolean isCorrectRecordId(String recordId, int bibLibLength) {
 		if (recordId.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength) {
 			return true;
 		}
 		return false;
 	}
 
-	private boolean isCorrectItemId(String sequenceNumber, int bibLibLength) {
+	public static boolean isCorrectItemId(String sequenceNumber, int bibLibLength) {
 		if (sequenceNumber.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength + AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH) {
 			return true;
 		}
 		return false;
 	}
 
-	private boolean isCorrectLoanId(String alephLoanId, int bibLibLength) {
+	public static boolean isCorrectLoanId(String alephLoanId, int bibLibLength) {
 		// Loan Id has the same length specifications as Record Id
 		return isCorrectRecordId(alephLoanId, bibLibLength);
+	}
+
+	/**
+	 * Marks expired tokens as expired.<br>
+	 * Note that these expired tokens are removed immediately after new token is created.<br>
+	 * The purpose of not removing those earlier is to let user know of the token expiration.
+	 * 
+	 * @param tokens
+	 * @param tokenExpirationTimeInSeconds
+	 */
+	public static void markExpiredTokens(HashMap<String, ItemToken> tokens, int tokenExpirationTimeInSeconds) {
+		long theTime = new Date().getTime();
+
+		for (ItemToken token : tokens.values()) {
+			if (token.getTimeCreated() + tokenExpirationTimeInSeconds * 1000 < theTime) {
+				token.setExpired();
+			}
+		}
+	}
+
+	/**
+	 * Removes expired tokens from memory hashmap.
+	 * 
+	 * @param tokens
+	 */
+	public static void purgeExpiredTokens(HashMap<String, ItemToken> tokens) {
+		for (Map.Entry<String, ItemToken> tokenEntry : tokens.entrySet()) {
+			if (tokenEntry.getValue().isExpired())
+				tokens.remove(tokenEntry.getKey());
+		}
 	}
 }

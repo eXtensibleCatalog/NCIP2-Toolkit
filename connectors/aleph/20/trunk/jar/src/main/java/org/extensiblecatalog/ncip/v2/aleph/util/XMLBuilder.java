@@ -17,7 +17,7 @@ public class XMLBuilder {
 	 * 
 	 * post_xml= <hold-request-parameters><last-interest-date>20141005</last-interest-date> <start-interest-date>20140906</start-interest-date> <note-1>dg</note-1> <note-2></note-2> <rush>N</rush> </hold-request-parameters>
 	 */
-	
+
 	/**
 	 * Creates "post_xml=" & does in fact nothing.
 	 * 

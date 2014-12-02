@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author General exception for interacting with aleph
  *
  */
-public class AlephException extends Exception implements Serializable{
+public class AlephException extends Exception implements Serializable {
 
 	/**
 	 * 

@@ -10,9 +10,9 @@ import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
@@ -71,25 +71,40 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		maximumItemsCount = parseMaximumItemsCount(initData);
 
-		nextItemToken = parseItemToken(initData.getNextItemToken(), initData.getBibliographicIds(), initData.getItemIds());
-
 		AlephRemoteServiceManager alephSvcMgr = (AlephRemoteServiceManager) serviceManager;
-
-		bibInformations = new ArrayList<BibInformation>();
-		itemsForwarded = 0;
 
 		final LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 
-		if (initData.getBibliographicIds() != null && initData.getBibliographicIds().size() > 0) {
+		try {
+			nextItemToken = parseItemToken(initData, alephSvcMgr);
+		} catch (ServiceException se) {
+			if (se.getError().equals(ServiceError.UNSUPPORTED_REQUEST)) {
+				Problem p = new Problem(new ProblemType("Unknown NextItemToken was used."), null, null, "It has probably been deleted.");
+				responseData.setProblems(Arrays.asList(p));
+			}
+		}
 
-			parseBibIds(initData, responseData, alephSvcMgr, nextItemToken);
+		if (nextItemToken != null && nextItemToken.isExpired()) {
 
-		} else if (initData.getItemIds() != null && initData.getItemIds().size() > 0) {
+			Problem p = new Problem(new ProblemType("Usage of expired NextItemToken is not allowed."), null, null);
+			responseData.setProblems(Arrays.asList(p));
 
-			parseItemIds(initData, responseData, alephSvcMgr, nextItemToken);
+		} else if (responseData.getProblems() == null) {
 
-		} else
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "LookupItemSet service has no implemented service to process HoldingsSetId.");
+			bibInformations = new ArrayList<BibInformation>();
+			itemsForwarded = 0;
+
+			if (initData.getBibliographicIds() != null && initData.getBibliographicIds().size() > 0) {
+
+				parseBibIds(initData, responseData, alephSvcMgr, nextItemToken);
+
+			} else if (initData.getItemIds() != null && initData.getItemIds().size() > 0) {
+
+				parseItemIds(initData, responseData, alephSvcMgr, nextItemToken);
+
+			} else
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "LookupItemSet service has no implemented service to process HoldingsSetId.");
+		}
 
 		if (responseData.getProblems() == null || responseData.getProblem(0) == null)
 			responseData.setBibInformations(bibInformations);
@@ -194,7 +209,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							int newToken = random.nextInt();
 							itemToken.setNextToken(Integer.toString(newToken));
 
-							tokens.put(Integer.toString(newToken), itemToken);
+							this.addItemToken(Integer.toString(newToken), itemToken);
 
 							responseData.setNextItemToken(Integer.toString(newToken));
 							break;
@@ -248,7 +263,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							int newToken = random.nextInt();
 
 							itemToken.setNextToken(Integer.toString(newToken));
-							tokens.put(Integer.toString(newToken), itemToken);
+							this.addItemToken(Integer.toString(newToken), itemToken);
 
 							responseData.setNextItemToken(Integer.toString(newToken));
 							break;
@@ -273,7 +288,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 							int newToken = random.nextInt();
 
 							itemToken.setNextToken(Integer.toString(newToken));
-							tokens.put(Integer.toString(newToken), itemToken);
+							this.addItemToken(Integer.toString(newToken), itemToken);
 
 							responseData.setNextItemToken(Integer.toString(newToken));
 							break;
@@ -386,7 +401,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						int newToken = random.nextInt();
 
 						itemToken.setNextToken(Integer.toString(newToken));
-						tokens.put(Integer.toString(newToken), itemToken);
+						this.addItemToken(Integer.toString(newToken), itemToken);
 
 						responseData.setNextItemToken(Integer.toString(newToken));
 						break;
@@ -411,7 +426,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						int newToken = random.nextInt();
 
 						itemToken.setNextToken(Integer.toString(newToken));
-						tokens.put(Integer.toString(newToken), itemToken);
+						this.addItemToken(Integer.toString(newToken), itemToken);
 
 						responseData.setNextItemToken(Integer.toString(newToken));
 						break;
@@ -605,12 +620,26 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 * @return {@link org.extensiblecatalog.ncip.v2.aleph.util.ItemToken}
 	 * @throws ServiceException
 	 */
-	private ItemToken parseItemToken(String tokenKey, List<BibliographicId> bibIds, List<ItemId> itemIds) throws ServiceException {
+	private ItemToken parseItemToken(LookupItemSetInitiationData initData, AlephRemoteServiceManager alephSvcMgr) throws ServiceException {
+
+		String tokenKey = initData.getNextItemToken();
+		List<BibliographicId> bibIds;
+		List<ItemId> itemIds;
+
 		ItemToken nextItemToken = null;
+
 		if (tokenKey != null && !tokenKey.isEmpty()) {
+
+			AlephUtil.markExpiredTokens(tokens, alephSvcMgr.getLocalConfig().getTokenExpirationTime());
+
 			nextItemToken = tokens.get(tokenKey);
-			if (nextItemToken != null) {
+			if (nextItemToken != null && !nextItemToken.isExpired()) {
+
+				bibIds = initData.getBibliographicIds();
+				itemIds = initData.getItemIds();
+
 				int index;
+
 				if (bibIds != null && bibIds.size() > 0) {
 					index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
 					if (index > -1) {
@@ -628,8 +657,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				}
 
 				tokens.remove(tokenKey);
-			} else
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Invalid NextItemToken: " + tokenKey);
+			} else if (nextItemToken == null) {
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, null, null);
+			} else {
+				// Do nothing .. token expiration will be announced to user with Problem element in responseData
+			}
 		}
 		return nextItemToken;
 	}
@@ -740,6 +772,9 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	}
 
 	public void addItemToken(String key, ItemToken token) {
+
+		AlephUtil.purgeExpiredTokens(tokens);
+
 		tokens.put(key, token);
 	}
 

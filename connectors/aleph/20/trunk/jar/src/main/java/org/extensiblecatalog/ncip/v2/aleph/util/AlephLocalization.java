@@ -1,4 +1,3 @@
-
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
 /**
@@ -12,5 +11,5 @@ public class AlephLocalization {
 	public static final String MAGAZINE1 = "Vazan. ser.";
 	public static final String MAGAZINE2 = "Seriál";
 	public static final String COMPACT_DISC = "Kompaktní disk";
-	public static final String AUDIO_TAPE = "Audiokazeta";	
+	public static final String AUDIO_TAPE = "Audiokazeta";
 }

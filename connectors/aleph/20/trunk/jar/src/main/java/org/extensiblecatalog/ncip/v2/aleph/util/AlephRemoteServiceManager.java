@@ -43,7 +43,7 @@ public class AlephRemoteServiceManager extends RestDlfConnector implements Remot
 		initializeAvailabilityMaps();
 	}
 
-	public AlephRemoteServiceManager(Properties properties) throws ServiceException, ParserConfigurationException, SAXException  {
+	public AlephRemoteServiceManager(Properties properties) throws ServiceException, ParserConfigurationException, SAXException {
 		this();
 		log.info("AlephRemoteServiceManager constructor called");
 	}

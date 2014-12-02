@@ -18,17 +18,16 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers.AlephItemHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers.AlephLoanHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers.AlephRequestHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers.AlephRequestItemHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers.AlephURLsHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRenewItem;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLoanHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRequestHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRequestItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephURLsHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
@@ -63,13 +62,12 @@ import org.xml.sax.SAXException;
 public class RestDlfConnector extends AlephMediator {
 
 	private static final long serialVersionUID = -4425639616999642735L;
-	
+
 	private static SAXParser parser;
 
 	private static LocalConfig localConfig;
 
 	private Random random = new Random();
-
 
 	public RestDlfConnector() throws ServiceException, ParserConfigurationException, SAXException {
 
@@ -77,32 +75,32 @@ public class RestDlfConnector extends AlephMediator {
 		try {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			AlephConfiguration alephConfig = new AlephConfiguration(config);
-			
+
 			localConfig = new LocalConfig();
-			
+
 			localConfig.setServerName(alephConfig.getProperty(AlephConstants.REST_DLF_SERVER));
 			localConfig.setServerPort(alephConfig.getProperty(AlephConstants.REST_DLF_PORT));
 			localConfig.setServerSuffix(alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX));
-			
+
 			localConfig.setBibLibrary(alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY));
 			localConfig.setAdmLibrary(alephConfig.getProperty(AlephConstants.ALEPH_ADMINISTRATIVE_LIBRARY));
-			
+
 			localConfig.setDefaultAgency(alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY));
 
 			localConfig.setAgencyAddress(alephConfig.getProperty(AlephConstants.AGENCY_UNSTRUCTURED_ADDRESS));
 			localConfig.setAgencyName(alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME));
-			
+
 			localConfig.setUserRegistrationLink(alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK));
 			localConfig.setAuthDataFormatType(alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE));
 
 			localConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
+			localConfig.setTokenExpirationTime(Integer.parseInt(alephConfig.getProperty(AlephConstants.NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
 
 			localConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
 
-
 		} catch (ToolkitException e) {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
-		} 
+		}
 
 	}
 
@@ -131,7 +129,10 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		if (!isCorrectRecordId(recordId) || !isCorrectItemId(itemId)) {
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibrary().length());
+
+		if (!isCorrectRecordId || !isCorrectItemId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
@@ -168,7 +169,9 @@ public class RestDlfConnector extends AlephMediator {
 	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData lookupItemInitData, AlephLookupItemSetService service) throws ParserConfigurationException,
 			IOException, SAXException, AlephException {
 
-		if (!isCorrectRecordId(recordId)) {
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+
+		if (!isCorrectRecordId) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
 		}
 		String appProfileType = null;
@@ -212,7 +215,7 @@ public class RestDlfConnector extends AlephMediator {
 					ItemToken itemToken = new ItemToken();
 
 					itemToken.setBibliographicId(recordId);
-					// itemToken.setItemId(alephItems.get(itemsCount - 1).getItemId());
+
 					itemToken.setIsRecordId(true);
 
 					if (urlsHandler.haveParsedAll())
@@ -444,7 +447,9 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		if (!isCorrectRecordId(recordId) || !isCorrectItemId(itemId)) {
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+
+		if (!isCorrectRecordId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
@@ -556,7 +561,10 @@ public class RestDlfConnector extends AlephMediator {
 				String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 				String itemIdVal = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-				if (!isCorrectRecordId(recordId) || !isCorrectItemId(itemIdVal)) {
+				boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+				boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemIdVal, localConfig.getBibLibrary().length());
+
+				if (!isCorrectRecordId || !isCorrectItemId) {
 					throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 				}
 
@@ -643,7 +651,10 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		if (!isCorrectRecordId(recordId) || !isCorrectItemId(itemId)) {
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibrary().length());
+
+		if (!isCorrectRecordId || !isCorrectItemId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
@@ -703,7 +714,9 @@ public class RestDlfConnector extends AlephMediator {
 
 		String alephLoanId = initData.getItemId().getItemIdentifierValue();
 
-		if (!isCorrectLoanId(alephLoanId)) {
+		boolean isCorrectLoanId = AlephUtil.isCorrectRecordId(alephLoanId, localConfig.getBibLibrary().length());
+
+		if (!isCorrectLoanId) {
 			throw new AlephException("Loan Id is accepted only in strict format with strict length. e.g. MZK50004929137");
 		}
 
@@ -852,24 +865,5 @@ public class RestDlfConnector extends AlephMediator {
 		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;
-	}
-
-	private boolean isCorrectRecordId(String recordId) {
-		if (recordId.length() == AlephConstants.BIB_ID_LENGTH + localConfig.getBibLibrary().length()) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isCorrectItemId(String sequenceNumber) {
-		if (sequenceNumber.length() == AlephConstants.BIB_ID_LENGTH + localConfig.getBibLibrary().length() + AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isCorrectLoanId(String alephLoanId) {
-		// Loan Id has the same length specifications as Record Id
-		return isCorrectRecordId(alephLoanId);
 	}
 }

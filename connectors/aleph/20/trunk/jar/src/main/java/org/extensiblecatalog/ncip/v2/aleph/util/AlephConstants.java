@@ -11,76 +11,72 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
 import java.text.SimpleDateFormat;
 
 /**
- * This class defines several constants as public static final variables which
- * may be used throughout the NCIP Toolkit
+ * This class defines several constants as public static final variables which may be used throughout the NCIP Toolkit
  * 
  */
-public class AlephConstants{
-    // Aleph configuration
-
-    /**
-     * X-Server address for making Aleph X-Service calls
-     */
-    public static final String CONFIG_ALEPH_X_SERVER_NAME = "AlephXServerName";
-
-    /**
-     * X-Server port for making Aleph X-Service calls
-     */
-    public static final String CONFIG_ALEPH_X_SERVER_PORT = "AlephXServerPort";
-
-    /**
-     * X-Server address for making Aleph RESTful APIs calls
-     */
-    public static final String CONFIG_ALEPH_API_NAME = "AlephAPIName";
-
-    /**
-     * X-Server port for making Aleph RESTful APIs calls
-     */
-    public static final String CONFIG_ALEPH_API_PORT = "AlephAPIPort";
-
-    /**
-     * Currency code used for fines for aleph
-     */
-    public static final String CONFIG_ALEPH_CURRENCY_CODE = "AlephCurrencyCode";
-
-    /**
-     * The number of agencies defined in the NCIPToolkit_config.xml file
-     */
-    public static final String CONFIG_ALEPH_AGENCY_COUNT = "AlephAgencyCount";
-
-    /**
-     * Define Agency, ADMLibrary, BIBLibrary, and Hold Library for all agencies,
-     * This is actually the base of indexed properties in the config file
-     */
-    public static final String CONFIG_ALEPH_AGENCY = "AlephILSAgency";
-    public static final String CONFIG_ALEPH_ADM_LIBRARY = "AlephAdmLibrary";
-    public static final String CONFIG_ALEPH_BIB_LIBRARY = "AlephBibLibrary";
-    public static final String CONFIG_ALEPH_HOLD_LIBRARY = "AlephHoldLibrary";
-
-    public static final String CONFIG_ALEPH_CIRC_STATUS_AVAILABLE = "AlephCircStatusAvailable";
-    public static final String CONFIG_ALEPH_CIRC_STATUS_POSSIBLY_AVAILABLE = "AlephCircStatusPossiblyAvailable";
-    public static final String CONFIG_ALEPH_CIRC_STATUS_NOT_AVAILABLE = "AlephCircStatusNotAvailable";
-    
-    /**
-     * Location Type Enum, Defined in the Schema
-     */
-    public static final String LOCATION_TYPE_PERMANENT = "Permanent";
+public class AlephConstants {
+	// Aleph configuration
 
 	/**
-     * Location Type Enum, Defined in the Schema
-     */
-    public static final String LOCATION_TYPE_TEMPORARY = "Temporary";
+	 * X-Server address for making Aleph X-Service calls
+	 */
+	public static final String CONFIG_ALEPH_X_SERVER_NAME = "AlephXServerName";
 
 	/**
-     * Location Type Enum, Defined in the Schema
-	 * not yet supported in database, item table only has perm and temp
-     */
-    public static final String LOCATION_TYPE_CURRENT = "Current";
+	 * X-Server port for making Aleph X-Service calls
+	 */
+	public static final String CONFIG_ALEPH_X_SERVER_PORT = "AlephXServerPort";
+
+	/**
+	 * X-Server address for making Aleph RESTful APIs calls
+	 */
+	public static final String CONFIG_ALEPH_API_NAME = "AlephAPIName";
+
+	/**
+	 * X-Server port for making Aleph RESTful APIs calls
+	 */
+	public static final String CONFIG_ALEPH_API_PORT = "AlephAPIPort";
+
+	/**
+	 * Currency code used for fines for aleph
+	 */
+	public static final String CONFIG_ALEPH_CURRENCY_CODE = "AlephCurrencyCode";
+
+	/**
+	 * The number of agencies defined in the NCIPToolkit_config.xml file
+	 */
+	public static final String CONFIG_ALEPH_AGENCY_COUNT = "AlephAgencyCount";
+
+	/**
+	 * Define Agency, ADMLibrary, BIBLibrary, and Hold Library for all agencies, This is actually the base of indexed properties in the config file
+	 */
+	public static final String CONFIG_ALEPH_AGENCY = "AlephILSAgency";
+	public static final String CONFIG_ALEPH_ADM_LIBRARY = "AlephAdmLibrary";
+	public static final String CONFIG_ALEPH_BIB_LIBRARY = "AlephBibLibrary";
+	public static final String CONFIG_ALEPH_HOLD_LIBRARY = "AlephHoldLibrary";
+
+	public static final String CONFIG_ALEPH_CIRC_STATUS_AVAILABLE = "AlephCircStatusAvailable";
+	public static final String CONFIG_ALEPH_CIRC_STATUS_POSSIBLY_AVAILABLE = "AlephCircStatusPossiblyAvailable";
+	public static final String CONFIG_ALEPH_CIRC_STATUS_NOT_AVAILABLE = "AlephCircStatusNotAvailable";
+
+	/**
+	 * Location Type Enum, Defined in the Schema
+	 */
+	public static final String LOCATION_TYPE_PERMANENT = "Permanent";
+
+	/**
+	 * Location Type Enum, Defined in the Schema
+	 */
+	public static final String LOCATION_TYPE_TEMPORARY = "Temporary";
+
+	/**
+	 * Location Type Enum, Defined in the Schema not yet supported in database, item table only has perm and temp
+	 */
+	public static final String LOCATION_TYPE_CURRENT = "Current";
 
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 
 	// Constants for Rest-Dlf & X-Services
-
 
 	public static final boolean FIRST_SURNAME = true; // Sets whether aleph returns first surname at z304-address-2
 
@@ -398,12 +394,13 @@ public class AlephConstants{
 	public static final String ALEPH_ADMINISTRATIVE_LIBRARY = "AlephAdmLibrary";
 
 	public static final String MAX_ITEM_PREPARATION_TIME_DELAY = "MaxItemPreparationTimeDelay";
-	
+	public static final String NEXT_ITEM_TOKEN_EXPIRATION_TIME = "NextItemTokenExpirationTime";
+
 	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
-	
+
 	public static final char REQUEST_ID_DELIMITER = ';';
-	
+
 	public static final String UNIQUE_ITEM_ID_SEPARATOR = "-";
 	public static final String SEQUENCE_NUMBER_SEPARATOR = "\\."; // Be aware of this regex (dot is reserved character)
 	public static final String UNSTRUCTURED_NAME_SEPARATOR = ", ";
@@ -445,8 +442,8 @@ public class AlephConstants{
 	public static final String ITEM_STATUS_NOT_PUBLISHED = "Not published";
 	public static final String ITEM_STATUS_CURRENT_YEAR_2 = "Current Year 2";
 	public static final String ITEM_STATUS_ITEM_UNDER_CLAIN = "Item under claim";
-	
-	//Aleph circulation statuses:
+
+	// Aleph circulation statuses:
 	public static final String CIRC_STATUS_ON_SHELF = "On Shelf";
 	public static final String CIRC_STATUS_REQUESTED = "Requested";
 	public static final String CIRC_STATUS_PROCESSING = "Processing";
@@ -510,8 +507,8 @@ public class AlephConstants{
 	public static enum Availability {
 		UNKNOWN, NOT_AVAILABLE, POSSIBLY_AVAILABLE, AVAILABLE, DOESNT_EXIST, DOESNT_EXIST_REMOVED_MANUALLY
 	}
-	
-	//x-services
+
+	// x-services
 	public static final String XSERVICE_BOR_AUTH = "bor-auth";
 	public static final String XSERVICE_BOR_INFO = "bor-info";
 	public static final String XSERVICE_CIRC_STATUS = "circ-status";
@@ -530,60 +527,9 @@ public class AlephConstants{
 
 	public static final String ALEPH_ILS_AGENCY = "AlephILSAgency";
 	public static final String ALEPH_HOLD_LIBRARY = "AlephHoldLibrary";
-	
-	//x-service params
+
+	// x-service params
 	public static final String PARAM_X_SERVICE_NAME = "op";
 	public static final String CIRC_STATUS_CHECKED_OUT = "A";
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }

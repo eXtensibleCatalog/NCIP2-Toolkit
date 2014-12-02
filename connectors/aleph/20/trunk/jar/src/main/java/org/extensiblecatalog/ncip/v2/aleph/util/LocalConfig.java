@@ -22,6 +22,8 @@ public class LocalConfig {
 
 	private int maxItemPreparationTimeDelay;
 
+	private int tokenExpirationTime;
+
 	public LocalConfig() {
 
 	}
@@ -224,6 +226,14 @@ public class LocalConfig {
 	 */
 	public void setMaxItemPreparationTimeDelay(int maxItemPreparationTimeDelay) {
 		this.maxItemPreparationTimeDelay = maxItemPreparationTimeDelay;
+	}
+
+	public int getTokenExpirationTime() {
+		return tokenExpirationTime;
+	}
+
+	public void setTokenExpirationTime(int tokenExpirationTime) {
+		this.tokenExpirationTime = tokenExpirationTime;
 	}
 
 }

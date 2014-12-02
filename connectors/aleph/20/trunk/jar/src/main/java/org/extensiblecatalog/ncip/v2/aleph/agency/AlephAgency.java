@@ -13,7 +13,8 @@ public class AlephAgency {
 	private String holdingsLibrary;
 
 	/**
-	 * @param agencyId the agencyId to set
+	 * @param agencyId
+	 *            the agencyId to set
 	 */
 	public void setAgencyId(final String agencyId) {
 		this.agencyId = agencyId;
@@ -27,7 +28,8 @@ public class AlephAgency {
 	}
 
 	/**
-	 * @param admLibrary the admLibrary to set
+	 * @param admLibrary
+	 *            the admLibrary to set
 	 */
 	public void setAdmLibrary(final String admLibrary) {
 		this.admLibrary = admLibrary;
@@ -41,7 +43,8 @@ public class AlephAgency {
 	}
 
 	/**
-	 * @param bibLibrary the bibLibrary to set
+	 * @param bibLibrary
+	 *            the bibLibrary to set
 	 */
 	public void setBibLibrary(final String bibLibrary) {
 		this.bibLibrary = bibLibrary;
@@ -55,7 +58,8 @@ public class AlephAgency {
 	}
 
 	/**
-	 * @param holdingsLibrary the holdLibrary to set
+	 * @param holdingsLibrary
+	 *            the holdLibrary to set
 	 */
 	public void setHoldingsLibrary(final String holdingsLibrary) {
 		this.holdingsLibrary = holdingsLibrary;
