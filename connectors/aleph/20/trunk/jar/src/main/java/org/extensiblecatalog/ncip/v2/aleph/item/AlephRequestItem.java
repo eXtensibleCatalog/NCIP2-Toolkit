@@ -1,11 +1,11 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf.item;
+package org.extensiblecatalog.ncip.v2.aleph.item;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.service.AcknowledgedFeeAmount;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.ItemId;

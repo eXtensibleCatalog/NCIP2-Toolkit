@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf.item;
+package org.extensiblecatalog.ncip.v2.aleph.item;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -7,44 +7,40 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants.Availability;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants.Availability;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 
 /**
- * An item returned from Aleph.
+ * An item returned from Aleph
  * 
  * @author Rick Johnson (NDU) & Jiří Kozlovský (MZK)
- * 
+ *
  */
 public class AlephItem implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 65004L;
+	private static final long serialVersionUID = 163979327947903965L;
 	private String bibId;
 	private String itemId;
 	private String holdingsId;
 	private String description;
 	private String location;
-	private String link;
 	private String callNumber;
 	private String author;
 	private String isbn;
 	private String mediumType;
-	private String subLibrary;
-	private String collection;
 
 	private String docNumber;
-	private String itemSeqNumber;
+	private String seqNumber;
 
 	private String publisher;
 	private String series;
@@ -63,11 +59,10 @@ public class AlephItem implements Serializable {
 	private int holdQueueLength = 0;
 
 	private BigDecimal fineAmount;
-	private BigDecimal numberOfPieces;
 	private Date fineAccrualDate;
 
-	private List<AlephUser> borrowingUsers;
-	private List<AlephUser> requestingUsers;
+	private List<AlephXServicesUser> borrowingUsers;
+	private List<AlephXServicesUser> requestingUsers;
 
 	private Availability availability;
 
@@ -76,25 +71,101 @@ public class AlephItem implements Serializable {
 
 	private String holdRequestId;
 	private AlephAgency agency;
+
+	private String link;
+	private String subLibrary;
+	private String collection;
+
+	private String itemSeqNumber;
+	private BigDecimal numberOfPieces;
 	private String holdQueue;
 	private String publicationDate;
 	private String copyNumber;
 	private boolean exists = true;
-	private String seqNumber;
 
 	private List<String> itemRestrictions;
 
 	private boolean localizationDesired = false;
 
-	public AlephItem() {
-		borrowingUsers = new ArrayList<AlephUser>();
-		requestingUsers = new ArrayList<AlephUser>();
-		itemRestrictions = new ArrayList<String>();
-	}
-
 	public AlephItem doesntExists() {
 		this.exists = false;
 		return this;
+	}
+
+	/**
+	 * @return the link
+	 */
+	public String getLink() {
+		return link;
+	}
+
+	/**
+	 * @param link
+	 *            the link to set
+	 */
+	public void setLink(String link) {
+		this.link = link;
+	}
+
+	public String getSubLibrary() {
+		return subLibrary;
+	}
+
+	public void setSubLibrary(String subLibrary) {
+		this.subLibrary = subLibrary;
+	}
+
+	public String getCollection() {
+		return collection;
+	}
+
+	public void setCollection(String collection) {
+		this.collection = collection;
+	}
+
+	/**
+	 * @return the holdQueueErrorMessage
+	 */
+	public String getHoldQueue() {
+		return holdQueue;
+	}
+
+	/**
+	 * @param itemSeqNumber
+	 *            the itemSeqNumber to set
+	 */
+	public void setItemSeqNumber(String itemSeqNumber) {
+
+		this.itemSeqNumber = itemSeqNumber.trim();
+
+		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPARATOR)
+		this.itemSeqNumber = this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[0] + this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[1];
+
+		// make sure seqnumber is 6 digits, if not add leading zeroes
+		while (this.itemSeqNumber != null && this.itemSeqNumber.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {
+			this.itemSeqNumber = "0" + this.itemSeqNumber;
+		}
+	}
+
+	/**
+	 * @return the itemSeqNumber
+	 */
+	public String getItemSeqNumber() {
+		return itemSeqNumber;
+	}
+
+	public void addItemRestriction(String itemRestriction) {
+		itemRestrictions.add(itemRestriction);
+	}
+
+	public List<String> getItemRestrictions() {
+		return itemRestrictions;
+	}
+
+	public AlephItem() {
+		borrowingUsers = new ArrayList<AlephXServicesUser>();
+		requestingUsers = new ArrayList<AlephXServicesUser>();
+		itemRestrictions = new ArrayList<String>();
 	}
 
 	/**
@@ -133,6 +204,12 @@ public class AlephItem implements Serializable {
 		this.itemId = itemId;
 	}
 
+	private void updateItemId() {
+		if (getDocNumber() != null && getSeqNumber() != null) {
+			setItemId(getDocNumber() + getSeqNumber());
+		}
+	}
+
 	/**
 	 * @return the description
 	 */
@@ -161,21 +238,6 @@ public class AlephItem implements Serializable {
 	 */
 	public void setLocation(String location) {
 		this.location = location;
-	}
-
-	/**
-	 * @return the link
-	 */
-	public String getLink() {
-		return link;
-	}
-
-	/**
-	 * @param link
-	 *            the link to set
-	 */
-	public void setLink(String link) {
-		this.link = link;
 	}
 
 	/**
@@ -240,22 +302,6 @@ public class AlephItem implements Serializable {
 	 */
 	public void setMediumType(String mediumType) {
 		this.mediumType = mediumType;
-	}
-
-	public String getSubLibrary() {
-		return subLibrary;
-	}
-
-	public void setSubLibrary(String subLibrary) {
-		this.subLibrary = subLibrary;
-	}
-
-	public String getCollection() {
-		return collection;
-	}
-
-	public void setCollection(String collection) {
-		this.collection = collection;
 	}
 
 	/**
@@ -393,18 +439,11 @@ public class AlephItem implements Serializable {
 	}
 
 	/**
-	 * @return the holdQueueErrorMessage
-	 */
-	public String getHoldQueue() {
-		return holdQueue;
-	}
-
-	/**
 	 * Add a borrowing user to this aleph item. It will not add it to the internal list if it already exists
 	 * 
 	 * @param user
 	 */
-	public void addBorrowingUser(AlephUser user) {
+	public void addBorrowingUser(AlephXServicesUser user) {
 		if (!borrowingUsers.contains(user)) {
 			borrowingUsers.add(user);
 		}
@@ -413,7 +452,7 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the borrowingUsers
 	 */
-	public List<AlephUser> getBorrowingUsers() {
+	public List<AlephXServicesUser> getBorrowingUsers() {
 		return borrowingUsers;
 	}
 
@@ -422,7 +461,7 @@ public class AlephItem implements Serializable {
 	 * 
 	 * @param user
 	 */
-	public void addRequestingUser(AlephUser user) {
+	public void addRequestingUser(AlephXServicesUser user) {
 		if (!requestingUsers.contains(user)) {
 			requestingUsers.add(user);
 		}
@@ -431,7 +470,7 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the requestingUsers
 	 */
-	public List<AlephUser> getRequestingUsers() {
+	public List<AlephXServicesUser> getRequestingUsers() {
 		return requestingUsers;
 	}
 
@@ -460,6 +499,8 @@ public class AlephItem implements Serializable {
 		while (this.docNumber != null && this.docNumber.length() < AlephConstants.DOC_NUMBER_LENGTH) {
 			this.docNumber = "0" + this.docNumber;
 		}
+		// update the item id if necessary
+		updateItemId();
 	}
 
 	/**
@@ -470,33 +511,22 @@ public class AlephItem implements Serializable {
 	}
 
 	/**
-	 * @param itemSeqNumber
-	 *            the itemSeqNumber to set
+	 * @param seqNumber
+	 *            the seqNumber to set
 	 */
-	public void setItemSeqNumber(String itemSeqNumber) {
-
-		this.itemSeqNumber = itemSeqNumber.trim();
-
-		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPARATOR)
-		this.itemSeqNumber = this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[0] + this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[1];
-
+	public void setSeqNumber(String seqNumber) {
+		this.seqNumber = seqNumber;
 		// make sure seqnumber is 6 digits, if not add leading zeroes
-		while (this.itemSeqNumber != null && this.itemSeqNumber.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {
-			this.itemSeqNumber = "0" + this.itemSeqNumber;
+		while (this.seqNumber != null && this.seqNumber.length() < AlephConstants.SEQ_NUMBER_LENGTH) {
+			this.seqNumber = "0" + this.seqNumber;
 		}
+		// update the item id if necessary
+		updateItemId();
 	}
 
 	/**
-	 * @return the itemSeqNumber
+	 * @return the seqNumber
 	 */
-	public String getItemSeqNumber() {
-		return itemSeqNumber;
-	}
-
-	public void setSeqNumber(String seqNumber) {
-		this.seqNumber = seqNumber;
-	}
-
 	public String getSeqNumber() {
 		return seqNumber;
 	}
@@ -534,8 +564,8 @@ public class AlephItem implements Serializable {
 
 	public void setDateAvailablePickup(String date) throws ParseException {
 		// assume date in right format and parse, ignore empty values
-		if (date != null && !date.isEmpty()) {
-			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.STATUS_DATE_FORMAT, Locale.ENGLISH);
+		if (date != null && date.length() > 0) {
+			SimpleDateFormat dateFormatter = new SimpleDateFormat(AlephConstants.HOLD_DATE_FORMAT);
 			setDateAvailablePickup(dateFormatter.parse(date));
 		}
 	}
@@ -729,14 +759,6 @@ public class AlephItem implements Serializable {
 		return agency;
 	}
 
-	public void addItemRestriction(String itemRestriction) {
-		itemRestrictions.add(itemRestriction);
-	}
-
-	public List<String> getItemRestrictions() {
-		return itemRestrictions;
-	}
-
 	/**
 	 * This method will update this overwrite anything in this alephItem with the alephItem's values passed in if they are not null.
 	 * 
@@ -760,7 +782,7 @@ public class AlephItem implements Serializable {
 				this.setBibId(item.getBibId());
 			}
 			if (item.getBorrowingUsers() != null) {
-				for (AlephUser user : item.getBorrowingUsers()) {
+				for (AlephXServicesUser user : item.getBorrowingUsers()) {
 					this.addBorrowingUser(user);
 				}
 			}
@@ -825,12 +847,12 @@ public class AlephItem implements Serializable {
 				this.setPublisher(item.getPublisher());
 			}
 			if (item.getRequestingUsers() != null) {
-				for (AlephUser user : item.getRequestingUsers()) {
+				for (AlephXServicesUser user : item.getRequestingUsers()) {
 					this.addRequestingUser(user);
 				}
 			}
-			if (item.getItemSeqNumber() != null) {
-				this.setItemSeqNumber(item.getItemSeqNumber());
+			if (item.getSeqNumber() != null) {
+				this.setSeqNumber(item.getSeqNumber());
 			}
 			if (item.getSeries() != null) {
 				this.setSeries(item.getSeries());
@@ -850,7 +872,7 @@ public class AlephItem implements Serializable {
 		sb.append("[ItemID:" + (getItemId() != null ? getItemId() : "null") + "],");
 		sb.append("[HoldingsID:" + (getHoldingsId() != null ? getHoldingsId() : "null") + "],");
 		sb.append("[DocNumber:" + (getDocNumber() != null ? getDocNumber() : "null") + "],");
-		sb.append("[SeqNumber:" + (getItemSeqNumber() != null ? getItemSeqNumber() : "null") + "],");
+		sb.append("[SeqNumber:" + (getSeqNumber() != null ? getSeqNumber() : "null") + "],");
 		sb.append("[Barcode:" + (getBarcode() != null ? getBarcode() : "null") + "],");
 		sb.append("[Agency:" + (getAgency() != null && getAgency().getAgencyId() != null ? getAgency().getAgencyId() : "null") + "],");
 		sb.append("[Description:" + (getDescription() != null ? getDescription() : "null") + "],");
@@ -869,7 +891,7 @@ public class AlephItem implements Serializable {
 		sb.append("[DateHoldRequested:" + (getDateHoldRequested() != null ? getDateHoldRequested() : "null") + "],");
 		sb.append("[DateAvailablePickup:" + (getDateAvailablePickup() != null ? getDateAvailablePickup() : "null") + "],");
 		sb.append("[DueDate:" + (getDueDate() != null ? getDueDate() : "null") + "],");
-		sb.append("[HoldQueueLength:" + (getHoldQueueLength() != -1 ? getHoldQueueLength() : getHoldQueue()) + "],");
+		sb.append("[HoldQueueLength:" + getHoldQueueLength() + "],");
 		sb.append("[FineAmount:" + (getFineAmount() != null ? getFineAmount().doubleValue() : "null") + "],");
 		sb.append("[FineAccrualDate:" + (getFineAccrualDate() != null ? getFineAccrualDate() : "null") + "],");
 		sb.append("[FineStatus:" + (getFineStatus() != null ? getFineStatus() : "null") + "],");
@@ -933,5 +955,4 @@ public class AlephItem implements Serializable {
 	public boolean getLocalizationDesired() {
 		return localizationDesired;
 	}
-
 }

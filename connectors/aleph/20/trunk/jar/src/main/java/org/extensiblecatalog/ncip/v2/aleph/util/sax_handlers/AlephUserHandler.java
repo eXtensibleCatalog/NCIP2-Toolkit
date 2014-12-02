@@ -1,11 +1,11 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers;
+package org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
@@ -19,7 +19,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  */
 public class AlephUserHandler extends DefaultHandler {
-	private AlephUser user;
+	private AlephRestDlfUser user;
 	private String address;
 	private AgencyId agencyId;
 	private String city;
@@ -27,7 +27,7 @@ public class AlephUserHandler extends DefaultHandler {
 	private String fineSum;
 	private String fineDescription;
 	private List<BlockOrTrap> blockOrTraps;
-	
+
 	private boolean nameInformationDesired;
 	private boolean userIdDesired;
 	private boolean userAddressInformationDesired;
@@ -71,11 +71,11 @@ public class AlephUserHandler extends DefaultHandler {
 		blockOrTraps = new ArrayList<BlockOrTrap>();
 	}
 
-	public void setAlephUser(AlephUser alephUser) {
+	public void setAlephUser(AlephRestDlfUser alephUser) {
 		user = alephUser;
 	}
 
-	public AlephUser getAlephUser() {
+	public AlephRestDlfUser getAlephUser() {
 		// Iterate over blockOrTraps list & set parsed agencyId
 		if (agencyId != null) {
 			for (BlockOrTrap blockOrTrap : blockOrTraps) {

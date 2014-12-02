@@ -1,50 +1,49 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user;
+package org.extensiblecatalog.ncip.v2.aleph.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 
 import java.util.ArrayList;
 
-
 import junit.framework.TestCase;
 
-public class AlephUserTest extends TestCase {
+public class AlephXServicesUserTest extends TestCase {
 
 	public void testSetUsername() {
-		AlephUser user = new AlephUser();
+		AlephXServicesUser user = new AlephXServicesUser();
 		user.setUsername("rick");
 		assertEquals("Username incorrect, Expected: rick Actual: "+user.getUsername(),"rick",user.getUsername());
 	}
 
 	public void testSetFullName() {
-		AlephUser user = new AlephUser();
+		AlephXServicesUser user = new AlephXServicesUser();
 		String fullName = "Johnson, Richard Patrick";
 		user.setFullName(fullName);
 		assertEquals("Full name incorrect, Expected: "+fullName+" Actual: "+user.getFullName(),fullName,user.getFullName());
 	}
 
 	public void testSetAddress() {
-		AlephUser user = new AlephUser();
+		AlephXServicesUser user = new AlephXServicesUser();
 		String address = "111 Mockingbird Lane";
 		user.setAddress(address);
 		assertEquals("Address incorrect, Expected: "+address+" Actual: "+user.getAddress(),address,user.getAddress());
 	}
 
 	public void testSetEmailAddress() {
-		AlephUser user = new AlephUser();
+		AlephXServicesUser user = new AlephXServicesUser();
 		String email = "rick@user.com";
 		user.setEmailAddress(email);
 		assertEquals("Email incorrect, Expected: "+email+" Actual: "+user.getEmailAddress(),email,user.getEmailAddress());
 	}
 
 	public void testSetSessionId() {
-		AlephUser user = new AlephUser();
+		AlephXServicesUser user = new AlephXServicesUser();
 		String sessionId = "fdafraere5555";
 		user.setSessionId(sessionId);
 		assertEquals("Session id incorrect, Expected: "+sessionId+" Actual: "+user.getSessionId(),sessionId,user.getSessionId());
 	}
 	
 	public void testHasRequestedItem(){
-		AlephUser user = new AlephUser();
+		AlephXServicesUser user = new AlephXServicesUser();
 		AlephItem item1 = new AlephItem();
 		item1.setItemId("item1");
 		item1.setBibId("bib1");

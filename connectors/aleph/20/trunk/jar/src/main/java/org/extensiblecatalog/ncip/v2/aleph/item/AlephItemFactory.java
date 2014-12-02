@@ -1,9 +1,9 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item;
+package org.extensiblecatalog.ncip.v2.aleph.item;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.XMLParserUtil;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
 
 import java.io.IOException;
 import java.io.Serializable;

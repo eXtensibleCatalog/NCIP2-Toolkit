@@ -1,14 +1,16 @@
 package org.extensiblecatalog.ncip.v2.aleph.AlephXServices;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgencyFactory;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItemFactory;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUserFactory;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XServiceFactory;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgencyFactory;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItemFactory;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUserFactory;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConfiguration;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
 
@@ -22,6 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+
+
+
+
 
 //import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -170,7 +177,7 @@ public class AlephMediator implements Serializable {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public AlephUser authenticateUser(String patron_id, String password) throws IOException, ParserConfigurationException, SAXException, AlephException {
+	public AlephXServicesUser authenticateUser(String patron_id, String password) throws IOException, ParserConfigurationException, SAXException, AlephException {
 		return authenticateUser(getDefaultAgencyId(), patron_id, password);
 	}
 
@@ -188,7 +195,7 @@ public class AlephMediator implements Serializable {
 	 * @throws SAXException
 	 * @throws AlephException
 	 */
-	public AlephUser authenticateUser(String agencyId, String patron_id, String password) throws IOException, ParserConfigurationException, SAXException, AlephException {
+	public AlephXServicesUser authenticateUser(String agencyId, String patron_id, String password) throws IOException, ParserConfigurationException, SAXException, AlephException {
 		AlephAgency agency = getAlephAgency(agencyId);
 		if (agency == null) {
 			throw new AlephException(AlephConstants.ERROR_UNKNOWN_AGENCY + " " + agencyId);
@@ -199,7 +206,7 @@ public class AlephMediator implements Serializable {
 		XService xService = XServiceFactory.createBorAuthXService(agency.getAdmLibrary(), null, patron_id, password);
 		Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 		// generate new aleph user
-		AlephUser user = AlephUserFactory.createAlephUser(agency, doc);
+		AlephXServicesUser user = AlephXServicesUserFactory.createAlephUser(agency, doc);
 		if (user != null)
 			user.setAuthenticatedUsername(patron_id);
 		return user;
@@ -216,7 +223,7 @@ public class AlephMediator implements Serializable {
 		XService xService = XServiceFactory.createBorAuthXService(agency.getAdmLibrary(), null, patron_id, password);
 		Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 		// generate new aleph user
-		AlephUser user = AlephUserFactory.createAlephUser(agency, doc);
+		AlephXServicesUser user = AlephXServicesUserFactory.createAlephUser(agency, doc);
 		return user.getUsername();
 	}
 
@@ -238,7 +245,7 @@ public class AlephMediator implements Serializable {
 	 * 
 	 * @return AlephUser with specified information if available
 	 */
-	public AlephUser lookupUser(String agencyId, String patron_id, String password, boolean getFines, boolean getHolds, boolean getLoans) throws IOException,
+	public AlephXServicesUser lookupUser(String agencyId, String patron_id, String password, boolean getFines, boolean getHolds, boolean getLoans) throws IOException,
 			ParserConfigurationException, SAXException, AlephException {
 
 		AlephAgency agency = getAlephAgency(agencyId);
@@ -266,7 +273,7 @@ public class AlephMediator implements Serializable {
 		XService xService = XServiceFactory.createBorInfoXService(agency.getAdmLibrary(), patron_id, password, cash, null, holds, loans);
 		Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 		// generate new aleph user
-		return AlephUserFactory.createAlephUser(agency, doc);
+		return AlephXServicesUserFactory.createAlephUser(agency, doc);
 	}
 
 	/**
@@ -698,7 +705,7 @@ public class AlephMediator implements Serializable {
 			throw new AlephException("Patron id and item id must be set.");
 		}
 		// first get item hold ids for the item from item id....using lookupUser call
-		AlephUser user = this.lookupUser(agencyId, patron_id, null, false, true, false);
+		AlephXServicesUser user = this.lookupUser(agencyId, patron_id, null, false, true, false);
 		// then cancel all holds returned (maybe more than one)
 		boolean cancelled = false;
 		if (user != null && user.getRequestedItems() != null && user.getRequestedItems().size() > 0) {
@@ -837,7 +844,7 @@ public class AlephMediator implements Serializable {
 		if (item != null && item.getCirculationStatus() != null && item.getCirculationStatus().equals(AlephConstants.CIRC_STATUS_CHECKED_OUT)) {
 			throw new AlephException("Item is checked out.  Please recall item instead.");
 		}
-		AlephUser user = this.lookupUser(agencyId, request_user_bor_id, null, false, true, false);
+		AlephXServicesUser user = this.lookupUser(agencyId, request_user_bor_id, null, false, true, false);
 		Date available = null;
 		if (user == null) {
 			throw new AlephException("Requesting user not found in the system");
@@ -1300,7 +1307,7 @@ public class AlephMediator implements Serializable {
 			if (item.getDueDate() != null) {
 				available = AlephConstants.Availability.NOT_AVAILABLE;
 			} else if (item.getCirculationStatus() != null) {
-				available = this.availabilityCircStatusMap.get(item.getCirculationStatus().toLowerCase());
+				available = this.availabilityCircStatusMap.get(item.getCirculationStatus().getValue().toLowerCase());
 				if (available == null) {
 					// default to possibly available if a status is set but unrecognized
 					available = AlephConstants.Availability.POSSIBLY_AVAILABLE;
@@ -1312,9 +1319,9 @@ public class AlephMediator implements Serializable {
 		return available;
 	}
 
-	public AlephUser updateUser(String patronId, String password, UpdateUserInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+	public AlephXServicesUser updateUser(String patronId, String password, UpdateUserInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 
-		AlephUser user = authenticateUser(patronId, password);
+		AlephXServicesUser user = authenticateUser(patronId, password);
 
 		return user;
 	}

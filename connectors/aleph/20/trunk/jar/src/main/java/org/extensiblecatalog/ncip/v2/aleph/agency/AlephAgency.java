@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency;
+package org.extensiblecatalog.ncip.v2.aleph.agency;
 
 /**
  * Class that holds Agency settings for current user

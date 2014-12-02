@@ -1,6 +1,6 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item;
+package org.extensiblecatalog.ncip.v2.aleph.item;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.XMLParserUtil;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.test.TestConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XService;

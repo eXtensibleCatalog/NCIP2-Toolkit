@@ -1,10 +1,10 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user;
+package org.extensiblecatalog.ncip.v2.aleph.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItemFactory;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.XMLParserUtil;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItemFactory;
 
 import java.io.Serializable;
 
@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
  * @author Rick Johnson (NDU)
  *
  */
-public class AlephUserFactory implements Serializable {
+public class AlephXServicesUserFactory implements Serializable {
 	
 	/**
 	 * 
@@ -32,8 +32,8 @@ public class AlephUserFactory implements Serializable {
 	 * @return AlephUser
 	 * @throws AlephException
 	 */
-	public static AlephUser createAlephUser(AlephAgency agency, Document doc) throws AlephException{
-		AlephUser user = new AlephUser();
+	public static AlephXServicesUser createAlephUser(AlephAgency agency, Document doc) throws AlephException{
+		AlephXServicesUser user = new AlephXServicesUser();
 		if (doc!=null){
 			if (!doc.hasChildNodes()){
 				throw new AlephException(AlephConstants.ERROR_AUTHENTICATION_FAILED_UNKNOWN);

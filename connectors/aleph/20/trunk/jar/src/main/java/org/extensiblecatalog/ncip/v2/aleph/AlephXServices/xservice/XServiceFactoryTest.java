@@ -1,13 +1,13 @@
 package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgencyFactory;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUserFactory;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.XMLParserUtil;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgencyFactory;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.test.TestConfiguration;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUserFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 import junit.framework.TestCase;
 
@@ -496,7 +495,7 @@ public class XServiceFactoryTest extends TestCase {
 		Document doc = xService.execute(serverName,serverPort, false);
 		
 		//generate new aleph user
-		AlephUser user = AlephUserFactory.createAlephUser(agency,doc);
+		AlephXServicesUser user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		//then cancel all holds returned (maybe more than one)
 		
 		if (user!=null&&user.getRequestedItems()!=null&&user.getRequestedItems().size()>0){

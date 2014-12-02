@@ -69,8 +69,8 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		String localAgencyId = alephSvcMgr.getDefaultAgency();
-		String registrationLink = alephSvcMgr.getRegistrationLink();
+		String localAgencyId = alephSvcMgr.getLocalConfig().getDefaultAgency();
+		String registrationLink = alephSvcMgr.getLocalConfig().getUserRegistrationLink();
 
 		if (getAgencyAddressInformation)
 			responseData.setAgencyAddressInformations(Arrays.asList(alephSvcMgr.getAgencyPhysicalAddressInformation()));
@@ -95,7 +95,7 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 			AuthenticationDataFormatType authenticationDataFormatType;
 
 			String authenticationDataFormatTypeScheme = Version1AuthenticationDataFormatType.VERSION_1_AUTHENTICATION_DATA_FORMAT_TYPE;
-			String authenticationDataFormatTypeValue = alephSvcMgr.getAuthDataFormatType();
+			String authenticationDataFormatTypeValue = alephSvcMgr.getLocalConfig().getAuthDataFormatType();
 
 			authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
 			promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);
@@ -108,7 +108,7 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 			authenticationPrompt.setPromptInput(promptInput);
 			responseData.setAuthenticationPrompts(Arrays.asList(authenticationPrompt));
 		}
-		responseData.setAgencyId(alephSvcMgr.toAgencyId(localAgencyId));
+		responseData.setAgencyId(AlephUtil.toAgencyId(localAgencyId));
 
 		return responseData;
 	}

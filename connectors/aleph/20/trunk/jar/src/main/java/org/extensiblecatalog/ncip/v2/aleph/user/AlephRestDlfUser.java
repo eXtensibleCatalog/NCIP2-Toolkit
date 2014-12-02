@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf.user;
+package org.extensiblecatalog.ncip.v2.aleph.user;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
  *
  */
 
-public class AlephUser implements Serializable {
+public class AlephRestDlfUser implements Serializable {
 
 	private static final long serialVersionUID = 65005L;
 	private String username;
@@ -73,7 +73,7 @@ public class AlephUser implements Serializable {
 	private UserFiscalAccount userFiscalAccount;
 	private List<AccountDetails> accountDetails;
 
-	public AlephUser() {
+	public AlephRestDlfUser() {
 		requestedItems = new ArrayList<RequestedItem>();
 		loanedItems = new ArrayList<LoanedItem>();
 		blockOrTraps = new ArrayList<BlockOrTrap>();

@@ -13,8 +13,8 @@ import java.util.Arrays;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephRenewItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephRenewItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.Problem;

@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.AlephXServices;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

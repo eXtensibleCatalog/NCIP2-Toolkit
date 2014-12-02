@@ -10,8 +10,8 @@ import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
@@ -112,7 +112,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 */
 	private void parseBibIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
-		boolean wantSeeAllProblems = alephSvcMgr.echoParticularProblemsToLUIS;
+		boolean wantSeeAllProblems = alephSvcMgr.getLocalConfig().isEchoParticularProblemsToLUIS();
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
 
@@ -156,7 +156,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						AgencyId suppliedAgencyId = null;
 						if (initData.getBibliographicDescriptionDesired()) {
 							if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-								suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+								suppliedAgencyId = AlephUtil.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 							else
 								suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 						}
@@ -224,7 +224,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						AgencyId suppliedAgencyId = null;
 						if (initData.getBibliographicDescriptionDesired()) {
 							if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-								suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+								suppliedAgencyId = AlephUtil.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 							else
 								suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 						}
@@ -324,7 +324,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 */
 	private void parseItemIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
-		boolean wantSeeAllProblems = alephSvcMgr.echoParticularProblemsToLUIS;
+		boolean wantSeeAllProblems = alephSvcMgr.getLocalConfig().isEchoParticularProblemsToLUIS();
 
 		List<ItemId> itemIds = initData.getItemIds();
 
@@ -363,7 +363,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 					if (initData.getBibliographicDescriptionDesired()) {
 						if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-							suppliedAgencyId = alephSvcMgr.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+							suppliedAgencyId = AlephUtil.toAgencyId(alephSvcMgr.getDefaultAgencyId());
 						else
 							suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 					}

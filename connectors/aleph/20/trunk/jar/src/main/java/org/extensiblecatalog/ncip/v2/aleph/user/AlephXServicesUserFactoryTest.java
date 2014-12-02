@@ -1,10 +1,10 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user;
+package org.extensiblecatalog.ncip.v2.aleph.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgencyFactory;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.XMLParserUtil;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgencyFactory;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.test.TestConfiguration;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice.XServiceFactory;
@@ -15,10 +15,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 import junit.framework.TestCase;
 
-public class AlephUserFactoryTest extends TestCase {
+public class AlephXServicesUserFactoryTest extends TestCase {
 	
 	public void testCreateAlephUser() throws Exception{
 		String admLibrary = TestConfiguration.getProperty("ADM_LIBRARY");
@@ -34,7 +33,7 @@ public class AlephUserFactoryTest extends TestCase {
 		String holdDataType = AlephConstants.USER_HOLDS_ALL_DATA;
 		String loanDataType = AlephConstants.USER_LOANS_ALL_DATA;
 		
-		AlephUser user;
+		AlephXServicesUser user;
 		AlephAgency agency = AlephAgencyFactory.createAlephAgency(agencyId, admLibrary, bibLibrary, holdLibrary);
 		
 		//do negative testing, test bad values
@@ -44,7 +43,7 @@ public class AlephUserFactoryTest extends TestCase {
 		
 		boolean threwException = false;
 		try {
-			user = AlephUserFactory.createAlephUser(agency,doc);
+			user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		} catch (Exception ex){
 			if (!ex.getMessage().equals(AlephConstants.ERROR_BOR_ID_VER)){
 				fail("Unexpected Error Found: "+ex);
@@ -72,7 +71,7 @@ public class AlephUserFactoryTest extends TestCase {
 		
 		threwException = false;
 		try {
-			user = AlephUserFactory.createAlephUser(agency,doc);
+			user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		} catch (Exception ex){
 			if (!ex.getMessage().equals(AlephConstants.ERROR_AUTHENTICATION_FAILED_SESSION_ID_MISSING)){
 				fail("Unexpected Error Found");
@@ -96,7 +95,7 @@ public class AlephUserFactoryTest extends TestCase {
 		
 		threwException = false;
 		try {
-			user = AlephUserFactory.createAlephUser(agency,doc);
+			user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		} catch (Exception ex){
 			if (!ex.getMessage().equals(AlephConstants.ERROR_GLOBAL_PATRON_RECORD_MISSING)){
 				fail("Unexpected Error Found: "+ex);
@@ -120,7 +119,7 @@ public class AlephUserFactoryTest extends TestCase {
 		
 		threwException = false;
 		try {
-			user = AlephUserFactory.createAlephUser(agency,doc);
+			user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		} catch (Exception ex){
 			if (!ex.getMessage().equals(AlephConstants.ERROR_ADDRESS_INFORMATION_MISSING)){
 				fail("Unexpected Error Found: "+ex);
@@ -144,7 +143,7 @@ public class AlephUserFactoryTest extends TestCase {
 		
 		threwException = false;
 		try {
-			user = AlephUserFactory.createAlephUser(agency,doc);
+			user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		} catch (Exception ex){
 			if (!ex.getMessage().equals(AlephConstants.ERROR_LOCAL_PATRON_RECORD_MISSING)){
 				fail("Unexpected Error Found: "+ex);
@@ -159,7 +158,7 @@ public class AlephUserFactoryTest extends TestCase {
 		
 		xService = XServiceFactory.createBorInfoXService(admLibrary, patron_id, null, cashDataType, null, holdDataType, loanDataType);
 		doc = xService.execute(TestConfiguration.getProperty("XSERVER_NAME"), TestConfiguration.getProperty("XSERVER_PORT"), false);
-		user = AlephUserFactory.createAlephUser(agency,doc);
+		user = AlephXServicesUserFactory.createAlephUser(agency,doc);
 		XMLParserUtil.outputNode(doc);
 		
 		assertEquals("Aleph User name returned is incorrect, Expected: "+expectedUserId+" Actual: "+user.getUsername(),expectedUserId,user.getUsername());

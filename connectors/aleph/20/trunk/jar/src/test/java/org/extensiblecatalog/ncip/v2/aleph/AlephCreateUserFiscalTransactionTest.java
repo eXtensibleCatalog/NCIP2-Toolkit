@@ -2,13 +2,16 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.math.BigDecimal;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
 
 public class AlephCreateUserFiscalTransactionTest extends TestCase {
-	public void testPerformService() throws ServiceException, ValidationException {
+	public void testPerformService() throws ServiceException, ValidationException, ParserConfigurationException, SAXException {
 		AlephCreateUserFiscalTransactionService service = new AlephCreateUserFiscalTransactionService();
 		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();
 		CreateUserFiscalTransactionInitiationData initData = new CreateUserFiscalTransactionInitiationData();

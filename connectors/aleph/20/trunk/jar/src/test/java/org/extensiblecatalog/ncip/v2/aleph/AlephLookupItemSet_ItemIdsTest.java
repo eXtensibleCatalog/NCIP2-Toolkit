@@ -4,14 +4,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import junit.framework.TestCase;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 public class AlephLookupItemSet_ItemIdsTest extends TestCase {
 
-	public void testPerformService() throws ServiceException {
+	public void testPerformService() throws ServiceException, ParserConfigurationException, SAXException {
 		AlephLookupItemSetService service = new AlephLookupItemSetService();
 
 		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();

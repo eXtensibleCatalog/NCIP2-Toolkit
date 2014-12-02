@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item;
+package org.extensiblecatalog.ncip.v2.aleph.item;
 
 import junit.framework.TestCase;
 

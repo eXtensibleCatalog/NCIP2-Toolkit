@@ -12,6 +12,16 @@ public class XMLBuilder {
 	private String secondNote;
 	private String rush;
 
+	/*
+	 * Here is an example:
+	 * 
+	 * post_xml= <hold-request-parameters><last-interest-date>20141005</last-interest-date> <start-interest-date>20140906</start-interest-date> <note-1>dg</note-1> <note-2></note-2> <rush>N</rush> </hold-request-parameters>
+	 */
+	
+	/**
+	 * Creates "post_xml=" & does in fact nothing.
+	 * 
+	 */
 	public XMLBuilder() {
 		xml = new String("post_xml=");
 		initialParentElement = "";
@@ -64,7 +74,7 @@ public class XMLBuilder {
 
 	public XMLBuilder setRush(String rush) {
 		if (rush != null)
-			this.rush = "<rush>"+rush+"</rush>";
+			this.rush = "<rush>" + rush + "</rush>";
 		return this;
 	}
 
@@ -82,7 +92,4 @@ public class XMLBuilder {
 		sb.append(finalParentElement);
 		return sb.toString();
 	}
-	/*
-	 * post_xml= <hold-request-parameters><last-interest-date>20141005</last-interest-date> <start-interest-date>20140906</start-interest-date> <note-1>dg</note-1> <note-2></note-2> <rush>N</rush> </hold-request-parameters>
-	 */
 }

@@ -16,8 +16,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
@@ -79,7 +79,7 @@ public class AlephLookupUserService implements LookupUserService {
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 
 		if (!authenticateOnly) {
-			AlephUser alephUser = null;
+			AlephRestDlfUser alephUser = null;
 			try {
 				alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
 			} catch (MalformedURLException mue) {
@@ -121,7 +121,7 @@ public class AlephLookupUserService implements LookupUserService {
 			} catch (SAXException se) {
 				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
 				responseData.setProblems(Arrays.asList(p));
-			} catch (org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException ae) {
+			} catch (org.extensiblecatalog.ncip.v2.aleph.util.AlephException ae) {
 				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (ParserConfigurationException pce) {
@@ -132,7 +132,7 @@ public class AlephLookupUserService implements LookupUserService {
 		return responseData;
 	}
 
-	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephUser alephUser, AlephRemoteServiceManager svcMgr) {
+	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, AlephRestDlfUser alephUser, AlephRemoteServiceManager svcMgr) {
 
 		if (alephUser != null) {
 

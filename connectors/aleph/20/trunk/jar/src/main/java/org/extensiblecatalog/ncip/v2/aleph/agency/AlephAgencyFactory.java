@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency;
+package org.extensiblecatalog.ncip.v2.aleph.agency;
 
 /**
  * Factory class to create a new AlephAgency object

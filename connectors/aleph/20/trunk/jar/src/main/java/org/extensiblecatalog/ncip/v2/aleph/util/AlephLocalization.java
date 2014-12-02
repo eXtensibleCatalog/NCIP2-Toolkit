@@ -1,5 +1,5 @@
 
-package org.extensiblecatalog.ncip.v2.aleph.restdlf;
+package org.extensiblecatalog.ncip.v2.aleph.util;
 
 /**
  * @author Jiří Kozlovský (MZK)

@@ -5,14 +5,17 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.*;
+import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
 
 public class AlephRequestAndCancelRequestItemTest extends TestCase {
-	public void testPerformService() throws ServiceException {
+	public void testPerformService() throws ServiceException, ParserConfigurationException, SAXException {
 		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();
 
 		//

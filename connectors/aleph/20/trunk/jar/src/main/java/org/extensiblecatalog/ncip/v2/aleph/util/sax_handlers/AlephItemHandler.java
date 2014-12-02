@@ -1,11 +1,11 @@
-package org.extensiblecatalog.ncip.v2.aleph.restdlf.handlers;
+package org.extensiblecatalog.ncip.v2.aleph.util.sax_handlers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -93,7 +93,7 @@ public class AlephItemHandler extends DefaultHandler {
 	 *            - parsed from initData
 	 * @throws AlephException
 	 */
-	public AlephItemHandler(String bibLibrary, boolean requireAtLeastOneService, LookupItemInitiationData initData) throws AlephException {
+	public AlephItemHandler(String bibLibrary, LookupItemInitiationData initData) throws AlephException {
 
 		this.bibLibrary = bibLibrary;
 		bibDescriptionDesired = initData.getBibliographicDescriptionDesired();
@@ -102,10 +102,6 @@ public class AlephItemHandler extends DefaultHandler {
 		itemDesrciptionDesired = initData.getItemDescriptionDesired();
 		locationDesired = initData.getLocationDesired();
 		itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
-
-		if (requireAtLeastOneService && !bibDescriptionDesired && !circulationStatusDesired && !holdQueueLengthDesired && !itemDesrciptionDesired) {
-			throw new AlephException("Instance of class AlephItemHandler cannot be created with no service desired. Please supply at least one service you wish to use.");
-		}
 
 		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null) {
 			String localization = initData.getInitiationHeader().getApplicationProfileType().getValue();

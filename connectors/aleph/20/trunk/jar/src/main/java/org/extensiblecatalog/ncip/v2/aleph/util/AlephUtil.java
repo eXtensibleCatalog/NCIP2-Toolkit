@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.AlephLocalization;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.restdlf.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
@@ -42,6 +41,7 @@ import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
@@ -85,6 +85,10 @@ public class AlephUtil {
 
 		// Note that other item statuses returned by Aleph RESTful APIs ILS are non-restrictive
 		itemRestrictionClassesInitialized = true;
+	}
+
+	public static AgencyId toAgencyId(String agencyId) {
+		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
 
 	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
@@ -315,7 +319,7 @@ public class AlephUtil {
 		if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
 			CurrentBorrower borrower = new CurrentBorrower();
 			UserId userId = new UserId();
-			AlephUser alephUser = alephItem.getBorrowingUsers().get(0);
+			AlephXServicesUser alephUser = alephItem.getBorrowingUsers().get(0);
 			userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
 			userId.setUserIdentifierType(new UserIdentifierType("Username"));
 			userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
@@ -324,9 +328,9 @@ public class AlephUtil {
 		}
 
 		if (alephItem.getRequestingUsers() != null && alephItem.getRequestingUsers().size() > 0) {
-			Iterator<AlephUser> i = alephItem.getRequestingUsers().iterator();
+			Iterator<AlephXServicesUser> i = alephItem.getRequestingUsers().iterator();
 			while (i.hasNext()) {
-				AlephUser alephUser = i.next();
+				AlephXServicesUser alephUser = i.next();
 				CurrentRequester requester = new CurrentRequester();
 				UserId userId = new UserId();
 				userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
@@ -371,7 +375,7 @@ public class AlephUtil {
 	public static MediumType detectMediumType(String mediumTypeParsed) {
 		MediumType mediumType = null;
 
-		// FIXME: Find out Aleph non-localized values & change these AlephLocalization.SOMETHING to AlephConstants.SOMETHING ...
+		// TODO: Find out Aleph non-localized values & change these AlephLocalization.SOMETHING to AlephConstants.SOMETHING ...
 		if (mediumTypeParsed.matches(AlephLocalization.BOOK + "|" + AlephLocalization.GRAPHICS + "|" + AlephLocalization.MAP))
 			mediumType = Version1MediumType.BOOK;
 		else if (mediumTypeParsed.matches(AlephLocalization.MAGAZINE1 + "|" + AlephLocalization.MAGAZINE2))
@@ -517,5 +521,24 @@ public class AlephUtil {
 			}
 		}
 		return responseHeader;
+	}
+
+	private boolean isCorrectRecordId(String recordId, int bibLibLength) {
+		if (recordId.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isCorrectItemId(String sequenceNumber, int bibLibLength) {
+		if (sequenceNumber.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength + AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isCorrectLoanId(String alephLoanId, int bibLibLength) {
+		// Loan Id has the same length specifications as Record Id
+		return isCorrectRecordId(alephLoanId, bibLibLength);
 	}
 }

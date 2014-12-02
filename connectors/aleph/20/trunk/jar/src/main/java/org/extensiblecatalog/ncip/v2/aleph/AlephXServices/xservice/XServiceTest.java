@@ -1,6 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.xservice;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.test.TestConfiguration;
 
 import java.net.URL;

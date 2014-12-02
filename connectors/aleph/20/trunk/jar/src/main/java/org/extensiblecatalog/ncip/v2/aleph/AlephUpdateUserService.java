@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
@@ -49,7 +49,7 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 		final UpdateUserResponseData responseData = new UpdateUserResponseData();
 
 		try {
-			AlephUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
+			AlephXServicesUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
 			if (alephUser == null)
 				throw new AlephException("alephUser returned by responder is null");
 			else {

@@ -2,6 +2,8 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
 
 import java.util.Properties;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemService;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
@@ -9,6 +11,7 @@ import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.xml.sax.SAXException;
 
 /**
  * AlephRemoteServiceManager just extends AlephMediator to interface with Aleph X-Services for fulfilling NCIP requests
@@ -35,12 +38,12 @@ public class AlephRemoteServiceManager extends RestDlfConnector implements Remot
 		}
 	}
 
-	public AlephRemoteServiceManager() throws ServiceException {
+	public AlephRemoteServiceManager() throws ServiceException, ParserConfigurationException, SAXException {
 		initializeAgencyMap();
 		initializeAvailabilityMaps();
 	}
 
-	public AlephRemoteServiceManager(Properties properties) throws ServiceException {
+	public AlephRemoteServiceManager(Properties properties) throws ServiceException, ParserConfigurationException, SAXException  {
 		this();
 		log.info("AlephRemoteServiceManager constructor called");
 	}

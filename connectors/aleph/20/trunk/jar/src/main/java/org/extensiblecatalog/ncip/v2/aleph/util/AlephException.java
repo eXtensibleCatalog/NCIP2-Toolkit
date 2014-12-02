@@ -1,4 +1,4 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices;
+package org.extensiblecatalog.ncip.v2.aleph.util;
 
 import java.io.Serializable;
 

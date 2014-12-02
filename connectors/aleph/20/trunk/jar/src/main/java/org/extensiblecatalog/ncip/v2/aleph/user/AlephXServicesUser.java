@@ -1,7 +1,7 @@
-package org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user;
+package org.extensiblecatalog.ncip.v2.aleph.user;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
  * @author rjohns14
  *
  */
-public class AlephUser implements Serializable{
+public class AlephXServicesUser implements Serializable{
 	
 	/**
 	 * 
@@ -42,7 +42,7 @@ public class AlephUser implements Serializable{
 	
 	private AlephAgency agency;
 	
-	public AlephUser(){
+	public AlephXServicesUser(){
 		requestedItems = new ArrayList<AlephItem>();
 		loanItems = new ArrayList<AlephItem>();
 	}

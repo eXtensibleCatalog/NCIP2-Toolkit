@@ -1,14 +1,15 @@
 package org.extensiblecatalog.ncip.v2.aleph.AlephXServices;
 
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgency;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.agency.AlephAgencyFactory;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.test.TestConfiguration;
-import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.user.AlephUser;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
+import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgencyFactory;
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import junit.framework.TestCase;
 
@@ -57,7 +58,7 @@ public class AlephMediatorTest extends TestCase {
 		String sub_library = TestConfiguration.getProperty("AGENCY_1");
 		String expectedUserId = TestConfiguration.getProperty("PATRON_ID");
 		
-		AlephUser user = getAlephMediator().authenticateUser(sub_library, patron_id, password);
+		AlephXServicesUser user = getAlephMediator().authenticateUser(sub_library, patron_id, password);
 		
 		assertEquals("Aleph User name returned is incorrect, Expected: "+expectedUserId+" Actual: "+user.getUsername(),expectedUserId,user.getUsername());
 		assertTrue("User session id not Returned",user.getSessionId()!=null&&user.getSessionId().length()>0);
@@ -99,7 +100,7 @@ public class AlephMediatorTest extends TestCase {
 		String patron_id = TestConfiguration.getProperty("USERNAME");
 		String expectedUserId = TestConfiguration.getProperty("PATRON_ID");
 		
-		AlephUser user = getAlephMediator().lookupUser(agencyId, patron_id, null, true, true, true);
+		AlephXServicesUser user = getAlephMediator().lookupUser(agencyId, patron_id, null, true, true, true);
 		
 		assertEquals("Aleph User name returned is incorrect, Expected: "+expectedUserId+" Actual: "+user.getUsername(),expectedUserId,user.getUsername());
 		assertTrue("User session id not Returned",user.getSessionId()!=null&&user.getSessionId().length()>0);
