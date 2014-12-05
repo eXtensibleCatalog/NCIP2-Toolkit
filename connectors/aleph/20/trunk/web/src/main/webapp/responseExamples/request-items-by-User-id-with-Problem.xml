@@ -3,7 +3,7 @@
 	<ns1:RequestItemResponse>
 		<ns1:RequestId>
 			<!-- It is a good habit to let initiator know about which items were not requested & why. Also please keep in mind to respect current RequestId separator defined in AlephConstants - which is ";" here -->
-			<ns1:RequestIdentifierValue>005102983;Failed to create request - Patron has already requested this item.;Failed to create request -	Empty ItemIdentifierValue was specified here.</ns1:RequestIdentifierValue>
+			<ns1:RequestIdentifierValue>005102983;Failed to create request - Patron has already requested this item.;Failed to create request - Empty ItemIdentifierValue was specified here.</ns1:RequestIdentifierValue>
 		</ns1:RequestId>
 		<ns1:ItemId>
 			<ns1:ItemIdentifierType

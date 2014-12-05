@@ -635,10 +635,18 @@ public class RestDlfConnector extends AlephMediator {
 
 				} else if (itemIds.size() > 1) {
 					// If there is more than one item requested, than it is a good habit to let user know of which items could not been requested and why
-					requestItem.addRequestId(requestItemHandler.getReplyText() + " - " + requestItemHandler.getNoteValue());
+					String noteValue = requestItemHandler.getNoteValue();
+
+					if (noteValue == null)
+						noteValue = "";
+					else
+						noteValue = " - " + requestItemHandler.getNoteValue();
+
+					requestItem.addRequestId(requestItemHandler.getReplyText() + noteValue);
 					// Output of this will usually be: Failed to create request - Patron has already requested this item.
 				} else {
 					Problem problem = new Problem();
+
 					problem.setProblemValue(requestItemHandler.getReplyText());
 
 					if (requestItemHandler.getNoteValue() != null)

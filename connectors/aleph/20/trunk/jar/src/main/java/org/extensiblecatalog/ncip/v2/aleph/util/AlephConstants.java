@@ -299,6 +299,7 @@ public class AlephConstants {
 	// Values lengths:
 	public static final int BIB_ID_LENGTH = 9;
 	public static final int SEQ_NUMBER_LENGTH = 4;
+	public static final int REQUEST_ID_LENGTH = 9;
 	public static final int DOC_NUMBER_LENGTH = 9;
 	public static final int POSTAL_CODE_LENGTH = 6;
 	public static final int HOLDINGS_ID_LENGTH = 9;
