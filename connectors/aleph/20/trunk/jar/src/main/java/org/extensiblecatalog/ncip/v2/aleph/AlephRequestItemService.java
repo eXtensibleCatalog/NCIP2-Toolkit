@@ -71,6 +71,9 @@ public class AlephRequestItemService implements RequestItemService {
 
 	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, AlephRequestItem requestItem) {
 
+		requestItem.setRequestType(initData.getRequestType());
+		requestItem.setRequestScopeType(initData.getRequestScopeType());
+
 		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
@@ -82,10 +85,15 @@ public class AlephRequestItemService implements RequestItemService {
 			StringBuilder joinedItemIds = new StringBuilder();
 			int itemIdsSize = initData.getItemIds().size();
 			for (int i = 0; i < itemIdsSize; i++) {
-				if (i == itemIdsSize - 1) {
-					joinedItemIds.append(initData.getItemId(i).getItemIdentifierValue());
-				} else {
-					joinedItemIds.append(initData.getItemId(i).getItemIdentifierValue());
+
+				String itemIdValue = initData.getItemId(i).getItemIdentifierValue();
+
+				if (itemIdValue.isEmpty())
+					itemIdValue = "null";
+
+				joinedItemIds.append(itemIdValue);
+
+				if (i != itemIdsSize - 1) {
 					joinedItemIds.append(AlephConstants.REQUEST_ID_DELIMITER);
 				}
 			}

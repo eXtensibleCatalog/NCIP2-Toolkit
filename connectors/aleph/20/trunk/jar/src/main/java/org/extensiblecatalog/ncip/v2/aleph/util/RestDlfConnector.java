@@ -555,10 +555,11 @@ public class RestDlfConnector extends AlephMediator {
 
 		AlephRequestItem requestItem = new AlephRequestItem();
 		String alephItemId;
-		
+
 		for (ItemId itemId : itemIds) {
 			alephItemId = itemId.getItemIdentifierValue();
-			if (alephItemId != "") {
+
+			if (!alephItemId.isEmpty()) {
 				String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 				String itemIdVal = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
@@ -569,7 +570,9 @@ public class RestDlfConnector extends AlephMediator {
 					throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 				}
 
-				String pickupLocation = initData.getPickupLocation().getValue();
+				String pickupLocation = null;
+				if (initData.getPickupLocation() != null)
+					pickupLocation = initData.getPickupLocation().getValue();
 
 				String needBeforeDate = AlephUtil.convertToAlephDate(initData.getNeedBeforeDate());
 				String earliestDateNeeded = AlephUtil.convertToAlephDate(initData.getEarliestDateNeeded());
@@ -607,8 +610,6 @@ public class RestDlfConnector extends AlephMediator {
 				parser.parse(streamSource, requestItemHandler);
 
 				if (!requestItemHandler.returnedError()) {
-					requestItem.setRequestType(initData.getRequestType());
-					requestItem.setRequestScopeType(initData.getRequestScopeType());
 
 					// Parse sequence number
 					URL holdsUrl = new URLBuilder()
@@ -632,13 +633,28 @@ public class RestDlfConnector extends AlephMediator {
 
 					requestItem.addRequestId(requestItemHandler.getRequestId());
 
+				} else if (itemIds.size() > 1) {
+					// If there is more than one item requested, than it is a good habit to let user know of which items could not been requested and why
+					requestItem.addRequestId(requestItemHandler.getReplyText() + " - " + requestItemHandler.getNoteValue());
+					// Output of this will usually be: Failed to create request - Patron has already requested this item.
 				} else {
 					Problem problem = new Problem();
-					problem.setProblemDetail(requestItemHandler.getNoteValue());
 					problem.setProblemValue(requestItemHandler.getReplyText());
+
+					if (requestItemHandler.getNoteValue() != null)
+						problem.setProblemDetail(requestItemHandler.getNoteValue() + " (" + alephItemId + ")");
+
 					problem.setProblemType(new ProblemType("Aleph returned error while processing the request. See details below."));
 					requestItem.setProblem(problem);
 				}
+			} else if (itemIds.size() > 1) {
+				// If there is more than one item requested, than it is a good habit to let user know of which items could not been requested and why
+				requestItem.addRequestId("Failed to create request - Empty ItemIdentifierValue was specified here.");
+			} else {
+				Problem problem = new Problem();
+				problem.setProblemDetail("Cannot request unknown item.");
+				problem.setProblemType(new ProblemType("You have sent empty ItemIdentifierValue."));
+				requestItem.setProblem(problem);
 			}
 		}
 
