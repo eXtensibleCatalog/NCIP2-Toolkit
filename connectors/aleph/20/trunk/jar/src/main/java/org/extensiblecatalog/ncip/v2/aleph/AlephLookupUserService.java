@@ -11,13 +11,14 @@ package org.extensiblecatalog.ncip.v2.aleph;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
@@ -35,7 +36,6 @@ import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
@@ -48,6 +48,8 @@ public class AlephLookupUserService implements LookupUserService {
 
 	@Override
 	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
+
+		final LookupUserResponseData responseData = new LookupUserResponseData();
 
 		String patronId = null;
 		String password = null;
@@ -66,67 +68,95 @@ public class AlephLookupUserService implements LookupUserService {
 			authenticateOnly = true;
 		}
 
-		if (patronId.isEmpty()) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
-		}
+		boolean userIdIsEmpty = patronId.isEmpty();
+		boolean authIsSetAndPwIsEmpty = initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty();
 
-		if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty()) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Password is undefined.");
-		}
+		if (userIdIsEmpty || authIsSetAndPwIsEmpty) {
+			List<Problem> problems = new ArrayList<Problem>();
 
-		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+			if (userIdIsEmpty) {
 
-		final LookupUserResponseData responseData = new LookupUserResponseData();
+				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Set AuthenticationInputType to \""
+						+ Version1AuthenticationInputType.USER_ID.getValue() + "\" to specify user id input.");
+				problems.add(p);
 
-		if (!authenticateOnly) {
-			AlephRestDlfUser alephUser = null;
-			try {
-				alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
-			} catch (MalformedURLException mue) {
-				Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
-				responseData.setProblems(Arrays.asList(p));
-			} catch (SAXException se) {
-				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (AlephException ae) {
-				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
-				responseData.setProblems(Arrays.asList(p));
+			}
+			if (authIsSetAndPwIsEmpty) {
+
+				Problem p = new Problem(new ProblemType("Password is undefined."), null, "Can't authenticate without password specified.", "Set AuthenticationInputType to \""
+						+ Version1AuthenticationInputType.PASSWORD.getValue() + "\" to specify password input.");
+				problems.add(p);
+
 			}
 
-			updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
+			responseData.setProblems(problems);
 		} else {
-			AgencyId suppliedAgencyId;
-			if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null)
-				suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
-			else
-				suppliedAgencyId = new AgencyId(alephRemoteServiceManager.getDefaultAgencyId());
 
-			try {
+			if (authenticateOnly) {
+				// Just authenticate patronId with password input through X-Services ..
 
-				String username = alephRemoteServiceManager.authenticateUser(suppliedAgencyId, patronId, password);
+				AgencyId suppliedAgencyId;
 
-				UserId userId = new UserId();
-				userId.setAgencyId(suppliedAgencyId);
-				userId.setUserIdentifierValue(username);
-				userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+				AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-				responseData.setUserId(userId);
+				if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null)
+					suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
+				else
+					suppliedAgencyId = new AgencyId(alephRemoteServiceManager.getDefaultAgencyId());
 
-			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
-				responseData.setProblems(Arrays.asList(p));
-			} catch (SAXException se) {
-				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (org.extensiblecatalog.ncip.v2.aleph.util.AlephException ae) {
-				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (ParserConfigurationException pce) {
-				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
-				responseData.setProblems(Arrays.asList(p));
+				try {
+
+					String username = alephRemoteServiceManager.authenticateUser(suppliedAgencyId, patronId, password);
+
+					UserId userId = new UserId();
+					userId.setAgencyId(suppliedAgencyId);
+					userId.setUserIdentifierValue(username);
+					userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+
+					responseData.setUserId(userId);
+
+				} catch (IOException ie) {
+					Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+					responseData.setProblems(Arrays.asList(p));
+				} catch (SAXException se) {
+					Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				} catch (AlephException ae) {
+					Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				} catch (ParserConfigurationException pce) {
+					Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				} catch (Exception e) {
+					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				}
+			} else {
+				// Regular lookup User ..
+
+				AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+
+				AlephRestDlfUser alephUser = null;
+				try {
+					alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
+				} catch (MalformedURLException mue) {
+					Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				} catch (IOException ie) {
+					Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+					responseData.setProblems(Arrays.asList(p));
+				} catch (SAXException se) {
+					Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				} catch (AlephException ae) {
+					Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				} catch (Exception e) {
+					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+					responseData.setProblems(Arrays.asList(p));
+				}
+
+				updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
 			}
 		}
 		return responseData;

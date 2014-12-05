@@ -1,6 +1,8 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
@@ -13,10 +15,11 @@ import org.extensiblecatalog.ncip.v2.service.FiscalActionType;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionReferenceId;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionType;
 import org.extensiblecatalog.ncip.v2.service.NCIPService;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ValidationException;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
@@ -26,6 +29,8 @@ public class AlephCreateUserFiscalTransactionService implements NCIPService<Crea
 	@Override
 	public CreateUserFiscalTransactionResponseData performService(CreateUserFiscalTransactionInitiationData initData, ServiceContext serviceContext,
 			RemoteServiceManager serviceManager) throws ServiceException, ValidationException {
+
+		final CreateUserFiscalTransactionResponseData responseData = new CreateUserFiscalTransactionResponseData();
 
 		String patronId = null;
 		String password = null;
@@ -42,43 +47,60 @@ public class AlephCreateUserFiscalTransactionService implements NCIPService<Crea
 			}
 		}
 
-		if (patronId.isEmpty()) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is undefined.");
+		boolean userIdIsEmpty = patronId.isEmpty();
+		boolean authIsSetAndPwIsEmpty = initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty();
+
+		if (userIdIsEmpty || authIsSetAndPwIsEmpty) {
+			List<Problem> problems = new ArrayList<Problem>();
+
+			if (userIdIsEmpty) {
+
+				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Set AuthenticationInputType to \""
+						+ Version1AuthenticationInputType.USER_ID.getValue() + "\" to specify user id input.");
+				problems.add(p);
+
+			}
+			if (authIsSetAndPwIsEmpty) {
+
+				Problem p = new Problem(new ProblemType("Password is undefined."), null, "Can't authenticate without password specified.", "Set AuthenticationInputType to \""
+						+ Version1AuthenticationInputType.PASSWORD.getValue() + "\" to specify password input.");
+				problems.add(p);
+
+			}
+
+			responseData.setProblems(problems);
 		}
 
-		if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty()) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Password is undefined.");
+		if (responseData.getProblems() == null) {
+
+			AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+
+			ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
+
+			if (responseHeader != null)
+				responseData.setResponseHeader(responseHeader);
+
+			responseData.setUserId(initData.getUserId());
+
+			FiscalActionType fiscalActionType = initData.getFiscalTransactionInformation().getFiscalActionType();
+			FiscalTransactionType fiscalTransactionType = initData.getFiscalTransactionInformation().getFiscalTransactionType();
+			Amount amount = initData.getFiscalTransactionInformation().getAmount();
+
+			// TODO: Implement storing this information into database.
+			// This service basically says user has paid mentioned amount.
+			// For now we will just send a message back we understood the payment was a success.
+
+			FiscalTransactionReferenceId fiscalTransactionReferenceId = new FiscalTransactionReferenceId();
+
+			AgencyId agencyId = new AgencyId(alephRemoteServiceManager.getDefaultAgencyId());
+			fiscalTransactionReferenceId.setAgencyId(agencyId);
+
+			String uniquePaymentIdentifier = createUniquePaymentIdentifier(initData, patronId);
+
+			fiscalTransactionReferenceId.setFiscalTransactionIdentifierValue(uniquePaymentIdentifier);
+
+			responseData.setFiscalTransactionReferenceId(fiscalTransactionReferenceId);
 		}
-
-		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
-
-		final CreateUserFiscalTransactionResponseData responseData = new CreateUserFiscalTransactionResponseData();
-
-		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
-
-		if (responseHeader != null)
-			responseData.setResponseHeader(responseHeader);
-
-		responseData.setUserId(initData.getUserId());
-
-		FiscalActionType fiscalActionType = initData.getFiscalTransactionInformation().getFiscalActionType();
-		FiscalTransactionType fiscalTransactionType = initData.getFiscalTransactionInformation().getFiscalTransactionType();
-		Amount amount = initData.getFiscalTransactionInformation().getAmount();
-
-		// TODO: Implement storing this information into database.
-		// This service basically says user has paid mentioned amount.
-		// For now we will just send a message back we understood the payment was a success.
-
-		FiscalTransactionReferenceId fiscalTransactionReferenceId = new FiscalTransactionReferenceId();
-
-		AgencyId agencyId = new AgencyId(alephRemoteServiceManager.getDefaultAgencyId());
-		fiscalTransactionReferenceId.setAgencyId(agencyId);
-
-		String uniquePaymentIdentifier = createUniquePaymentIdentifier(initData, patronId);
-
-		fiscalTransactionReferenceId.setFiscalTransactionIdentifierValue(uniquePaymentIdentifier);
-
-		responseData.setFiscalTransactionReferenceId(fiscalTransactionReferenceId);
 
 		return responseData;
 	}

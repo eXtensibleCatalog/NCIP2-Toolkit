@@ -75,21 +75,43 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		final LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 
+		List<Problem> problems = new ArrayList<Problem>();
 		try {
 			nextItemToken = parseItemToken(initData, alephSvcMgr);
+
+			if (nextItemToken != null && nextItemToken.isExpired()) {
+
+				Problem p = new Problem(new ProblemType("Usage of expired NextItemToken is not allowed."), null, null);
+				problems.add(p);
+			}
 		} catch (ServiceException se) {
 			if (se.getError().equals(ServiceError.UNSUPPORTED_REQUEST)) {
 				Problem p = new Problem(new ProblemType("Unknown NextItemToken was used."), null, null, "It has probably been deleted.");
-				responseData.setProblems(Arrays.asList(p));
+				problems.add(p);
 			}
 		}
 
-		if (nextItemToken != null && nextItemToken.isExpired()) {
+		boolean itemIdsIsEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
+		
+		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
+				&& initData.getBibliographicId(0).getBibliographicItemId() == null
+				&& initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier().isEmpty();
+		
+		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
+				&& initData.getBibliographicId(0).getBibliographicRecordId() == null
+				&& initData.getBibliographicId(0).getBibliographicItemId().getBibliographicItemIdentifier().isEmpty();
 
-			Problem p = new Problem(new ProblemType("Usage of expired NextItemToken is not allowed."), null, null);
-			responseData.setProblems(Arrays.asList(p));
+		if (itemIdsIsEmpty && bibRecIdIsEmpty && bibItemIdIsEmpty) {
 
-		} else if (responseData.getProblems() == null) {
+			Problem p = new Problem(new ProblemType("Item id nor Bibliographic Id is undefined."), null, null);
+			problems.add(p);
+
+		}
+
+		if (problems.size() > 0)
+			responseData.setProblems(problems);
+
+		if (responseData.getProblems() == null) {
 
 			bibInformations = new ArrayList<BibInformation>();
 			itemsForwarded = 0;
@@ -102,17 +124,21 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 				parseItemIds(initData, responseData, alephSvcMgr, nextItemToken);
 
-			} else
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "LookupItemSet service has no implemented service to process HoldingsSetId.");
+			} else {
+				Problem p = new Problem(new ProblemType("LookupItemSet service has no implemented service to process HoldingsSetId."), null, null);
+				responseData.setProblems(Arrays.asList(p));
+			}
+
+			if (responseData.getProblems() == null) {
+
+				responseData.setBibInformations(bibInformations);
+
+				ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
+
+				if (responseHeader != null)
+					responseData.setResponseHeader(responseHeader);
+			}
 		}
-
-		if (responseData.getProblems() == null || responseData.getProblem(0) == null)
-			responseData.setBibInformations(bibInformations);
-
-		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
-
-		if (responseHeader != null)
-			responseData.setResponseHeader(responseHeader);
 
 		return responseData;
 	}

@@ -440,7 +440,7 @@ public class RestDlfConnector extends AlephMediator {
 			return null;
 	}
 
-	public AlephRequestItem lookupRequest(LookupRequestInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException, ServiceException {
+	public AlephRequestItem lookupRequest(LookupRequestInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 
 		String alephItemId = initData.getItemId().getItemIdentifierValue();
 
@@ -548,7 +548,7 @@ public class RestDlfConnector extends AlephMediator {
 		return requestItem;
 	}
 
-	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException, ServiceException {
+	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
 
 		List<ItemId> itemIds = initData.getItemIds();
 		String patronId = initData.getUserId().getUserIdentifierValue();

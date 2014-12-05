@@ -1,13 +1,15 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
-import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -19,7 +21,6 @@ import org.extensiblecatalog.ncip.v2.service.RequestItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.RequestItemService;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.xml.sax.SAXException;
@@ -29,43 +30,59 @@ public class AlephRequestItemService implements RequestItemService {
 	@Override
 	public RequestItemResponseData performService(RequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
-
-		if (userIdIsEmpty) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "User Id is empty.");
-		}
-
-		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
-
 		final RequestItemResponseData responseData = new RequestItemResponseData();
 
-		try {
-			AlephRequestItem requestItem = alephRemoteServiceManager.requestItem(initData);
+		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
+		boolean itemIdsisEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
 
-			if (requestItem.getProblem() == null) {
-				updateResponseData(responseData, initData, requestItem);
-			} else {
-				responseData.setProblems(Arrays.asList(requestItem.getProblem()));
-				responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
-				responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
+		if (userIdIsEmpty || itemIdsisEmpty) {
+			List<Problem> problems = new ArrayList<Problem>();
+
+			if (userIdIsEmpty) {
+
+				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Cannot request item with unknown user.");
+				problems.add(p);
 			}
-		} catch (IOException ie) {
-			Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
-			responseData.setProblems(Arrays.asList(p));
-		} catch (SAXException se) {
-			Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		} catch (AlephException ae) {
-			Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		} catch (ParserConfigurationException pce) {
-			Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		} catch (Exception e) {
-			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		}
 
+			if (itemIdsisEmpty) {
+
+				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null, "Cannot request unknown item");
+				problems.add(p);
+
+			}
+
+			responseData.setProblems(problems);
+		} else {
+
+			AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+
+			try {
+				AlephRequestItem requestItem = alephRemoteServiceManager.requestItem(initData);
+
+				if (requestItem.getProblem() == null) {
+					updateResponseData(responseData, initData, requestItem);
+				} else {
+					responseData.setProblems(Arrays.asList(requestItem.getProblem()));
+					responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
+					responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
+				}
+			} catch (IOException ie) {
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+				responseData.setProblems(Arrays.asList(p));
+			} catch (SAXException se) {
+				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (AlephException ae) {
+				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (ParserConfigurationException pce) {
+				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (Exception e) {
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			}
+		}
 		return responseData;
 	}
 

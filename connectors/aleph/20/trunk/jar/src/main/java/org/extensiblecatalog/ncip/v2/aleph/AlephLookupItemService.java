@@ -53,44 +53,47 @@ public class AlephLookupItemService implements LookupItemService {
 	@Override
 	public LookupItemResponseData performService(LookupItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
+		final LookupItemResponseData responseData = new LookupItemResponseData();
+
 		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
 
 		if (itemIdIsEmpty) {
-			throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "Item id is undefined.");
-		}
+			
+			Problem p = new Problem(new ProblemType("Item id is undefined."), null, null);
+			responseData.setProblems(Arrays.asList(p));
+			
+		} else {
 
-		AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
+			AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
-		final LookupItemResponseData responseData = new LookupItemResponseData();
+			try {
+				AlephItem alephItem = alephRemoteServiceManager.lookupItem(initData);
 
-		try {
-			AlephItem alephItem = alephRemoteServiceManager.lookupItem(initData);
+				// update NCIP response data with aleph item data
+				if (alephItem != null) {
+					updateResponseData(initData, responseData, alephItem);
+				} else {
+					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
+					responseData.setProblems(Arrays.asList(p));
+				}
 
-			// update NCIP response data with aleph item data
-			if (alephItem != null) {
-				updateResponseData(initData, responseData, alephItem);
-			} else {
-				Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
+			} catch (IOException ie) {
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+				responseData.setProblems(Arrays.asList(p));
+			} catch (SAXException se) {
+				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (AlephException ae) {
+				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (ParserConfigurationException pce) {
+				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (Exception e) {
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			}
-
-		} catch (IOException ie) {
-			Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
-			responseData.setProblems(Arrays.asList(p));
-		} catch (SAXException se) {
-			Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		} catch (AlephException ae) {
-			Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		} catch (ParserConfigurationException pce) {
-			Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
-			responseData.setProblems(Arrays.asList(p));
-		} catch (Exception e) {
-			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
-			responseData.setProblems(Arrays.asList(p));
 		}
-
 		return responseData;
 	}
 
