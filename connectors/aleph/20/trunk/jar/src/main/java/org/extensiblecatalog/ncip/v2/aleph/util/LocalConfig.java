@@ -24,6 +24,8 @@ public class LocalConfig {
 
 	private int tokenExpirationTime;
 
+	private int bibLibraryLength;
+
 	public LocalConfig() {
 
 	}
@@ -195,6 +197,7 @@ public class LocalConfig {
 	 *            the bibLibrary to set
 	 */
 	public void setBibLibrary(String bibLibrary) {
+		bibLibraryLength = bibLibrary.length();
 		this.bibLibrary = bibLibrary;
 	}
 
@@ -203,6 +206,10 @@ public class LocalConfig {
 	 */
 	public String getAdmLibrary() {
 		return admLibrary;
+	}
+
+	public int getBibLibraryLength() {
+		return bibLibraryLength;
 	}
 
 	/**

@@ -129,8 +129,8 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
-		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibrary().length());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
+		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId || !isCorrectItemId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -169,7 +169,7 @@ public class RestDlfConnector extends AlephMediator {
 	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData lookupItemInitData, AlephLookupItemSetService service) throws ParserConfigurationException,
 			IOException, SAXException, AlephException {
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
@@ -447,7 +447,7 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -555,14 +555,15 @@ public class RestDlfConnector extends AlephMediator {
 
 		AlephRequestItem requestItem = new AlephRequestItem();
 		String alephItemId;
+		
 		for (ItemId itemId : itemIds) {
 			alephItemId = itemId.getItemIdentifierValue();
 			if (alephItemId != "") {
 				String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 				String itemIdVal = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-				boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
-				boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemIdVal, localConfig.getBibLibrary().length());
+				boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
+				boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemIdVal, localConfig.getBibLibraryLength());
 
 				if (!isCorrectRecordId || !isCorrectItemId) {
 					throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -651,8 +652,8 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibrary().length());
-		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibrary().length());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
+		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId || !isCorrectItemId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -714,7 +715,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		String alephLoanId = initData.getItemId().getItemIdentifierValue();
 
-		boolean isCorrectLoanId = AlephUtil.isCorrectRecordId(alephLoanId, localConfig.getBibLibrary().length());
+		boolean isCorrectLoanId = AlephUtil.isCorrectRecordId(alephLoanId, localConfig.getBibLibraryLength());
 
 		if (!isCorrectLoanId) {
 			throw new AlephException("Loan Id is accepted only in strict format with strict length. e.g. MZK50004929137");
