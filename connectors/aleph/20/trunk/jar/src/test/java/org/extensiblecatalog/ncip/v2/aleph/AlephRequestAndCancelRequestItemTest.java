@@ -1,6 +1,7 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -29,6 +30,142 @@ import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
 import org.xml.sax.SAXException;
 
 public class AlephRequestAndCancelRequestItemTest extends TestCase {
+	public void testRequestItem() throws ServiceException, ParserConfigurationException, SAXException {
+		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();
+
+		//
+		// Test RequestItemService first
+		//
+
+		AlephRequestItemService requestItemService = new AlephRequestItemService();
+		RequestItemInitiationData requestItemInitData = new RequestItemInitiationData();
+		RequestItemResponseData requestItemResponseData = new RequestItemResponseData();
+
+		// Input:
+
+		AgencyId agencyId = new AgencyId("MZK");
+
+		// Test multiple Requests
+		String[] itemIdVals = { "MZK01001333770-MZK50001370317000010", "MZK01001333770-MZK50001370317000040", "MZK01001333770-MZK50001370317000050" };
+
+		String userIdVal = "701";
+
+		UserId userId = new UserId();
+		userId.setAgencyId(agencyId);
+		userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+		userId.setUserIdentifierValue(userIdVal);
+		requestItemInitData.setUserId(userId);
+
+		for (String itemIdVal : itemIdVals) {
+			ItemId itemId = new ItemId();
+			itemId.setAgencyId(agencyId);
+			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+			itemId.setItemIdentifierValue(itemIdVal);
+
+			requestItemInitData.setItemIds(Arrays.asList(itemId));
+
+			PickupLocation pickupLocation = new PickupLocation("MZK ");
+			requestItemInitData.setPickupLocation(pickupLocation);
+
+			requestItemInitData.setAuthenticationInputDesired(true);
+			requestItemInitData.setBlockOrTrapDesired(true);
+			requestItemInitData.setDateOfBirthDesired(true);
+			requestItemInitData.setNameInformationDesired(true);
+			requestItemInitData.setPreviousUserIdDesired(true);
+			requestItemInitData.setUserAddressInformationDesired(true);
+			requestItemInitData.setUserLanguageDesired(true);
+			requestItemInitData.setUserPrivilegeDesired(true);
+
+			requestItemInitData.setBibliographicDescriptionDesired(true);
+			requestItemInitData.setCirculationStatusDesired(true);
+			requestItemInitData.setElectronicResourceDesired(true);
+			requestItemInitData.setHoldQueueLengthDesired(true);
+
+			GregorianCalendar now = new GregorianCalendar();
+			requestItemInitData.setEarliestDateNeeded(now);
+			requestItemInitData.setNeedBeforeDate(now);
+			requestItemInitData.setPickupExpiryDate(now);
+
+			requestItemInitData.setRequestType(Version1RequestType.HOLD);
+			requestItemInitData.setRequestScopeType(Version1RequestScopeType.ITEM);
+
+			InitiationHeader initiationHeader = new InitiationHeader();
+
+			ToAgencyId toAgencyId = new ToAgencyId();
+			toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
+
+			FromAgencyId fromAgencyId = new FromAgencyId();
+			fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
+
+			initiationHeader.setFromAgencyId(fromAgencyId);
+			initiationHeader.setToAgencyId(toAgencyId);
+			requestItemInitData.setInitiationHeader(initiationHeader);
+
+			// Ouput:
+
+			requestItemResponseData = requestItemService.performService(requestItemInitData, null, serviceManager);
+
+			assertEquals("Unexpected presence of ns1:Problem element.", true, requestItemResponseData.getProblems() == null || requestItemResponseData.getProblems().get(0) == null);
+
+			assertEquals("Unexpected UserId returned.", userIdVal, requestItemResponseData.getUserId().getUserIdentifierValue());
+
+			assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), requestItemResponseData.getResponseHeader().getToAgencyId().getAgencyId()
+					.getValue());
+			assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), requestItemResponseData.getResponseHeader().getFromAgencyId().getAgencyId()
+					.getValue());
+
+			assertEquals("Unexpected ItemIds returned.", itemIdVal, requestItemResponseData.getItemId().getItemIdentifierValue());
+
+			assertEquals("Unexpected RequestIdentifierValue length returned.", 9, requestItemResponseData.getRequestId().getRequestIdentifierValue().length());
+
+			assertEquals("Unexpected RequestType returned.", Version1RequestType.HOLD.getValue(), requestItemResponseData.getRequestType().getValue());
+			assertEquals("Unexpected RequestScopeType retuned.", Version1RequestScopeType.ITEM.getValue(), requestItemResponseData.getRequestScopeType().getValue());
+
+			//
+			// Now test CancelRequestItemService
+			//
+			
+			AlephCancelRequestItemService cancelRequestItemService = new AlephCancelRequestItemService();
+			CancelRequestItemInitiationData cancelRequestItemInitData = new CancelRequestItemInitiationData();
+			CancelRequestItemResponseData cancelRequestItemResponseData = new CancelRequestItemResponseData();
+
+			cancelRequestItemInitData.setUserId(userId);
+			
+			cancelRequestItemInitData.setItemId(itemId);
+
+			cancelRequestItemInitData.setRequestType(Version1RequestType.HOLD);
+			cancelRequestItemInitData.setRequestScopeType(Version1RequestScopeType.ITEM);
+
+			cancelRequestItemInitData.setAuthenticationInputDesired(true);
+			cancelRequestItemInitData.setBlockOrTrapDesired(true);
+			cancelRequestItemInitData.setDateOfBirthDesired(true);
+			cancelRequestItemInitData.setNameInformationDesired(true);
+			cancelRequestItemInitData.setPreviousUserIdDesired(true);
+			cancelRequestItemInitData.setUserAddressInformationDesired(true);
+			cancelRequestItemInitData.setUserLanguageDesired(true);
+			cancelRequestItemInitData.setUserPrivilegeDesired(true);
+
+			cancelRequestItemInitData.setBibliographicDescriptionDesired(true);
+			cancelRequestItemInitData.setCirculationStatusDesired(true);
+			cancelRequestItemInitData.setElectronicResourceDesired(true);
+			cancelRequestItemInitData.setHoldQueueLengthDesired(true);
+
+			cancelRequestItemInitData.setInitiationHeader(initiationHeader);
+
+			cancelRequestItemResponseData = cancelRequestItemService.performService(cancelRequestItemInitData, null, serviceManager);
+
+			assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), cancelRequestItemResponseData.getResponseHeader().getToAgencyId().getAgencyId()
+					.getValue());
+			assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), cancelRequestItemResponseData.getResponseHeader().getFromAgencyId()
+					.getAgencyId().getValue());
+			assertEquals("Unexpected presence of ns1:Problem element in CancelRequestItemTest. Was testing on " + itemIdVals + " itemId.", true,
+					cancelRequestItemResponseData.getProblems() == null || cancelRequestItemResponseData.getProblems().get(0) == null);
+
+			assertEquals("Unexpected UserId returned.", userIdVal, cancelRequestItemResponseData.getUserId().getUserIdentifierValue());
+			assertEquals("Unexpected ItemId returned.", itemIdVal, cancelRequestItemResponseData.getItemId().getItemIdentifierValue());
+		}
+	}
+
 	public void testRequestItems() throws ServiceException, ParserConfigurationException, SAXException {
 		AlephRemoteServiceManager serviceManager = new AlephRemoteServiceManager();
 
@@ -105,7 +242,6 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		initiationHeader.setToAgencyId(toAgencyId);
 		requestItemInitData.setInitiationHeader(initiationHeader);
 
-		int itemIdsCount = requestItemInitData.getItemIds().size();
 		// Ouput:
 
 		requestItemResponseData = requestItemService.performService(requestItemInitData, null, serviceManager);
@@ -142,7 +278,7 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 			// We have two options here:
 			// 1) requestId is a nine-digit number, which means request was a success
 			// 2) requestId specifies occurred error - than its length is at least 20 chars
-			// 		- shortest error returned by Aleph ILS is "Group does not exist"
+			// - shortest error returned by Aleph ILS is "Group does not exist"
 
 			boolean isCorrect = requestId.length() == AlephConstants.REQUEST_ID_LENGTH || requestId.length() > 19;
 
