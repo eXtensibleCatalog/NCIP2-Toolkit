@@ -5,7 +5,7 @@
 i=$(docker run -d -p 8080:8080 xcncip2toolkit/xcncip2toolkit)
 
 # Run xcncip2toolkit on tomcat with custom PW:
-# docker run -d -p 8080:8080 -e TOMCAT_PASS="myCustomPasswordToTomcat" xcncip2toolkit/xcncip2toolkit
+# i=$(docker run -d -p 8080:8080 -e TOMCAT_PASS="myCustomPasswordToTomcat" xcncip2toolkit/xcncip2toolkit)
 
 # Tomcat admin panel available at: 
 # http://127.0.0.1:8080/manager/html
