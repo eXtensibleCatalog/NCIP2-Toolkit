@@ -102,41 +102,41 @@ public class AlephItemHandler extends DefaultHandler {
 			if (listOfItems == null)
 				listOfItems = new ArrayList<AlephItem>();
 
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
-			barcodeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && itemDesrciptionDesired) {
-			materialReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
-			circulationStatusReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthDesired) {
 			holdQueueLengthReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && itemDesrciptionDesired) {
-			callNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && itemDesrciptionDesired) {
-			secondCallNoTypeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && itemDesrciptionDesired) {
-			secondCallNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && itemDesrciptionDesired) {
-			copyNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
-			itemDesrciptionReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationDesired) {
-			locationReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && locationDesired) {
 			collectionReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationDesired) {
+			locationReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
+			circulationStatusReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && itemDesrciptionDesired) {
+			copyNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && itemDesrciptionDesired) {
+			materialReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
+			itemDesrciptionReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && itemDesrciptionDesired) {
+			callNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && itemDesrciptionDesired) {
+			secondCallNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && itemDesrciptionDesired) {
+			secondCallNoTypeReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && itemRestrictionDesired) {
 			itemStatusReached = true;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 				authorReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
+				barcodeReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE)) {
 				isbnReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
 				titleReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
-				publisherReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
 				bibDocNoReached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
+				publisherReached = true;
 			}
 		}
 
@@ -148,34 +148,34 @@ public class AlephItemHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 			listOfItems.add(currentAlephItem);
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
-			callNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && secondCallNoTypeReached) {
-			secondCallNoTypeReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && secondCallNoReached) {
-			secondCallNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
-			copyNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
-			barcodeReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
-			materialReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
-			circulationStatusReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
 			currentAlephItem.setHoldQueueLength(0);
 			holdQueueLengthReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionReached) {
-			itemDesrciptionReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationReached) {
-			locationReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && collectionReached) {
 			collectionReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationReached) {
+			locationReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
+			circulationStatusReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
+			copyNoReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
+			materialReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionReached) {
+			itemDesrciptionReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
+			callNoReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && secondCallNoReached) {
+			secondCallNoReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && secondCallNoTypeReached) {
+			secondCallNoTypeReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && itemStatusReached) {
 			itemStatusReached = false;
 		} else if (bibDescriptionDesired) {
 			if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 				authorReached = false;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
+				barcodeReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
 				isbnReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
@@ -226,9 +226,6 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (copyNoReached) {
 			currentAlephItem.setCopyNumber(new String(ch, start, length));
 			copyNoReached = false;
-		} else if (barcodeReached) {
-			currentAlephItem.setBarcode(new String(ch, start, length));
-			barcodeReached = false;
 		} else if (materialReached) {
 			currentAlephItem.setMediumType(new String(ch, start, length));
 			materialReached = false;
@@ -242,6 +239,9 @@ public class AlephItemHandler extends DefaultHandler {
 			if (authorReached) {
 				currentAlephItem.setAuthor(new String(ch, start, length));
 				authorReached = false;
+			} else if (barcodeReached) {
+				currentAlephItem.setBarcode(new String(ch, start, length));
+				barcodeReached = false;
 			} else if (isbnReached) {
 				currentAlephItem.setIsbn(new String(ch, start, length));
 				isbnReached = false;

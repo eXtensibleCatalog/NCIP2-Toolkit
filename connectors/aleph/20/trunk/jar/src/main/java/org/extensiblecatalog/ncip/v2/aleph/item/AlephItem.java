@@ -53,7 +53,7 @@ public class AlephItem implements Serializable {
 
 	private Date dueDate;
 
-	private int holdQueueLength = 0;
+	private int holdQueueLength = -1;
 
 	private BigDecimal fineAmount;
 	private Date fineAccrualDate;
@@ -69,7 +69,6 @@ public class AlephItem implements Serializable {
 	private String holdRequestId;
 	private AlephAgency agency;
 
-	private String link;
 	private String subLibrary;
 	private String collection;
 
@@ -77,16 +76,10 @@ public class AlephItem implements Serializable {
 	private BigDecimal numberOfPieces;
 	private String publicationDate;
 	private String copyNumber;
-	private boolean exists = true;
 
 	private List<String> itemRestrictions;
 
 	private boolean localizationDesired = false;
-
-	public AlephItem doesntExists() {
-		this.exists = false;
-		return this;
-	}
 
 	public String getSubLibrary() {
 		return subLibrary;

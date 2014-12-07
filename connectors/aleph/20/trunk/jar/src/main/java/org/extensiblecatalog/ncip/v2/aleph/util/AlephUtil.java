@@ -302,35 +302,45 @@ public class AlephUtil {
 	}
 
 	public static ItemTransaction parseItemTransaction(AlephItem alephItem) {
-		ItemTransaction itemTransaction = new ItemTransaction();
-		if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
-			CurrentBorrower borrower = new CurrentBorrower();
-			UserId userId = new UserId();
-			AlephXServicesUser alephUser = alephItem.getBorrowingUsers().get(0);
-			userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
-			userId.setUserIdentifierType(new UserIdentifierType("Username"));
-			userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
-			borrower.setUserId(userId);
-			itemTransaction.setCurrentBorrower(borrower);
-		}
 
-		if (alephItem.getRequestingUsers() != null && alephItem.getRequestingUsers().size() > 0) {
-			Iterator<AlephXServicesUser> i = alephItem.getRequestingUsers().iterator();
-			while (i.hasNext()) {
-				AlephXServicesUser alephUser = i.next();
-				CurrentRequester requester = new CurrentRequester();
+		ItemTransaction itemTransaction = null;
+
+		boolean borrowingUsersSet = alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0;
+		boolean requestingUsersSet = alephItem.getRequestingUsers() != null && alephItem.getRequestingUsers().size() > 0;
+
+		if (borrowingUsersSet || requestingUsersSet) {
+
+			itemTransaction = new ItemTransaction();
+
+			if (borrowingUsersSet) {
+				CurrentBorrower borrower = new CurrentBorrower();
 				UserId userId = new UserId();
+				AlephXServicesUser alephUser = alephItem.getBorrowingUsers().get(0);
 				userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
 				userId.setUserIdentifierType(new UserIdentifierType("Username"));
 				userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
-				requester.setUserId(userId);
-				List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
-				if (requesters == null)
-					requesters = new ArrayList<CurrentRequester>();
-				requesters.add(requester);
-				itemTransaction.setCurrentRequesters(requesters);
+				borrower.setUserId(userId);
+				itemTransaction.setCurrentBorrower(borrower);
 			}
 
+			if (requestingUsersSet) {
+				Iterator<AlephXServicesUser> i = alephItem.getRequestingUsers().iterator();
+				while (i.hasNext()) {
+					AlephXServicesUser alephUser = i.next();
+					CurrentRequester requester = new CurrentRequester();
+					UserId userId = new UserId();
+					userId.setUserIdentifierValue(alephUser.getAuthenticatedUsername());
+					userId.setUserIdentifierType(new UserIdentifierType("Username"));
+					userId.setAgencyId(new AgencyId(alephUser.getAgency().getAgencyId()));
+					requester.setUserId(userId);
+					List<CurrentRequester> requesters = itemTransaction.getCurrentRequesters();
+					if (requesters == null)
+						requesters = new ArrayList<CurrentRequester>();
+					requesters.add(requester);
+					itemTransaction.setCurrentRequesters(requesters);
+				}
+
+			}
 		}
 		return itemTransaction;
 	}
