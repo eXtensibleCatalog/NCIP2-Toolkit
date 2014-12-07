@@ -257,7 +257,7 @@ public class RestDlfConnector extends AlephMediator {
 
 				itemHandler.getCurrentAlephItem().setNumberOfPieces(totalNumberOfPieces);
 
-				// Now because handler doesn't know URL it's parsing, we need to set itemIds manually 
+				// Now because handler doesn't know URL it's parsing, we need to set itemIds manually
 				String[] linkParts = link.split("/");
 				itemHandler.getCurrentAlephItem().setItemId(linkParts[5] + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + linkParts[7]);
 			}

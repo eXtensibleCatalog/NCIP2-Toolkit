@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -17,10 +18,11 @@ import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.ComponentId;
+import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
@@ -93,27 +95,23 @@ public class AlephUtil {
 	}
 
 	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
+		return parseBibliographicDescription(alephItem, agencyId, false);
+	}
+
+	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem, AgencyId agencyId, boolean includeComponentIdWithBarcode) {
 
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
-		BibliographicItemId bibliographicItemId;
-		BibliographicRecordId bibliographicRecordId;
 
-		List<BibliographicItemId> bibIds = new ArrayList<BibliographicItemId>();
-		List<BibliographicRecordId> bibRecIds = new ArrayList<BibliographicRecordId>();
 		if (alephItem.getAuthor() != null) {
 			bibliographicDescription.setAuthor(alephItem.getAuthor());
 		}
+
+		BibliographicItemId bibliographicItemId = null;
+
 		if (alephItem.getIsbn() != null) {
 			bibliographicItemId = new BibliographicItemId();
 			bibliographicItemId.setBibliographicItemIdentifier(alephItem.getIsbn());
 			bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
-			bibIds.add(bibliographicItemId);
-		}
-		if (alephItem.getBarcode() != null) {
-			bibliographicItemId = new BibliographicItemId();
-			bibliographicItemId.setBibliographicItemIdentifier(alephItem.getBarcode());
-			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-			bibIds.add(bibliographicItemId);
 		}
 
 		if (alephItem.getMediumType() != null) {
@@ -126,31 +124,28 @@ public class AlephUtil {
 
 			bibliographicDescription.setMediumType(mediumType);
 		}
-		if (alephItem.getPublisher() != null) {
+
+		if (alephItem.getPublisher() != null)
 			bibliographicDescription.setPublisher(alephItem.getPublisher());
-		}
-		if (alephItem.getSeries() != null) {
+
+		if (alephItem.getSeries() != null)
 			bibliographicDescription.setSeriesTitleNumber(alephItem.getSeries());
-		}
-		if (alephItem.getTitle() != null) {
+
+		if (alephItem.getTitle() != null)
 			bibliographicDescription.setTitle(alephItem.getTitle());
+
+		if (includeComponentIdWithBarcode && alephItem.getBarcode() != null) {
+			ComponentId componentId = new ComponentId();
+			componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.VERSION_1_BIBLIOGRAPHIC_RECORD_IDENTIFIER_CODE,
+					Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
+			componentId.setComponentIdentifier(alephItem.getBarcode());
+			bibliographicDescription.setComponentId(componentId);
 		}
 
-		if (alephItem.getBibId() != null) {
+		if (bibliographicItemId != null)
+			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
 
-			bibliographicRecordId = new BibliographicRecordId();
-			bibliographicRecordId.setAgencyId(agencyId);
-			bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getBibId());
-			bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
-			bibRecIds.add(bibliographicRecordId);
-
-		}
-
-		bibliographicDescription.setBibliographicItemIds(bibIds);
-		bibliographicDescription.setBibliographicRecordIds(bibRecIds);
-
-		// FIXME: NCIP cuts multiple bibliographic items/records although they are set properly - forwarded is only first bibItemId
-		// all other item ids & record ids are cut off
+		// FIXME: NCIP JAXB translator cuts off all BibliographicRecordIds - that's why we're using componentId to transfer barcode
 		return bibliographicDescription;
 	}
 

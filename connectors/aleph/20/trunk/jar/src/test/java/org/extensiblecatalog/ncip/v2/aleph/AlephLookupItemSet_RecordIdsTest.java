@@ -152,8 +152,9 @@ public class AlephLookupItemSet_RecordIdsTest extends TestCase {
 					assertEquals("Returned bibliographicRecordIdentifies doesn't equal to input.", bibRecIds[processedBibInfos], responseData.getBibInformation(i)
 							.getBibliographicId().getBibliographicRecordId().getBibliographicRecordIdentifier());
 					assertEquals("Unexpected Author returned.", authors[processedBibInfos], holdSet.getBibliographicDescription().getAuthor());
-					assertEquals("Unexpected ISBN returned.", isbns[processedBibInfos], holdSet.getBibliographicDescription().getBibliographicItemId(0)
-							.getBibliographicItemIdentifier());
+					if (processedBibInfos < 3)
+						assertEquals("Unexpected ISBN returned.", isbns[processedBibInfos], holdSet.getBibliographicDescription().getBibliographicItemId(0)
+								.getBibliographicItemIdentifier());
 					assertEquals("Unexpected Publisher returned.", publishers[processedBibInfos], holdSet.getBibliographicDescription().getPublisher());
 					assertEquals("Unexpected Title returned.", titles[processedBibInfos], holdSet.getBibliographicDescription().getTitle());
 					assertEquals("Unexpected MediumType returned.", mediumTypes[processedBibInfos], holdSet.getBibliographicDescription().getMediumType().getValue());
