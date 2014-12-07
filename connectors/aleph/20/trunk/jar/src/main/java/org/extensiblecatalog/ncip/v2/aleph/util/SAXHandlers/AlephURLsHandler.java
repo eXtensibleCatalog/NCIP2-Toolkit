@@ -79,7 +79,7 @@ public class AlephURLsHandler extends DefaultHandler {
 		return fromIndex + links.size();
 	}
 
-	public boolean haveParsedMax() {
+	public boolean haveParsedMaxLinks() {
 		return parsedMax;
 	}
 

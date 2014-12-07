@@ -69,9 +69,15 @@ public class RestDlfConnector extends AlephMediator {
 
 	private Random random = new Random();
 
-	public RestDlfConnector() throws ServiceException, ParserConfigurationException, SAXException {
+	public RestDlfConnector() throws ServiceException {
 
-		parser = SAXParserFactory.newInstance().newSAXParser();
+		try {
+			parser = SAXParserFactory.newInstance().newSAXParser();
+		} catch (ParserConfigurationException e1) {
+			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory.");
+		} catch (SAXException e1) {
+			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory.");
+		}
 		try {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			AlephConfiguration alephConfig = new AlephConfiguration(config);
@@ -140,9 +146,10 @@ public class RestDlfConnector extends AlephMediator {
 		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
 			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
+		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
+
 		URL url = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-				.setPath(localConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS, itemId)
-				.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+				.setPath(localConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS, itemId).addRequest("lang", lang).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -150,7 +157,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		parser.parse(streamSource, itemHandler);
 
-		return itemHandler.getAlephItem();
+		return itemHandler.getCurrentAlephItem();
 	}
 
 	public List<AlephItem> lookupItems(String id, LookupItemSetInitiationData luisInitData, AlephLookupItemSetService service) throws ParserConfigurationException, IOException,
@@ -178,6 +185,8 @@ public class RestDlfConnector extends AlephMediator {
 		if (lookupItemInitData.getInitiationHeader() != null && lookupItemInitData.getInitiationHeader().getApplicationProfileType() != null)
 			appProfileType = lookupItemInitData.getInitiationHeader().getApplicationProfileType().getValue();
 
+		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
+
 		URL url;
 		InputSource streamSource;
 
@@ -185,7 +194,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		// If there is maximumItemsCount set, then parse only URLs in range of maxItemsCount
 		// Else parse all at once with "view=full" GET request
-
+		
 		if (service.getMaximumItemsCount() != 0) {
 
 			ItemToken nextItemToken = service.getNextItemToken();
@@ -202,7 +211,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			parser.parse(streamSource, urlsHandler);
 
-			if (urlsHandler.haveParsedMax()) {
+			if (urlsHandler.haveParsedMaxLinks()) {
 				// Just create NextItemToken & continue
 
 				// It is important to let token create even if the bibId is last of all desired bibIds in case of not all children items can be forwarded due to maximumItemsCount
@@ -220,10 +229,9 @@ public class RestDlfConnector extends AlephMediator {
 
 					if (urlsHandler.haveParsedAll())
 						itemToken.setDoneWithRecordId(true);
-					else {
+					else 
 						itemToken.setNoOfDoneItemIds(urlsHandler.getNextLinkIndex());
-					}
-
+										
 					String tokenKey = Integer.toString(random.nextInt());
 
 					itemToken.setNextToken(tokenKey);
@@ -241,20 +249,20 @@ public class RestDlfConnector extends AlephMediator {
 
 			for (String link : urlsHandler.getLinks()) {
 
-				url = new URLBuilder().parseLink(link).addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+				url = new URLBuilder().parseLink(link).addRequest("lang", lang).toURL();
 
 				streamSource = new InputSource(url.openStream());
 
 				parser.parse(streamSource, itemHandler);
 
-				itemHandler.getAlephItem().setNumberOfPieces(totalNumberOfPieces);
+				itemHandler.getCurrentAlephItem().setNumberOfPieces(totalNumberOfPieces);
 			}
 
 		} else {
 
 			url = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
 					.setPath(localConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS).addRequest("view", "full")
-					.addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+					.addRequest("lang", lang).toURL();
 
 			streamSource = new InputSource(url.openStream());
 
@@ -294,6 +302,8 @@ public class RestDlfConnector extends AlephMediator {
 		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
 			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
+		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
+
 		// Create URL request only if specified service was desired
 		URL addressUrl = null;
 		if (nameInformationDesired || userIdDesired || userAddressInformationDesired || userPrivilegeDesired) {
@@ -321,13 +331,12 @@ public class RestDlfConnector extends AlephMediator {
 				// If there is not history expected, parse regular loans
 				loansUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
 						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
-						.addRequest("view", "full").addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+						.addRequest("view", "full").addRequest("lang", lang).toURL();
 
 			} else {
 				loansHistoryUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
 						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
-						.addRequest("view", "full").addRequest("type", "history").addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType)
-						.toURL();
+						.addRequest("view", "full").addRequest("type", "history").addRequest("lang", lang).toURL();
 			}
 		}
 
@@ -338,8 +347,7 @@ public class RestDlfConnector extends AlephMediator {
 			requestsUrl = new URLBuilder()
 					.setBase(localConfig.getServerName(), localConfig.getServerPort())
 					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
-							AlephConstants.PARAM_HOLDS).addRequest("view", "full").addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType)
-					.toURL();
+							AlephConstants.PARAM_HOLDS).addRequest("view", "full").addRequest("lang", lang).toURL();
 		}
 
 		URL blocksOrTrapsUrl = null;
@@ -461,10 +469,12 @@ public class RestDlfConnector extends AlephMediator {
 		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
 			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 
+		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
+
 		URL holdsUrl = new URLBuilder()
 				.setBase(localConfig.getServerName(), localConfig.getServerPort())
 				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
-						AlephConstants.PARAM_HOLDS).addRequest("lang", appProfileType == null || appProfileType.isEmpty() ? "en" : appProfileType).toURL();
+						AlephConstants.PARAM_HOLDS).addRequest("lang", lang).toURL();
 
 		AlephRequestHandler requestHandler = new AlephRequestHandler(itemId, requestItem);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
@@ -516,8 +526,9 @@ public class RestDlfConnector extends AlephMediator {
 			boolean getCircStatus = initData.getCirculationStatusDesired();
 			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
 			boolean getItemDescription = initData.getItemDescriptionDesired();
+			boolean getLocation = initData.getLocationDesired();
 
-			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription) {
+			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription || getLocation) {
 
 				LookupItemInitiationData LIinitData = new LookupItemInitiationData();
 				ItemId LIitemId = new ItemId();
@@ -530,6 +541,7 @@ public class RestDlfConnector extends AlephMediator {
 				LIinitData.setCirculationStatusDesired(getCircStatus);
 				LIinitData.setHoldQueueLengthDesired(getHoldQueueLength);
 				LIinitData.setItemDescriptionDesired(getItemDescription);
+				LIinitData.setLocationDesired(getLocation);
 
 				AlephItem item = lookupItem(LIinitData);
 				if (item == null)

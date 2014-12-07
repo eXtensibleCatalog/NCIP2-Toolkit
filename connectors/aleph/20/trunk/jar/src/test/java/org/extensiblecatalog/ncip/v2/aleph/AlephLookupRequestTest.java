@@ -65,6 +65,7 @@ public class AlephLookupRequestTest extends TestCase {
 		initData.setCirculationStatusDesired(true);
 		initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
+		initData.setLocationDesired(true);
 
 		int requestIdentifierLength = 9;
 
@@ -76,8 +77,9 @@ public class AlephLookupRequestTest extends TestCase {
 		String callNumber = "2-0805.673";
 		String barcode = "2610034811";
 		String medium = "Book";
-		String location = "Stock / within 1 hour";
-		
+		String locationLevelOne = "MZK?";
+		String locationLevelTwo = "Stock / within 1 hour";
+
 		String surName = "Pokus1 Přijmení";
 		String street = "Trvalá ulice 123";
 		String locality = "Trvalé";
@@ -87,13 +89,13 @@ public class AlephLookupRequestTest extends TestCase {
 		String privilegeDesc = "04 - S";
 
 		InitiationHeader initiationHeader = new InitiationHeader();
-		
+
 		ToAgencyId toAgencyId = new ToAgencyId();
 		toAgencyId.setAgencyId(new AgencyId("MZK-Aleph"));
-				
+
 		FromAgencyId fromAgencyId = new FromAgencyId();
 		fromAgencyId.setAgencyId(new AgencyId("MZK-VuFind"));
-		
+
 		initiationHeader.setFromAgencyId(fromAgencyId);
 		initiationHeader.setToAgencyId(toAgencyId);
 		initData.setInitiationHeader(initiationHeader);
@@ -110,14 +112,16 @@ public class AlephLookupRequestTest extends TestCase {
 		assertEquals("Unexpected RequestScopeType retuned.", Version1RequestScopeType.ITEM.getValue(), responseData.getRequestScopeType().getValue());
 		assertEquals("Unexpected RequestStatusType returned.", Version1RequestStatusType.IN_PROCESS.getValue(), responseData.getRequestStatusType().getValue());
 		assertEquals("Unexpected PickupLocation returned.", pickupLocation, responseData.getPickupLocation().getValue());
-		
+
 		assertEquals("Call number incorrect", callNumber, responseData.getItemOptionalFields().getItemDescription().getCallNumber());
-		assertEquals("Location incorrect", location, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstances().get(0)
-				.getLocationNameValue());
+		
+		assertEquals("Location incorrect", locationLevelOne, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(0).getLocationNameValue());
+		assertEquals("Location incorrect", locationLevelTwo, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(1).getLocationNameValue());
+		
 		assertEquals("Medium incorrect", medium, responseData.getItemOptionalFields().getBibliographicDescription().getMediumType().getValue());
 		assertEquals("Publisher incorrect", publisher, responseData.getItemOptionalFields().getBibliographicDescription().getPublisher());
 		assertEquals("Title incorrect", title, responseData.getItemOptionalFields().getBibliographicDescription().getTitle());
-		
+
 		assertEquals("Unexpected Surname returned.", surName, responseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation()
 				.getStructuredPersonalUserName().getSurname());
 
