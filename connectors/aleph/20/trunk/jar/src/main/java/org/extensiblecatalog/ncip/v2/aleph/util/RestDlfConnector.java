@@ -153,7 +153,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(url.openStream());
 
-		AlephItemHandler itemHandler = new AlephItemHandler(localConfig.getBibLibrary(), initData);
+		AlephItemHandler itemHandler = new AlephItemHandler(initData);
 
 		parser.parse(streamSource, itemHandler);
 
@@ -190,11 +190,11 @@ public class RestDlfConnector extends AlephMediator {
 		URL url;
 		InputSource streamSource;
 
-		AlephItemHandler itemHandler = new AlephItemHandler(localConfig.getBibLibrary(), lookupItemInitData);
+		AlephItemHandler itemHandler = new AlephItemHandler(lookupItemInitData);
 
 		// If there is maximumItemsCount set, then parse only URLs in range of maxItemsCount
 		// Else parse all at once with "view=full" GET request
-		
+
 		if (service.getMaximumItemsCount() != 0) {
 
 			ItemToken nextItemToken = service.getNextItemToken();
@@ -229,9 +229,9 @@ public class RestDlfConnector extends AlephMediator {
 
 					if (urlsHandler.haveParsedAll())
 						itemToken.setDoneWithRecordId(true);
-					else 
+					else
 						itemToken.setNoOfDoneItemIds(urlsHandler.getNextLinkIndex());
-										
+
 					String tokenKey = Integer.toString(random.nextInt());
 
 					itemToken.setNextToken(tokenKey);
@@ -256,6 +256,10 @@ public class RestDlfConnector extends AlephMediator {
 				parser.parse(streamSource, itemHandler);
 
 				itemHandler.getCurrentAlephItem().setNumberOfPieces(totalNumberOfPieces);
+
+				// Now because handler doesn't know URL it's parsing, we need to set itemIds manually 
+				String[] linkParts = link.split("/");
+				itemHandler.getCurrentAlephItem().setItemId(linkParts[5] + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + linkParts[7]);
 			}
 
 		} else {

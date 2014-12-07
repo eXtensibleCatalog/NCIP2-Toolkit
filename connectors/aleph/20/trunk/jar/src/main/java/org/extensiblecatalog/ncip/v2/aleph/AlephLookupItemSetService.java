@@ -92,11 +92,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		}
 
 		boolean itemIdsIsEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
-		
+
 		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
 				&& initData.getBibliographicId(0).getBibliographicItemId() == null
 				&& initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier().isEmpty();
-		
+
 		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
 				&& initData.getBibliographicId(0).getBibliographicRecordId() == null
 				&& initData.getBibliographicId(0).getBibliographicItemId().getBibliographicItemIdentifier().isEmpty();
@@ -395,6 +395,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 			try {
 				alephItem = alephSvcMgr.lookupItem(id, initData);
+
+				alephItem.setItemId(id);
 
 				bibInformation.setBibliographicId(createBibliographicId(id));
 

@@ -92,21 +92,6 @@ public class AlephItem implements Serializable {
 		return this;
 	}
 
-	/**
-	 * @return the link
-	 */
-	public String getLink() {
-		return link;
-	}
-
-	/**
-	 * @param link
-	 *            the link to set
-	 */
-	public void setLink(String link) {
-		this.link = link;
-	}
-
 	public String getSubLibrary() {
 		return subLibrary;
 	}
@@ -930,10 +915,6 @@ public class AlephItem implements Serializable {
 
 	public void setCopyNumber(String copyNumber) {
 		this.copyNumber = copyNumber;
-	}
-
-	public boolean exists() {
-		return exists;
 	}
 
 	public void setAgency(String agencyId) {

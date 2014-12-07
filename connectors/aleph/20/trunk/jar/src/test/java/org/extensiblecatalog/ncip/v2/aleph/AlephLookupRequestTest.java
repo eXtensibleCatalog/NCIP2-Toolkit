@@ -115,10 +115,10 @@ public class AlephLookupRequestTest extends TestCase {
 
 		assertEquals("Call number incorrect", callNumber, responseData.getItemOptionalFields().getItemDescription().getCallNumber());
 		
-		assertEquals("Location incorrect", locationLevelOne, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(0).getLocationNameValue());
-		assertEquals("Location incorrect", locationLevelTwo, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(1).getLocationNameValue());
+		assertEquals("Location of first NameLevel incorrect", locationLevelOne, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(0).getLocationNameValue());
+		assertEquals("Location of second NameLevel incorrect", locationLevelTwo, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(1).getLocationNameValue());
 		
-		assertEquals("Medium incorrect", medium, responseData.getItemOptionalFields().getBibliographicDescription().getMediumType().getValue());
+		assertEquals("MediumType incorrect", medium, responseData.getItemOptionalFields().getBibliographicDescription().getMediumType().getValue());
 		assertEquals("Publisher incorrect", publisher, responseData.getItemOptionalFields().getBibliographicDescription().getPublisher());
 		assertEquals("Title incorrect", title, responseData.getItemOptionalFields().getBibliographicDescription().getTitle());
 
