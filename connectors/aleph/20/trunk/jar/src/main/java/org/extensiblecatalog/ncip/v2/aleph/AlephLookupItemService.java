@@ -114,15 +114,15 @@ public class AlephLookupItemService implements LookupItemService {
 
 		responseData.setItemId(initData.getItemId());
 
-		ItemOptionalFields iof = AlephUtil.getItemOptionalFields(alephItem);
+		ItemOptionalFields iof = AlephUtil.parseItemOptionalFields(alephItem);
 
 		if (initData.getBibliographicDescriptionDesired()) {
-			iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
+			iof.setBibliographicDescription(AlephUtil.parseBibliographicDescription(alephItem, initData.getItemId().getAgencyId()));
 		}
 
 		responseData.setItemOptionalFields(iof);
 
-		ItemTransaction itemTransaction = AlephUtil.getItemTransaction(alephItem);
+		ItemTransaction itemTransaction = AlephUtil.parseItemTransaction(alephItem);
 		responseData.setItemTransaction(itemTransaction);
 
 	}

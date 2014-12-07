@@ -197,7 +197,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						AgencyId suppliedAgencyId = null;
 						if (initData.getBibliographicDescriptionDesired()) {
 							if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-								suppliedAgencyId = AlephUtil.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+								suppliedAgencyId = AlephUtil.createAgencyId(alephSvcMgr.getDefaultAgencyId());
 							else
 								suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 						}
@@ -265,7 +265,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 						AgencyId suppliedAgencyId = null;
 						if (initData.getBibliographicDescriptionDesired()) {
 							if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-								suppliedAgencyId = AlephUtil.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+								suppliedAgencyId = AlephUtil.createAgencyId(alephSvcMgr.getDefaultAgencyId());
 							else
 								suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 						}
@@ -406,7 +406,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 					if (initData.getBibliographicDescriptionDesired()) {
 						if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-							suppliedAgencyId = AlephUtil.toAgencyId(alephSvcMgr.getDefaultAgencyId());
+							suppliedAgencyId = AlephUtil.createAgencyId(alephSvcMgr.getDefaultAgencyId());
 						else
 							suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 					}
@@ -503,7 +503,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 		ItemOptionalFields iof = new ItemOptionalFields();
 
 		if (initData.getBibliographicDescriptionDesired()) {
-			BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(alephItem, suppliedAgencyId);
+			BibliographicDescription bDesc = AlephUtil.parseBibliographicDescription(alephItem, suppliedAgencyId);
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
@@ -580,7 +580,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			ItemOptionalFields iof = new ItemOptionalFields();
 
 			if (initData.getBibliographicDescriptionDesired()) {
-				BibliographicDescription bDesc = AlephUtil.getBibliographicDescription(item, suppliedAgencyId);
+				BibliographicDescription bDesc = AlephUtil.parseBibliographicDescription(item, suppliedAgencyId);
 				holdingsSet.setBibliographicDescription(bDesc);
 			}
 

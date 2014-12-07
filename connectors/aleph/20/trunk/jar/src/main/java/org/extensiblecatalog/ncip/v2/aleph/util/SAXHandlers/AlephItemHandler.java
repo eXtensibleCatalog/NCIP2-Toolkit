@@ -102,11 +102,11 @@ public class AlephItemHandler extends DefaultHandler {
 			if (listOfItems == null)
 				listOfItems = new ArrayList<AlephItem>();
 
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE)) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && itemDesrciptionDesired) {
 			callNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE)) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && itemDesrciptionDesired) {
 			secondCallNoTypeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE)) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && itemDesrciptionDesired) {
 			secondCallNoReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE)) {
 			copyNoReached = true;

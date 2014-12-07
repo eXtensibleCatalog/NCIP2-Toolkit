@@ -25,9 +25,9 @@ import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
@@ -88,11 +88,11 @@ public class AlephUtil {
 		itemRestrictionClassesInitialized = true;
 	}
 
-	public static AgencyId toAgencyId(String agencyId) {
+	public static AgencyId createAgencyId(String agencyId) {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
 
-	public static BibliographicDescription getBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
+	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
 
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 		BibliographicItemId bibliographicItemId;
@@ -160,7 +160,7 @@ public class AlephUtil {
 		return bibliographicDescription;
 	}
 
-	public static Location getLocation(AlephItem alephItem) {
+	public static Location parseLocation(AlephItem alephItem) {
 		Location location = new Location();
 		alephItem.getLocation();
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
@@ -181,11 +181,14 @@ public class AlephUtil {
 		return location;
 	}
 
-	public static ItemOptionalFields getItemOptionalFields(AlephItem alephItem) {
+	public static ItemOptionalFields parseItemOptionalFields(AlephItem alephItem) {
 		ItemOptionalFields iof = new ItemOptionalFields();
-		if (alephItem.getCirculationStatus() != null) {
+
+		if (alephItem.getCirculationStatus() != null)
 			iof.setCirculationStatus(alephItem.getCirculationStatus());
-		}
+
+		if (alephItem.getHoldQueueLength() >= 0)
+			iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
 
 		if (alephItem.getElectronicResource() != null) {
 			ElectronicResource resource = new ElectronicResource();
@@ -193,23 +196,24 @@ public class AlephUtil {
 			iof.setElectronicResource(resource);
 		}
 
-		if (alephItem.getHoldQueueLength() >= 0) {
-			iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
-		} else if (alephItem.getHoldQueue() != null) {
-			iof.setHoldQueue(alephItem.getHoldQueue());
-		}
+		if (alephItem.getCallNumber() != null || alephItem.getCopyNumber() != null || alephItem.getDescription() != null) {
+			ItemDescription description = new ItemDescription();
 
-		ItemDescription description = null;
+			if (alephItem.getCallNumber() != null)
+				description.setCallNumber(alephItem.getCallNumber());
 
-		if (alephItem.getCallNumber() != null) {
-			description = new ItemDescription();
-			description.setCallNumber(alephItem.getCallNumber());
-			iof.setItemDescription(description);
-		}
+			if (alephItem.getCopyNumber() != null)
+				description.setCopyNumber(alephItem.getCopyNumber());
 
-		if (alephItem.getCopyNumber() != null) {
-			description = new ItemDescription();
-			description.setCopyNumber(alephItem.getCopyNumber());
+			if (alephItem.getDescription() != null) {
+				HoldingsInformation holdInfo = new HoldingsInformation();
+				holdInfo.setUnstructuredHoldingsData(alephItem.getDescription());
+				description.setHoldingsInformation(holdInfo);
+			}
+
+			if (alephItem.getNumberOfPieces() != null)
+				description.setNumberOfPieces(alephItem.getNumberOfPieces());
+
 			iof.setItemDescription(description);
 		}
 
@@ -267,13 +271,6 @@ public class AlephUtil {
 			iof.setLocations(locations);
 		}
 
-		if (alephItem.getDescription() != null) {
-			if (description == null)
-				description = new ItemDescription();
-			description.setNumberOfPieces(alephItem.getNumberOfPieces());
-			description.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, alephItem.getDescription()));
-			iof.setItemDescription(description);
-		}
 		return iof;
 	}
 
@@ -315,7 +312,7 @@ public class AlephUtil {
 		return itemUseRestrictionType;
 	}
 
-	public static ItemTransaction getItemTransaction(AlephItem alephItem) {
+	public static ItemTransaction parseItemTransaction(AlephItem alephItem) {
 		ItemTransaction itemTransaction = new ItemTransaction();
 		if (alephItem.getBorrowingUsers() != null && alephItem.getBorrowingUsers().size() > 0) {
 			CurrentBorrower borrower = new CurrentBorrower();

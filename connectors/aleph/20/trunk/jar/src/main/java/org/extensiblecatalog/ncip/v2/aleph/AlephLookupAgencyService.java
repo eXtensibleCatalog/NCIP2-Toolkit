@@ -115,7 +115,7 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 					authenticationPrompt.setPromptInput(promptInput);
 					responseData.setAuthenticationPrompts(Arrays.asList(authenticationPrompt));
 				}
-				responseData.setAgencyId(AlephUtil.toAgencyId(localAgencyId));
+				responseData.setAgencyId(AlephUtil.createAgencyId(localAgencyId));
 			}
 		}
 		return responseData;

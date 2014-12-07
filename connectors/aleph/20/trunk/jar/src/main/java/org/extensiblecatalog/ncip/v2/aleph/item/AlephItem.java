@@ -78,7 +78,6 @@ public class AlephItem implements Serializable {
 
 	private String itemSeqNumber;
 	private BigDecimal numberOfPieces;
-	private String holdQueue;
 	private String publicationDate;
 	private String copyNumber;
 	private boolean exists = true;
@@ -106,13 +105,6 @@ public class AlephItem implements Serializable {
 
 	public void setCollection(String collection) {
 		this.collection = collection;
-	}
-
-	/**
-	 * @return the holdQueueErrorMessage
-	 */
-	public String getHoldQueue() {
-		return holdQueue;
 	}
 
 	/**
@@ -887,12 +879,6 @@ public class AlephItem implements Serializable {
 		return sb.toString();
 	}
 
-	public void setholdQueue(String errorHoldQueueNotFound) {
-		this.holdQueueLength = -1;
-		this.holdQueue = errorHoldQueueNotFound;
-
-	}
-
 	public BigDecimal getNumberOfPieces() {
 		return numberOfPieces;
 	}
@@ -924,8 +910,8 @@ public class AlephItem implements Serializable {
 	}
 
 	public ItemOptionalFields getItemOptionalFields() {
-		ItemOptionalFields iof = AlephUtil.getItemOptionalFields(this);
-		iof.setBibliographicDescription(AlephUtil.getBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
+		ItemOptionalFields iof = AlephUtil.parseItemOptionalFields(this);
+		iof.setBibliographicDescription(AlephUtil.parseBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
 		return iof;
 	}
 

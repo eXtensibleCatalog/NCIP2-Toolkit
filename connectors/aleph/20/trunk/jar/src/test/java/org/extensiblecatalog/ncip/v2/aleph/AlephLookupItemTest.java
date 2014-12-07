@@ -38,10 +38,9 @@ public class AlephLookupItemTest extends TestCase {
 		LookupItemInitiationData initData = new LookupItemInitiationData();
 		initData.setBibliographicDescriptionDesired(true);
 		initData.setCirculationStatusDesired(true);
-		initData.setCurrentBorrowerDesired(true);
-		initData.setCurrentRequestersDesired(true);
 		initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
+		initData.setItemDescriptionDesired(true);
 		initData.setLocationDesired(true);
 
 		ItemId itemId = new ItemId();

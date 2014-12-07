@@ -65,6 +65,7 @@ public class AlephLookupRequestTest extends TestCase {
 		initData.setCirculationStatusDesired(true);
 		initData.setElectronicResourceDesired(true);
 		initData.setHoldQueueLengthDesired(true);
+		initData.setItemDescriptionDesired(true);
 		initData.setLocationDesired(true);
 
 		int requestIdentifierLength = 9;
