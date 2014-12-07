@@ -13,6 +13,10 @@
                <ns1:BibliographicItemIdentifier>80-900870-1-9</ns1:BibliographicItemIdentifier>
                <ns1:BibliographicItemIdentifierCode ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicitemidentifiercode/bibliographicitemidentifiercode.scm">ISBN</ns1:BibliographicItemIdentifierCode>
             </ns1:BibliographicItemId>
+            <ns1:ComponentId>
+               <ns1:ComponentIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">Accession Number</ns1:ComponentIdentifierType>
+               <ns1:ComponentIdentifier>2610002885</ns1:ComponentIdentifier>
+            </ns1:ComponentId>
             <ns1:Publisher>EPA,</ns1:Publisher>
             <ns1:Title>Anglicko-český a česko-anglický elektrotechnický a elektronický slovník / Sest. aut. kol. pod</ns1:Title>
             <ns1:MediumType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm">Book</ns1:MediumType>
@@ -24,7 +28,7 @@
             <ns1:CallNumber>621.3 ANG</ns1:CallNumber>
          </ns1:ItemDescription>
          <ns1:Location>
-            <ns1:LocationType ns1:Scheme="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">Permanent Location</ns1:LocationType>
+            <ns1:LocationType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/locationtype/locationtype.scm">Permanent Location</ns1:LocationType>
             <ns1:LocationName>
                <ns1:LocationNameInstance>
                   <ns1:LocationNameLevel>1</ns1:LocationNameLevel>

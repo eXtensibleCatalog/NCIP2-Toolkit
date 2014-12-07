@@ -104,7 +104,7 @@ public class AlephItemHandler extends DefaultHandler {
 
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
 			barcodeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && itemDesrciptionDesired) {
 			materialReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
 			circulationStatusReached = true;
