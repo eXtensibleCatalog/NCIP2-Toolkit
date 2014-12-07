@@ -181,10 +181,6 @@ public class AlephItemFactory implements Serializable{
 				if (z30DataNode!=null){
 					if (AlephConstants.Z30_BARCODE.equalsIgnoreCase(z30DataNode.getNodeName())){
 						alephItem.setBarcode(XMLParserUtil.getNodeTextValue(z30DataNode));
-					} else if (AlephConstants.Z30_DOC_NUMBER_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
-						alephItem.setDocNumber(XMLParserUtil.getNodeTextValue(z30DataNode));
-					} else if (AlephConstants.Z30_ITEM_SEQUENCE_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
-						alephItem.setSeqNumber(XMLParserUtil.getNodeTextValue(z30DataNode));
 					} else if (AlephConstants.Z30_MATERIAL_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
 						alephItem.setMediumType(XMLParserUtil.getNodeTextValue(z30DataNode));
 					} else if (AlephConstants.Z30_CALL_NUMBER_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
@@ -214,11 +210,7 @@ public class AlephItemFactory implements Serializable{
 			for (int k=0; k<z36Nodes.getLength(); k++){
 				Node z36DataNode = z36Nodes.item(k);
 				if (z36DataNode!=null){
-					if (AlephConstants.Z36_DOC_NUMBER_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
-						alephItem.setDocNumber(XMLParserUtil.getNodeTextValue(z36DataNode));
-					} else if (AlephConstants.Z36_ITEM_SEQUENCE_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
-						alephItem.setSeqNumber(XMLParserUtil.getNodeTextValue(z36DataNode));
-					} else if (AlephConstants.Z36_MATERIAL_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
+					if (AlephConstants.Z36_MATERIAL_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
 						alephItem.setMediumType(XMLParserUtil.getNodeTextValue(z36DataNode));
 					} else if (AlephConstants.Z36_SUB_LIBRARY_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
 						alephItem.setLocation(XMLParserUtil.getNodeTextValue(z36DataNode));
@@ -254,11 +246,7 @@ public class AlephItemFactory implements Serializable{
 			for (int k=0; k<z37Nodes.getLength(); k++){
 				Node z37DataNode = z37Nodes.item(k);
 				if (z37DataNode!=null){
-					if (AlephConstants.Z37_DOC_NUMBER_NODE.equalsIgnoreCase(z37DataNode.getNodeName())){
-						alephItem.setDocNumber(XMLParserUtil.getNodeTextValue(z37DataNode));
-					} else if (AlephConstants.Z37_ITEM_SEQUENCE_NODE.equalsIgnoreCase(z37DataNode.getNodeName())){
-						alephItem.setSeqNumber(XMLParserUtil.getNodeTextValue(z37DataNode));
-					} else if (AlephConstants.Z37_REQUEST_NUMBER_NODE.equalsIgnoreCase(z37DataNode.getNodeName())){
+					if (AlephConstants.Z37_REQUEST_NUMBER_NODE.equalsIgnoreCase(z37DataNode.getNodeName())){
 						alephItem.setHoldRequestId(XMLParserUtil.getNodeTextValue(z37DataNode));
 					} else if (AlephConstants.Z37_REQUEST_DATE_NODE.equalsIgnoreCase(z37DataNode.getNodeName())){
 						try {

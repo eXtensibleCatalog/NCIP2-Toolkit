@@ -136,20 +136,14 @@ public class AlephUtil {
 			bibliographicDescription.setTitle(alephItem.getTitle());
 		}
 
-		if (alephItem.getBibId() != null || alephItem.getDocNumber() != null) {
-			if (alephItem.getDocNumber() != null) {
-				bibliographicRecordId = new BibliographicRecordId();
-				bibliographicRecordId.setAgencyId(agencyId);
-				bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getDocNumber());
-				bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
-				bibRecIds.add(bibliographicRecordId);
-			} else {
-				bibliographicRecordId = new BibliographicRecordId();
-				bibliographicRecordId.setAgencyId(agencyId);
-				bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getBibId());
-				bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
-				bibRecIds.add(bibliographicRecordId);
-			}
+		if (alephItem.getBibId() != null) {
+
+			bibliographicRecordId = new BibliographicRecordId();
+			bibliographicRecordId.setAgencyId(agencyId);
+			bibliographicRecordId.setBibliographicRecordIdentifier(alephItem.getBibId());
+			bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
+			bibRecIds.add(bibliographicRecordId);
+
 		}
 
 		bibliographicDescription.setBibliographicItemIds(bibIds);

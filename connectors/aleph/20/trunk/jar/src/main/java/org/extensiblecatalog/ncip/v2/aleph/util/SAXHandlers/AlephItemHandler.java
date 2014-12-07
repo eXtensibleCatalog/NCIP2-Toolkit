@@ -102,14 +102,6 @@ public class AlephItemHandler extends DefaultHandler {
 			if (listOfItems == null)
 				listOfItems = new ArrayList<AlephItem>();
 
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && itemDesrciptionDesired) {
-			callNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && itemDesrciptionDesired) {
-			secondCallNoTypeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && itemDesrciptionDesired) {
-			secondCallNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE)) {
-			copyNoReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE)) {
 			barcodeReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
@@ -118,6 +110,14 @@ public class AlephItemHandler extends DefaultHandler {
 			circulationStatusReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthDesired) {
 			holdQueueLengthReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && itemDesrciptionDesired) {
+			callNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && itemDesrciptionDesired) {
+			secondCallNoTypeReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && itemDesrciptionDesired) {
+			secondCallNoReached = true;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && itemDesrciptionDesired) {
+			copyNoReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && itemDesrciptionDesired) {
 			itemDesrciptionReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationDesired) {

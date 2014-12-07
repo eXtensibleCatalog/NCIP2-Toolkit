@@ -96,21 +96,5 @@ public class AlephItemTest extends TestCase {
 		item.setBarcode("00000002");
 		assertEquals("Unexpected Barcode, Expected: '00000002', Actual: '"+item.getBarcode()+"'",item.getBarcode(),"00000002");
 	}
-	
-	public void testSetDocNumber(){
-		AlephItem item = new AlephItem();
-		String inDocNum = "0335678";
-		String expectedDocNum = "000335678";
-		item.setDocNumber(inDocNum);
-		assertEquals("Unexpected doc number, Expected: "+expectedDocNum+", Actual: "+item.getDocNumber(),expectedDocNum,item.getDocNumber());
-	}
-	
-	public void testSetSeqNumber(){
-		AlephItem item = new AlephItem();
-		String inSeqNum = "10";
-		String expectedSeqNum = "000010";
-		item.setSeqNumber(inSeqNum);
-		assertEquals("Unexpected Seq Number, Expected: "+expectedSeqNum+", Actual: "+item.getSeqNumber(),expectedSeqNum,item.getSeqNumber());
-	}
 
 }

@@ -39,9 +39,6 @@ public class AlephItem implements Serializable {
 	private String isbn;
 	private String mediumType;
 
-	private String docNumber;
-	private String seqNumber;
-
 	private String publisher;
 	private String series;
 	private String title;
@@ -179,12 +176,6 @@ public class AlephItem implements Serializable {
 	 */
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
-	}
-
-	private void updateItemId() {
-		if (getDocNumber() != null && getSeqNumber() != null) {
-			setItemId(getDocNumber() + getSeqNumber());
-		}
 	}
 
 	/**
@@ -467,48 +458,6 @@ public class AlephItem implements Serializable {
 	}
 
 	/**
-	 * @param docNumber
-	 *            the docNumber to set
-	 */
-	public void setDocNumber(String docNumber) {
-		this.docNumber = docNumber;
-		// make sure docnumber is 9 digits, if not add leading zeroes
-		while (this.docNumber != null && this.docNumber.length() < AlephConstants.DOC_NUMBER_LENGTH) {
-			this.docNumber = "0" + this.docNumber;
-		}
-		// update the item id if necessary
-		updateItemId();
-	}
-
-	/**
-	 * @return the docNumber
-	 */
-	public String getDocNumber() {
-		return docNumber;
-	}
-
-	/**
-	 * @param seqNumber
-	 *            the seqNumber to set
-	 */
-	public void setSeqNumber(String seqNumber) {
-		this.seqNumber = seqNumber;
-		// make sure seqnumber is 6 digits, if not add leading zeroes
-		while (this.seqNumber != null && this.seqNumber.length() < AlephConstants.SEQ_NUMBER_LENGTH) {
-			this.seqNumber = "0" + this.seqNumber;
-		}
-		// update the item id if necessary
-		updateItemId();
-	}
-
-	/**
-	 * @return the seqNumber
-	 */
-	public String getSeqNumber() {
-		return seqNumber;
-	}
-
-	/**
 	 * @param dateHoldRequested
 	 *            the dateHoldRequested to set
 	 */
@@ -781,9 +730,6 @@ public class AlephItem implements Serializable {
 			if (item.getDescription() != null) {
 				this.setDescription(item.getDescription());
 			}
-			if (item.getDocNumber() != null) {
-				this.setDocNumber(item.getDocNumber());
-			}
 			if (item.getDueDate() != null) {
 				this.setDueDate(item.getDueDate());
 			}
@@ -828,9 +774,6 @@ public class AlephItem implements Serializable {
 					this.addRequestingUser(user);
 				}
 			}
-			if (item.getSeqNumber() != null) {
-				this.setSeqNumber(item.getSeqNumber());
-			}
 			if (item.getSeries() != null) {
 				this.setSeries(item.getSeries());
 			}
@@ -848,8 +791,6 @@ public class AlephItem implements Serializable {
 		sb.append("[BibID:" + (getBibId() != null ? getBibId() : "null") + "],");
 		sb.append("[ItemID:" + (getItemId() != null ? getItemId() : "null") + "],");
 		sb.append("[HoldingsID:" + (getHoldingsId() != null ? getHoldingsId() : "null") + "],");
-		sb.append("[DocNumber:" + (getDocNumber() != null ? getDocNumber() : "null") + "],");
-		sb.append("[SeqNumber:" + (getSeqNumber() != null ? getSeqNumber() : "null") + "],");
 		sb.append("[Barcode:" + (getBarcode() != null ? getBarcode() : "null") + "],");
 		sb.append("[Agency:" + (getAgency() != null && getAgency().getAgencyId() != null ? getAgency().getAgencyId() : "null") + "],");
 		sb.append("[Description:" + (getDescription() != null ? getDescription() : "null") + "],");

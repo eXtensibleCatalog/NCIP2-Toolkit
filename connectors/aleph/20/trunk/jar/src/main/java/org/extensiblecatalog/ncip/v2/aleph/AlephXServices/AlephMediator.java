@@ -380,14 +380,6 @@ public class AlephMediator implements Serializable {
 				bibItem.updateFromAlephItem(readItem);
 				holdingsItems.add(bibItem);
 				// }
-			} else if (bibItem.getDocNumber() != null && bibItem.getSeqNumber() != null) {
-				XService xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getDocNumber(), bibItem.getSeqNumber());
-				Document doc = xService.execute(getXServerName(), getXServerPort(), false);
-				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
-				// if ((readItem.getHoldingsId()!=null&&readItem.getHoldingsId().endsWith(holdingsId))||(holdingsId!=null&&holdingsId.endsWith(readItem.getHoldingsId()))){
-				bibItem.updateFromAlephItem(readItem);
-				holdingsItems.add(bibItem);
-				// }
 			}
 		}
 		return holdingsItems;
@@ -563,14 +555,6 @@ public class AlephMediator implements Serializable {
 				xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getBarcode());
 				doc = xService.execute(getXServerName(), getXServerPort(), false);
 				XMLParserUtil.outputNode(doc);
-				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
-				if ((readItem.getHoldingsId() != null && readItem.getHoldingsId().endsWith(holdingsId)) || (holdingsId != null && holdingsId.endsWith(readItem.getHoldingsId()))) {
-					bibItem.updateFromAlephItem(readItem);
-					keepItems.add(bibItem);
-				}
-			} else if (bibItem.getDocNumber() != null && bibItem.getSeqNumber() != null) {
-				xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getDocNumber(), item.getSeqNumber());
-				doc = xService.execute(getXServerName(), getXServerPort(), false);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
 				if ((readItem.getHoldingsId() != null && readItem.getHoldingsId().endsWith(holdingsId)) || (holdingsId != null && holdingsId.endsWith(readItem.getHoldingsId()))) {
 					bibItem.updateFromAlephItem(readItem);
