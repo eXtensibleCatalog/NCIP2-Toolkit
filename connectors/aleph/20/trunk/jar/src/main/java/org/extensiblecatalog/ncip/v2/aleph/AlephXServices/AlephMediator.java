@@ -372,7 +372,7 @@ public class AlephMediator implements Serializable {
 		for (AlephItem bibItem : items) {
 			// call read item and only keep items with correct hold id
 			if (bibItem.getBarcode() != null) {
-				XService xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getBarcode());
+				XService xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getBarcodeValue());
 				Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 				XMLParserUtil.outputNode(doc);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
@@ -450,7 +450,7 @@ public class AlephMediator implements Serializable {
 		item = AlephItemFactory.updateAlephItemParseFindDocResponse(item, doc);
 
 		if (getBibInformation && item.getBibId() != null) {
-			item = lookupItemByBibIdItemId(item.getBibId(), item.getItemId(), agencyId, getBibInformation, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
+			item = lookupItemByBibIdItemId(item.getBibId(), item.getItemId().getItemIdentifierValue(), agencyId, getBibInformation, getHoldQueueLength, getCurrentBorrowers, getCurrentRequesters);
 		}
 
 		if (getCirculationStatus && item.getCirculationStatus() == null && item.getBibId() != null) {
@@ -552,7 +552,7 @@ public class AlephMediator implements Serializable {
 		for (AlephItem bibItem : items) {
 			// call read item and only keep items with correct hold id
 			if (bibItem.getBarcode() != null) {
-				xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getBarcode());
+				xService = XServiceFactory.createReadItemXService(agency.getAdmLibrary(), bibItem.getBarcodeValue());
 				doc = xService.execute(getXServerName(), getXServerPort(), false);
 				XMLParserUtil.outputNode(doc);
 				AlephItem readItem = AlephItemFactory.getReadAlephItem(agency, doc);
@@ -601,7 +601,7 @@ public class AlephMediator implements Serializable {
 		boolean cancelled = false;
 		for (AlephItem item : items) {
 			try {
-				returnItem = cancelRequestItemByItemId(agencyId, patron_id, item.getItemId());
+				returnItem = cancelRequestItemByItemId(agencyId, patron_id, item.getItemId().getItemIdentifierValue());
 			} catch (AlephException ex) {
 				failEx = ex;
 			}
@@ -648,7 +648,7 @@ public class AlephMediator implements Serializable {
 		boolean cancelled = false;
 		for (AlephItem item : items) {
 			try {
-				returnItem = cancelRequestItemByItemId(agencyId, patron_id, item.getItemId());
+				returnItem = cancelRequestItemByItemId(agencyId, patron_id, item.getItemId().getItemIdentifierValue());
 			} catch (AlephException ex) {
 				failEx = ex;
 			}
@@ -694,8 +694,8 @@ public class AlephMediator implements Serializable {
 		boolean cancelled = false;
 		if (user != null && user.getRequestedItems() != null && user.getRequestedItems().size() > 0) {
 			for (AlephItem eachItem : user.getRequestedItems()) {
-				if (eachItem != null && item_id.equals(eachItem.getItemId()) && eachItem.getHoldRequestId() != null) {
-					XService xService = XServiceFactory.createCancelHoldRequestXService(agency.getAdmLibrary(), eachItem.getItemId(), eachItem.getHoldRequestId());
+				if (eachItem != null && item_id.equals(eachItem.getItemId().getItemIdentifierValue()) && eachItem.getHoldRequestId() != null) {
+					XService xService = XServiceFactory.createCancelHoldRequestXService(agency.getAdmLibrary(), eachItem.getItemId().getItemIdentifierValue(), eachItem.getHoldRequestId());
 					Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 					String error = XMLParserUtil.getError(doc);
 					if (error != null) {
@@ -835,7 +835,7 @@ public class AlephMediator implements Serializable {
 		} else if (user.hasRequestedItem(item)) {
 			throw new AlephException("Item is already requested");
 		} else if (item != null && item.getBarcode() != null) {
-			XService xService = XServiceFactory.createHoldRequestXService(agency.getAdmLibrary(), item.getBarcode(), request_user_bor_id);
+			XService xService = XServiceFactory.createHoldRequestXService(agency.getAdmLibrary(), item.getBarcodeValue(), request_user_bor_id);
 			Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 			String error = XMLParserUtil.getError(doc);
 			if (error != null) {
@@ -972,7 +972,7 @@ public class AlephMediator implements Serializable {
 			throw new AlephException(AlephConstants.ERROR_ITEM_NOT_CHECKED_OUT);
 		}
 		if (item != null && item.getBarcode() != null) {
-			XService xService = XServiceFactory.createRenewXService(adm_library, item.getBarcode(), request_user_bor_id);
+			XService xService = XServiceFactory.createRenewXService(adm_library, item.getBarcodeValue(), request_user_bor_id);
 			Document doc = xService.execute(getXServerName(), getXServerPort(), false);
 			String error = XMLParserUtil.getError(doc);
 			if (error != null) {
@@ -1209,7 +1209,7 @@ public class AlephMediator implements Serializable {
 		for (AlephItem item : foundItems) {
 			if (item.getBarcode() != null) {
 				item.setAvailability(this.getAlephItemAvailability(item));
-				barcodeStatusMap.put(item.getBarcode(), item);
+				barcodeStatusMap.put(item.getBarcodeValue(), item);
 			}
 		}
 

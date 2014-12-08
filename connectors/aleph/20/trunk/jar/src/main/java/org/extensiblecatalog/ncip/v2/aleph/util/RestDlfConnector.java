@@ -550,9 +550,7 @@ public class RestDlfConnector extends AlephMediator {
 				AlephItem item = lookupItem(LIinitData);
 				if (item == null)
 					throw new AlephException("Unknown itemId passed.");
-				if (item.getAgency() == null) {
-					item.setAgency(localConfig.getDefaultAgency());
-				}
+
 				requestItem.setItemOptionalFields(item.getItemOptionalFields());
 			}
 		} else {
@@ -854,9 +852,7 @@ public class RestDlfConnector extends AlephMediator {
 					LIinitData.setItemDescriptionDesired(getItemDescription);
 
 					AlephItem item = lookupItem(LIinitData);
-					if (item.getAgency() == null) {
-						item.setAgency(localConfig.getDefaultAgency());
-					}
+
 					renewItem.setItemOptionalFields(item.getItemOptionalFields());
 				}
 			} else {

@@ -8,6 +8,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -43,7 +44,6 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean isbnReached = false;
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
-	private boolean bibDocNoReached = false;
 	private boolean locationReached = false;
 	private boolean callNoReached = false;
 	private boolean copyNoReached = false;
@@ -97,9 +97,6 @@ public class AlephItemHandler extends DefaultHandler {
 				currentAlephItem.setItemId(itemLinkParts[5] + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + itemLinkParts[7]);
 			}
 
-			// This is needed in AlephUtil in order to determine if MediumType should be localized or not while parsing item optional fields
-			currentAlephItem.setLocalizationDesired(localizationDesired);
-
 			if (listOfItems == null)
 				listOfItems = new ArrayList<AlephItem>();
 
@@ -134,8 +131,6 @@ public class AlephItemHandler extends DefaultHandler {
 				isbnReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
 				titleReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE)) {
-				bibDocNoReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
 				publisherReached = true;
 			}
@@ -183,8 +178,6 @@ public class AlephItemHandler extends DefaultHandler {
 				titleReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
 				publisherReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z13_BIB_ID_NODE) && bibDocNoReached) {
-				bibDocNoReached = false;
 			}
 		}
 	}
@@ -228,7 +221,8 @@ public class AlephItemHandler extends DefaultHandler {
 			currentAlephItem.setCopyNumber(new String(ch, start, length));
 			copyNoReached = false;
 		} else if (materialReached) {
-			currentAlephItem.setMediumType(AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired));
+			MediumType mediumType = AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired);
+			currentAlephItem.setMediumType(mediumType);
 			materialReached = false;
 		} else if (collectionReached) {
 			currentAlephItem.setCollection(new String(ch, start, length));
@@ -252,9 +246,6 @@ public class AlephItemHandler extends DefaultHandler {
 			} else if (publisherReached) {
 				currentAlephItem.setPublisher(new String(ch, start, length));
 				publisherReached = false;
-			} else if (bibDocNoReached) {
-				currentAlephItem.setBibId(new String(ch, start, length));
-				bibDocNoReached = false;
 			}
 		}
 	}

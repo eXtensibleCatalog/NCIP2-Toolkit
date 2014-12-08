@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -13,10 +14,17 @@ import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants.Availability;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
+import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
+import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
+import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 
 /**
  * An item returned from Aleph
@@ -30,64 +38,64 @@ public class AlephItem implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 163979327947903965L;
-	private String bibId;
-	private String itemId;
-	private String holdingsId;
-	private String description;
-	private String location;
-	private String callNumber;
-	private String author;
-	private String isbn;
-	private MediumType mediumType;
 
-	private String publisher;
-	private String series;
-	private String title;
-
-	private CirculationStatus circulationStatus;
-	private String electronicResource;
-	private String sessionId;
-	private String barcode;
-
-	private Date dateHoldRequested;
-	private Date dateAvailablePickup;
-
-	private Date dueDate;
-
-	private int holdQueueLength = -1;
-
-	private BigDecimal fineAmount;
-	private Date fineAccrualDate;
-
-	private List<AlephXServicesUser> borrowingUsers;
+	private List<ItemUseRestrictionType> itemUseRestrictionTypes;
 	private List<AlephXServicesUser> requestingUsers;
+	private List<AlephXServicesUser> borrowingUsers;
 
 	private Availability availability;
 
-	private String fineStatus;
-	private String creditDebit;
+	private int holdQueueLength = -1;
 
-	private String holdRequestId;
+	private BigDecimal numberOfPieces;
+	private BigDecimal fineAmount;
+
+	private Date dateAvailablePickup;
+	private Date dateHoldRequested;
+	private Date fineAccrualDate;
+	private Date dueDate;
+
+	private ElectronicResource electronicResource;
+
+	private CirculationStatus circulationStatus;
+
+	private BibliographicDescription barcode;
+
+	private HoldingsInformation description;
+
+	private BibliographicItemId isbn;
+
+	private MediumType mediumType;
+
 	private AlephAgency agency;
 
-	private String subLibrary;
-	private String collection;
+	// Item identifiers
+	private String holdingsId;
+	private ItemId itemId;
+	private String bibId;
 
-	private String itemSeqNumber;
-	private BigDecimal numberOfPieces;
-	private String publicationDate;
+	// Bib description:
+	private String callNumber;
+	private String author;
+	private String publisher;
+	private String series;
+	private String title;
 	private String copyNumber;
 
-	private List<String> itemRestrictions;
+	// Item locations
+	private String location;
+	private String collection;
 
-	private boolean localizationDesired = false;
+	// User variables
+	private String fineStatus;
+	private String creditDebit;
+	private String holdRequestId;
+	private String sessionId;
 
-	public String getSubLibrary() {
-		return subLibrary;
-	}
-
-	public void setSubLibrary(String subLibrary) {
-		this.subLibrary = subLibrary;
+	public AlephItem() {
+		borrowingUsers = new ArrayList<AlephXServicesUser>();
+		requestingUsers = new ArrayList<AlephXServicesUser>();
+		itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
 	}
 
 	public String getCollection() {
@@ -98,42 +106,12 @@ public class AlephItem implements Serializable {
 		this.collection = collection;
 	}
 
-	/**
-	 * @param itemSeqNumber
-	 *            the itemSeqNumber to set
-	 */
-	public void setItemSeqNumber(String itemSeqNumber) {
-
-		this.itemSeqNumber = itemSeqNumber.trim();
-
-		// Erase the dot (AlephConstants.SEQUENCE_NUMBER_SEPARATOR)
-		this.itemSeqNumber = this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[0] + this.itemSeqNumber.split(AlephConstants.SEQUENCE_NUMBER_SEPARATOR)[1];
-
-		// make sure seqnumber is 6 digits, if not add leading zeroes
-		while (this.itemSeqNumber != null && this.itemSeqNumber.length() < AlephConstants.ITEM_SEQ_NUMBER_LENGTH) {
-			this.itemSeqNumber = "0" + this.itemSeqNumber;
-		}
-	}
-
-	/**
-	 * @return the itemSeqNumber
-	 */
-	public String getItemSeqNumber() {
-		return itemSeqNumber;
-	}
-
 	public void addItemRestriction(String itemRestriction) {
-		itemRestrictions.add(itemRestriction);
+		itemUseRestrictionTypes.add(AlephUtil.parseItemUseRestrictionType(itemRestriction));
 	}
 
-	public List<String> getItemRestrictions() {
-		return itemRestrictions;
-	}
-
-	public AlephItem() {
-		borrowingUsers = new ArrayList<AlephXServicesUser>();
-		requestingUsers = new ArrayList<AlephXServicesUser>();
-		itemRestrictions = new ArrayList<String>();
+	public List<ItemUseRestrictionType> getItemUseRestrictionTypes() {
+		return itemUseRestrictionTypes;
 	}
 
 	/**
@@ -160,7 +138,7 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the admId
 	 */
-	public String getItemId() {
+	public ItemId getItemId() {
 		return itemId;
 	}
 
@@ -168,15 +146,26 @@ public class AlephItem implements Serializable {
 	 * @param itemId
 	 *            the admId to set
 	 */
-	public void setItemId(String itemId) {
+	public void setItemId(ItemId itemId) {
+		this.itemId = itemId;
+	}
+
+	public void setItemId(String itemIdValue) {
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue(itemIdValue);
+		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 		this.itemId = itemId;
 	}
 
 	/**
 	 * @return the description
 	 */
-	public String getDescription() {
+	public HoldingsInformation getDescription() {
 		return description;
+	}
+
+	public void setDescription(HoldingsInformation description) {
+		this.description = description;
 	}
 
 	/**
@@ -184,7 +173,9 @@ public class AlephItem implements Serializable {
 	 *            the description to set
 	 */
 	public void setDescription(String description) {
-		this.description = description;
+		HoldingsInformation holdingsInformation = new HoldingsInformation();
+		holdingsInformation.setUnstructuredHoldingsData(description);
+		this.description = holdingsInformation;
 	}
 
 	/**
@@ -239,8 +230,12 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the isbn
 	 */
-	public String getIsbn() {
+	public BibliographicItemId getIsbn() {
 		return isbn;
+	}
+
+	public void setIsbn(BibliographicItemId isbn) {
+		this.isbn = isbn;
 	}
 
 	/**
@@ -248,7 +243,10 @@ public class AlephItem implements Serializable {
 	 *            the isbn to set
 	 */
 	public void setIsbn(String isbn) {
-		this.isbn = isbn;
+		BibliographicItemId bibliographicItemId = new BibliographicItemId();
+		bibliographicItemId.setBibliographicItemIdentifier(isbn);
+		bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
+		this.isbn = bibliographicItemId;
 	}
 
 	/**
@@ -337,8 +335,12 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the electronicResource
 	 */
-	public String getElectronicResource() {
+	public ElectronicResource getElectronicResource() {
 		return electronicResource;
+	}
+
+	public void setElectronicResource(ElectronicResource electronicResource) {
+		this.electronicResource = electronicResource;
 	}
 
 	/**
@@ -346,7 +348,10 @@ public class AlephItem implements Serializable {
 	 *            the electronicResource to set
 	 */
 	public void setElectronicResource(String electronicResource) {
-		this.electronicResource = electronicResource;
+
+		ElectronicResource resource = new ElectronicResource();
+		resource.setReferenceToResource(electronicResource);
+		this.electronicResource = resource;
 	}
 
 	/**
@@ -441,14 +446,29 @@ public class AlephItem implements Serializable {
 	 *            the barcode to set
 	 */
 	public void setBarcode(String barcode) {
+		BibliographicDescription bibDesc = new BibliographicDescription();
+
+		BibliographicItemId bibId = new BibliographicItemId();
+		bibId.setBibliographicItemIdentifier(barcode);
+		bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+
+		bibDesc.setBibliographicItemIds(Arrays.asList(bibId));
+		this.barcode = bibDesc;
+	}
+
+	public void setBarcode(BibliographicDescription barcode) {
 		this.barcode = barcode;
 	}
 
 	/**
 	 * @return the barcode
 	 */
-	public String getBarcode() {
+	public BibliographicDescription getBarcode() {
 		return barcode;
+	}
+
+	public String getBarcodeValue() {
+		return barcode.getBibliographicItemId(0).getBibliographicItemIdentifier();
 	}
 
 	/**
@@ -822,14 +842,6 @@ public class AlephItem implements Serializable {
 		this.numberOfPieces = numberOfPieces;
 	}
 
-	public String getPublicationDate() {
-		return publicationDate;
-	}
-
-	public void setPublicationDate(String publicationDate) {
-		this.publicationDate = publicationDate;
-	}
-
 	public String getCopyNumber() {
 		return copyNumber;
 	}
@@ -838,23 +850,9 @@ public class AlephItem implements Serializable {
 		this.copyNumber = copyNumber;
 	}
 
-	public void setAgency(String agencyId) {
-		AlephAgency agency = new AlephAgency();
-		agency.setAgencyId(agencyId);
-		this.agency = agency;
-	}
-
 	public ItemOptionalFields getItemOptionalFields() {
 		ItemOptionalFields iof = AlephUtil.parseItemOptionalFields(this);
-		iof.setBibliographicDescription(AlephUtil.parseBibliographicDescription(this, new AgencyId(this.getAgency().getAgencyId())));
+		iof.setBibliographicDescription(AlephUtil.parseBibliographicDescription(this));
 		return iof;
-	}
-
-	public void setLocalizationDesired(boolean localizationDesired) {
-		this.localizationDesired = localizationDesired;
-	}
-
-	public boolean getLocalizationDesired() {
-		return localizationDesired;
 	}
 }

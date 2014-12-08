@@ -17,7 +17,6 @@ import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
@@ -25,9 +24,7 @@ import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
-import org.extensiblecatalog.ncip.v2.service.ElectronicResource;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
-import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
@@ -45,7 +42,6 @@ import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
@@ -94,25 +90,16 @@ public class AlephUtil {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
 
-	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem, AgencyId agencyId) {
-		return parseBibliographicDescription(alephItem, agencyId, false);
+	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem) {
+		return parseBibliographicDescription(alephItem, false);
 	}
 
-	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem, AgencyId agencyId, boolean includeComponentIdWithBarcode) {
+	public static BibliographicDescription parseBibliographicDescription(AlephItem alephItem, boolean includeComponentIdWithBarcode) {
 
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 
-		if (alephItem.getAuthor() != null) {
+		if (alephItem.getAuthor() != null)
 			bibliographicDescription.setAuthor(alephItem.getAuthor());
-		}
-
-		BibliographicItemId bibliographicItemId = null;
-
-		if (alephItem.getIsbn() != null) {
-			bibliographicItemId = new BibliographicItemId();
-			bibliographicItemId.setBibliographicItemIdentifier(alephItem.getIsbn());
-			bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
-		}
 
 		if (alephItem.getMediumType() != null)
 			bibliographicDescription.setMediumType(alephItem.getMediumType());
@@ -126,16 +113,16 @@ public class AlephUtil {
 		if (alephItem.getTitle() != null)
 			bibliographicDescription.setTitle(alephItem.getTitle());
 
-		if (includeComponentIdWithBarcode && alephItem.getBarcode() != null) {
+		if (includeComponentIdWithBarcode && alephItem.getBarcodeValue() != null) {
 			ComponentId componentId = new ComponentId();
 			componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.VERSION_1_BIBLIOGRAPHIC_RECORD_IDENTIFIER_CODE,
 					Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
-			componentId.setComponentIdentifier(alephItem.getBarcode());
+			componentId.setComponentIdentifier(alephItem.getBarcodeValue());
 			bibliographicDescription.setComponentId(componentId);
 		}
 
-		if (bibliographicItemId != null)
-			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+		if (alephItem.getIsbn() != null)
+			bibliographicDescription.setBibliographicItemIds(Arrays.asList(alephItem.getIsbn()));
 
 		// FIXME: NCIP JAXB translator cuts off all BibliographicRecordIds - that's why we're using componentId to transfer barcode
 		return bibliographicDescription;
@@ -171,11 +158,8 @@ public class AlephUtil {
 		if (alephItem.getHoldQueueLength() >= 0)
 			iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
 
-		if (alephItem.getElectronicResource() != null) {
-			ElectronicResource resource = new ElectronicResource();
-			resource.setReferenceToResource(alephItem.getElectronicResource());
-			iof.setElectronicResource(resource);
-		}
+		if (alephItem.getElectronicResource() != null)
+			iof.setElectronicResource(alephItem.getElectronicResource());
 
 		if (alephItem.getCallNumber() != null || alephItem.getCopyNumber() != null || alephItem.getDescription() != null) {
 			ItemDescription description = new ItemDescription();
@@ -186,11 +170,8 @@ public class AlephUtil {
 			if (alephItem.getCopyNumber() != null)
 				description.setCopyNumber(alephItem.getCopyNumber());
 
-			if (alephItem.getDescription() != null) {
-				HoldingsInformation holdInfo = new HoldingsInformation();
-				holdInfo.setUnstructuredHoldingsData(alephItem.getDescription());
-				description.setHoldingsInformation(holdInfo);
-			}
+			if (alephItem.getDescription() != null)
+				description.setHoldingsInformation(alephItem.getDescription());
 
 			if (alephItem.getNumberOfPieces() != null)
 				description.setNumberOfPieces(alephItem.getNumberOfPieces());
@@ -198,21 +179,8 @@ public class AlephUtil {
 			iof.setItemDescription(description);
 		}
 
-		if (alephItem.getItemRestrictions().size() > 0) {
-
-			List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-
-			for (String itemRestriction : alephItem.getItemRestrictions()) {
-
-				ItemUseRestrictionType itemUseRestrictionType = parseItemUseRestrictionType(itemRestriction);
-
-				if (itemUseRestrictionType != null)
-					itemUseRestrictionTypes.add(itemUseRestrictionType);
-			}
-
-			if (itemUseRestrictionTypes.size() > 0)
-				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-		}
+		if (alephItem.getItemUseRestrictionTypes().size() > 0)
+			iof.setItemUseRestrictionTypes(alephItem.getItemUseRestrictionTypes());
 
 		if (alephItem.getLocation() != null || alephItem.getCollection() != null) {
 			List<Location> locations = new ArrayList<Location>();
@@ -251,6 +219,9 @@ public class AlephUtil {
 			locations.add(location);
 			iof.setLocations(locations);
 		}
+
+		if (alephItem.getBarcode() != null)
+			iof.setBibliographicDescription(alephItem.getBarcode());
 
 		return iof;
 	}
@@ -338,7 +309,7 @@ public class AlephUtil {
 	}
 
 	public static boolean inDaylightTime() {
-		return TimeZone.getDefault().inDaylightTime(new java.util.Date());
+		return TimeZone.getDefault().inDaylightTime(new Date());
 	}
 
 	public static String convertToAlephDate(GregorianCalendar gregorianCalendar) {

@@ -10,13 +10,11 @@ package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
@@ -29,7 +27,6 @@ import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
@@ -58,10 +55,10 @@ public class AlephLookupItemService implements LookupItemService {
 		boolean itemIdIsEmpty = initData.getItemId().getItemIdentifierValue().isEmpty();
 
 		if (itemIdIsEmpty) {
-			
+
 			Problem p = new Problem(new ProblemType("Item id is undefined."), null, null);
 			responseData.setProblems(Arrays.asList(p));
-			
+
 		} else {
 
 			AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
@@ -104,20 +101,12 @@ public class AlephLookupItemService implements LookupItemService {
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		if (alephItem.getDateAvailablePickup() != null) {
-			GregorianCalendar gc = new GregorianCalendar();
-			gc.setTime(alephItem.getDateAvailablePickup());
-			if (AlephUtil.inDaylightTime())
-				gc.add(Calendar.HOUR_OF_DAY, 2);
-			responseData.setHoldPickupDate(gc);
-		}
-
 		responseData.setItemId(initData.getItemId());
 
 		ItemOptionalFields iof = AlephUtil.parseItemOptionalFields(alephItem);
 
 		if (initData.getBibliographicDescriptionDesired()) {
-			iof.setBibliographicDescription(AlephUtil.parseBibliographicDescription(alephItem, initData.getItemId().getAgencyId(), true));
+			iof.setBibliographicDescription(AlephUtil.parseBibliographicDescription(alephItem, true));
 		}
 
 		responseData.setItemOptionalFields(iof);

@@ -1,7 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,25 +10,17 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
@@ -43,7 +34,6 @@ import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
@@ -194,15 +184,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 					if (alephItems != null && alephItems.size() > 0) {
 
-						AgencyId suppliedAgencyId = null;
-						if (initData.getBibliographicDescriptionDesired()) {
-							if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-								suppliedAgencyId = AlephUtil.createAgencyId(alephSvcMgr.getDefaultAgencyId());
-							else
-								suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
-						}
-
-						holdingSets = parseHoldingsSets(alephItems, suppliedAgencyId, initData);
+						holdingSets = parseHoldingsSets(alephItems, initData);
 
 						bibInformation.setHoldingsSets(holdingSets);
 
@@ -262,15 +244,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					alephItem = alephSvcMgr.lookupItem(id, initData);
 					if (alephItem != null) {
 
-						AgencyId suppliedAgencyId = null;
-						if (initData.getBibliographicDescriptionDesired()) {
-							if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-								suppliedAgencyId = AlephUtil.createAgencyId(alephSvcMgr.getDefaultAgencyId());
-							else
-								suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
-						}
-
-						holdingSets = Arrays.asList(parseHoldingsSet(alephItem, suppliedAgencyId, initData));
+						holdingSets = Arrays.asList(parseHoldingsSet(alephItem, initData));
 
 						bibInformation.setHoldingsSets(holdingSets);
 
@@ -284,7 +258,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 							ItemToken itemToken = new ItemToken();
 							itemToken.setBibliographicId(id);
-							itemToken.setItemId(alephItem.getItemId());
+							itemToken.setItemId(alephItem.getItemId().getItemIdentifierValue());
 
 							int newToken = random.nextInt();
 
@@ -387,8 +361,8 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					Problem problem = new Problem(new ProblemType("Empty ItemIdIdentifierValue."), null, "Here you have specified empty ItemIdIdentifierValue.");
 					bibInformation.setProblems(Arrays.asList(problem));
 					bibInformations.add(bibInformation);
-				}
-				continue;
+				} else
+					continue;
 			}
 
 			bibInformation = new BibInformation();
@@ -402,16 +376,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 				if (alephItem != null) {
 
-					AgencyId suppliedAgencyId = null;
-
-					if (initData.getBibliographicDescriptionDesired()) {
-						if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getToAgencyId() == null)
-							suppliedAgencyId = AlephUtil.createAgencyId(alephSvcMgr.getDefaultAgencyId());
-						else
-							suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
-					}
-
-					holdingsSets = Arrays.asList(parseHoldingsSet(alephItem, suppliedAgencyId, initData));
+					holdingsSets = Arrays.asList(parseHoldingsSet(alephItem, initData));
 
 					bibInformation.setHoldingsSets(holdingsSets);
 
@@ -497,62 +462,19 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 * @param getItemDescription
 	 * @return {@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}
 	 */
-	private HoldingsSet parseHoldingsSet(AlephItem alephItem, AgencyId suppliedAgencyId, LookupItemSetInitiationData initData) {
+	private HoldingsSet parseHoldingsSet(AlephItem alephItem, LookupItemSetInitiationData initData) {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
-		ItemOptionalFields iof = new ItemOptionalFields();
-
 		if (initData.getBibliographicDescriptionDesired()) {
-			BibliographicDescription bDesc = AlephUtil.parseBibliographicDescription(alephItem, suppliedAgencyId);
+			BibliographicDescription bDesc = AlephUtil.parseBibliographicDescription(alephItem);
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
-		addItemIdentifierToItemOptionalFields(iof, alephItem.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-
 		ItemInformation info = new ItemInformation();
 
-		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierValue(alephItem.getItemId());
-		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-		info.setItemId(itemId);
+		info.setItemId(alephItem.getItemId());
 
-		if (initData.getHoldQueueLengthDesired())
-			iof.setHoldQueueLength(new BigDecimal(alephItem.getHoldQueueLength()));
-		if (initData.getCirculationStatusDesired())
-			iof.setCirculationStatus(alephItem.getCirculationStatus());
-		if (initData.getItemDescriptionDesired()) {
-			ItemDescription itemDescription = new ItemDescription();
-			if (alephItem.getDescription() != null)
-				itemDescription.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, alephItem.getDescription()));
-			itemDescription.setCallNumber(alephItem.getCallNumber());
-			itemDescription.setCopyNumber(alephItem.getCopyNumber());
-			itemDescription.setNumberOfPieces(alephItem.getNumberOfPieces());
-			if (alephItem.getDescription() != null) {
-				HoldingsInformation holdingsInformation = new HoldingsInformation();
-				holdingsInformation.setUnstructuredHoldingsData(alephItem.getDescription());
-				itemDescription.setHoldingsInformation(holdingsInformation);
-			}
-			iof.setItemDescription(itemDescription);
-		}
-		if (initData.getItemUseRestrictionTypeDesired()) {
-			if (alephItem.getItemRestrictions().size() > 0) {
-
-				List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-
-				for (String itemRestriction : alephItem.getItemRestrictions()) {
-
-					ItemUseRestrictionType itemUseRestrictionType = AlephUtil.parseItemUseRestrictionType(itemRestriction);
-
-					if (itemUseRestrictionType != null)
-						itemUseRestrictionTypes.add(itemUseRestrictionType);
-				}
-
-				if (itemUseRestrictionTypes.size() > 0)
-					iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-			}
-		}
-
-		info.setItemOptionalFields(iof);
+		info.setItemOptionalFields(AlephUtil.parseItemOptionalFields(alephItem));
 
 		holdingsSet.setItemInformations(Arrays.asList(info));
 
@@ -571,65 +493,23 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 * @param getItemDescription
 	 * @return List<{@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}>
 	 */
-	private List<HoldingsSet> parseHoldingsSets(List<AlephItem> alephItems, AgencyId suppliedAgencyId, LookupItemSetInitiationData initData) {
+	private List<HoldingsSet> parseHoldingsSets(List<AlephItem> alephItems, LookupItemSetInitiationData initData) {
 
 		HoldingsSet holdingsSet = new HoldingsSet();
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
+
 		for (AlephItem item : alephItems) {
 
-			ItemOptionalFields iof = new ItemOptionalFields();
-
 			if (initData.getBibliographicDescriptionDesired()) {
-				BibliographicDescription bDesc = AlephUtil.parseBibliographicDescription(item, suppliedAgencyId);
+				BibliographicDescription bDesc = AlephUtil.parseBibliographicDescription(item);
 				holdingsSet.setBibliographicDescription(bDesc);
 			}
 
-			addItemIdentifierToItemOptionalFields(iof, item.getBarcode(), Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-
 			ItemInformation info = new ItemInformation();
 
-			ItemId itemId = new ItemId();
-			itemId.setItemIdentifierValue(item.getItemId());
-			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-			info.setItemId(itemId);
+			info.setItemId(item.getItemId());
 
-			if (initData.getHoldQueueLengthDesired())
-				iof.setHoldQueueLength(new BigDecimal(item.getHoldQueueLength()));
-			if (initData.getCirculationStatusDesired())
-				iof.setCirculationStatus(item.getCirculationStatus());
-			if (initData.getItemDescriptionDesired()) {
-				ItemDescription itemDescription = new ItemDescription();
-				if (item.getDescription() != null)
-					itemDescription.setItemDescriptionLevel(new ItemDescriptionLevel(AlephConstants.DEFAULT_SCHEME, item.getDescription()));
-				itemDescription.setCallNumber(item.getCallNumber());
-				itemDescription.setCopyNumber(item.getCopyNumber());
-				itemDescription.setNumberOfPieces(item.getNumberOfPieces());
-				if (item.getDescription() != null) {
-					HoldingsInformation holdingsInformation = new HoldingsInformation();
-					holdingsInformation.setUnstructuredHoldingsData(item.getDescription());
-					itemDescription.setHoldingsInformation(holdingsInformation);
-				}
-				iof.setItemDescription(itemDescription);
-			}
-			if (initData.getItemUseRestrictionTypeDesired()) {
-				if (item.getItemRestrictions().size() > 0) {
-
-					List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-
-					for (String itemRestriction : item.getItemRestrictions()) {
-
-						ItemUseRestrictionType itemUseRestrictionType = AlephUtil.parseItemUseRestrictionType(itemRestriction);
-
-						if (itemUseRestrictionType != null)
-							itemUseRestrictionTypes.add(itemUseRestrictionType);
-					}
-
-					if (itemUseRestrictionTypes.size() > 0)
-						iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-				}
-			}
-
-			info.setItemOptionalFields(iof);
+			info.setItemOptionalFields(AlephUtil.parseItemOptionalFields(item));
 
 			itemInfoList.add(info);
 		}
@@ -721,24 +601,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		bibliographicId.setBibliographicItemId(bibliographicItemId);
 		return bibliographicId;
-	}
-
-	/**
-	 * Adds passed String to Item Optional Fields as BibliographicItemIdentifier with passed BibliographicItemIdentifierCode.
-	 * 
-	 * @param iof
-	 * @param barcode
-	 * @param bibItemIdCode
-	 */
-	private void addItemIdentifierToItemOptionalFields(ItemOptionalFields iof, String barcode, BibliographicItemIdentifierCode bibItemIdCode) {
-		BibliographicDescription bibDesc = new BibliographicDescription();
-		List<BibliographicItemId> itemIds = new ArrayList<BibliographicItemId>();
-		BibliographicItemId bibId = new BibliographicItemId();
-		bibId.setBibliographicItemIdentifier(barcode);
-		bibId.setBibliographicItemIdentifierCode(bibItemIdCode);
-		itemIds.add(bibId);
-		bibDesc.setBibliographicItemIds(itemIds);
-		iof.setBibliographicDescription(bibDesc);
 	}
 
 	/**

@@ -503,7 +503,7 @@ public class XServiceFactoryTest extends TestCase {
 				System.out.println("Requested Item id: "+eachItem.getItemId()+"Holdings id: "+eachItem.getHoldingsId());
 				if (eachItem!=null&&eachItem.getHoldRequestId()!=null&&
 						(item_id.equals(eachItem.getItemId())||item_id2.equals(eachItem.getItemId()))){
-					xService = XServiceFactory.createCancelHoldRequestXService(admLibrary, eachItem.getItemId(), eachItem.getHoldRequestId());
+					xService = XServiceFactory.createCancelHoldRequestXService(admLibrary, eachItem.getItemId().getItemIdentifierValue(), eachItem.getHoldRequestId());
 					doc = xService.execute(serverName, serverPort, false);
 					XMLParserUtil.outputNode(doc);
 				}
