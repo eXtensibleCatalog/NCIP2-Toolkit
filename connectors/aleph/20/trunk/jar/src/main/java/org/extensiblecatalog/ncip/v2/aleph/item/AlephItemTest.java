@@ -1,5 +1,7 @@
 package org.extensiblecatalog.ncip.v2.aleph.item;
 
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+
 import junit.framework.TestCase;
 
 public class AlephItemTest extends TestCase {
@@ -51,8 +53,8 @@ public class AlephItemTest extends TestCase {
 
 	public void testSetMediumType() {
 		AlephItem item = new AlephItem();
-		item.setMediumType("dvd");
-		assertEquals("Unexpected medium type, Expected: 'dvd', Actual: '"+item.getMediumType()+"'",item.getMediumType(),"dvd");
+		item.setMediumType(AlephUtil.detectMediumType("dvd"));
+		assertEquals("Unexpected medium type, Expected: 'dvd', Actual: '"+item.getMediumType()+"'",item.getMediumType(),AlephUtil.detectMediumType("dvd"));
 	}
 
 	public void testSetPublisher() {

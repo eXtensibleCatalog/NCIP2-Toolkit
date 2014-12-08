@@ -287,7 +287,7 @@ public class AlephXServicesUserFactoryTest extends TestCase {
 				//assertEquals("Due Date Mismatch Expected: "+dueDate1+" Actual: "+item.getDueDate(),dueDate1,item.getDueDate());
 				assertEquals("ISBN Mismatch Expected: "+isbn1+" Actual: "+item.getIsbn(),isbn1,item.getIsbn());
 				assertEquals("Location Mismatch Expected: "+loanLocation1+" Actual: "+item.getLocation(),loanLocation1,item.getLocation());
-				assertEquals("Medium Type Mismatch Expected: "+mediumType1+" Actual: "+item.getMediumType(),mediumType1.toLowerCase(),item.getMediumType().toLowerCase());
+				assertEquals("Medium Type Mismatch Expected: "+mediumType1+" Actual: "+item.getMediumType(),mediumType1.toLowerCase(),item.getMediumType().getValue().toLowerCase());
 				assertEquals("Publisher Mismatch Expected: "+publisher1+" Actual: "+item.getPublisher(),publisher1,item.getPublisher());
 				assertEquals("Title Mismatch Expected: "+title1+" Actual: "+item.getTitle(),title1,item.getTitle());
 				found1 = true;
@@ -302,7 +302,7 @@ public class AlephXServicesUserFactoryTest extends TestCase {
 				//assertEquals("Due Date Mismatch Expected: "+dueDate2+" Actual: "+item.getDueDate(),dueDate2,item.getDueDate());
 				assertEquals("ISBN Mismatch Expected: "+isbn2+" Actual: "+item.getIsbn(),isbn2,item.getIsbn());
 				assertEquals("Location Mismatch Expected: "+loanLocation2+" Actual: "+item.getLocation(),loanLocation2,item.getLocation());
-				assertEquals("Medium Type Mismatch Expected: "+mediumType2+" Actual: "+item.getMediumType(),mediumType2.toLowerCase(),item.getMediumType().toLowerCase());
+				assertEquals("Medium Type Mismatch Expected: "+mediumType2+" Actual: "+item.getMediumType(),mediumType2.toLowerCase(),item.getMediumType().getValue().toLowerCase());
 				assertEquals("Publisher Mismatch Expected: "+publisher2+" Actual: "+item.getPublisher(),publisher2,item.getPublisher());
 				assertEquals("Title Mismatch Expected: "+title2+" Actual: "+item.getTitle(),title2,item.getTitle());
 				found2 = true;
@@ -317,7 +317,7 @@ public class AlephXServicesUserFactoryTest extends TestCase {
 				//assertEquals("Due Date Mismatch Expected: "+dueDate3+" Actual: "+item.getDueDate(),dueDate3,item.getDueDate());
 				assertEquals("ISBN Mismatch Expected: "+isbn3+" Actual: "+item.getIsbn(),isbn3,item.getIsbn());
 				assertEquals("Location Mismatch Expected: "+loanLocation3+" Actual: "+item.getLocation(),loanLocation3,item.getLocation());
-				assertEquals("Medium Type Mismatch Expected: "+mediumType3+" Actual: "+item.getMediumType().toLowerCase(),mediumType3.toLowerCase(),item.getMediumType().toLowerCase());
+				assertEquals("Medium Type Mismatch Expected: "+mediumType3+" Actual: "+item.getMediumType().getValue().toLowerCase(),mediumType3.toLowerCase(),item.getMediumType().getValue().toLowerCase());
 				assertEquals("Publisher Mismatch Expected: "+publisher3+" Actual: "+item.getPublisher(),publisher3,item.getPublisher());
 				found3 = true;
 				assertEquals("Title Mismatch Expected: "+title3+" Actual: "+item.getTitle(),title3,item.getTitle());
@@ -332,7 +332,7 @@ public class AlephXServicesUserFactoryTest extends TestCase {
 				//assertEquals("Due Date Mismatch Expected: "+dueDate4+" Actual: "+item.getDueDate(),dueDate4,item.getDueDate());
 				//assertEquals("ISBN Mismatch Expected: "+isbn4+" Actual: "+item.getIsbn(),isbn4,item.getIsbn());
 				assertEquals("Location Mismatch Expected: "+loanLocation4+" Actual: "+item.getLocation(),loanLocation4,item.getLocation());
-				assertEquals("Medium Type Mismatch Expected: "+mediumType4+" Actual: "+item.getMediumType().toLowerCase(),mediumType4.toLowerCase(),item.getMediumType().toLowerCase());
+				assertEquals("Medium Type Mismatch Expected: "+mediumType4+" Actual: "+item.getMediumType().getValue().toLowerCase(),mediumType4.toLowerCase(),item.getMediumType().getValue().toLowerCase());
 				assertEquals("Publisher Mismatch Expected: "+publisher4+" Actual: "+item.getPublisher(),publisher4,item.getPublisher());
 				assertEquals("Title Mismatch Expected: "+title4+" Actual: "+item.getTitle(),title4,item.getTitle());
 				found4 = true;

@@ -16,6 +16,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.MediumType;
 
 /**
  * An item returned from Aleph
@@ -37,7 +38,7 @@ public class AlephItem implements Serializable {
 	private String callNumber;
 	private String author;
 	private String isbn;
-	private String mediumType;
+	private MediumType mediumType;
 
 	private String publisher;
 	private String series;
@@ -253,7 +254,7 @@ public class AlephItem implements Serializable {
 	/**
 	 * @return the mediumType
 	 */
-	public String getMediumType() {
+	public MediumType getMediumType() {
 		return mediumType;
 	}
 
@@ -261,7 +262,7 @@ public class AlephItem implements Serializable {
 	 * @param mediumType
 	 *            the mediumType to set
 	 */
-	public void setMediumType(String mediumType) {
+	public void setMediumType(MediumType mediumType) {
 		this.mediumType = mediumType;
 	}
 

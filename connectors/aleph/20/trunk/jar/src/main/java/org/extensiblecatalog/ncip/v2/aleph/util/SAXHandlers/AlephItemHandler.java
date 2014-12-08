@@ -6,6 +6,7 @@ import java.util.List;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -227,7 +228,7 @@ public class AlephItemHandler extends DefaultHandler {
 			currentAlephItem.setCopyNumber(new String(ch, start, length));
 			copyNoReached = false;
 		} else if (materialReached) {
-			currentAlephItem.setMediumType(new String(ch, start, length));
+			currentAlephItem.setMediumType(AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired));
 			materialReached = false;
 		} else if (collectionReached) {
 			currentAlephItem.setCollection(new String(ch, start, length));

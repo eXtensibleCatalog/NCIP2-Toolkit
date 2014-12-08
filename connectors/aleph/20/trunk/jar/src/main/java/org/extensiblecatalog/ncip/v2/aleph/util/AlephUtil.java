@@ -114,16 +114,8 @@ public class AlephUtil {
 			bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
 		}
 
-		if (alephItem.getMediumType() != null) {
-			MediumType mediumType;
-
-			if (!alephItem.getLocalizationDesired())
-				mediumType = AlephUtil.detectMediumType(alephItem.getMediumType());
-			else
-				mediumType = new MediumType("localized", alephItem.getMediumType());
-
-			bibliographicDescription.setMediumType(mediumType);
-		}
+		if (alephItem.getMediumType() != null)
+			bibliographicDescription.setMediumType(alephItem.getMediumType());
 
 		if (alephItem.getPublisher() != null)
 			bibliographicDescription.setPublisher(alephItem.getPublisher());
@@ -370,19 +362,28 @@ public class AlephUtil {
 	}
 
 	public static MediumType detectMediumType(String mediumTypeParsed) {
+		return detectMediumType(mediumTypeParsed, false);
+	}
+
+	public static MediumType detectMediumType(String mediumTypeParsed, boolean localizationDesired) {
 		MediumType mediumType = null;
 
 		// TODO: Find out Aleph non-localized values & change these AlephLocalization.SOMETHING to AlephConstants.SOMETHING ...
-		if (mediumTypeParsed.matches(AlephLocalization.BOOK + "|" + AlephLocalization.GRAPHICS + "|" + AlephLocalization.MAP))
-			mediumType = Version1MediumType.BOOK;
-		else if (mediumTypeParsed.matches(AlephLocalization.MAGAZINE1 + "|" + AlephLocalization.MAGAZINE2))
-			mediumType = Version1MediumType.MAGAZINE;
-		else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.COMPACT_DISC))
-			mediumType = Version1MediumType.CD_ROM;
-		else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.AUDIO_TAPE))
-			mediumType = Version1MediumType.AUDIO_TAPE;
-		else {
+
+		if (localizationDesired) {
 			mediumType = new MediumType("localized", mediumTypeParsed);
+		} else {
+			if (mediumTypeParsed.matches(AlephLocalization.BOOK + "|" + AlephLocalization.GRAPHICS + "|" + AlephLocalization.MAP))
+				mediumType = Version1MediumType.BOOK;
+			else if (mediumTypeParsed.matches(AlephLocalization.MAGAZINE1 + "|" + AlephLocalization.MAGAZINE2))
+				mediumType = Version1MediumType.MAGAZINE;
+			else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.COMPACT_DISC))
+				mediumType = Version1MediumType.CD_ROM;
+			else if (mediumTypeParsed.equalsIgnoreCase(AlephLocalization.AUDIO_TAPE))
+				mediumType = Version1MediumType.AUDIO_TAPE;
+			else {
+				mediumType = new MediumType("localized", mediumTypeParsed);
+			}
 		}
 		return mediumType;
 	}

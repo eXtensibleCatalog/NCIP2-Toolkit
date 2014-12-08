@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.item;
 import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.XMLParserUtil;
 
 import java.io.IOException;
@@ -182,7 +183,7 @@ public class AlephItemFactory implements Serializable{
 					if (AlephConstants.Z30_BARCODE.equalsIgnoreCase(z30DataNode.getNodeName())){
 						alephItem.setBarcode(XMLParserUtil.getNodeTextValue(z30DataNode));
 					} else if (AlephConstants.Z30_MATERIAL_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
-						alephItem.setMediumType(XMLParserUtil.getNodeTextValue(z30DataNode));
+						alephItem.setMediumType(AlephUtil.detectMediumType(XMLParserUtil.getNodeTextValue(z30DataNode)));
 					} else if (AlephConstants.Z30_CALL_NUMBER_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
 						alephItem.setCallNumber(XMLParserUtil.getNodeTextValue(z30DataNode));
 					} else if (AlephConstants.Z30_SUB_LIBRARY_NODE.equalsIgnoreCase(z30DataNode.getNodeName())){
@@ -211,7 +212,7 @@ public class AlephItemFactory implements Serializable{
 				Node z36DataNode = z36Nodes.item(k);
 				if (z36DataNode!=null){
 					if (AlephConstants.Z36_MATERIAL_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
-						alephItem.setMediumType(XMLParserUtil.getNodeTextValue(z36DataNode));
+						alephItem.setMediumType(AlephUtil.detectMediumType(XMLParserUtil.getNodeTextValue(z36DataNode)));
 					} else if (AlephConstants.Z36_SUB_LIBRARY_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
 						alephItem.setLocation(XMLParserUtil.getNodeTextValue(z36DataNode));
 					} else if (AlephConstants.Z36_STATUS_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
@@ -593,7 +594,7 @@ public class AlephItemFactory implements Serializable{
 								if (location!=null) item.setLocation(location);
 								//set medium type
 								String medium = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.MEDIUM_LABEL_ATTR_VALUE);
-								if (medium!=null) item.setMediumType(medium);
+								if (medium!=null) item.setMediumType(AlephUtil.detectMediumType(medium));
 							} else if (AlephConstants.SERIES_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
 								String series = XMLParserUtil.getValueFromMarcField(varfield);
 								if (series!=null) item.setSeries(series);

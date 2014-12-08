@@ -224,7 +224,7 @@ public class AlephMediatorTest extends TestCase {
 		assertEquals("Aleph item series returned is incorrect, Expected: "+series4+" Actual: "+item.getSeries(),series4,item.getSeries());
 		assertEquals("Aleph item location returned is incorrect, Expected: "+location4+" Actual: "+item.getLocation(),location4,item.getLocation());
 		assertEquals("Aleph item eresource returned is incorrect, Expected: "+eresource4+" Actual: "+item.getElectronicResource(),eresource4,item.getElectronicResource());
-		assertEquals("Aleph item medium returned is incorrect, Expected: "+medium4+" Actual: "+item.getMediumType().toUpperCase(),medium4.toUpperCase(),item.getMediumType().toUpperCase());
+		assertEquals("Aleph item medium returned is incorrect, Expected: "+medium4+" Actual: "+item.getMediumType().getValue().toUpperCase(),medium4.toUpperCase(),item.getMediumType().getValue().toUpperCase());
 		assertEquals("Aleph item circulation status returned is incorrect, Expected: "+circStatus4+" Actual :"+item.getCirculationStatus(),circStatus4,item.getCirculationStatus());
 		assertEquals("Aleph item adm id returned is incorrect, Expected: "+item_id4+" Actual :"+item.getItemId(),item_id4,item.getItemId());
 		assertEquals("Aleph item bib id returned is incorrect, Expected: "+bib_id4+" Actual :"+item.getBibId(),bib_id4,item.getBibId());
