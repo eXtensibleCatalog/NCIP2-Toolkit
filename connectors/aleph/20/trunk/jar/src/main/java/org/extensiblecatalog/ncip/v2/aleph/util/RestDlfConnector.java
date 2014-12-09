@@ -25,9 +25,9 @@ import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephDoRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLoanHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestsHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRenewHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephURLsHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
@@ -491,7 +491,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		AlephLookupRequestHandler requestHandler = new AlephLookupRequestHandler(itemId, requestItem);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
-		
+
 		// Here parser finds requested request's link if any
 		parser.parse(streamSource, requestHandler);
 
@@ -508,7 +508,7 @@ public class RestDlfConnector extends AlephMediator {
 			parser.parse(streamSource, requestHandler.setParsingRequest());
 
 			RequestDetails requestDetails = requestItem.getRequestDetails();
-			
+
 			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestDetails.getDatePlaced() != null) {
 				GregorianCalendar pickupDate = (GregorianCalendar) requestDetails.getDatePlaced().clone();
 				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
@@ -560,6 +560,7 @@ public class RestDlfConnector extends AlephMediator {
 				LIinitData.setItemDescriptionDesired(getItemDescription);
 				LIinitData.setLocationDesired(getLocation);
 
+				// TODO: How about parsing IOF from AlephLookupRequestHandler as AlephLookupRequestsHandler does?
 				AlephItem item = lookupItem(LIinitData);
 				if (item == null)
 					throw new ServiceException(ServiceError.RUNTIME_ERROR, "LookupItem within LookupRequest in order to carry ItemOptionalFields returned null");
@@ -634,7 +635,7 @@ public class RestDlfConnector extends AlephMediator {
 				streamSource = new InputSource(httpCon.getInputStream());
 
 				AlephDoRequestHandler requestItemHandler = new AlephDoRequestHandler(itemIdVal);
-				
+
 				// Here parser detects error if any
 				parser.parse(streamSource, requestItemHandler);
 
@@ -647,7 +648,7 @@ public class RestDlfConnector extends AlephMediator {
 									AlephConstants.PARAM_HOLDS).toURL();
 
 					streamSource = new InputSource(holdsUrl.openStream());
-					
+
 					// Here parser gets sequence number
 					parser.parse(streamSource, requestItemHandler);
 
@@ -660,7 +661,7 @@ public class RestDlfConnector extends AlephMediator {
 									AlephConstants.PARAM_HOLDS, itemIdVal + seqNumber).toURL();
 
 					streamSource = new InputSource(requestsUrl.openStream());
-					
+
 					// Here parser parses RequestId
 					parser.parse(streamSource, requestItemHandler);
 
@@ -729,7 +730,7 @@ public class RestDlfConnector extends AlephMediator {
 		AlephDoRequestHandler requestItemHandler = new AlephDoRequestHandler(itemId);
 
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
-		
+
 		// Here parser finds request, detects if delete="Y" & gets sequence number
 		parser.parse(streamSource, requestItemHandler);
 

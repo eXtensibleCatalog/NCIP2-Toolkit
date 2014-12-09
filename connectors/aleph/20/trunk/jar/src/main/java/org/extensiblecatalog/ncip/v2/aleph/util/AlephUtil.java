@@ -37,6 +37,8 @@ import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
@@ -50,6 +52,8 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.SAXException;
 
 public class AlephUtil {
@@ -433,21 +437,22 @@ public class AlephUtil {
 	 * Throws SAXException if not successful.
 	 * 
 	 * @param alephDateParsed
-	 * @return
+	 * @return gregorianCalendarDate
 	 * @throws SAXException
 	 */
 	public static GregorianCalendar parseGregorianCalendarFromAlephDate(String alephDateParsed) throws SAXException {
 		if (!alephDateParsed.equalsIgnoreCase("00000000")) {
-			GregorianCalendar loanDate = new GregorianCalendar(TimeZone.getDefault());
+			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
 
 			try {
-				loanDate.setTime(AlephConstants.ALEPH_DATE_FORMATTER.parse(alephDateParsed));
-				loanDate.add(Calendar.HOUR_OF_DAY, 2);
+				gregorianCalendarDate.setTime(AlephConstants.ALEPH_DATE_FORMATTER.parse(alephDateParsed));
+				if (inDaylightTime())
+					gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 2);
 			} catch (ParseException e) {
 				throw new SAXException(e);
 			}
 
-			return loanDate;
+			return gregorianCalendarDate;
 		} else
 			return null;
 	}
@@ -589,5 +594,23 @@ public class AlephUtil {
 	private static String buildRenewPOSTXml(String desiredDueDate) {
 		return "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" + "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" + desiredDueDate
 				+ "</z36-due-date></z36></loan></get-pat-loan>";
+	}
+
+	public static RequestType parseRequestTypeFromZ37PriorityNode(String value) {
+		RequestType requestType;
+		if (value == "30") // TODO: Add remaining request types
+			requestType = Version1RequestType.LOAN;
+		else
+			requestType = Version1RequestType.ESTIMATE; // FIXME: Put here better default value
+		return requestType;
+	}
+
+	public static RequestStatusType parseRequestStatusTypeFromZ37StatusNode(String value) {
+		RequestStatusType requestStatusType;
+		if (value == "S")
+			requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
+		else
+			requestStatusType = Version1RequestStatusType.IN_PROCESS;
+		return requestStatusType;
 	}
 }

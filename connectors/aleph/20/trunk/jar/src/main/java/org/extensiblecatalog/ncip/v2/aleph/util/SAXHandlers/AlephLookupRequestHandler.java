@@ -15,14 +15,12 @@ import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class AlephLookupRequestHandler extends DefaultHandler {
-	private SimpleDateFormat alephDateFormatter;
+
 	private SimpleDateFormat alephHourFormatter;
 	private TimeZone localTimeZone;
 	private AlephRequestItem requestItem;
@@ -52,10 +50,9 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	public AlephLookupRequestHandler(String itemIdToLookFor, AlephRequestItem requestItem) {
 		this.itemIdToLookFor = itemIdToLookFor;
 		this.requestItem = requestItem;
-		alephDateFormatter = new SimpleDateFormat("yyyyMMdd");
 		alephHourFormatter = new SimpleDateFormat("HHmm");
 		localTimeZone = TimeZone.getTimeZone("ECT");
-		
+
 		requestDetails = new RequestDetails();
 		requestItem.setRequestDetails(requestDetails);
 	}
@@ -142,20 +139,8 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				requestItem.setRequestId(requestId);
 				requestNumberReached = false;
 			} else if (datePlacedReached) {
-				String datePlacedParsed = new String(ch, start, length);
-				if (!datePlacedParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar datePlaced = new GregorianCalendar(localTimeZone);
-
-					try {
-						datePlaced.setTime(alephDateFormatter.parse(datePlacedParsed));
-						if (AlephUtil.inDaylightTime())
-							datePlaced.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					requestDetails.setDatePlaced(datePlaced); // FIXME
-				}
+				GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
+				requestDetails.setDatePlaced(datePlaced);
 				datePlacedReached = false;
 			} else if (hourPlacedReached) {
 				String hourPlacedParsed = new String(ch, start, length);
@@ -172,40 +157,17 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
 					datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
 
-					requestDetails.setDatePlaced(datePlaced); // FIXME
+					// Note that this is not duplicate of the above "setDatePlaced", it just adds hours if any
+					requestDetails.setDatePlaced(datePlaced);
 				}
 				hourPlacedReached = false;
 			} else if (earliestDateNeededReached) {
-				String earliestDateNeededParsed = new String(ch, start, length);
-				if (!earliestDateNeededParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar earliestDateNeeded = new GregorianCalendar(localTimeZone);
-
-					try {
-						earliestDateNeeded.setTime(alephDateFormatter.parse(earliestDateNeededParsed));
-						if (AlephUtil.inDaylightTime())
-							earliestDateNeeded.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					requestDetails.setEarliestDateNeeded(earliestDateNeeded);
-				}
+				GregorianCalendar earliestDateNeeded = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
+				requestDetails.setEarliestDateNeeded(earliestDateNeeded);
 				earliestDateNeededReached = false;
 			} else if (needBeforeDateReached) {
-				String needBeforeDateParsed = new String(ch, start, length);
-				if (!needBeforeDateParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar needBeforeDate = new GregorianCalendar(localTimeZone);
-
-					try {
-						needBeforeDate.setTime(alephDateFormatter.parse(needBeforeDateParsed));
-						if (AlephUtil.inDaylightTime())
-							needBeforeDate.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					requestDetails.setNeedBeforeDate(needBeforeDate);
-				}
+				GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
+				requestDetails.setNeedBeforeDate(needBeforeDate);
 				needBeforeDateReached = false;
 			} else if (holdQueueLengthReached) {
 				requestItem.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
@@ -215,53 +177,19 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				requestDetails.setPickupLocation(pickupLocation);
 				pickupLocationReached = false;
 			} else if (pickupExpiryDateReached) {
-				String pickupExpiryDateParsed = new String(ch, start, length);
-				if (!pickupExpiryDateParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar pickupExpiryDate = new GregorianCalendar(localTimeZone);
-
-					try {
-						pickupExpiryDate.setTime(alephDateFormatter.parse(pickupExpiryDateParsed));
-						if (AlephUtil.inDaylightTime())
-							pickupExpiryDate.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					requestDetails.setPickupExpiryDate(pickupExpiryDate);
-				}
+				GregorianCalendar pickupExpiryDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
+				requestDetails.setPickupExpiryDate(pickupExpiryDate);
 				pickupExpiryDateReached = false;
 			} else if (requestTypeReached) {
-				RequestType requestType = null;
-				String parsedValue = new String(ch, start, length);
-				if (parsedValue == "30") // TODO: Add remaining request types
-					requestType = Version1RequestType.LOAN;
-				else
-					requestType = Version1RequestType.ESTIMATE; // FIXME: Put here better default value
+				RequestType requestType = AlephUtil.parseRequestTypeFromZ37PriorityNode(new String(ch, start, length));
 				requestItem.setRequestType(requestType);
 				requestTypeReached = false;
 			} else if (pickupDateReached) {
-				String pickupDateParsed = new String(ch, start, length);
-				if (!pickupDateParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar pickupDate = new GregorianCalendar(localTimeZone);
-
-					try {
-						pickupDate.setTime(alephDateFormatter.parse(pickupDateParsed));
-						if (AlephUtil.inDaylightTime())
-							pickupDate.add(Calendar.HOUR_OF_DAY, 2);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					requestItem.setHoldPickupDate(pickupDate);
-				}
+				GregorianCalendar pickupDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
+				requestItem.setHoldPickupDate(pickupDate);
 				pickupDateReached = false;
 			} else if (z37statusReached) {
-				String parsedStatus = new String(ch, start, length);
-				RequestStatusType requestStatusType;
-				if (parsedStatus == "S")
-					requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
-				else
-					requestStatusType = Version1RequestStatusType.IN_PROCESS;
+				RequestStatusType requestStatusType = AlephUtil.parseRequestStatusTypeFromZ37StatusNode(new String(ch, start, length));
 				requestDetails.setRequestStatusType(requestStatusType);
 				z37statusReached = false;
 			}
