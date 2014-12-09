@@ -20,7 +20,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class AlephRequestHandler extends DefaultHandler {
+public class AlephLookupRequestHandler extends DefaultHandler {
 	private SimpleDateFormat alephDateFormatter;
 	private SimpleDateFormat alephHourFormatter;
 	private TimeZone localTimeZone;
@@ -43,12 +43,12 @@ public class AlephRequestHandler extends DefaultHandler {
 	private boolean earliestDateNeededReached = false;
 
 	/**
-	 * This class is used to work with single request. To parse more requests use {@link AlephRequestItemHandler}.
+	 * This class is used to work with single request. To parse more requests use {@link AlephLookupRequestsHandler}.
 	 * 
 	 * @param itemIdToLookFor
 	 * @param requestItem
 	 */
-	public AlephRequestHandler(String itemIdToLookFor, AlephRequestItem requestItem) {
+	public AlephLookupRequestHandler(String itemIdToLookFor, AlephRequestItem requestItem) {
 		this.itemIdToLookFor = itemIdToLookFor;
 		this.requestItem = requestItem;
 		alephDateFormatter = new SimpleDateFormat("yyyyMMdd");
@@ -56,7 +56,7 @@ public class AlephRequestHandler extends DefaultHandler {
 		localTimeZone = TimeZone.getTimeZone("ECT");
 	}
 
-	public AlephRequestHandler setParsingRequests() {
+	public AlephLookupRequestHandler setParsingRequest() {
 		parsingRequest = true;
 		return this;
 	}
@@ -154,7 +154,7 @@ public class AlephRequestHandler extends DefaultHandler {
 						e.printStackTrace();
 					}
 
-					requestItem.setDatePlaced(datePlaced);
+					requestItem.setDatePlaced(datePlaced); // FIXME
 				}
 				datePlacedReached = false;
 			} else if (hourPlacedReached) {
@@ -172,7 +172,7 @@ public class AlephRequestHandler extends DefaultHandler {
 					datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
 					datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
 
-					requestItem.setDatePlaced(datePlaced);
+					requestItem.setDatePlaced(datePlaced); // FIXME
 				}
 				hourPlacedReached = false;
 			} else if (earliestDateNeededReached) {

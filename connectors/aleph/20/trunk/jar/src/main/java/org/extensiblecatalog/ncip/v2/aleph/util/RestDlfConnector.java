@@ -22,11 +22,12 @@ import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRenewItem;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephDoRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLoanHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestsHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRenewHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRequestHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRequestItemHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephURLsHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephUserHandler;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
@@ -100,10 +101,15 @@ public class RestDlfConnector extends AlephMediator {
 			localConfig.setUserRegistrationLink(alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK));
 			localConfig.setAuthDataFormatType(alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE));
 
-			localConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
 			localConfig.setTokenExpirationTime(Integer.parseInt(alephConfig.getProperty(AlephConstants.NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
 
 			localConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
+
+			try {
+				localConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
+			} catch (NumberFormatException e) {
+				localConfig.setMaxItemPreparationTimeDelay(0);
+			}
 
 		} catch (ToolkitException e) {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
@@ -396,12 +402,15 @@ public class RestDlfConnector extends AlephMediator {
 
 			}
 			if (requestsUrl != null) {
-				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(localConfig.getBibLibrary());
+				AlephLookupRequestsHandler requestItemHandler = new AlephLookupRequestsHandler(localConfig);
 
 				if (appProfileType != null && !appProfileType.isEmpty())
 					requestItemHandler.setLocalizationDesired(true);
 
 				streamSource = new InputSource(requestsUrl.openStream());
+
+				// FIXME this is not appropriate parser for this job
+				// Here parser parses all available info saveable into RequestItem class
 				parser.parse(streamSource, requestItemHandler);
 
 				List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
@@ -449,10 +458,10 @@ public class RestDlfConnector extends AlephMediator {
 
 			return userHandler.getAlephUser();
 		} else
-			return null;
+			throw new AlephException("You haven't desired anything. Cannot forward empty LookupUserResponseData.");
 	}
 
-	public AlephRequestItem lookupRequest(LookupRequestInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {
+	public AlephRequestItem lookupRequest(LookupRequestInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException, ServiceException {
 
 		String alephItemId = initData.getItemId().getItemIdentifierValue();
 
@@ -480,17 +489,13 @@ public class RestDlfConnector extends AlephMediator {
 				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 						AlephConstants.PARAM_HOLDS).addRequest("lang", lang).toURL();
 
-		AlephRequestHandler requestHandler = new AlephRequestHandler(itemId, requestItem);
+		AlephLookupRequestHandler requestHandler = new AlephLookupRequestHandler(itemId, requestItem);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
+		
+		// Here parser finds requested request's link if any
 		parser.parse(streamSource, requestHandler);
 
 		if (requestHandler.requestWasFound() && requestHandler.getRequestLink() != null) {
-
-			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestItem.getDatePlaced() != null) {
-				GregorianCalendar pickupDate = (GregorianCalendar) requestItem.getDatePlaced().clone();
-				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
-				requestItem.setPickupDate(pickupDate);
-			}
 
 			requestItem.setRequestType(initData.getRequestType());
 			requestItem.setRequestScopeType(Version1RequestScopeType.ITEM);
@@ -499,8 +504,14 @@ public class RestDlfConnector extends AlephMediator {
 
 			streamSource = new InputSource(requestLink.openStream());
 
-			requestHandler.setParsingRequests();
-			parser.parse(streamSource, requestHandler);
+			// Here parser parses info pasteable into LookupRequestResponseData
+			parser.parse(streamSource, requestHandler.setParsingRequest());
+
+			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestItem.getDatePlaced() != null) {
+				GregorianCalendar pickupDate = (GregorianCalendar) requestItem.getDatePlaced().clone();
+				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
+				requestItem.setPickupDate(pickupDate);
+			}
 
 			boolean nameInformationDesired = initData.getNameInformationDesired();
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
@@ -549,7 +560,7 @@ public class RestDlfConnector extends AlephMediator {
 
 				AlephItem item = lookupItem(LIinitData);
 				if (item == null)
-					throw new AlephException("Unknown itemId passed.");
+					throw new ServiceException(ServiceError.RUNTIME_ERROR, "LookupItem within LookupRequest in order to carry ItemOptionalFields returned null");
 
 				requestItem.setItemOptionalFields(item.getItemOptionalFields());
 			}
@@ -606,7 +617,7 @@ public class RestDlfConnector extends AlephMediator {
 					firstNote = "dg";
 				}
 
-				String XMLRequest = new XMLBuilder().setParent("hold-request-parameters").setPickupLocation(pickupLocation).setLastInterestDate(needBeforeDate)
+				String XMLRequest = new RequestItemXMLBuilder().setParent("hold-request-parameters").setPickupLocation(pickupLocation).setLastInterestDate(needBeforeDate)
 						.setStartInterestDate(earliestDateNeeded).setFirstNote(firstNote).setRush("N").toString();
 
 				InputSource streamSource;
@@ -620,7 +631,9 @@ public class RestDlfConnector extends AlephMediator {
 
 				streamSource = new InputSource(httpCon.getInputStream());
 
-				AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(localConfig.getBibLibrary());
+				AlephDoRequestHandler requestItemHandler = new AlephDoRequestHandler(itemIdVal);
+				
+				// Here parser detects error if any
 				parser.parse(streamSource, requestItemHandler);
 
 				if (!requestItemHandler.returnedError()) {
@@ -632,7 +645,9 @@ public class RestDlfConnector extends AlephMediator {
 									AlephConstants.PARAM_HOLDS).toURL();
 
 					streamSource = new InputSource(holdsUrl.openStream());
-					parser.parse(streamSource, requestItemHandler.parseSequenceNumber(itemIdVal));
+					
+					// Here parser gets sequence number
+					parser.parse(streamSource, requestItemHandler);
 
 					String seqNumber = requestItemHandler.getSequenceNumber();
 
@@ -643,6 +658,8 @@ public class RestDlfConnector extends AlephMediator {
 									AlephConstants.PARAM_HOLDS, itemIdVal + seqNumber).toURL();
 
 					streamSource = new InputSource(requestsUrl.openStream());
+					
+					// Here parser parses RequestId
 					parser.parse(streamSource, requestItemHandler);
 
 					requestItem.addRequestId(requestItemHandler.getRequestId());
@@ -707,9 +724,11 @@ public class RestDlfConnector extends AlephMediator {
 				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 						AlephConstants.PARAM_HOLDS).toURL();
 
-		AlephRequestItemHandler requestItemHandler = new AlephRequestItemHandler(localConfig.getBibLibrary()).parseSequenceNumber(itemId);
+		AlephDoRequestHandler requestItemHandler = new AlephDoRequestHandler(itemId);
 
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
+		
+		// Here parser finds request, detects if delete="Y" & gets sequence number
 		parser.parse(streamSource, requestItemHandler);
 
 		if (requestItemHandler.requestWasFound() && requestItemHandler.isDeletable()) {
@@ -728,6 +747,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			streamSource = new InputSource(httpCon.getInputStream());
 
+			// Here parser gets error if any
 			parser.parse(streamSource, requestItemHandler);
 
 			if (requestItemHandler.returnedError()) {

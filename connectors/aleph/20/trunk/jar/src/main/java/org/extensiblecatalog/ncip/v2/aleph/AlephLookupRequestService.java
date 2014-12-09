@@ -39,8 +39,7 @@ public class AlephLookupRequestService implements LookupRequestService {
 
 			if (itemIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null,
-						"Cannot lookup request of unknown item. ");
+				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null, "Cannot lookup request of unknown item. ");
 				problems.add(p);
 
 			}
@@ -76,6 +75,8 @@ public class AlephLookupRequestService implements LookupRequestService {
 			} catch (ParserConfigurationException pce) {
 				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
 				responseData.setProblems(Arrays.asList(p));
+			} catch (ServiceException e) {
+				throw e;
 			} catch (Exception e) {
 				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
 				responseData.setProblems(Arrays.asList(p));

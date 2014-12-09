@@ -1,6 +1,6 @@
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
-public class XMLBuilder {
+public class RequestItemXMLBuilder {
 
 	private String xml;
 	private String initialParentElement;
@@ -22,7 +22,7 @@ public class XMLBuilder {
 	 * Creates "post_xml=" & does in fact nothing.
 	 * 
 	 */
-	public XMLBuilder() {
+	public RequestItemXMLBuilder() {
 		xml = new String("post_xml=");
 		initialParentElement = "";
 		finalParentElement = "";
@@ -34,7 +34,7 @@ public class XMLBuilder {
 		rush = "";
 	}
 
-	public XMLBuilder setParent(String parentElement) {
+	public RequestItemXMLBuilder setParent(String parentElement) {
 		if (parentElement != null) {
 			this.initialParentElement = "<" + parentElement + ">";
 			this.finalParentElement = "</" + parentElement + ">";
@@ -42,37 +42,37 @@ public class XMLBuilder {
 		return this;
 	}
 
-	public XMLBuilder setPickupLocation(String pickupLocation) {
+	public RequestItemXMLBuilder setPickupLocation(String pickupLocation) {
 		if (pickupLocation != null)
 			this.pickupLocation = "<pickup-location>" + pickupLocation + "</pickup-location>";
 		return this;
 	}
 
-	public XMLBuilder setLastInterestDate(String needBeforeDate) {
+	public RequestItemXMLBuilder setLastInterestDate(String needBeforeDate) {
 		if (needBeforeDate != null)
 			this.needBeforeDate = "<last-interest-date>" + needBeforeDate + "</last-interest-date>";
 		return this;
 	}
 
-	public XMLBuilder setStartInterestDate(String earliestDateNeeded) {
+	public RequestItemXMLBuilder setStartInterestDate(String earliestDateNeeded) {
 		if (earliestDateNeeded != null)
 			this.earliestDateNeeded = "<start-interest-date>" + earliestDateNeeded + "</start-interest-date>";
 		return this;
 	}
 
-	public XMLBuilder setFirstNote(String firstNote) {
+	public RequestItemXMLBuilder setFirstNote(String firstNote) {
 		if (firstNote != null)
 			this.firstNote = "<note-1>" + firstNote + "</note-1>";
 		return this;
 	}
 
-	public XMLBuilder setSecondNote(String secondNote) {
+	public RequestItemXMLBuilder setSecondNote(String secondNote) {
 		if (secondNote != null)
 			this.firstNote = "<note-2>" + secondNote + "</note-2>";
 		return this;
 	}
 
-	public XMLBuilder setRush(String rush) {
+	public RequestItemXMLBuilder setRush(String rush) {
 		if (rush != null)
 			this.rush = "<rush>" + rush + "</rush>";
 		return this;

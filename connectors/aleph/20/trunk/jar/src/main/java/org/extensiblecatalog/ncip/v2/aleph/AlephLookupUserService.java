@@ -139,6 +139,8 @@ public class AlephLookupUserService implements LookupUserService {
 				AlephRestDlfUser alephUser = null;
 				try {
 					alephUser = alephRemoteServiceManager.lookupUser(patronId, initData);
+
+					updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
 				} catch (MalformedURLException mue) {
 					Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
 					responseData.setProblems(Arrays.asList(p));
@@ -155,8 +157,6 @@ public class AlephLookupUserService implements LookupUserService {
 					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
 					responseData.setProblems(Arrays.asList(p));
 				}
-
-				updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
 			}
 		}
 		return responseData;

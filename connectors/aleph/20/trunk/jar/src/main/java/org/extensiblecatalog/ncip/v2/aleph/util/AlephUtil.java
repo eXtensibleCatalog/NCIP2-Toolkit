@@ -315,6 +315,8 @@ public class AlephUtil {
 	}
 
 	public static String convertToAlephDate(GregorianCalendar gregorianCalendar) {
+		if (gregorianCalendar == null)
+			return null;
 		// We need: 20141231
 
 		String month = Integer.toString(gregorianCalendar.get(Calendar.MONTH) + 1);
