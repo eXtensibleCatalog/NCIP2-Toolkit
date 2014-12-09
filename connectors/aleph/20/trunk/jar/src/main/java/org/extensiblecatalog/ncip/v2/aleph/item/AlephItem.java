@@ -23,7 +23,6 @@ import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 
 /**
@@ -243,10 +242,7 @@ public class AlephItem implements Serializable {
 	 *            the isbn to set
 	 */
 	public void setIsbn(String isbn) {
-		BibliographicItemId bibliographicItemId = new BibliographicItemId();
-		bibliographicItemId.setBibliographicItemIdentifier(isbn);
-		bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
-		this.isbn = bibliographicItemId;
+		this.isbn = AlephUtil.createBibliographicItemIdAsISBN(isbn);
 	}
 
 	/**
@@ -448,9 +444,7 @@ public class AlephItem implements Serializable {
 	public void setBarcode(String barcode) {
 		BibliographicDescription bibDesc = new BibliographicDescription();
 
-		BibliographicItemId bibId = new BibliographicItemId();
-		bibId.setBibliographicItemIdentifier(barcode);
-		bibId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+		BibliographicItemId bibId = AlephUtil.createBibliographicItemIdAsLegalDepositNumber(barcode);
 
 		bibDesc.setBibliographicItemIds(Arrays.asList(bibId));
 		this.barcode = bibDesc;

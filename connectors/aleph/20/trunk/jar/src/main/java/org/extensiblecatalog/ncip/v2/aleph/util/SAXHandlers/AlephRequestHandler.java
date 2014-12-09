@@ -92,7 +92,7 @@ public class AlephRequestHandler extends DefaultHandler {
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
-				if (link.indexOf(itemIdToLookFor) > -1) {
+				if (link.contains(itemIdToLookFor)) {
 					requestLink = link;
 					holdRequestFound = true;
 				}

@@ -1,106 +1,93 @@
 package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.extensiblecatalog.ncip.v2.aleph.item.AlephRenewItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * @author jirislav
+ * @author Jiří Kozlovský (MZK)
  *
  */
 public class AlephLoanHandler extends DefaultHandler {
-	private BibliographicDescription bibliographicDescription;
 
-	private AlephRenewItem renewItem;
+	private LocalConfig localConfig;
+
 	private List<LoanedItem> loanedItems;
 	private LoanedItem currentLoanedItem;
 
-	private String itemIdToLookFor;
-	private String loanLink;
-	private String docNumber;
-	private String status;
-	private String replyText;
-	private String itemSequenceNumber;
+	private BibliographicDescription bibliographicDescription;
 
-	private boolean loanFound = false;
-	private boolean renewable;
-	private boolean docNoReached;
-	private boolean returnedOkResponseCode;
-	private boolean replyCodeReached;
-	private boolean replyTextReached;
-	private boolean statusReached;
-	private boolean newDueDateReached;
-
-	private boolean dueDateReached = false;
-	private boolean loanDateReached = false;
-	private boolean loanNumberReached = false;
-
-	private boolean authorReached = false;
-	private boolean isbnReached = false;
-	private boolean titleReached = false;
-	private boolean publisherReached = false;
-	private boolean bibDocNoReached = false;
-	private boolean itemDocNoReached = false;
-	private boolean materialReached = false;
-	private boolean itemSequenceReached = false;
-	private boolean agencyReached = false;
-
-	private String agencyId;
 	private String bibDocNumber;
 	private String itemDocNumber;
-	private String bibLibrary;
+	private String itemSequenceNumber;
+
 	private String loanNumber;
-	private boolean itemFullIdFound;
-	private boolean parsingRenewabilityOnly = false;
 
 	private boolean localizationDesired = false;
+	private boolean renewable;
 
-	/**
-	 * This constructor is used to initialize parser for outputs of successful renewals.
-	 * 
-	 * @param itemIdToLookFor
-	 * @param renewItem
-	 */
-	public AlephLoanHandler(String itemIdToLookFor, AlephRenewItem renewItem) {
-		this.itemIdToLookFor = itemIdToLookFor;
-		this.renewItem = renewItem;
+	// Dates
+	private boolean dueDateReached = false;
+	private boolean loanDateReached = false;
 
-		parsingRenewabilityOnly = true;
-	}
+	// Bibliographic description
+	private boolean authorReached = false;
+	private boolean titleReached = false;
+	private boolean publisherReached = false;
+	private boolean materialReached = false;
+
+	// Item identifiers
+	private boolean bibDocNoReached = false;
+	private boolean itemDocNoReached = false;
+	private boolean itemSequenceReached = false;
+
+	// False if one of bibDocNumber, itemDocNumber, itemSeqNo had empty node
+	private boolean itemFullIdFound;
+
+	// Loan identifier
+	private boolean loanNumberReached = false;
 
 	/**
 	 * This initializes SAX parser for parsing loans.
 	 */
-	public AlephLoanHandler(String bibLibrary) {
-		this.bibLibrary = bibLibrary;
-
-		// Expect there will be data needed to construct Item Id (item doc no., item bib doc no. & agency id)
-		// If one of these is not found, then this boolean is set to false
-		itemFullIdFound = true;
+	public AlephLoanHandler(LocalConfig localConfig) {
+		this.localConfig = localConfig;
+		loanedItems = new ArrayList<LoanedItem>();
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equalsIgnoreCase(AlephConstants.Z36_DOC_NUMBER_NODE)) {
-			docNoReached = true;
+		if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
+
+			bibliographicDescription = new BibliographicDescription();
+			currentLoanedItem = new LoanedItem();
+
+			String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
+			if (renewAttr != null && renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
+				renewable = true;
+			} else
+				renewable = false;
+
+			// Expect there will be data needed to construct Item Id (item doc no., item bib doc no. & agency id)
+			// If one of these is not found, then this boolean is set to false
+			itemFullIdFound = true;
+
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
 			authorReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE)) {
-			isbnReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
 			titleReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
@@ -109,27 +96,8 @@ public class AlephLoanHandler extends DefaultHandler {
 			itemDocNoReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE)) {
 			bibDocNoReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
-			agencyReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
 			materialReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-			bibliographicDescription = new BibliographicDescription();
-			currentLoanedItem = new LoanedItem();
-
-			if (loanedItems == null)
-				loanedItems = new ArrayList<LoanedItem>();
-
-			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
-			if (link != null && itemIdToLookFor != null && link.indexOf(itemIdToLookFor) > -1) {
-				loanLink = link;
-				loanFound = true;
-			}
-			String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
-			if (renewAttr != null && renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
-				renewable = true;
-			} else
-				renewable = false;
 		} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE)) {
 			dueDateReached = true;
 		} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE)) {
@@ -138,29 +106,42 @@ public class AlephLoanHandler extends DefaultHandler {
 			itemSequenceReached = true;
 		} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE)) {
 			loanNumberReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
-			replyCodeReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
-			replyTextReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
-			statusReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.NEW_DUE_DATE_NODE)) {
-			newDueDateReached = true;
 		}
-
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
+		if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
+			if (itemFullIdFound) {
+				// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
+				String bibliographicItemIdentifier = AlephUtil.buildAlephItemId(localConfig, bibDocNumber, itemDocNumber, itemSequenceNumber);
 
-		if (qName.equalsIgnoreCase(AlephConstants.Z36_DOC_NUMBER_NODE) && docNoReached) {
-			docNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z36_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
-			itemSequenceReached = false;
+				BibliographicItemId bibliographicItemId = AlephUtil.createBibliographicItemIdAsURI(bibliographicItemIdentifier);
+
+				bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+			}
+			// Create loan identifier from admLibrary & loanNumber
+			ItemId itemId = new ItemId();
+
+			if (renewable && loanNumber != null) {
+				// Loan number is needed to apply RenewItemService
+				itemId.setItemIdentifierValue(localConfig.getAdmLibrary() + loanNumber);
+			} else {
+				// This will be significant for loaned items marked as not renewable
+				itemId.setItemIdentifierValue("-1");
+			}
+			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+			currentLoanedItem.setItemId(itemId);
+
+			currentLoanedItem.setBibliographicDescription(bibliographicDescription);
+
+			if (currentLoanedItem.getDateDue() == null)
+				currentLoanedItem.setIndeterminateLoanPeriodFlag(true);
+
+			loanedItems.add(currentLoanedItem);
+
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
 			authorReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
-			isbnReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
 			titleReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
@@ -171,96 +152,33 @@ public class AlephLoanHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && bibDocNoReached) {
 			itemFullIdFound = false;
 			bibDocNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
-			itemFullIdFound = false;
-			agencyReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 			materialReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
-			if (!parsingRenewabilityOnly) {
-				if (itemFullIdFound) {
-					// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
-					List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
-					BibliographicItemId bibliographicItemId = new BibliographicItemId();
-					String bibliographicItemIdentifier = bibLibrary + bibDocNumber.trim() + "-" + agencyId.trim() + itemDocNumber.trim() + itemSequenceNumber;
-					bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
-					bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
-					bibliographicItemIds.add(bibliographicItemId);
-					bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
-
-					// Create loan identifier from admLibrary & loanNumber
-					ItemId itemId = new ItemId();
-
-					if (renewable) {
-						// Loan number is needed to apply RenewItemService
-						itemId.setItemIdentifierValue(agencyId.trim() + loanNumber);
-					} else {
-						// This will be significant for loaned items marked as not renewable
-						itemId.setItemIdentifierValue("-1");
-					}
-					itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-					currentLoanedItem.setItemId(itemId);
-				}
-
-				currentLoanedItem.setBibliographicDescription(bibliographicDescription);
-
-				if (currentLoanedItem.getDateDue() == null)
-					currentLoanedItem.setIndeterminateLoanPeriodFlag(true);
-
-				loanedItems.add(currentLoanedItem);
-
-				// Again, expect there will be found full item id next time
-				itemFullIdFound = true;
-
-				bibliographicDescription = new BibliographicDescription();
-			}
 		} else if (qName.matches(AlephConstants.Z36_DUE_DATE_NODE + "|" + AlephConstants.Z36H_DUE_DATE_NODE) && dueDateReached) {
 			dueDateReached = false;
 		} else if (qName.matches(AlephConstants.Z36_LOAN_DATE_NODE + "|" + AlephConstants.Z36H_LOAN_DATE_NODE) && loanDateReached) {
 			loanDateReached = false;
 		} else if (qName.matches(AlephConstants.Z36_ITEM_SEQUENCE_NODE + "|" + AlephConstants.Z36H_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
-			itemFullIdFound = true;
+			itemFullIdFound = false;
 			itemSequenceReached = false;
 		} else if (qName.matches(AlephConstants.Z36_NUMBER_NODE + "|" + AlephConstants.Z36H_NUMBER_NODE) && loanNumberReached) {
 			loanNumberReached = false;
-
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE) && replyCodeReached) {
-			replyCodeReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE) && replyTextReached) {
-			replyTextReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
-			statusReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.NEW_DUE_DATE_NODE) && newDueDateReached) {
-			newDueDateReached = false;
 		}
 
 	}
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
-
-		if (docNoReached) {
-			docNumber = new String(ch, start, length);
-			docNoReached = false;
-		} else if (itemSequenceReached) {
+		if (itemSequenceReached) {
 			itemSequenceNumber = new String(ch, start, length);
 			itemSequenceReached = false;
 		} else if (materialReached) {
-			String mediumTypeParsed = new String(ch, start, length);
-			MediumType mediumType;
-			if (!localizationDesired)
-				mediumType = AlephUtil.detectMediumType(mediumTypeParsed);
-			else
-				mediumType = new MediumType("localized", mediumTypeParsed);
-
+			MediumType mediumType = AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired);
 			bibliographicDescription.setMediumType(mediumType);
 			materialReached = false;
 		} else if (authorReached) {
 			bibliographicDescription.setAuthor(new String(ch, start, length));
 			authorReached = false;
-		} else if (isbnReached) {
-			bibliographicDescription.setBibliographicLevel(null);
-			isbnReached = false;
 		} else if (titleReached) {
 			bibliographicDescription.setTitle(new String(ch, start, length));
 			titleReached = false;
@@ -271,82 +189,20 @@ public class AlephLoanHandler extends DefaultHandler {
 			itemDocNumber = new String(ch, start, length);
 			itemDocNoReached = false;
 		} else if (bibDocNoReached) {
-			String parsedBibId = new String(ch, start, length);
-			bibDocNumber = parsedBibId;
+			bibDocNumber = new String(ch, start, length);
 			bibDocNoReached = false;
-		} else if (agencyReached) {
-			agencyId = new String(ch, start, length);
-			agencyReached = false;
 		} else if (dueDateReached) {
-			String dateDueParsed = new String(ch, start, length);
-			GregorianCalendar dateDue = AlephUtil.parseGregorianCalendarFromAlephDate(dateDueParsed);
-
+			GregorianCalendar dateDue = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentLoanedItem.setDateDue(dateDue);
-
 			dueDateReached = false;
 		} else if (loanDateReached) {
-			String loanDateParsed = new String(ch, start, length);
-			GregorianCalendar loanDate = AlephUtil.parseGregorianCalendarFromAlephDate(loanDateParsed);
-
+			GregorianCalendar loanDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentLoanedItem.setDateCheckedOut(loanDate);
-
 			loanDateReached = false;
 		} else if (loanNumberReached) {
 			loanNumber = new String(ch, start, length);
 			loanNumberReached = false;
-
-		} else if (replyCodeReached) {
-			String replyCodeParsed = new String(ch, start, length);
-			if (replyCodeParsed.equalsIgnoreCase(AlephConstants.SUCCESS_REPLY_CODE)) {
-				returnedOkResponseCode = true;
-			} else
-				returnedOkResponseCode = false;
-		} else if (replyTextReached) {
-			replyText = new String(ch, start, length);
-			replyTextReached = false;
-		} else if (statusReached) {
-			status = new String(ch, start, length);
-			statusReached = false;
-		} else if (newDueDateReached) {
-			String newDueDateParsed = new String(ch, start, length);
-			GregorianCalendar newDueDate = AlephUtil.parseGregorianCalendarFromAlephDate(newDueDateParsed);
-
-			renewItem.setDateDue(newDueDate);
-
-			newDueDateReached = false;
 		}
-	}
-
-	public String getDocNumber() {
-		return docNumber;
-	}
-
-	public String getItemSequenceNumber() {
-		return itemSequenceNumber;
-	}
-
-	public String getLoanLink() {
-		return loanLink;
-	}
-
-	public boolean loanWasFound() {
-		return loanFound;
-	}
-
-	public boolean isRenewable() {
-		return renewable;
-	}
-
-	public boolean actionSucceeded() {
-		return returnedOkResponseCode;
-	}
-
-	public String getReplyText() {
-		return replyText;
-	}
-
-	public String getStatusText() {
-		return status;
 	}
 
 	public List<LoanedItem> getListOfLoanedItems() {
@@ -355,9 +211,5 @@ public class AlephLoanHandler extends DefaultHandler {
 
 	public void setLocalizationDesired(boolean localizationDesired) {
 		this.localizationDesired = localizationDesired;
-	}
-
-	public boolean getLocalizationDesired() {
-		return localizationDesired;
 	}
 }

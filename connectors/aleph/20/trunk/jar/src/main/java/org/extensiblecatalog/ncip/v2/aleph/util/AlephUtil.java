@@ -17,6 +17,7 @@ import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
+import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
@@ -42,6 +43,7 @@ import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
+import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
@@ -398,20 +400,21 @@ public class AlephUtil {
 
 	/**
 	 * Pattern for building unique item Id from document number & item sequence item is:<br/>
-	 * bibLibrary + docNumber + "-" + admLibrary + docNumber + itemSequenceNumber<br/>
+	 * bibLibrary + docRecordNumber + "-" + admLibrary + docItemNumber + itemSequenceNumber<br/>
 	 * <br/>
 	 * 
 	 * Output should look like this example:<br />
-	 * MZK01000000421-MZK50000000421000010
+	 * MZK01000000421-MZK50000062021000010 <br />
 	 * 
-	 * @param bibLibrary
-	 * @param admLibrary
-	 * @param docNumber
+	 * @param localConfig
+	 * @param docRecordNumber
+	 * @param docItemNumber
 	 * @param itemSequenceNumber
 	 * @return
 	 */
-	public static String buildAlephItemId(String bibLibrary, String admLibrary, String docNumber, String itemSequenceNumber) {
-		String itemId = bibLibrary + docNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + admLibrary + docNumber + itemSequenceNumber;
+	public static String buildAlephItemId(LocalConfig localConfig, String documentRecordNumber, String documentItemNumber, String itemSequenceNumber) {
+		String itemId = localConfig.getBibLibrary() + documentRecordNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + localConfig.getAdmLibrary() + documentItemNumber
+				+ itemSequenceNumber;
 		return itemId;
 	}
 
@@ -539,5 +542,50 @@ public class AlephUtil {
 			if (tokenEntry.getValue().isExpired())
 				tokens.remove(tokenEntry.getKey());
 		}
+	}
+
+	public static BibliographicItemId createBibliographicItemIdAsISBN(String bibliographicItemIdentifier) {
+		BibliographicItemId bibliographicItemId = new BibliographicItemId();
+		bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
+		bibliographicItemId.setBibliographicItemIdentifierCode((Version1BibliographicItemIdentifierCode.ISBN));
+		return bibliographicItemId;
+	}
+
+	public static BibliographicItemId createBibliographicItemIdAsLegalDepositNumber(String bibliographicItemIdentifier) {
+		BibliographicItemId bibliographicItemId = new BibliographicItemId();
+		bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
+		bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+		return bibliographicItemId;
+	}
+
+	public static BibliographicItemId createBibliographicItemIdAsURI(String bibliographicItemIdentifier) {
+		BibliographicItemId bibliographicItemId = new BibliographicItemId();
+		bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
+		bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.URI);
+		return bibliographicItemId;
+	}
+
+	/**
+	 * Builds an XML POST in order to send it as a Http request to renew an item.
+	 * 
+	 * You can set desired due date - but your Aleph settings may not be compatible with
+	 * 
+	 * setting custom due date & will add by default let's say 5 days to old due date.<br>
+	 * <br>
+	 * That's why you can set it's argument to null & nothing extra will happen
+	 * 
+	 * @param desiredDueDate
+	 * @return renewXMLtoPOST
+	 */
+	public static String buildRenewPOSTXml(GregorianCalendar desiredDueDate) {
+		if (desiredDueDate != null)
+			return buildRenewPOSTXml(AlephUtil.convertToAlephDate(desiredDueDate));
+		else
+			return buildRenewPOSTXml("20991231");
+	}
+
+	private static String buildRenewPOSTXml(String desiredDueDate) {
+		return "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" + "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" + desiredDueDate
+				+ "</z36-due-date></z36></loan></get-pat-loan>";
 	}
 }

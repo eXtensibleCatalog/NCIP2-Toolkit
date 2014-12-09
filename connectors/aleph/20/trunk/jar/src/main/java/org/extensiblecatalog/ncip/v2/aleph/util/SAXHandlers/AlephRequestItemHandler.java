@@ -171,7 +171,7 @@ public class AlephRequestItemHandler extends DefaultHandler {
 		} else { // parsing sequence number from e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
-				if (link.indexOf(itemIdToLookForSeqNumber) > -1) {
+				if (link.contains(itemIdToLookForSeqNumber)) {
 					holdRequestFound = true;
 					// Substring last 4 characters from link - this should be sequence number
 					// E.g. <hold-request delete="Y" href="http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001"/>
@@ -488,9 +488,5 @@ public class AlephRequestItemHandler extends DefaultHandler {
 
 	public void setLocalizationDesired(boolean localizationDesired) {
 		this.localizationDesired = localizationDesired;
-	}
-
-	public boolean getLocalizationDesired() {
-		return localizationDesired;
 	}
 }

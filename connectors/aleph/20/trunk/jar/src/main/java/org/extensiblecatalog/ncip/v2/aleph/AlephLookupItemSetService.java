@@ -32,7 +32,6 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
-import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
@@ -372,7 +371,11 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 				alephItem.setItemId(id);
 
-				bibInformation.setBibliographicId(createBibliographicId(id));
+				BibliographicId bibliographicId = new BibliographicId();
+				BibliographicItemId bibliographicItemId = AlephUtil.createBibliographicItemIdAsLegalDepositNumber(id);
+				bibliographicId.setBibliographicItemId(bibliographicItemId);
+
+				bibInformation.setBibliographicId(bibliographicId);
 
 				if (alephItem != null) {
 
@@ -590,17 +593,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 			}
 		else
 			return 0;
-	}
-
-	private BibliographicId createBibliographicId(String id) {
-		BibliographicId bibliographicId = new BibliographicId();
-		BibliographicItemId bibliographicItemId = new BibliographicItemId();
-
-		bibliographicItemId.setBibliographicItemIdentifier(id);
-		bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-
-		bibliographicId.setBibliographicItemId(bibliographicItemId);
-		return bibliographicId;
 	}
 
 	/**
