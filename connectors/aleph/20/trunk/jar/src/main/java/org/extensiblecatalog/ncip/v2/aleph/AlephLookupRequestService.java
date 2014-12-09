@@ -11,6 +11,7 @@ import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.aleph.util.RequestDetails;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestService;
@@ -104,15 +105,17 @@ public class AlephLookupRequestService implements LookupRequestService {
 		responseData.setDateAvailable(requestItem.getDateAvailable());
 		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
 		responseData.setShippingInformation(requestItem.getShippingInformation());
-		responseData.setAcknowledgedFeeAmount(requestItem.getAcknowledgedFeeAmout());
-		responseData.setDateOfUserRequest(requestItem.getDatePlaced());
-		responseData.setEarliestDateNeeded(requestItem.getEarliestDateNeeded());
-		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		responseData.setNeedBeforeDate(requestItem.getNeedBeforeDate());
-		responseData.setPaidFeeAmount(requestItem.getPaidFeeAmount());
-		responseData.setPickupDate(requestItem.getPickupDate());
-		responseData.setPickupExpiryDate(requestItem.getPickupExpiryDate());
-		responseData.setPickupLocation(requestItem.getPickupLocation());
-		responseData.setRequestStatusType(requestItem.getRequestStatusType());
+
+		RequestDetails requestDetails = requestItem.getRequestDetails();
+
+		responseData.setAcknowledgedFeeAmount(requestDetails.getAcknowledgedFeeAmout());
+		responseData.setDateOfUserRequest(requestDetails.getDatePlaced());
+		responseData.setEarliestDateNeeded(requestDetails.getEarliestDateNeeded());
+		responseData.setNeedBeforeDate(requestDetails.getNeedBeforeDate());
+		responseData.setPaidFeeAmount(requestDetails.getPaidFeeAmount());
+		responseData.setPickupDate(requestDetails.getPickupDate());
+		responseData.setPickupExpiryDate(requestDetails.getPickupExpiryDate());
+		responseData.setPickupLocation(requestDetails.getPickupLocation());
+		responseData.setRequestStatusType(requestDetails.getRequestStatusType());
 	}
 }

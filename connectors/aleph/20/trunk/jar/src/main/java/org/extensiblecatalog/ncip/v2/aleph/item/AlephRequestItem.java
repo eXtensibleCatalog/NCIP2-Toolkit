@@ -6,17 +6,14 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
-import org.extensiblecatalog.ncip.v2.service.AcknowledgedFeeAmount;
+import org.extensiblecatalog.ncip.v2.aleph.util.RequestDetails;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
-import org.extensiblecatalog.ncip.v2.service.PaidFeeAmount;
-import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestScopeType;
-import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.RequiredFeeAmount;
 import org.extensiblecatalog.ncip.v2.service.ShippingInformation;
@@ -26,6 +23,8 @@ import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 public class AlephRequestItem implements Serializable {
 
 	private static final long serialVersionUID = 8760934932234833600L;
+	
+	private RequestDetails requestDetails;
 
 	private Problem problem;
 	private UserId userId;
@@ -43,26 +42,6 @@ public class AlephRequestItem implements Serializable {
 	private ShippingInformation shippingInformation;
 	private FiscalTransactionInformation fiscalTransactionInfo;
 	private List<ItemUseRestrictionType> itemUseRestrictionTypes;
-
-	private AcknowledgedFeeAmount acknowledgedFeeAmount;
-
-	private GregorianCalendar dateOfUserRequest;
-
-	private RequestStatusType requestStatusType;
-
-	private GregorianCalendar earliestDateNeeded;
-
-	private GregorianCalendar needBeforeDate;
-
-	private PaidFeeAmount paidFeeAmount;
-
-	private GregorianCalendar pickupExpiryDate;
-
-	private PickupLocation pickupLocation;
-
-	private String sponsoringBody;
-
-	private GregorianCalendar pickupDate;
 
 	/**
 	 * @return the problem
@@ -317,84 +296,11 @@ public class AlephRequestItem implements Serializable {
 		this.shippingInformation = shippingInformation;
 	}
 
-	public AcknowledgedFeeAmount getAcknowledgedFeeAmout() {
-		return acknowledgedFeeAmount;
+	public RequestDetails getRequestDetails() {
+		return requestDetails;
 	}
 
-	public void setAcknowledgedFeeAmount(AcknowledgedFeeAmount acknowledgedFeeAmount) {
-		this.acknowledgedFeeAmount = acknowledgedFeeAmount;
+	public void setRequestDetails(RequestDetails requestDetails) {
+		this.requestDetails = requestDetails;
 	}
-
-	public GregorianCalendar getDatePlaced() {
-		return dateOfUserRequest;
-	}
-
-	public void setDatePlaced(GregorianCalendar dateOfUserRequest) {
-		this.dateOfUserRequest = dateOfUserRequest;
-	}
-
-	public GregorianCalendar getEarliestDateNeeded() {
-		return earliestDateNeeded;
-	}
-
-	public void setEarliestDateNeeded(GregorianCalendar earliestDateNeeded) {
-		this.earliestDateNeeded = earliestDateNeeded;
-	}
-
-	public GregorianCalendar getNeedBeforeDate() {
-		return needBeforeDate;
-	}
-
-	public void setNeedBeforeDate(GregorianCalendar needBeforeDate) {
-		this.needBeforeDate = needBeforeDate;
-	}
-
-	public PaidFeeAmount getPaidFeeAmount() {
-		return paidFeeAmount;
-	}
-
-	public void setPaidFeeAmount(PaidFeeAmount paidFeeAmount) {
-		this.paidFeeAmount = paidFeeAmount;
-	}
-
-	public GregorianCalendar getPickupExpiryDate() {
-		return pickupExpiryDate;
-	}
-
-	public void setPickupExpiryDate(GregorianCalendar pickupExpiryDate) {
-		this.pickupExpiryDate = pickupExpiryDate;
-	}
-
-	public PickupLocation getPickupLocation() {
-		return pickupLocation;
-	}
-
-	public void setPickupLocation(PickupLocation pickupLocation) {
-		this.pickupLocation = pickupLocation;
-	}
-
-	public RequestStatusType getRequestStatusType() {
-		return requestStatusType;
-	}
-
-	public void setRequestStatusType(RequestStatusType requestStatusType) {
-		this.requestStatusType = requestStatusType;
-	}
-
-	public void setSponsoringBody(String parsedStatus) {
-		this.sponsoringBody = parsedStatus;
-	}
-
-	public String getSponsoringBody() {
-		return sponsoringBody;
-	}
-
-	public void setPickupDate(GregorianCalendar pickupDate) {
-		this.pickupDate = pickupDate;
-	}
-
-	public GregorianCalendar getPickupDate() {
-		return pickupDate;
-	}
-
 }

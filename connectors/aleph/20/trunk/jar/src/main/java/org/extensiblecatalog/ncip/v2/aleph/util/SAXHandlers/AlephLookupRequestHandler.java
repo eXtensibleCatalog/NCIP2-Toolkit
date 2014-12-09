@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.aleph.util.RequestDetails;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
@@ -25,9 +26,9 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	private SimpleDateFormat alephHourFormatter;
 	private TimeZone localTimeZone;
 	private AlephRequestItem requestItem;
+	private RequestDetails requestDetails;
 	private String itemIdToLookFor;
 	private String requestLink;
-	private boolean statusReached = false;
 	private boolean parsingRequest = false;
 	private boolean z37statusReached = false;
 	private boolean holdRequestFound = false;
@@ -54,6 +55,9 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 		alephDateFormatter = new SimpleDateFormat("yyyyMMdd");
 		alephHourFormatter = new SimpleDateFormat("HHmm");
 		localTimeZone = TimeZone.getTimeZone("ECT");
+		
+		requestDetails = new RequestDetails();
+		requestItem.setRequestDetails(requestDetails);
 	}
 
 	public AlephLookupRequestHandler setParsingRequest() {
@@ -86,8 +90,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				pickupDateReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
 				z37statusReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
-				statusReached = true;
 			}
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
@@ -126,8 +128,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				pickupDateReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && z37statusReached) {
 				z37statusReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
-				statusReached = false;
 			}
 		}
 	}
@@ -154,13 +154,13 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 						e.printStackTrace();
 					}
 
-					requestItem.setDatePlaced(datePlaced); // FIXME
+					requestDetails.setDatePlaced(datePlaced); // FIXME
 				}
 				datePlacedReached = false;
 			} else if (hourPlacedReached) {
 				String hourPlacedParsed = new String(ch, start, length);
 				if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
-					GregorianCalendar datePlaced = requestItem.getDatePlaced();
+					GregorianCalendar datePlaced = requestDetails.getDatePlaced();
 					GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
 
 					try {
@@ -172,7 +172,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
 					datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
 
-					requestItem.setDatePlaced(datePlaced); // FIXME
+					requestDetails.setDatePlaced(datePlaced); // FIXME
 				}
 				hourPlacedReached = false;
 			} else if (earliestDateNeededReached) {
@@ -188,7 +188,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 						e.printStackTrace();
 					}
 
-					requestItem.setEarliestDateNeeded(earliestDateNeeded);
+					requestDetails.setEarliestDateNeeded(earliestDateNeeded);
 				}
 				earliestDateNeededReached = false;
 			} else if (needBeforeDateReached) {
@@ -204,7 +204,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 						e.printStackTrace();
 					}
 
-					requestItem.setNeedBeforeDate(needBeforeDate);
+					requestDetails.setNeedBeforeDate(needBeforeDate);
 				}
 				needBeforeDateReached = false;
 			} else if (holdQueueLengthReached) {
@@ -212,7 +212,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				holdQueueLengthReached = false;
 			} else if (pickupLocationReached) {
 				PickupLocation pickupLocation = new PickupLocation(new String(ch, start, length));
-				requestItem.setPickupLocation(pickupLocation);
+				requestDetails.setPickupLocation(pickupLocation);
 				pickupLocationReached = false;
 			} else if (pickupExpiryDateReached) {
 				String pickupExpiryDateParsed = new String(ch, start, length);
@@ -227,7 +227,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 						e.printStackTrace();
 					}
 
-					requestItem.setPickupExpiryDate(pickupExpiryDate);
+					requestDetails.setPickupExpiryDate(pickupExpiryDate);
 				}
 				pickupExpiryDateReached = false;
 			} else if (requestTypeReached) {
@@ -262,12 +262,8 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
 				else
 					requestStatusType = Version1RequestStatusType.IN_PROCESS;
-				requestItem.setRequestStatusType(requestStatusType);
+				requestDetails.setRequestStatusType(requestStatusType);
 				z37statusReached = false;
-			} else if (statusReached) {
-				String parsedStatus = new String(ch, start, length);
-				requestItem.setSponsoringBody(parsedStatus);
-				statusReached = false;
 			}
 
 		}

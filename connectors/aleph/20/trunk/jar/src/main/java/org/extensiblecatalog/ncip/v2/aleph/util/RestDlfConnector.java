@@ -507,10 +507,12 @@ public class RestDlfConnector extends AlephMediator {
 			// Here parser parses info pasteable into LookupRequestResponseData
 			parser.parse(streamSource, requestHandler.setParsingRequest());
 
-			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestItem.getDatePlaced() != null) {
-				GregorianCalendar pickupDate = (GregorianCalendar) requestItem.getDatePlaced().clone();
+			RequestDetails requestDetails = requestItem.getRequestDetails();
+			
+			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestDetails.getDatePlaced() != null) {
+				GregorianCalendar pickupDate = (GregorianCalendar) requestDetails.getDatePlaced().clone();
 				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
-				requestItem.setPickupDate(pickupDate);
+				requestDetails.setPickupDate(pickupDate);
 			}
 
 			boolean nameInformationDesired = initData.getNameInformationDesired();
