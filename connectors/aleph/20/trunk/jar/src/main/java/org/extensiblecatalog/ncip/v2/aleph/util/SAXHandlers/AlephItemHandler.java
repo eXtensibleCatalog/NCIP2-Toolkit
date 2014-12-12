@@ -39,6 +39,10 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean locationDesired;
 	private boolean itemRestrictionDesired;
 
+	// Location
+	private boolean subLibraryReached = false;
+	private boolean collectionReached = false;
+
 	// Regular item achievements
 	private boolean circulationStatusReached = false;
 	private boolean holdQueueLengthReached = false;
@@ -47,11 +51,9 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean isbnReached = false;
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
-	private boolean locationReached = false;
 	private boolean copyNoReached = false;
 	private boolean materialReached = false;
 	private boolean barcodeReached = false;
-	private boolean collectionReached = false;
 	private boolean itemStatusReached = false;
 
 	private boolean localizationDesired = false;
@@ -105,7 +107,7 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && locationDesired) {
 			collectionReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationDesired) {
-			locationReached = true;
+			subLibraryReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusDesired) {
 			circulationStatusReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && itemDesrciptionDesired) {
@@ -149,8 +151,8 @@ public class AlephItemHandler extends DefaultHandler {
 			holdQueueLengthReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && collectionReached) {
 			collectionReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && locationReached) {
-			locationReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && subLibraryReached) {
+			subLibraryReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && circulationStatusReached) {
 			circulationStatusReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_COPY_ID_NODE) && copyNoReached) {
@@ -187,7 +189,7 @@ public class AlephItemHandler extends DefaultHandler {
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (circulationStatusReached) {
-			currentAlephItem.setCirculationStatus(new String(ch, start, length));
+			currentAlephItem.setCirculationStatus(AlephUtil.parseCirculationStatus(new String(ch, start, length)));
 			circulationStatusReached = false;
 		} else if (holdQueueLengthReached) {
 			// Parse this: <queue>1 request(s) of 4 items</queue>
@@ -197,9 +199,6 @@ public class AlephItemHandler extends DefaultHandler {
 		} else if (itemDesrciptionReached) {
 			currentAlephItem.setDescription(new String(ch, start, length));
 			itemDesrciptionReached = false;
-		} else if (locationReached) {
-			currentAlephItem.setLocation(new String(ch, start, length));
-			locationReached = false;
 		} else if (callNoReached) {
 			currentAlephItem.setCallNumber(new String(ch, start, length));
 			callNoReached = false;
@@ -224,6 +223,9 @@ public class AlephItemHandler extends DefaultHandler {
 			MediumType mediumType = AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired);
 			currentAlephItem.setMediumType(mediumType);
 			materialReached = false;
+		} else if (subLibraryReached) {
+			currentAlephItem.setLocation(new String(ch, start, length));
+			subLibraryReached = false;
 		} else if (collectionReached) {
 			currentAlephItem.setCollection(new String(ch, start, length));
 			collectionReached = false;

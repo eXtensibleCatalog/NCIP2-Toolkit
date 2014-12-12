@@ -172,9 +172,7 @@ public class AlephItem implements Serializable {
 	 *            the description to set
 	 */
 	public void setDescription(String description) {
-		HoldingsInformation holdingsInformation = new HoldingsInformation();
-		holdingsInformation.setUnstructuredHoldingsData(description);
-		this.description = holdingsInformation;
+		this.description = AlephUtil.createHoldingsInformationUnscructured(description);
 	}
 
 	/**
@@ -310,14 +308,6 @@ public class AlephItem implements Serializable {
 	 */
 	public CirculationStatus getCirculationStatus() {
 		return circulationStatus;
-	}
-
-	/**
-	 * @param circulationStatus
-	 *            the circulationStatus to set
-	 */
-	public void setCirculationStatus(String circulationStatus) {
-		this.circulationStatus = AlephUtil.parseCirculationStatus(circulationStatus);
 	}
 
 	/**

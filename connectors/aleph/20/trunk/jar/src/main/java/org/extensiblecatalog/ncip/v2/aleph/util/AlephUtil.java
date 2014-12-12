@@ -26,8 +26,10 @@ import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrentBorrower;
 import org.extensiblecatalog.ncip.v2.service.CurrentRequester;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
+import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
@@ -196,47 +198,39 @@ public class AlephUtil {
 			iof.setItemUseRestrictionTypes(alephItem.getItemUseRestrictionTypes());
 
 		if (alephItem.getLocation() != null || alephItem.getCollection() != null) {
-			List<Location> locations = new ArrayList<Location>();
 			Location location = new Location();
 
 			LocationName locationName = new LocationName();
 
 			List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
-			LocationNameInstance locationNameInstance;
 
-			if (alephItem.getLocation() != null) {
-				locationNameInstance = new LocationNameInstance();
+			if (alephItem.getLocation() != null)
+				locationNameInstances.add(createLocationNameInstance(alephItem.getLocation(), new BigDecimal(1)));
+			
 
-				locationNameInstance.setLocationNameValue(alephItem.getLocation());
-				// TODO: more to come from requirement for level
-				locationNameInstance.setLocationNameLevel(new BigDecimal("1"));// temporarily set to 1.
-
-				locationNameInstances.add(locationNameInstance);
-			}
-
-			if (alephItem.getCollection() != null) {
-				locationNameInstance = new LocationNameInstance();
-
-				locationNameInstance.setLocationNameValue(alephItem.getCollection());
-				// TODO: more to come from requirement for level
-				locationNameInstance.setLocationNameLevel(new BigDecimal("2"));// temporarily set to 2.
-
-				locationNameInstances.add(locationNameInstance);
-			}
+			if (alephItem.getCollection() != null) 
+				locationNameInstances.add(createLocationNameInstance(alephItem.getCollection(), new BigDecimal(2)));
+		
 
 			locationName.setLocationNameInstances(locationNameInstances);
 
 			location.setLocationName(locationName);
 			location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
 
-			locations.add(location);
-			iof.setLocations(locations);
+			iof.setLocations(Arrays.asList(location));
 		}
 
 		if (alephItem.getBarcode() != null)
 			iof.setBibliographicDescription(alephItem.getBarcode());
 
 		return iof;
+	}
+
+	public static LocationNameInstance createLocationNameInstance(String locationNameValue, BigDecimal locationNameLevel) {
+		LocationNameInstance locationNameInstance = new LocationNameInstance();
+		locationNameInstance.setLocationNameValue(locationNameValue);
+		locationNameInstance.setLocationNameLevel(locationNameLevel);
+		return locationNameInstance;
 	}
 
 	public static ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
@@ -610,5 +604,11 @@ public class AlephUtil {
 		else
 			requestStatusType = Version1RequestStatusType.IN_PROCESS;
 		return requestStatusType;
+	}
+
+	public static HoldingsInformation createHoldingsInformationUnscructured(String description) {
+		HoldingsInformation holdingsInformation = new HoldingsInformation();
+		holdingsInformation.setUnstructuredHoldingsData(description);
+		return holdingsInformation;
 	}
 }

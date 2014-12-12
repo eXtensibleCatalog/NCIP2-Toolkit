@@ -216,7 +216,7 @@ public class AlephItemFactory implements Serializable{
 					} else if (AlephConstants.Z36_SUB_LIBRARY_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
 						alephItem.setLocation(XMLParserUtil.getNodeTextValue(z36DataNode));
 					} else if (AlephConstants.Z36_STATUS_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
-						alephItem.setCirculationStatus(XMLParserUtil.getNodeTextValue(z36DataNode));
+						alephItem.setCirculationStatus(AlephUtil.parseCirculationStatus(XMLParserUtil.getNodeTextValue(z36DataNode)));
 					} else if (AlephConstants.Z36_DUE_DATE_NODE.equalsIgnoreCase(z36DataNode.getNodeName())){
 						try {
 							alephItem.setDueDateLoan(XMLParserUtil.getNodeTextValue(z36DataNode));
@@ -289,7 +289,7 @@ public class AlephItemFactory implements Serializable{
 					if (AlephConstants.Z30_DESCRIPTION_NODE.equalsIgnoreCase(childNode.getNodeName())){
 						alephItem.setDescription(XMLParserUtil.getNodeTextValue(childNode));
 					} else if (AlephConstants.LOAN_STATUS_NODE.equalsIgnoreCase(childNode.getNodeName())){
-						alephItem.setCirculationStatus(XMLParserUtil.getNodeTextValue(childNode));
+						alephItem.setCirculationStatus(AlephUtil.parseCirculationStatus(XMLParserUtil.getNodeTextValue(childNode)));
 					} else if (AlephConstants.DUE_DATE_NODE.equalsIgnoreCase(childNode.getNodeName())){
 						try {
 							alephItem.setDueDate(XMLParserUtil.getNodeTextValue(childNode),AlephConstants.CIRC_STATUS_DUE_DATE_FORMAT);
@@ -612,7 +612,7 @@ public class AlephItemFactory implements Serializable{
 			
 			//check if this is item data
 			String circulationStatus = XMLParserUtil.getNodeTextValue(doc,AlephConstants.LOAN_STATUS_NODE);
-			if (circulationStatus!=null) item.setCirculationStatus(circulationStatus);
+			if (circulationStatus!=null) item.setCirculationStatus(AlephUtil.parseCirculationStatus(circulationStatus));
 			
 			//try to get adm id
 			String itemId = XMLParserUtil.getNodeTextValue(doc, AlephConstants.REC_KEY_NODE);

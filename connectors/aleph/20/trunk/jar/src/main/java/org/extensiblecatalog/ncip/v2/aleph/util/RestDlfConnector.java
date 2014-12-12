@@ -520,10 +520,6 @@ public class RestDlfConnector extends AlephMediator {
 			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 
-			InitiationHeader initiationHeader = new InitiationHeader();
-			ApplicationProfileType applicationProfileType = new ApplicationProfileType("", appProfileType);
-			initiationHeader.setApplicationProfileType(applicationProfileType);
-
 			if (nameInformationDesired || userAddressInformationDesired || userIdDesired || userPrivilegeDesired || blockOrTrapDesired) {
 				LookupUserInitiationData userInitData = new LookupUserInitiationData();
 				userInitData.setNameInformationDesired(nameInformationDesired);
@@ -532,40 +528,12 @@ public class RestDlfConnector extends AlephMediator {
 				userInitData.setUserPrivilegeDesired(userPrivilegeDesired);
 				userInitData.setBlockOrTrapDesired(blockOrTrapDesired);
 
-				userInitData.setInitiationHeader(initiationHeader);
+				userInitData.setInitiationHeader(initData.getInitiationHeader());
 
 				AlephRestDlfUser user = lookupUser(patronId, userInitData);
 				requestHandler.getAlephRequestItem().setUserOptionalFields(user.getUserOptionalFields());
 			}
-/*
-			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
-			boolean getCircStatus = initData.getCirculationStatusDesired();
-			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
-			boolean getItemDescription = initData.getItemDescriptionDesired();
-			boolean getLocation = initData.getLocationDesired();
-/*
-			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription || getLocation) {
 
-				LookupItemInitiationData LIinitData = new LookupItemInitiationData();
-				ItemId LIitemId = new ItemId();
-				LIitemId.setItemIdentifierValue(alephItemId);
-
-				LIinitData.setInitiationHeader(initiationHeader);
-
-				LIinitData.setItemId(LIitemId);
-				LIinitData.setBibliographicDescriptionDesired(getBibDescription);
-				LIinitData.setCirculationStatusDesired(getCircStatus);
-				LIinitData.setHoldQueueLengthDesired(getHoldQueueLength);
-				LIinitData.setItemDescriptionDesired(getItemDescription);
-				LIinitData.setLocationDesired(getLocation);
-
-				// TODO: How about parsing IOF from AlephLookupRequestHandler as AlephLookupRequestsHandler does?
-				AlephItem item = lookupItem(LIinitData);
-				if (item == null)
-					throw new ServiceException(ServiceError.RUNTIME_ERROR, "LookupItem within LookupRequest in order to carry ItemOptionalFields returned null");
-
-				requestItem.setItemOptionalFields(item.getItemOptionalFields());
-			}*/
 		} else {
 			Problem problem = new Problem();
 			problem.setProblemType(new ProblemType("Request does not exist."));

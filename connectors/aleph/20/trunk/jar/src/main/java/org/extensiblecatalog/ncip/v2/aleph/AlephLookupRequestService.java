@@ -18,9 +18,11 @@ import org.extensiblecatalog.ncip.v2.service.LookupRequestService;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.xml.sax.SAXException;
 
@@ -92,32 +94,53 @@ public class AlephLookupRequestService implements LookupRequestService {
 
 		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
 
-		responseData.setRequestScopeType(Version1RequestScopeType.ITEM);
-		responseData.setRequestType(initData.getRequestType());
-		
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId());
-		responseData.setRequestId(requestItem.getRequestId());
-		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-
-		responseData.setDateAvailable(requestItem.getDateAvailable());
-		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		responseData.setShippingInformation(requestItem.getShippingInformation());
-
 		RequestDetails requestDetails = requestItem.getRequestDetails();
 
-		responseData.setAcknowledgedFeeAmount(requestDetails.getAcknowledgedFeeAmout());
-		responseData.setDateOfUserRequest(requestDetails.getDatePlaced());
-		responseData.setEarliestDateNeeded(requestDetails.getEarliestDateNeeded());
-		responseData.setNeedBeforeDate(requestDetails.getNeedBeforeDate());
-		responseData.setPaidFeeAmount(requestDetails.getPaidFeeAmount());
-		responseData.setPickupDate(requestDetails.getPickupDate());
-		responseData.setPickupExpiryDate(requestDetails.getPickupExpiryDate());
-		responseData.setPickupLocation(requestDetails.getPickupLocation());
-		responseData.setRequestStatusType(requestDetails.getRequestStatusType());
+		for (RequestElementType desiredService : initData.getRequestElementTypes()) {
+
+			if (desiredService.equals(Version1RequestElementType.ACKNOWLEDGED_FEE_AMOUNT)) {
+				responseData.setAcknowledgedFeeAmount(requestDetails.getAcknowledgedFeeAmout());
+			} else if (desiredService.equals(Version1RequestElementType.DATE_AVAILABLE)) {
+				responseData.setDateAvailable(requestItem.getDateAvailable());
+			} else if (desiredService.equals(Version1RequestElementType.DATE_OF_USER_REQUEST)) {
+				responseData.setDateOfUserRequest(requestDetails.getDatePlaced());
+			} else if (desiredService.equals(Version1RequestElementType.EARLIEST_DATE_NEEDED)) {
+				responseData.setEarliestDateNeeded(requestDetails.getEarliestDateNeeded());
+			} else if (desiredService.equals(Version1RequestElementType.HOLD_QUEUE_POSITION)) {
+				responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
+			} else if (desiredService.equals(Version1RequestElementType.NEED_BEFORE_DATE)) {
+				responseData.setNeedBeforeDate(requestDetails.getNeedBeforeDate());
+			} else if (desiredService.equals(Version1RequestElementType.PAID_FEE_AMOUNT)) {
+				responseData.setPaidFeeAmount(requestDetails.getPaidFeeAmount());
+			} else if (desiredService.equals(Version1RequestElementType.PICKUP_DATE)) {
+				responseData.setPickupDate(requestDetails.getPickupDate());
+			} else if (desiredService.equals(Version1RequestElementType.PICKUP_EXPIRY_DATE)) {
+				responseData.setPickupExpiryDate(requestDetails.getPickupExpiryDate());
+			} else if (desiredService.equals(Version1RequestElementType.PICKUP_LOCATION)) {
+				responseData.setPickupLocation(requestDetails.getPickupLocation());
+			} else if (desiredService.equals(Version1RequestElementType.REQUEST_SCOPE_TYPE)) {
+				responseData.setRequestScopeType(Version1RequestScopeType.ITEM);
+			} else if (desiredService.equals(Version1RequestElementType.REQUEST_STATUS_TYPE)) {
+				responseData.setRequestStatusType(requestDetails.getRequestStatusType());
+			} else if (desiredService.equals(Version1RequestElementType.REQUEST_TYPE)) {
+				responseData.setRequestType(initData.getRequestType());
+			} else if (desiredService.equals(Version1RequestElementType.SHIPPING_INFORMATION)) {
+				responseData.setShippingInformation(requestItem.getShippingInformation());
+			} else if (desiredService.equals(Version1RequestElementType.USER_ID)) {
+				responseData.setUserId(initData.getUserId());				
+			}
+		}
+		
+		responseData.setItemId(initData.getItemId());
+		responseData.setRequestId(requestItem.getRequestId());
+		
+		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
+		
+		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
+
+
 	}
 }

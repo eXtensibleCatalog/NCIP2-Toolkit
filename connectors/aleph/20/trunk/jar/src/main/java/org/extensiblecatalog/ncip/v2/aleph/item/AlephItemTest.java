@@ -77,8 +77,8 @@ public class AlephItemTest extends TestCase {
 
 	public void testSetCirculationStatus() {
 		AlephItem item = new AlephItem();
-		item.setCirculationStatus("Checked Out");
-		assertEquals("Unexpected circulation status, Expected: 'Checked Out', Actual: '"+item.getCirculationStatus()+"'",item.getCirculationStatus(),"Checked Out");
+		item.setCirculationStatus(AlephUtil.parseCirculationStatus("Checked Out"));
+		assertEquals("Unexpected circulation status, Expected: 'Checked Out', Actual: '"+item.getCirculationStatus().getValue()+"'",item.getCirculationStatus().getValue(),"Checked Out");
 	}
 
 	public void testSetElectronicResource() {

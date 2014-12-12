@@ -2,9 +2,11 @@ package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
@@ -15,11 +17,15 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.Location;
+import org.extensiblecatalog.ncip.v2.service.LocationName;
+import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -33,6 +39,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 
 	private ItemOptionalFields itemOptionalFields;
 	private ItemDescription itemDescription;
+	private List<LocationNameInstance> locationNameInstances;
 
 	private String itemIdToLookFor;
 	private String requestLink;
@@ -42,13 +49,19 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 
 	private TimeZone localTimeZone;
 
+	private boolean holdRequestFound = false;
+
 	// Parsing one of two set call numbers
 	private boolean callNoReached = false;
 	private boolean secondCallNoTypeReached = false;
 	private boolean secondCallNoReached = false;
 
+	// Item description
+	private boolean barcodeReached = false;
+	private boolean z30descriptionReached = false;
+
+	// Request element types
 	private boolean z37statusReached = false;
-	private boolean holdRequestFound = false;
 	private boolean pickupDateReached = false;
 	private boolean hourPlacedReached = false;
 	private boolean datePlacedReached = false;
@@ -67,6 +80,13 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
 
+	// Location
+	private boolean subLibraryReached = false;
+	private boolean collectionReached = false;
+
+	// Item Use restriction type
+	private boolean z30itemStatusReached = false;
+
 	private boolean getBibDescription;
 	private boolean getHoldQueueLength;
 	private boolean getCircStatus;
@@ -77,8 +97,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	private BibliographicDescription bibliographicDescription;
 
 	private boolean localizationDesired = false;
-
-	private boolean barcodeReached;
 
 	/**
 	 * This class is used to work with single request. To parse more requests use {@link AlephLookupRequestsHandler}.
@@ -108,23 +126,35 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 		getLocation = initData.getLocationDesired();
 		getItemDescription = initData.getItemDescriptionDesired();
 
-		if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription || getLocation) {
+		if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription || getLocation || getItemUseRestrictionType) {
 			itemOptionalFields = new ItemOptionalFields();
 
 			if (getBibDescription) {
 				bibliographicDescription = new BibliographicDescription();
 				itemOptionalFields.setBibliographicDescription(bibliographicDescription);
 			}
+
 			if (getItemDescription) {
 				itemDescription = new ItemDescription();
 				itemOptionalFields.setItemDescription(itemDescription);
+			}
+
+			if (getLocation) {
+				Location location = new Location();
+				LocationName locationName = new LocationName();
+
+				locationNameInstances = new ArrayList<LocationNameInstance>();
+				locationName.setLocationNameInstances(locationNameInstances);
+
+				location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+				location.setLocationName(locationName);
+				itemOptionalFields.setLocations(Arrays.asList(location));
 			}
 			alephRequestItem.setItemOptionalFields(itemOptionalFields);
 
 			if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
 				localizationDesired = !initData.getInitiationHeader().getApplicationProfileType().getValue().isEmpty();
 		}
-
 	}
 
 	@Override
@@ -142,9 +172,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				earliestDateNeededReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE)) {
 				needBeforeDateReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && getHoldQueueLength) {
-				holdQueueLengthReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && getLocation) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE)) {
 				pickupLocationReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE)) {
 				pickupExpiryDateReached = true;
@@ -154,7 +182,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				z37statusReached = true;
 			} else if (itemOptionalFields != null) {
 				// Bibliographic description
-				if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && getBibDescription) {
+				if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && (getBibDescription || getCircStatus)) {
 					statusReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && getBibDescription) {
 					authorReached = true;
@@ -176,7 +204,24 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					secondCallNoReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && getItemDescription) {
 					secondCallNoTypeReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && getItemDescription) {
+					z30descriptionReached = true;
+				} else
+				// Location
+				if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && getLocation) {
+					collectionReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && getLocation) {
+					subLibraryReached = true;
+				} else
+				// Hold Queue Length
+				if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && getHoldQueueLength) {
+					holdQueueLengthReached = true;
+				} else
+				// Item Use Restriction Type
+				if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && getItemUseRestrictionType) {
+					z30itemStatusReached = true;
 				}
+
 			}
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
@@ -203,8 +248,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				earliestDateNeededReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && needBeforeDateReached) {
 				needBeforeDateReached = false;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && holdQueueLengthReached) {
-				holdQueueLengthReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && pickupLocationReached) {
 				pickupLocationReached = false;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && pickupExpiryDateReached) {
@@ -214,6 +257,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && z37statusReached) {
 				z37statusReached = false;
 			} else if (itemOptionalFields != null) {
+				// Bibliographic description
 				if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
 					statusReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
@@ -228,12 +272,30 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					materialReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
 					barcodeReached = false;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
+				} else
+				// Item description parsing
+				if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
 					callNoReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && secondCallNoReached) {
 					secondCallNoReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && secondCallNoTypeReached) {
 					secondCallNoTypeReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DESCRIPTION_NODE) && z30descriptionReached) {
+					z30descriptionReached = false;
+				} else
+				// Location parsing
+				if (qName.equalsIgnoreCase(AlephConstants.Z30_COLLECTION_NODE) && collectionReached) {
+					collectionReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && subLibraryReached) {
+					subLibraryReached = false;
+				} else
+				// Hold Queue Length
+				if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && holdQueueLengthReached) {
+					holdQueueLengthReached = false;
+				} else
+				// Item Use Restriction Type
+				if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && z30itemStatusReached) {
+					z30itemStatusReached = false;
 				}
 			}
 		}
@@ -279,9 +341,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 				requestDetails.setNeedBeforeDate(needBeforeDate);
 				needBeforeDateReached = false;
-			} else if (holdQueueLengthReached) {
-				alephRequestItem.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
-				holdQueueLengthReached = false;
 			} else if (pickupLocationReached) {
 				PickupLocation pickupLocation = new PickupLocation(new String(ch, start, length));
 				requestDetails.setPickupLocation(pickupLocation);
@@ -303,7 +362,13 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				// Bibliographic Description here:
 				if (statusReached) {
 					String parsedStatus = new String(ch, start, length);
-					bibliographicDescription.setSponsoringBody(parsedStatus);
+
+					if (getBibDescription)
+						bibliographicDescription.setSponsoringBody(parsedStatus);
+
+					if (getCircStatus)
+						itemOptionalFields.setCirculationStatus(AlephUtil.parseCirculationStatus(parsedStatus));
+
 					statusReached = false;
 				} else if (materialReached) {
 					MediumType mediumType = AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired);
@@ -325,7 +390,10 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				} else if (barcodeReached) {
 					bibliographicDescription.setComponentId(AlephUtil.createComponentIdAsAccessionNumber(new String(ch, start, length)));
 					barcodeReached = false;
-				} else if (callNoReached) {
+				} else
+
+				// Item description here:
+				if (callNoReached) {
 					itemDescription.setCallNumber(new String(ch, start, length));
 					callNoReached = false;
 				} else if (secondCallNoTypeReached) {
@@ -342,6 +410,30 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 						itemDescription.setCallNumber(new String(ch, start, length));
 
 					secondCallNoReached = false;
+				} else if (z30descriptionReached) {
+					itemDescription.setHoldingsInformation(AlephUtil.createHoldingsInformationUnscructured(new String(ch, start, length)));
+					z30descriptionReached = false;
+				} else
+				// Location
+				if (subLibraryReached) {
+					// This will be LocationLevel 1
+					locationNameInstances.add(AlephUtil.createLocationNameInstance(new String(ch, start, length), new BigDecimal(1)));
+					subLibraryReached = false;
+				} else if (collectionReached) {
+					// This will be LocationLevel 2
+					locationNameInstances.add(AlephUtil.createLocationNameInstance(new String(ch, start, length), new BigDecimal(2)));
+					collectionReached = false;
+				} else
+
+				// Hold queue here:
+				if (holdQueueLengthReached) {
+					itemOptionalFields.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
+					holdQueueLengthReached = false;
+				} else
+				// Item Use Restriction Type
+				if (z30itemStatusReached) {
+					itemOptionalFields.setItemUseRestrictionTypes(Arrays.asList(AlephUtil.parseItemUseRestrictionType(new String(ch, start, length))));
+					z30itemStatusReached = false;
 				}
 			}
 
