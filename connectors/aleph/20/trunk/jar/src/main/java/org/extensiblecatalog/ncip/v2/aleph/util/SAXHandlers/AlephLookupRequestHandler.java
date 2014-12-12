@@ -414,6 +414,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					itemDescription.setHoldingsInformation(AlephUtil.createHoldingsInformationUnscructured(new String(ch, start, length)));
 					z30descriptionReached = false;
 				} else
+
 				// Location
 				if (subLibraryReached) {
 					// This will be LocationLevel 1

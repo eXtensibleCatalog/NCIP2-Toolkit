@@ -513,7 +513,7 @@ public class RestDlfConnector extends AlephMediator {
 				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
 				requestDetails.setPickupDate(pickupDate);
 			}
-
+			
 			boolean nameInformationDesired = initData.getNameInformationDesired();
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
 			boolean userIdDesired = initData.getUserIdDesired();

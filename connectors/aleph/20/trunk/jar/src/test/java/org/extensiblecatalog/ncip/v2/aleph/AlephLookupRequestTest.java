@@ -5,11 +5,29 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.*;
-import org.xml.sax.SAXException;
-
 import junit.framework.TestCase;
+
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupRequestResponseData;
+import org.extensiblecatalog.ncip.v2.service.RequestElementType;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
+import org.xml.sax.SAXException;
 
 public class AlephLookupRequestTest extends TestCase {
 	public void testPerformService() throws ServiceException, ParserConfigurationException, SAXException {
@@ -60,6 +78,7 @@ public class AlephLookupRequestTest extends TestCase {
 		initData.setUserAddressInformationDesired(true);
 		initData.setUserLanguageDesired(true);
 		initData.setUserPrivilegeDesired(true);
+		initData.setItemUseRestrictionTypeDesired(true);
 
 		initData.setBibliographicDescriptionDesired(true);
 		initData.setCirculationStatusDesired(true);
@@ -76,10 +95,12 @@ public class AlephLookupRequestTest extends TestCase {
 		String publisher = "Dům techniky ČSVTS,";
 		String title = "Aktiv revizních techniků elektrických zařízení";
 		String callNumber = "2-0805.673";
+		String holdingsInfo = "1996";
 		String barcode = "2610034811";
 		String medium = "Book";
 		String locationLevelOne = "MZK?";
 		String locationLevelTwo = "Stock / within 1 hour";
+		String circulationStatus = "In process";
 
 		String surName = "Pokus1 Přijmení";
 		String street = "Trvalá ulice 123";
@@ -109,18 +130,30 @@ public class AlephLookupRequestTest extends TestCase {
 
 		assertEquals("Unexpected length of RequestIdentifierValue returned.", requestIdentifierLength, responseData.getRequestId().getRequestIdentifierValue().length());
 
+		assertEquals("Unexpected RequestType retuned.", Version1RequestType.HOLD.getValue(), responseData.getRequestType().getValue());
 		assertEquals("Unexpected RequestScopeType retuned.", Version1RequestScopeType.ITEM.getValue(), responseData.getRequestScopeType().getValue());
 		assertEquals("Unexpected RequestStatusType returned.", Version1RequestStatusType.IN_PROCESS.getValue(), responseData.getRequestStatusType().getValue());
 		assertEquals("Unexpected PickupLocation returned.", pickupLocation, responseData.getPickupLocation().getValue());
 
+		assertEquals("Unexpected ComponentId returned", barcode, responseData.getItemOptionalFields().getBibliographicDescription().getComponentId().getComponentIdentifier());
+
 		assertEquals("Call number incorrect", callNumber, responseData.getItemOptionalFields().getItemDescription().getCallNumber());
-		
-		assertEquals("Location of first NameLevel incorrect", locationLevelOne, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(0).getLocationNameValue());
-		assertEquals("Location of second NameLevel incorrect", locationLevelTwo, responseData.getItemOptionalFields().getLocations().get(0).getLocationName().getLocationNameInstance(1).getLocationNameValue());
-		
+		assertEquals("HoldingsInformation incorrect", holdingsInfo, responseData.getItemOptionalFields().getItemDescription().getHoldingsInformation()
+				.getUnstructuredHoldingsData());
+
+		assertEquals("LocationType incorrect", Version1LocationType.PERMANENT_LOCATION.getValue(), responseData.getItemOptionalFields().getLocation(0).getLocationType().getValue());
+		assertEquals("Location of first NameLevel incorrect", locationLevelOne, responseData.getItemOptionalFields().getLocations().get(0).getLocationName()
+				.getLocationNameInstance(0).getLocationNameValue());
+		assertEquals("Location of second NameLevel incorrect", locationLevelTwo, responseData.getItemOptionalFields().getLocations().get(0).getLocationName()
+				.getLocationNameInstance(1).getLocationNameValue());
+
 		assertEquals("MediumType incorrect", medium, responseData.getItemOptionalFields().getBibliographicDescription().getMediumType().getValue());
 		assertEquals("Publisher incorrect", publisher, responseData.getItemOptionalFields().getBibliographicDescription().getPublisher());
 		assertEquals("Title incorrect", title, responseData.getItemOptionalFields().getBibliographicDescription().getTitle());
+
+		assertEquals("Unexpected ItemUseRestrictionType returned.", Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY.getValue(), responseData.getItemOptionalFields()
+				.getItemUseRestrictionType(0).getValue());
+		assertEquals("Unexpected CirculationStatus returned.", circulationStatus, responseData.getItemOptionalFields().getCirculationStatus().getValue());
 
 		assertEquals("Unexpected Surname returned.", surName, responseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation()
 				.getStructuredPersonalUserName().getSurname());
