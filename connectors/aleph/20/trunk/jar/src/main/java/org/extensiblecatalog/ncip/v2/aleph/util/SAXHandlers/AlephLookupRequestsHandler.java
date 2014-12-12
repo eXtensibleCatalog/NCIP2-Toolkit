@@ -192,7 +192,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			bibDocNoReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 			materialReached = false;
-		}
+		} 
 
 	}
 

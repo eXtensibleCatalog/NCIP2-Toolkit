@@ -62,6 +62,7 @@ public class AlephLookupUserTest extends TestCase {
 		
 		responseData = service.performService(initData, null, serviceManager);
 
+		//FIXME: Add tests for LookupUser with all features desired
 		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
 
 		assertEquals("Unexpected Surname returned.", surName, responseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation()

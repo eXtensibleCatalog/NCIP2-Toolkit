@@ -27,6 +27,9 @@ public class AlephItemHandler extends DefaultHandler {
 
 	// Required to decide whether is set second call number the one we need
 	private String secondCallNoType;
+	private boolean callNoReached = false;
+	private boolean secondCallNoTypeReached = false;
+	private boolean secondCallNoReached = false;
 
 	// Desired services
 	private boolean bibDescriptionDesired;
@@ -45,13 +48,10 @@ public class AlephItemHandler extends DefaultHandler {
 	private boolean titleReached = false;
 	private boolean publisherReached = false;
 	private boolean locationReached = false;
-	private boolean callNoReached = false;
 	private boolean copyNoReached = false;
 	private boolean materialReached = false;
 	private boolean barcodeReached = false;
 	private boolean collectionReached = false;
-	private boolean secondCallNoTypeReached = false;
-	private boolean secondCallNoReached = false;
 	private boolean itemStatusReached = false;
 
 	private boolean localizationDesired = false;

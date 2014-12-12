@@ -13,6 +13,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.RequestDetails;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
+import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
@@ -31,11 +32,20 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	private RequestDetails requestDetails;
 
 	private ItemOptionalFields itemOptionalFields;
+	private ItemDescription itemDescription;
 
 	private String itemIdToLookFor;
 	private String requestLink;
 
+	// Required to decide whether is set second call number the one we need
+	private String secondCallNoType;
+
 	private TimeZone localTimeZone;
+
+	// Parsing one of two set call numbers
+	private boolean callNoReached = false;
+	private boolean secondCallNoTypeReached = false;
+	private boolean secondCallNoReached = false;
 
 	private boolean z37statusReached = false;
 	private boolean holdRequestFound = false;
@@ -101,11 +111,16 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 		if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription || getLocation) {
 			itemOptionalFields = new ItemOptionalFields();
 
-			bibliographicDescription = new BibliographicDescription();
-			itemOptionalFields.setBibliographicDescription(bibliographicDescription);
-
+			if (getBibDescription) {
+				bibliographicDescription = new BibliographicDescription();
+				itemOptionalFields.setBibliographicDescription(bibliographicDescription);
+			}
+			if (getItemDescription) {
+				itemDescription = new ItemDescription();
+				itemOptionalFields.setItemDescription(itemDescription);
+			}
 			alephRequestItem.setItemOptionalFields(itemOptionalFields);
-			
+
 			if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
 				localizationDesired = !initData.getInitiationHeader().getApplicationProfileType().getValue().isEmpty();
 		}
@@ -138,6 +153,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
 				z37statusReached = true;
 			} else if (itemOptionalFields != null) {
+				// Bibliographic description
 				if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && getBibDescription) {
 					statusReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && getBibDescription) {
@@ -152,6 +168,14 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					materialReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && getBibDescription) {
 					barcodeReached = true;
+				} else
+				// Item description parsing
+				if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && getItemDescription) {
+					callNoReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && getItemDescription) {
+					secondCallNoReached = true;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && getItemDescription) {
+					secondCallNoTypeReached = true;
 				}
 			}
 		} else {
@@ -204,6 +228,12 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					materialReached = false;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_BARCODE) && barcodeReached) {
 					barcodeReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_NODE) && callNoReached) {
+					callNoReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_NODE) && secondCallNoReached) {
+					secondCallNoReached = false;
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_CALL_NUMBER_2_TYPE_NODE) && secondCallNoTypeReached) {
+					secondCallNoTypeReached = false;
 				}
 			}
 		}
@@ -295,6 +325,23 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				} else if (barcodeReached) {
 					bibliographicDescription.setComponentId(AlephUtil.createComponentIdAsAccessionNumber(new String(ch, start, length)));
 					barcodeReached = false;
+				} else if (callNoReached) {
+					itemDescription.setCallNumber(new String(ch, start, length));
+					callNoReached = false;
+				} else if (secondCallNoTypeReached) {
+					secondCallNoType = new String(ch, start, length);
+					secondCallNoTypeReached = false;
+				} else if (secondCallNoReached) {
+
+					// MZK's Aleph ILS has specific settings - when 9 is set as call no. type, then parse it instead of the first.
+					// Note that NCIP doesn't allow transfer of two call numbers.
+
+					if (secondCallNoType != null && !secondCallNoType.equalsIgnoreCase("9"))
+						itemDescription.setCallNumber(new String(ch, start, length));
+					else if (secondCallNoType == null)
+						itemDescription.setCallNumber(new String(ch, start, length));
+
+					secondCallNoReached = false;
 				}
 			}
 
