@@ -109,7 +109,6 @@ public class AlephLookupRequestTest extends TestCase {
 
 		assertEquals("Unexpected length of RequestIdentifierValue returned.", requestIdentifierLength, responseData.getRequestId().getRequestIdentifierValue().length());
 
-		assertEquals("Unexpected RequestType returned.", Version1RequestType.ESTIMATE.getValue(), responseData.getRequestType().getValue());
 		assertEquals("Unexpected RequestScopeType retuned.", Version1RequestScopeType.ITEM.getValue(), responseData.getRequestScopeType().getValue());
 		assertEquals("Unexpected RequestStatusType returned.", Version1RequestStatusType.IN_PROCESS.getValue(), responseData.getRequestStatusType().getValue());
 		assertEquals("Unexpected PickupLocation returned.", pickupLocation, responseData.getPickupLocation().getValue());

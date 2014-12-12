@@ -52,6 +52,8 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.SAXException;
@@ -120,10 +122,7 @@ public class AlephUtil {
 			bibliographicDescription.setTitle(alephItem.getTitle());
 
 		if (includeComponentIdWithBarcode && alephItem.getBarcodeValue() != null) {
-			ComponentId componentId = new ComponentId();
-			componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.VERSION_1_BIBLIOGRAPHIC_RECORD_IDENTIFIER_CODE,
-					Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
-			componentId.setComponentIdentifier(alephItem.getBarcodeValue());
+			ComponentId componentId = createComponentIdAsAccessionNumber(alephItem.getBarcodeValue());
 			bibliographicDescription.setComponentId(componentId);
 		}
 
@@ -132,6 +131,14 @@ public class AlephUtil {
 
 		// FIXME: NCIP JAXB translator cuts off all BibliographicRecordIds - that's why we're using componentId to transfer barcode
 		return bibliographicDescription;
+	}
+
+	public static ComponentId createComponentIdAsAccessionNumber(String barcodeValue) {
+		ComponentId componentId = new ComponentId();
+		componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.VERSION_1_BIBLIOGRAPHIC_RECORD_IDENTIFIER_CODE,
+				Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
+		componentId.setComponentIdentifier(barcodeValue);
+		return componentId;
 	}
 
 	public static Location parseLocation(AlephItem alephItem) {
@@ -594,15 +601,6 @@ public class AlephUtil {
 	private static String buildRenewPOSTXml(String desiredDueDate) {
 		return "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" + "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" + desiredDueDate
 				+ "</z36-due-date></z36></loan></get-pat-loan>";
-	}
-
-	public static RequestType parseRequestTypeFromZ37PriorityNode(String value) {
-		RequestType requestType;
-		if (value == "30") // TODO: Add remaining request types
-			requestType = Version1RequestType.LOAN;
-		else
-			requestType = Version1RequestType.ESTIMATE; // FIXME: Put here better default value
-		return requestType;
 	}
 
 	public static RequestStatusType parseRequestStatusTypeFromZ37StatusNode(String value) {

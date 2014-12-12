@@ -415,17 +415,21 @@ public class RestDlfConnector extends AlephMediator {
 
 				List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
 
-				if (localConfig.getMaxItemPreparationTimeDelay() != 0)
-					for (RequestedItem requestedItem : requestedItems) {
-						if (requestedItem.getDatePlaced() != null) {
-							// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
-							GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
-							pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
-							requestedItem.setPickupDate(pickupDate);
-						}
-					}
+				if (requestedItems != null) {
 
-				alephUser.setRequestedItems(requestedItems);
+					// If there is set default item preparation delay, set it to all requested items
+					if (localConfig.getMaxItemPreparationTimeDelay() != 0)
+						for (RequestedItem requestedItem : requestedItems) {
+							if (requestedItem.getDatePlaced() != null) {
+								// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
+								GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
+								pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
+								requestedItem.setPickupDate(pickupDate);
+							}
+						}
+
+					alephUser.setRequestedItems(requestedItems);
+				}
 			}
 
 			userHandler.setAlephUser(alephUser);
@@ -474,8 +478,6 @@ public class RestDlfConnector extends AlephMediator {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
-		AlephRequestItem requestItem = new AlephRequestItem();
-
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
 		String appProfileType = null;
@@ -489,7 +491,7 @@ public class RestDlfConnector extends AlephMediator {
 				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 						AlephConstants.PARAM_HOLDS).addRequest("lang", lang).toURL();
 
-		AlephLookupRequestHandler requestHandler = new AlephLookupRequestHandler(itemId, requestItem);
+		AlephLookupRequestHandler requestHandler = new AlephLookupRequestHandler(initData, itemId);
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
 
 		// Here parser finds requested request's link if any
@@ -497,17 +499,14 @@ public class RestDlfConnector extends AlephMediator {
 
 		if (requestHandler.requestWasFound() && requestHandler.getRequestLink() != null) {
 
-			requestItem.setRequestType(initData.getRequestType());
-			requestItem.setRequestScopeType(Version1RequestScopeType.ITEM);
-
 			URL requestLink = new URL(requestHandler.getRequestLink());
 
 			streamSource = new InputSource(requestLink.openStream());
 
 			// Here parser parses info pasteable into LookupRequestResponseData
-			parser.parse(streamSource, requestHandler.setParsingRequest());
+			parser.parse(streamSource, requestHandler);
 
-			RequestDetails requestDetails = requestItem.getRequestDetails();
+			RequestDetails requestDetails = requestHandler.getAlephRequestItem().getRequestDetails();
 
 			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestDetails.getDatePlaced() != null) {
 				GregorianCalendar pickupDate = (GregorianCalendar) requestDetails.getDatePlaced().clone();
@@ -536,15 +535,15 @@ public class RestDlfConnector extends AlephMediator {
 				userInitData.setInitiationHeader(initiationHeader);
 
 				AlephRestDlfUser user = lookupUser(patronId, userInitData);
-				requestItem.setUserOptionalFields(user.getUserOptionalFields());
+				requestHandler.getAlephRequestItem().setUserOptionalFields(user.getUserOptionalFields());
 			}
-
+/*
 			boolean getBibDescription = initData.getBibliographicDescriptionDesired();
 			boolean getCircStatus = initData.getCirculationStatusDesired();
 			boolean getHoldQueueLength = initData.getHoldQueueLengthDesired();
 			boolean getItemDescription = initData.getItemDescriptionDesired();
 			boolean getLocation = initData.getLocationDesired();
-
+/*
 			if (getBibDescription || getCircStatus || getHoldQueueLength || getItemDescription || getLocation) {
 
 				LookupItemInitiationData LIinitData = new LookupItemInitiationData();
@@ -566,14 +565,14 @@ public class RestDlfConnector extends AlephMediator {
 					throw new ServiceException(ServiceError.RUNTIME_ERROR, "LookupItem within LookupRequest in order to carry ItemOptionalFields returned null");
 
 				requestItem.setItemOptionalFields(item.getItemOptionalFields());
-			}
+			}*/
 		} else {
 			Problem problem = new Problem();
 			problem.setProblemType(new ProblemType("Request does not exist."));
-			requestItem.setProblem(problem);
+			requestHandler.getAlephRequestItem().setProblem(problem);
 		}
 
-		return requestItem;
+		return requestHandler.getAlephRequestItem();
 	}
 
 	public AlephRequestItem requestItem(RequestItemInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException {

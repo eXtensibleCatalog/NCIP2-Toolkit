@@ -21,6 +21,7 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.xml.sax.SAXException;
 
 public class AlephLookupRequestService implements LookupRequestService {
@@ -91,13 +92,14 @@ public class AlephLookupRequestService implements LookupRequestService {
 
 		ResponseHeader responseHeader = AlephUtil.reverseInitiationHeader(initData);
 
+		responseData.setRequestScopeType(Version1RequestScopeType.ITEM);
+		responseData.setRequestType(initData.getRequestType());
+		
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());
-		responseData.setRequestScopeType(requestItem.getRequestScopeType());
-		responseData.setRequestType(requestItem.getRequestType());
 		responseData.setRequestId(requestItem.getRequestId());
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());

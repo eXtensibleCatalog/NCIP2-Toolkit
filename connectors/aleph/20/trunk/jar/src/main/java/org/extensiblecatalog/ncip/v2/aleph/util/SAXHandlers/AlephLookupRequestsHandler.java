@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -13,12 +14,12 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
+import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
-import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
@@ -55,7 +56,6 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 	// Request specifics
 	private boolean reminderLevelReached = false;
-	private boolean requestTypeReached = false;
 	private boolean z37statusReached = false;
 
 	// Item identifiers
@@ -79,11 +79,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 	public AlephLookupRequestsHandler(LocalConfig localConfig) {
 		this.localConfig = localConfig;
-		bibliographicDescription = new BibliographicDescription();
-	}
-
-	public AlephLookupRequestsHandler() throws AlephException {
-		throw new AlephException("Cannot initialize requestItemHandler without bibliographic library.");
+		requestedItems = new ArrayList<RequestedItem>();
 	}
 
 	@Override
@@ -91,8 +87,11 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 		if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 			currentRequestedItem = new RequestedItem();
-			if (requestedItems == null)
-				requestedItems = new ArrayList<RequestedItem>();
+
+			bibliographicDescription = new BibliographicDescription();
+
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
+			requestNumberReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE)) {
 			datePlacedReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE)) {
@@ -111,8 +110,6 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			needBeforeDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE)) {
 			reminderLevelReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE)) {
-			requestTypeReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
 			pickupDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
@@ -152,7 +149,8 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			}
 			currentRequestedItem.setBibliographicDescription(bibliographicDescription);
 			requestedItems.add(currentRequestedItem);
-			bibliographicDescription = new BibliographicDescription();
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestNumberReached) {
+			requestNumberReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE) && datePlacedReached) {
 			datePlacedReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && hourPlacedReached) {
@@ -172,8 +170,6 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			needBeforeDateReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE) && reminderLevelReached) {
 			reminderLevelReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PRIORITY_NODE) && requestTypeReached) {
-			requestTypeReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
 			pickupDateReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && z37statusReached) {
@@ -202,7 +198,15 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
-		if (datePlacedReached) {
+		if (requestNumberReached) {
+			String requestIdVal = new String(ch, start, length);
+
+			RequestId requestId = new RequestId();
+			requestId.setRequestIdentifierValue(requestIdVal);
+			currentRequestedItem.setRequestId(requestId);
+
+			requestNumberReached = false;
+		} else if (datePlacedReached) {
 			String datePlacedParsed = new String(ch, start, length);
 			GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(datePlacedParsed);
 
@@ -260,15 +264,6 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 		} else if (reminderLevelReached) {
 			currentRequestedItem.setReminderLevel(new BigDecimal(new String(ch, start, length)));
 			reminderLevelReached = false;
-		} else if (requestTypeReached) {
-			RequestType requestType = null;
-			String parsedValue = new String(ch, start, length);
-			if (parsedValue == "30") // TODO: Add remaining request types - better FIXME move to AlephUtil
-				requestType = Version1RequestType.LOAN;
-			else
-				requestType = Version1RequestType.ESTIMATE;
-			currentRequestedItem.setRequestType(requestType);
-			requestTypeReached = false;
 		} else if (pickupDateReached) {
 			GregorianCalendar pickupDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setPickupDate(pickupDate);
@@ -278,9 +273,10 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			RequestStatusType requestStatusType;
 			if (parsedStatus == "S") {
 				requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
-			} else 
+			} else
 				requestStatusType = Version1RequestStatusType.IN_PROCESS;
-			
+
+			currentRequestedItem.setRequestType(Version1RequestType.HOLD);
 			currentRequestedItem.setRequestStatusType(requestStatusType);
 			z37statusReached = false;
 		} else if (statusReached) {
@@ -295,7 +291,8 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			bibliographicDescription.setAuthor(new String(ch, start, length));
 			authorReached = false;
 		} else if (isbnReached) {
-			bibliographicDescription.setBibliographicLevel(null);
+			BibliographicItemId bibId = AlephUtil.createBibliographicItemIdAsISBN(new String(ch, start, length));
+			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibId));
 			isbnReached = false;
 		} else if (titleReached) {
 			bibliographicDescription.setTitle(new String(ch, start, length));
@@ -313,14 +310,6 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 		} else if (itemSequenceReached) {
 			itemSequence = new String(ch, start, length);
 			itemSequenceReached = false;
-		} else if (requestNumberReached) {
-			String requestIdVal = new String(ch, start, length);
-
-			RequestId requestId = new RequestId();
-			requestId.setRequestIdentifierValue(requestIdVal);
-			currentRequestedItem.setRequestId(requestId);
-
-			requestNumberReached = false;
 		} 
 	}
 
