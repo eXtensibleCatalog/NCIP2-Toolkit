@@ -206,11 +206,9 @@ public class AlephUtil {
 
 			if (alephItem.getLocation() != null)
 				locationNameInstances.add(createLocationNameInstance(alephItem.getLocation(), new BigDecimal(1)));
-			
 
-			if (alephItem.getCollection() != null) 
+			if (alephItem.getCollection() != null)
 				locationNameInstances.add(createLocationNameInstance(alephItem.getCollection(), new BigDecimal(2)));
-		
 
 			locationName.setLocationNameInstances(locationNameInstances);
 
@@ -610,5 +608,15 @@ public class AlephUtil {
 		HoldingsInformation holdingsInformation = new HoldingsInformation();
 		holdingsInformation.setUnstructuredHoldingsData(description);
 		return holdingsInformation;
+	}
+
+	public static int parseHoldQueueLengthFromStatusNode(String parsedStatus) {
+		// Parsing this : Waiting in position 1 in queue; current due date 05/Jan/2015
+		// Or this: In process - in this case return -1
+		String[] words = parsedStatus.split("\\s+");
+		if (words.length < 6)
+			return -1;
+		else
+			return Integer.parseInt(words[3]);
 	}
 }

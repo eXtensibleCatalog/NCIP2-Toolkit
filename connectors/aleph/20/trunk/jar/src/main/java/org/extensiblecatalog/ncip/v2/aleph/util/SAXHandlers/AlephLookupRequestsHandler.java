@@ -45,35 +45,34 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 	private boolean itemFullIdFound;
 
 	// Dates
-	private boolean earliestDateNeededReached = false;
-	private boolean needBeforeDateReached = false;
-	private boolean datePlacedReached = false;
-	private boolean pickupExpiryDateReached = false;
-	private boolean hourPlacedReached = false;
-	private boolean pickupDateReached = false;
+	private boolean z37requestDateReached = false;
+	private boolean z37endHoldDateReached = false;
+	private boolean z37openDateReached = false;
+	private boolean z37endRequestDateReached = false;
+	private boolean z37openHourReached = false;
+	private boolean z37holdDateReached = false;
 
 	// Request specifics
-	private boolean reminderLevelReached = false;
+	private boolean z37recallTypeReached = false;
 	private boolean z37statusReached = false;
 
 	// Item identifiers
-	private boolean bibDocNoReached = false;
-	private boolean itemDocNoReached = false;
-	private boolean itemSequenceReached = false;
+	private boolean z13docNumberReached = false;
+	private boolean z30docNumberReached = false;
+	private boolean z37itemSequenceReached = false;
 
 	// Bibliographic description
-	private boolean materialReached = false;
+	private boolean z30materialReached = false;
 	private boolean statusReached = false;
-	private boolean authorReached = false;
-	private boolean isbnReached = false;
-	private boolean titleReached = false;
-	private boolean publisherReached = false;
+	private boolean z13authorReached = false;
+	private boolean z13isbnReached = false;
+	private boolean z13titleReached = false;
+	private boolean z13publisherReached = false;
 
 	// Item optional fields etc.
-	private boolean pickupLocationReached = false;
-	private boolean holdQueueLengthReached = false;
+	private boolean z37pickupLocationReached = false;
 
-	private boolean requestNumberReached = false;
+	private boolean z37requestNumberReached = false;
 
 	public AlephLookupRequestsHandler(LocalConfig localConfig) {
 		this.localConfig = localConfig;
@@ -89,45 +88,43 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			bibliographicDescription = new BibliographicDescription();
 
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
-			requestNumberReached = true;
+			z37requestNumberReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE)) {
-			datePlacedReached = true;
+			z37openDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE)) {
-			hourPlacedReached = true;
+			z37openHourReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE)) {
-			earliestDateNeededReached = true;
+			z37requestDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE)) {
-			pickupExpiryDateReached = true;
+			z37endRequestDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE)) {
-			itemSequenceReached = true;
-		} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE)) {
-			holdQueueLengthReached = true;
+			z37itemSequenceReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE)) {
-			pickupLocationReached = true;
+			z37pickupLocationReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE)) {
-			needBeforeDateReached = true;
+			z37endHoldDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE)) {
-			reminderLevelReached = true;
+			z37recallTypeReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE)) {
-			pickupDateReached = true;
+			z37holdDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE)) {
 			z37statusReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE)) {
 			statusReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE)) {
-			authorReached = true;
+			z13authorReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE)) {
-			isbnReached = true;
+			z13isbnReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE)) {
-			titleReached = true;
+			z13titleReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE)) {
-			publisherReached = true;
+			z13publisherReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE)) {
-			itemDocNoReached = true;
+			z30docNumberReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE)) {
-			bibDocNoReached = true;
+			z13docNumberReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE)) {
-			materialReached = true;
+			z30materialReached = true;
 		}
 
 	}
@@ -147,65 +144,63 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			}
 			currentRequestedItem.setBibliographicDescription(bibliographicDescription);
 			requestedItems.add(currentRequestedItem);
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestNumberReached) {
-			requestNumberReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE) && datePlacedReached) {
-			datePlacedReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && hourPlacedReached) {
-			hourPlacedReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && z37requestNumberReached) {
+			z37requestNumberReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_DATE_NODE) && z37openDateReached) {
+			z37openDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && z37openHourReached) {
+			z37openHourReached = false;
 			itemFullIdFound = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE) && earliestDateNeededReached) {
-			earliestDateNeededReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && pickupExpiryDateReached) {
-			pickupExpiryDateReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && itemSequenceReached) {
-			itemSequenceReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.QUEUE_NODE) && holdQueueLengthReached) {
-			holdQueueLengthReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && pickupLocationReached) {
-			pickupLocationReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && needBeforeDateReached) {
-			needBeforeDateReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE) && reminderLevelReached) {
-			reminderLevelReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && pickupDateReached) {
-			pickupDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE) && z37requestDateReached) {
+			z37requestDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && z37endRequestDateReached) {
+			z37endRequestDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && z37itemSequenceReached) {
+			z37itemSequenceReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && z37pickupLocationReached) {
+			z37pickupLocationReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && z37endHoldDateReached) {
+			z37endHoldDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_RECALL_TYPE_NODE) && z37recallTypeReached) {
+			z37recallTypeReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_DATE_NODE) && z37holdDateReached) {
+			z37holdDateReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_STATUS_NODE) && z37statusReached) {
 			z37statusReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.STATUS_NODE) && statusReached) {
 			statusReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && authorReached) {
-			authorReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && isbnReached) {
-			isbnReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && titleReached) {
-			titleReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && publisherReached) {
-			publisherReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && itemDocNoReached) {
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_AUTHOR_NODE) && z13authorReached) {
+			z13authorReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_ISBN_NODE) && z13isbnReached) {
+			z13isbnReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_TITLE_NODE) && z13titleReached) {
+			z13titleReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_PUBLISHER_NODE) && z13publisherReached) {
+			z13publisherReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_DOC_NUMBER_NODE) && z30docNumberReached) {
 			itemFullIdFound = false;
-			itemDocNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && bibDocNoReached) {
+			z30docNumberReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && z13docNumberReached) {
 			itemFullIdFound = false;
-			bibDocNoReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
-			materialReached = false;
+			z13docNumberReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && z30materialReached) {
+			z30materialReached = false;
 		}
 
 	}
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
-		if (requestNumberReached) {
+		if (z37requestNumberReached) {
 			RequestId requestId = new RequestId();
 			requestId.setRequestIdentifierValue(new String(ch, start, length));
 			currentRequestedItem.setRequestId(requestId);
-			requestNumberReached = false;
-		} else if (datePlacedReached) {
+			z37requestNumberReached = false;
+		} else if (z37openDateReached) {
 			GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setDatePlaced(datePlaced);
-			datePlacedReached = false;
-		} else if (hourPlacedReached) {
+			z37openDateReached = false;
+		} else if (z37openHourReached) {
 			String hourPlacedParsed = new String(ch, start, length);
 			if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
 				GregorianCalendar datePlaced = currentRequestedItem.getDatePlaced();
@@ -222,68 +217,69 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 				currentRequestedItem.setDatePlaced(datePlaced);
 			}
-			hourPlacedReached = false;
-		} else if (earliestDateNeededReached) {
+			z37openHourReached = false;
+		} else if (z37requestDateReached) {
 			GregorianCalendar earliestDateNeeded = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setEarliestDateNeeded(earliestDateNeeded);
-			earliestDateNeededReached = false;
-		} else if (needBeforeDateReached) {
+			z37requestDateReached = false;
+		} else if (z37endHoldDateReached) {
 			GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setNeedBeforeDate(needBeforeDate);
-			needBeforeDateReached = false;
-		} else if (holdQueueLengthReached) {
-			// Parse this: <queue>1 request(s) of 4 items</queue>
-			String parsedHoldQueueLength = (new String(ch, start, length)).split(" ")[0];
-			currentRequestedItem.setHoldQueueLength(new BigDecimal(parsedHoldQueueLength));
-			holdQueueLengthReached = false;
-		} else if (pickupLocationReached) {
+			z37endHoldDateReached = false;
+		} else if (z37pickupLocationReached) {
 			currentRequestedItem.setPickupLocation(new PickupLocation(new String(ch, start, length)));
-			pickupLocationReached = false;
-		} else if (pickupExpiryDateReached) {
+			z37pickupLocationReached = false;
+		} else if (z37endRequestDateReached) {
 			GregorianCalendar pickupExpiryDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setPickupExpiryDate(pickupExpiryDate);
-			pickupExpiryDateReached = false;
-		} else if (reminderLevelReached) {
+			z37endRequestDateReached = false;
+		} else if (z37recallTypeReached) {
 			currentRequestedItem.setReminderLevel(new BigDecimal(new String(ch, start, length)));
-			reminderLevelReached = false;
-		} else if (pickupDateReached) {
+			z37recallTypeReached = false;
+		} else if (z37holdDateReached) {
 			GregorianCalendar pickupDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setPickupDate(pickupDate);
-			pickupDateReached = false;
+			z37holdDateReached = false;
 		} else if (z37statusReached) {
 			RequestStatusType requestStatusType = AlephUtil.parseRequestStatusTypeFromZ37StatusNode(new String(ch, start, length));
 			currentRequestedItem.setRequestStatusType(requestStatusType);
 			currentRequestedItem.setRequestType(Version1RequestType.HOLD);
 			z37statusReached = false;
 		} else if (statusReached) {
-			bibliographicDescription.setSponsoringBody(new String(ch, start, length));
+			String parsedStatus = new String(ch, start, length);
+			bibliographicDescription.setSponsoringBody(parsedStatus);
+
+			int parsedHoldQueue = AlephUtil.parseHoldQueueLengthFromStatusNode(parsedStatus);
+			if (parsedHoldQueue != -1)
+				currentRequestedItem.setHoldQueueLength(new BigDecimal(parsedHoldQueue));
+
 			statusReached = false;
-		} else if (materialReached) {
+		} else if (z30materialReached) {
 			MediumType mediumType = AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired);
 			bibliographicDescription.setMediumType(mediumType);
-			materialReached = false;
-		} else if (authorReached) {
+			z30materialReached = false;
+		} else if (z13authorReached) {
 			bibliographicDescription.setAuthor(new String(ch, start, length));
-			authorReached = false;
-		} else if (isbnReached) {
+			z13authorReached = false;
+		} else if (z13isbnReached) {
 			BibliographicItemId bibId = AlephUtil.createBibliographicItemIdAsISBN(new String(ch, start, length));
 			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibId));
-			isbnReached = false;
-		} else if (titleReached) {
+			z13isbnReached = false;
+		} else if (z13titleReached) {
 			bibliographicDescription.setTitle(new String(ch, start, length));
-			titleReached = false;
-		} else if (publisherReached) {
+			z13titleReached = false;
+		} else if (z13publisherReached) {
 			bibliographicDescription.setPublisher(new String(ch, start, length));
-			publisherReached = false;
-		} else if (itemDocNoReached) {
+			z13publisherReached = false;
+		} else if (z30docNumberReached) {
 			itemDocNumber = new String(ch, start, length);
-			itemDocNoReached = false;
-		} else if (bibDocNoReached) {
+			z30docNumberReached = false;
+		} else if (z13docNumberReached) {
 			bibDocNumber = new String(ch, start, length);
-			bibDocNoReached = false;
-		} else if (itemSequenceReached) {
+			z13docNumberReached = false;
+		} else if (z37itemSequenceReached) {
 			itemSequence = new String(ch, start, length);
-			itemSequenceReached = false;
+			z37itemSequenceReached = false;
 		}
 	}
 

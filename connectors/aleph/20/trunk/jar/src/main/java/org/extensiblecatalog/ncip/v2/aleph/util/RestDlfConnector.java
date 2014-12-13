@@ -698,6 +698,7 @@ public class RestDlfConnector extends AlephMediator {
 
 			String seqNumber = requestItemHandler.getSequenceNumber();
 
+			//FIXME: this URL building is not neccessary since it can be parsed with AlephDoRequestHandler ...
 			// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
 			URL holdRequestUrl = new URLBuilder()
 					.setBase(localConfig.getServerName(), localConfig.getServerPort())

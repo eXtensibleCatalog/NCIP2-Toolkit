@@ -36,7 +36,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 
 	private AlephRequestItem alephRequestItem;
 	private RequestDetails requestDetails;
-	
+
 	private BibliographicDescription bibliographicDescription;
 
 	private ItemOptionalFields itemOptionalFields;
@@ -72,7 +72,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	private boolean z37requestNumberReached = false;
 	private boolean z37endRequestDateReached = false;
 	private boolean z37pickupLocationReached = false;
-	private boolean z37holdSequenceReached = false;
 	private boolean z37endHoldDateReached = false;
 	private boolean z37requestDateReached = false;
 
@@ -97,7 +96,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 	private boolean getItemUseRestrictionType;
 	private boolean getLocation;
 	private boolean getItemDescription;
-
 
 	/**
 	 * This class is used to work with single request. To parse more requests use {@link AlephLookupRequestsHandler}.
@@ -214,10 +212,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && getLocation) {
 					z30subLibraryReached = true;
 				} else
-				// Hold Queue Length
-				if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && getHoldQueueLength) {
-					z37holdSequenceReached = true;
-				} else
 				// Item Use Restriction Type
 				if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && getItemUseRestrictionType) {
 					z30itemStatusReached = true;
@@ -290,10 +284,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z30_SUB_LIBRARY_NODE) && z30subLibraryReached) {
 					z30subLibraryReached = false;
 				} else
-				// Hold Queue Length
-				if (qName.equalsIgnoreCase(AlephConstants.Z37_HOLD_SEQUENCE_NODE) && z37holdSequenceReached) {
-					z37holdSequenceReached = false;
-				} else
 				// Item Use Restriction Type
 				if (qName.equalsIgnoreCase(AlephConstants.Z30_ITEM_STATUS_NODE) && z30itemStatusReached) {
 					z30itemStatusReached = false;
@@ -362,11 +352,14 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 
 				// Bibliographic Description here:
 				if (statusReached) {
+					// Here is also position in queue specified if there is any
 					String parsedStatus = new String(ch, start, length);
 
-					if (getBibDescription)
-						bibliographicDescription.setSponsoringBody(parsedStatus);
-
+					if (getHoldQueueLength) {
+						int parsedHoldQueue = AlephUtil.parseHoldQueueLengthFromStatusNode(parsedStatus);
+						if (parsedHoldQueue != -1)
+							itemOptionalFields.setHoldQueueLength(new BigDecimal(parsedHoldQueue));
+					}
 					if (getCircStatus)
 						itemOptionalFields.setCirculationStatus(AlephUtil.parseCirculationStatus(parsedStatus));
 
@@ -427,11 +420,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 					z30collectionReached = false;
 				} else
 
-				// Hold queue here:
-				if (z37holdSequenceReached) {
-					itemOptionalFields.setHoldQueueLength(new BigDecimal(new String(ch, start, length)));
-					z37holdSequenceReached = false;
-				} else
 				// Item Use Restriction Type
 				if (z30itemStatusReached) {
 					itemOptionalFields.setItemUseRestrictionTypes(Arrays.asList(AlephUtil.parseItemUseRestrictionType(new String(ch, start, length))));
