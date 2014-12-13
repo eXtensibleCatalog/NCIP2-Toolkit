@@ -24,6 +24,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class AlephLookupRequestsHandler extends DefaultHandler {
@@ -86,6 +87,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			currentRequestedItem = new RequestedItem();
 
 			bibliographicDescription = new BibliographicDescription();
+			itemFullIdFound = true;
 
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
 			z37requestNumberReached = true;
@@ -150,13 +152,10 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			z37openDateReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_OPEN_HOUR_NODE) && z37openHourReached) {
 			z37openHourReached = false;
-			itemFullIdFound = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_DATE_NODE) && z37requestDateReached) {
 			z37requestDateReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_REQUEST_DATE_NODE) && z37endRequestDateReached) {
 			z37endRequestDateReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && z37itemSequenceReached) {
-			z37itemSequenceReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_PICKUP_LOCATION_NODE) && z37pickupLocationReached) {
 			z37pickupLocationReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_END_HOLD_DATE_NODE) && z37endHoldDateReached) {
@@ -183,6 +182,9 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z13_DOC_NUMBER_NODE) && z13docNumberReached) {
 			itemFullIdFound = false;
 			z13docNumberReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_ITEM_SEQUENCE_NODE) && z37itemSequenceReached) {
+			itemFullIdFound = false;
+			z37itemSequenceReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && z30materialReached) {
 			z30materialReached = false;
 		}

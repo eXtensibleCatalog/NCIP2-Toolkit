@@ -352,7 +352,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 
 				// Bibliographic Description here:
 				if (statusReached) {
-					// Here is also position in queue specified if there is any
+					// Here is also possibly specified position in queue
 					String parsedStatus = new String(ch, start, length);
 
 					if (getHoldQueueLength) {
