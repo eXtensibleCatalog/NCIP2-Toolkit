@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
@@ -22,7 +21,6 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -75,7 +73,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 	private boolean pickupLocationReached = false;
 	private boolean holdQueueLengthReached = false;
 
-	private boolean requestNumberReached;
+	private boolean requestNumberReached = false;
 
 	public AlephLookupRequestsHandler(LocalConfig localConfig) {
 		this.localConfig = localConfig;
@@ -192,26 +190,20 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			bibDocNoReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z30_MATERIAL_NODE) && materialReached) {
 			materialReached = false;
-		} 
+		}
 
 	}
 
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (requestNumberReached) {
-			String requestIdVal = new String(ch, start, length);
-
 			RequestId requestId = new RequestId();
-			requestId.setRequestIdentifierValue(requestIdVal);
+			requestId.setRequestIdentifierValue(new String(ch, start, length));
 			currentRequestedItem.setRequestId(requestId);
-
 			requestNumberReached = false;
 		} else if (datePlacedReached) {
-			String datePlacedParsed = new String(ch, start, length);
-			GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(datePlacedParsed);
-
+			GregorianCalendar datePlaced = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setDatePlaced(datePlaced);
-
 			datePlacedReached = false;
 		} else if (hourPlacedReached) {
 			String hourPlacedParsed = new String(ch, start, length);
@@ -232,18 +224,12 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			}
 			hourPlacedReached = false;
 		} else if (earliestDateNeededReached) {
-			String earliestDateNeededParsed = new String(ch, start, length);
-			GregorianCalendar earliestDateNeeded = AlephUtil.parseGregorianCalendarFromAlephDate(earliestDateNeededParsed);
-
+			GregorianCalendar earliestDateNeeded = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setEarliestDateNeeded(earliestDateNeeded);
-
 			earliestDateNeededReached = false;
 		} else if (needBeforeDateReached) {
-			String needBeforeDateParsed = new String(ch, start, length);
-			GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(needBeforeDateParsed);
-
+			GregorianCalendar needBeforeDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setNeedBeforeDate(needBeforeDate);
-
 			needBeforeDateReached = false;
 		} else if (holdQueueLengthReached) {
 			// Parse this: <queue>1 request(s) of 4 items</queue>
@@ -251,15 +237,11 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			currentRequestedItem.setHoldQueueLength(new BigDecimal(parsedHoldQueueLength));
 			holdQueueLengthReached = false;
 		} else if (pickupLocationReached) {
-			PickupLocation pickupLocation = new PickupLocation(new String(ch, start, length));
-			currentRequestedItem.setPickupLocation(pickupLocation);
+			currentRequestedItem.setPickupLocation(new PickupLocation(new String(ch, start, length)));
 			pickupLocationReached = false;
 		} else if (pickupExpiryDateReached) {
-			String pickupExpiryDateParsed = new String(ch, start, length);
-			GregorianCalendar pickupExpiryDate = AlephUtil.parseGregorianCalendarFromAlephDate(pickupExpiryDateParsed);
-
+			GregorianCalendar pickupExpiryDate = AlephUtil.parseGregorianCalendarFromAlephDate(new String(ch, start, length));
 			currentRequestedItem.setPickupExpiryDate(pickupExpiryDate);
-
 			pickupExpiryDateReached = false;
 		} else if (reminderLevelReached) {
 			currentRequestedItem.setReminderLevel(new BigDecimal(new String(ch, start, length)));
@@ -269,19 +251,12 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			currentRequestedItem.setPickupDate(pickupDate);
 			pickupDateReached = false;
 		} else if (z37statusReached) {
-			String parsedStatus = new String(ch, start, length);
-			RequestStatusType requestStatusType;
-			if (parsedStatus == "S") {
-				requestStatusType = Version1RequestStatusType.AVAILABLE_FOR_PICKUP;
-			} else
-				requestStatusType = Version1RequestStatusType.IN_PROCESS;
-
-			currentRequestedItem.setRequestType(Version1RequestType.HOLD);
+			RequestStatusType requestStatusType = AlephUtil.parseRequestStatusTypeFromZ37StatusNode(new String(ch, start, length));
 			currentRequestedItem.setRequestStatusType(requestStatusType);
+			currentRequestedItem.setRequestType(Version1RequestType.HOLD);
 			z37statusReached = false;
 		} else if (statusReached) {
-			String parsedStatus = new String(ch, start, length);
-			bibliographicDescription.setSponsoringBody(parsedStatus);
+			bibliographicDescription.setSponsoringBody(new String(ch, start, length));
 			statusReached = false;
 		} else if (materialReached) {
 			MediumType mediumType = AlephUtil.detectMediumType(new String(ch, start, length), localizationDesired);
@@ -304,13 +279,12 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			itemDocNumber = new String(ch, start, length);
 			itemDocNoReached = false;
 		} else if (bibDocNoReached) {
-			String parsedBibId = new String(ch, start, length);
-			bibDocNumber = parsedBibId;
+			bibDocNumber = new String(ch, start, length);
 			bibDocNoReached = false;
 		} else if (itemSequenceReached) {
 			itemSequence = new String(ch, start, length);
 			itemSequenceReached = false;
-		} 
+		}
 	}
 
 	public List<RequestedItem> getRequestedItems() {

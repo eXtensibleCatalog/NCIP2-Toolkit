@@ -34,9 +34,7 @@ import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
-import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
@@ -56,7 +54,6 @@ import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -107,8 +104,8 @@ public class RestDlfConnector extends AlephMediator {
 
 			try {
 				localConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
-			} catch (NumberFormatException e) {
-				localConfig.setMaxItemPreparationTimeDelay(0);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 		} catch (ToolkitException e) {
@@ -377,7 +374,6 @@ public class RestDlfConnector extends AlephMediator {
 		}
 
 		if (atLeastOneDesired) {
-			AlephRestDlfUser alephUser = new AlephRestDlfUser();
 
 			AlephUserHandler userHandler = new AlephUserHandler(initData);
 
@@ -393,11 +389,11 @@ public class RestDlfConnector extends AlephMediator {
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());
 					parser.parse(streamSource, loanHandler);
-					alephUser.setLoanedItems(loanHandler.getListOfLoanedItems());
+					userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
 				} else {
 					streamSource = new InputSource(loansHistoryUrl.openStream());
 					parser.parse(streamSource, loanHandler);
-					alephUser.setLoanedItems(loanHandler.getListOfLoanedItems());
+					userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
 				}
 
 			}
@@ -409,7 +405,6 @@ public class RestDlfConnector extends AlephMediator {
 
 				streamSource = new InputSource(requestsUrl.openStream());
 
-				// FIXME this is not appropriate parser for this job
 				// Here parser parses all available info saveable into RequestItem class
 				parser.parse(streamSource, requestItemHandler);
 
@@ -428,11 +423,9 @@ public class RestDlfConnector extends AlephMediator {
 							}
 						}
 
-					alephUser.setRequestedItems(requestedItems);
+					userHandler.getAlephUser().setRequestedItems(requestedItems);
 				}
 			}
-
-			userHandler.setAlephUser(alephUser);
 
 			if (addressUrl != null) {
 				streamSource = new InputSource(addressUrl.openStream());
@@ -513,7 +506,7 @@ public class RestDlfConnector extends AlephMediator {
 				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
 				requestDetails.setPickupDate(pickupDate);
 			}
-			
+
 			boolean nameInformationDesired = initData.getNameInformationDesired();
 			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
 			boolean userIdDesired = initData.getUserIdDesired();

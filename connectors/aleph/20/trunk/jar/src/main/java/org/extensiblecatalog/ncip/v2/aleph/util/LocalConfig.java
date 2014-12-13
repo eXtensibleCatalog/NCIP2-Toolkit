@@ -27,7 +27,7 @@ public class LocalConfig {
 	private int bibLibraryLength;
 
 	public LocalConfig() {
-
+		maxItemPreparationTimeDelay = 0;
 	}
 
 	/**

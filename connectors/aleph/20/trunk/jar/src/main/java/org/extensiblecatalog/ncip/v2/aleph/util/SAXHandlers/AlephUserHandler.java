@@ -51,6 +51,8 @@ public class AlephUserHandler extends DefaultHandler {
 	private boolean descriptionReached = false;
 	private boolean cashTypeNoteReached = false;
 
+	private boolean agenciesSetToBlockOrTraps = false;
+
 	/**
 	 * Initializes new AlephUserHandler instance with desired services in the following order:
 	 * 
@@ -62,6 +64,8 @@ public class AlephUserHandler extends DefaultHandler {
 	 * @throws AlephException
 	 */
 	public AlephUserHandler(LookupUserInitiationData initData) throws AlephException {
+		user = new AlephRestDlfUser();
+
 		blockOrTrapDesired = initData.getBlockOrTrapDesired();
 		nameInformationDesired = initData.getNameInformationDesired();
 		userIdDesired = initData.getUserIdDesired();
@@ -69,21 +73,6 @@ public class AlephUserHandler extends DefaultHandler {
 		userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
 		userPrivilegeDesired = initData.getUserPrivilegeDesired();
 		blockOrTraps = new ArrayList<BlockOrTrap>();
-	}
-
-	public void setAlephUser(AlephRestDlfUser alephUser) {
-		user = alephUser;
-	}
-
-	public AlephRestDlfUser getAlephUser() {
-		// Iterate over blockOrTraps list & set parsed agencyId
-		if (agencyId != null) {
-			for (BlockOrTrap blockOrTrap : blockOrTraps) {
-				blockOrTrap.setAgencyId(agencyId);
-			}
-			user.setBlockOrTraps(blockOrTraps);
-		}
-		return user;
 	}
 
 	@Override
@@ -233,5 +222,19 @@ public class AlephUserHandler extends DefaultHandler {
 			validFromDateReached = false;
 		}
 
+	}
+	
+	public AlephRestDlfUser getAlephUser() {
+		// Iterate over blockOrTraps list & set parsed agencyId
+		if (!agenciesSetToBlockOrTraps) {
+			if (agencyId != null) {
+				for (BlockOrTrap blockOrTrap : blockOrTraps) {
+					blockOrTrap.setAgencyId(agencyId);
+				}
+				user.setBlockOrTraps(blockOrTraps);
+			}
+			agenciesSetToBlockOrTraps = true;
+		}
+		return user;
 	}
 }

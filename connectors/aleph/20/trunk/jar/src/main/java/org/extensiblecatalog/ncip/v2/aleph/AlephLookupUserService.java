@@ -69,24 +69,31 @@ public class AlephLookupUserService implements LookupUserService {
 		}
 
 		boolean userIdIsEmpty = patronId.isEmpty();
-		boolean authIsSetAndPwIsEmpty = initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty();
+		boolean authIsSetAndPwIsEmpty = initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && (password == null || password.isEmpty());
 
 		if (userIdIsEmpty || authIsSetAndPwIsEmpty) {
 			List<Problem> problems = new ArrayList<Problem>();
 
-			if (userIdIsEmpty) {
+			if (!authenticateOnly) {
 
-				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Set AuthenticationInputType to \""
-						+ Version1AuthenticationInputType.USER_ID.getValue() + "\" to specify user id input.");
+				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Element UserIdentifierValue is empty.");
 				problems.add(p);
 
-			}
-			if (authIsSetAndPwIsEmpty) {
+			} else {
+				if (userIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("Password is undefined."), null, "Can't authenticate without password specified.", "Set AuthenticationInputType to \""
-						+ Version1AuthenticationInputType.PASSWORD.getValue() + "\" to specify password input.");
-				problems.add(p);
+					Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Set AuthenticationInputType to \""
+							+ Version1AuthenticationInputType.USER_ID.getValue() + "\" to specify user id input.");
+					problems.add(p);
 
+				}
+				if (authIsSetAndPwIsEmpty) {
+
+					Problem p = new Problem(new ProblemType("Password is undefined."), null, "Can't authenticate without password specified.", "Set AuthenticationInputType to \""
+							+ Version1AuthenticationInputType.PASSWORD.getValue() + "\" to specify password input.");
+					problems.add(p);
+
+				}
 			}
 
 			responseData.setProblems(problems);
