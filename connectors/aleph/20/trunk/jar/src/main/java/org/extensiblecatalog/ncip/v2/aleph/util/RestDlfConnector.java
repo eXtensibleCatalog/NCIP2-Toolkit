@@ -292,19 +292,17 @@ public class RestDlfConnector extends AlephMediator {
 
 		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
-		boolean nameInformationDesired = initData.getNameInformationDesired();
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
-		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
 		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
-		boolean userIdDesired = initData.getUserIdDesired();
 		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+
+		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired();
 
 		boolean atLeastOneDesired = false;
 
 		// If there are only loanedItems desired, that means to include loans history to output
 		// Better suggestions how to forward loaned items history, please send to kozlovsky@mzk.cz
-		boolean loanedItemsDesiredOnly = loanedItemsDesired
-				&& !(blockOrTrapDesired || nameInformationDesired || requestedItemsDesired || userAddressInformationDesired || userFiscalAccountDesired || userIdDesired || userPrivilegeDesired);
+		boolean loanedItemsDesiredOnly = loanedItemsDesired && !(blockOrTrapDesired || requestedItemsDesired || userFiscalAccountDesired || personalInfoDesired);
 
 		String appProfileType = null;
 		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
@@ -314,7 +312,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		// Create URL request only if specified service was desired
 		URL addressUrl = null;
-		if (nameInformationDesired || userIdDesired || userAddressInformationDesired || userPrivilegeDesired) {
+		if (personalInfoDesired) {
 			atLeastOneDesired = true;
 			addressUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
 					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
@@ -340,7 +338,6 @@ public class RestDlfConnector extends AlephMediator {
 				loansUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
 						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
 						.addRequest("view", "full").addRequest("lang", lang).toURL();
-
 			} else {
 				loansHistoryUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
 						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
@@ -375,7 +372,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		if (atLeastOneDesired) {
 
-			AlephUserHandler userHandler = new AlephUserHandler(initData);
+			AlephUserHandler userHandler = new AlephUserHandler(initData, localConfig);
 
 			InputSource streamSource;
 
@@ -388,15 +385,14 @@ public class RestDlfConnector extends AlephMediator {
 
 				if (loansUrl != null) {
 					streamSource = new InputSource(loansUrl.openStream());
-					parser.parse(streamSource, loanHandler);
-					userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
-				} else {
+				} else
 					streamSource = new InputSource(loansHistoryUrl.openStream());
-					parser.parse(streamSource, loanHandler);
-					userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
-				}
+
+				parser.parse(streamSource, loanHandler);
+				userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
 
 			}
+
 			if (requestsUrl != null) {
 				AlephLookupRequestsHandler requestItemHandler = new AlephLookupRequestsHandler(localConfig);
 
@@ -410,7 +406,7 @@ public class RestDlfConnector extends AlephMediator {
 
 				List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
 
-				if (requestedItems != null) {
+				if (requestedItems.size() > 0) {
 
 					// If there is set default item preparation delay, set it to all requested items
 					if (localConfig.getMaxItemPreparationTimeDelay() != 0)
@@ -430,27 +426,27 @@ public class RestDlfConnector extends AlephMediator {
 			if (addressUrl != null) {
 				streamSource = new InputSource(addressUrl.openStream());
 
-				parser.parse(streamSource, userHandler);
+				parser.parse(streamSource, userHandler.parseAddress());
 			}
 			if (cashUrl != null) {
 				streamSource = new InputSource(cashUrl.openStream());
 
-				parser.parse(streamSource, userHandler);
+				parser.parse(streamSource, userHandler.parseCash());
 			}
 			if (circulationsUrl != null) {
 				streamSource = new InputSource(circulationsUrl.openStream());
 
-				parser.parse(streamSource, userHandler);
+				parser.parse(streamSource, userHandler.parseCirculations());
 			}
 			if (blocksOrTrapsUrl != null) {
 				streamSource = new InputSource(blocksOrTrapsUrl.openStream());
 
-				parser.parse(streamSource, userHandler);
+				parser.parse(streamSource, userHandler.parseBlockOrTraps());
 			}
 			if (registrationUrl != null) {
 				streamSource = new InputSource(registrationUrl.openStream());
 
-				parser.parse(streamSource, userHandler);
+				parser.parse(streamSource, userHandler.parseRegistration());
 			}
 
 			return userHandler.getAlephUser();

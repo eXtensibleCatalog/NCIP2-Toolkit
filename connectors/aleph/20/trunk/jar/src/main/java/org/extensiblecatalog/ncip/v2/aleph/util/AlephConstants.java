@@ -115,11 +115,16 @@ public class AlephConstants {
 	public static final String OPEN_SUM_NODE = "open-sum";
 	public static final String REPLY_CODE_NODE = "reply-code";
 	public static final String REPLY_TEXT_NODE = "reply-text";
+	public static final String PAT_BLOCKS_NODE = "pat-blocks";
 	public static final String CIRC_STATUS_NODE = "circ-status";
 	public static final String SUB_LIBRARY_NODE = "sub-library";
 	public static final String HOLD_REQUEST_NODE = "hold-request";
 	public static final String NEW_DUE_DATE_NODE = "new-due-date";
 	public static final String PATRON_BLOCK_NODE = "patron-block";
+	public static final String GET_PAT_ADRS_NODE = "get-pat-adrs";
+	public static final String PAT_REGISTER_NODE = "pat-register";
+	public static final String GET_CIRC_ACTS_NODE = "get-circ-acts";
+	public static final String PAT_CASH_LIST_NODE = "pat-cash-list";
 	public static final String HOLD_REQUESTS_NODE = "hold-requests";
 	public static final String CONSORTIAL_BLOCK_NODE = "consortial-block";
 	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
@@ -151,7 +156,7 @@ public class AlephConstants {
 
 	public static final String Z31_NODE = "z31";
 	public static final String Z31_FINE_SUM_NODE = "z31-sum";
-	public static final String Z31_FINE_DATE_NODE = "z31-date";
+	public static final String Z31_DATE_NODE = "z31-date";
 	public static final String Z31_NET_SUM_NODE = "z31-net-sum";
 	public static final String Z31_FINE_STATUS_NODE = "z31-status";
 	public static final String Z31_FINE_ACCRUAL_DATE_NODE = "z31-date";
@@ -238,6 +243,7 @@ public class AlephConstants {
 	public static final String Z305_DELINQUENCY_1_NODE = "z305-delinq-1";
 	public static final String Z305_DELINQUENCY_2_NODE = "z305-delinq-2";
 	public static final String Z305_DELINQUENCY_3_NODE = "z305-delinq-3";
+	public static final String Z305_EXPIRY_DATE_NODE = "z305-expiry-date";
 	public static final String Z305_DELINQUENCY_NOTE_1_NODE = "z305-delinq-n-1";
 	public static final String Z305_DELINQUENCY_NOTE_2_NODE = "z305-delinq-n-2";
 	public static final String Z305_DELINQUENCY_NOTE_3_NODE = "z305-delinq-n-3";

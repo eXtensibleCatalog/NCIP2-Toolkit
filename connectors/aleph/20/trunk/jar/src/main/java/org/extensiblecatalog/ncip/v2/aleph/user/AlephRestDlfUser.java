@@ -10,6 +10,7 @@ import org.extensiblecatalog.ncip.v2.aleph.agency.AlephAgency;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
@@ -515,7 +516,7 @@ public class AlephRestDlfUser implements Serializable {
 		this.userPrivileges = userPrivileges;
 	}
 
-	public void setBorStatus(String string) throws SAXException {
+	public void setBorStatus(String string, LocalConfig localConfig) throws SAXException {
 
 		if (userPrivilege == null)
 			userPrivilege = new UserPrivilege();
@@ -524,9 +525,9 @@ public class AlephRestDlfUser implements Serializable {
 		userPrivilege.setUserPrivilegeDescription(string);
 		userPrivilege.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm",
 				"MZK type"));
-		userPrivilege.setAgencyId(new AgencyId("MZK")); // FIXME: this is default - shouldn't be
+		userPrivilege.setAgencyId(new AgencyId(localConfig.getDefaultAgency()));
 
-		if (userPrivilege.getValidFromDate() != null && userPrivilege.getValidToDate() != null)
+		if (userPrivilege.getValidFromDate() != null)
 			userPrivileges.add(userPrivilege);
 	}
 
@@ -536,7 +537,7 @@ public class AlephRestDlfUser implements Serializable {
 
 		userPrivilege.setValidToDate(AlephUtil.parseGregorianCalendarFromAlephDate(validToDateParsed));
 
-		if (userPrivilege.getUserPrivilegeDescription() != null && userPrivilege.getValidFromDate() != null)
+		if (userPrivilege.getUserPrivilegeDescription() != null)
 			userPrivileges.add(userPrivilege);
 	}
 

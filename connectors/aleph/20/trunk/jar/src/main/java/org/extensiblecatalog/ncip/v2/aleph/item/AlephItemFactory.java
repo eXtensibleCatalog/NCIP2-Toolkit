@@ -135,7 +135,7 @@ public class AlephItemFactory implements Serializable{
 			for (int k=0; k<z31Nodes.getLength(); k++){
 				Node z31DataNode = z31Nodes.item(k);
 				if (z31DataNode!=null){
-					if (AlephConstants.Z31_FINE_DATE_NODE.equalsIgnoreCase(z31DataNode.getNodeName())){
+					if (AlephConstants.Z31_DATE_NODE.equalsIgnoreCase(z31DataNode.getNodeName())){
 						try {
 							alephItem.setFineAccrualDate(XMLParserUtil.getNodeTextValue(z31DataNode));
 						} catch (ParseException pe){
