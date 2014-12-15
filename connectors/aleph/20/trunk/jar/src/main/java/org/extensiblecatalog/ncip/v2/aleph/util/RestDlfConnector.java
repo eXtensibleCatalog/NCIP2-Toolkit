@@ -609,23 +609,20 @@ public class RestDlfConnector extends AlephMediator {
 
 					streamSource = new InputSource(holdsUrl.openStream());
 
-					// Here parser gets sequence number
+					// Here parser parses the newly created requestLink
 					parser.parse(streamSource, requestItemHandler);
 
-					String seqNumber = requestItemHandler.getSequenceNumber();
+					if (requestItemHandler.requestWasFound()) {
 
-					// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
-					URL requestsUrl = new URLBuilder()
-							.setBase(localConfig.getServerName(), localConfig.getServerPort())
-							.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
-									AlephConstants.PARAM_HOLDS, itemIdVal + seqNumber).toURL();
+						URL requestUrl = new URL(requestItemHandler.getLink());
 
-					streamSource = new InputSource(requestsUrl.openStream());
+						streamSource = new InputSource(requestUrl.openStream());
 
-					// Here parser parses RequestId
-					parser.parse(streamSource, requestItemHandler);
+						// Here parser parses RequestId
+						parser.parse(streamSource, requestItemHandler);
 
-					requestItem.addRequestId(requestItemHandler.getRequestId());
+						requestItem.addRequestId(requestItemHandler.getRequestId());
+					}
 
 				} else if (itemIds.size() > 1) {
 					// If there is more than one item requested, than it is a good habit to let user know of which items could not been requested and why
@@ -691,19 +688,12 @@ public class RestDlfConnector extends AlephMediator {
 
 		InputSource streamSource = new InputSource(holdsUrl.openStream());
 
-		// Here parser finds request, detects if delete="Y" & gets sequence number
+		// Here parser finds request, detects if delete="Y"
 		parser.parse(streamSource, requestItemHandler);
 
 		if (requestItemHandler.requestWasFound() && requestItemHandler.isDeletable()) {
 
-			String seqNumber = requestItemHandler.getSequenceNumber();
-
-			//FIXME: this URL building is not neccessary since it can be parsed with AlephDoRequestHandler ...
-			// Sample URL: http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001
-			URL holdRequestUrl = new URLBuilder()
-					.setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
-							AlephConstants.PARAM_HOLDS, itemId + seqNumber).toURL();
+			URL holdRequestUrl = new URL(requestItemHandler.getLink());
 
 			HttpURLConnection httpCon = (HttpURLConnection) holdRequestUrl.openConnection();
 			httpCon.setDoOutput(true);

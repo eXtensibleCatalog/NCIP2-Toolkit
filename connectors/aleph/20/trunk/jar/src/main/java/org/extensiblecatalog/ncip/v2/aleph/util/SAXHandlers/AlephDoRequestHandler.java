@@ -1,30 +1,19 @@
 package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
-import java.util.TimeZone;
-
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
-import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
-import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class AlephDoRequestHandler extends DefaultHandler {
 
-	// Required to build unique item id
-	private String bibDocNumber;
-	private String itemSequence;
-	private String itemDocNumber;
-	private LocalConfig localConfig;
-	private boolean itemFullIdFound;
-
 	private String replyCode;
 	private String replyText;
 	private String noteValue;
 	private String requestIdVal;
-	private String sequenceNumber;
 	private String itemIdToLookForSeqNumber;
+
+	private String link;
 
 	private boolean errorReturned;
 	private boolean deletable;
@@ -42,14 +31,12 @@ public class AlephDoRequestHandler extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
-			itemFullIdFound = true;
-			
+
 			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
 			if (link != null && link.contains(itemIdToLookForSeqNumber)) {
 				holdRequestFound = true;
-				// Substring last 4 characters from link - this should be sequence number
-				// E.g. <hold-request delete="Y" href="http://aleph.mzk.cz:1892/rest-dlf/patron/700/circulationActions/requests/holds/MZK500013118150000200001"/>
-				sequenceNumber = link.substring(link.length() - AlephConstants.SEQ_NUMBER_LENGTH);
+
+				this.link = link;
 
 				String deleteAttr = attributes.getValue(AlephConstants.DELETE_NODE_ATTR);
 				if (deleteAttr.equalsIgnoreCase(AlephConstants.YES)) {
@@ -57,7 +44,7 @@ public class AlephDoRequestHandler extends DefaultHandler {
 				} else
 					deletable = false;
 			}
-			
+
 		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE)) {
 			replyCodeReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
@@ -66,7 +53,7 @@ public class AlephDoRequestHandler extends DefaultHandler {
 			noteReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
 			requestNumberReached = true;
-		} 
+		}
 	}
 
 	@Override
@@ -100,7 +87,11 @@ public class AlephDoRequestHandler extends DefaultHandler {
 		} else if (requestNumberReached) {
 			requestIdVal = new String(ch, start, length);
 			requestNumberReached = false;
-		} 
+		}
+	}
+
+	public String getLink() {
+		return link;
 	}
 
 	/**
@@ -148,15 +139,6 @@ public class AlephDoRequestHandler extends DefaultHandler {
 		return requestIdVal;
 	}
 
-	/**
-	 * Returns sequence number from "hold-request" element's "href" attribute value.
-	 * 
-	 * @return
-	 */
-	public String getSequenceNumber() {
-		return sequenceNumber;
-	}
-	
 	/**
 	 * Returns true, if an hold request is deletable.
 	 * 
