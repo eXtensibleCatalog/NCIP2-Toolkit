@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
@@ -34,14 +35,19 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 		String patronId = null;
 		String password = null;
 
-		for (AuthenticationInput authInput : initData.getAuthenticationInputs()) {
-			if (authInput.getAuthenticationInputType() == Version1AuthenticationInputType.USER_ID) {
-				patronId = authInput.getAuthenticationInputData();
-			} else if (authInput.getAuthenticationInputType() == Version1AuthenticationInputType.PASSWORD) {
-				password = authInput.getAuthenticationInputData();
+		if (initData.getUserId() != null) {
+			patronId = initData.getUserId().getUserIdentifierValue();
+
+		} else if (initData.getAuthenticationInputs() != null) {
+
+			for (AuthenticationInput authInput : initData.getAuthenticationInputs()) {
+				if (authInput.getAuthenticationInputType() == Version1AuthenticationInputType.USER_ID) {
+					patronId = authInput.getAuthenticationInputData();
+				} else if (authInput.getAuthenticationInputType() == Version1AuthenticationInputType.PASSWORD) {
+					password = authInput.getAuthenticationInputData();
+				}
 			}
 		}
-
 		boolean userIdIsEmpty = patronId.isEmpty();
 		boolean authIsSetAndPwIsEmpty = initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 0 && password.isEmpty();
 
@@ -50,9 +56,14 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 
 			if (userIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Set AuthenticationInputType to \""
-						+ Version1AuthenticationInputType.USER_ID.getValue() + "\" to specify user id input.");
-				problems.add(p);
+				if (initData.getUserId() == null) {
+					Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Set AuthenticationInputType to \""
+							+ Version1AuthenticationInputType.USER_ID.getValue() + "\" to specify user id input.");
+					problems.add(p);
+				} else {
+					Problem p = new Problem(new ProblemType("User Id is empty."), null, null);
+					problems.add(p);
+				}
 
 			}
 			if (authIsSetAndPwIsEmpty) {
@@ -69,14 +80,19 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 			AlephRemoteServiceManager alephRemoteServiceManager = (AlephRemoteServiceManager) serviceManager;
 
 			try {
-				AlephXServicesUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
-				if (alephUser == null)
-					throw new AlephException("alephUser returned by responder is null");
-				else {
-					UserId id = new UserId();
-					String username = alephUser.getUsername();
-					id.setUserIdentifierValue(username);
-					responseData.setUserId(id);
+				if (initData.getUserId() == null) {
+					AlephXServicesUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
+					if (alephUser == null)
+						throw new AlephException("AlephXServicesUser returned by responder is null");
+					else {
+						UserId id = new UserId();
+						String username = alephUser.getUsername();
+						id.setUserIdentifierValue(username);
+						responseData.setUserId(id);
+					}
+				} else {
+					boolean alephUserUpdated = alephRemoteServiceManager.updateUser(initData);
+					responseData.setUserId(initData.getUserId());
 				}
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -102,5 +118,4 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 		}
 		return responseData;
 	}
-
 }

@@ -58,15 +58,10 @@ public class AlephDoRequestHandler extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (qName.equalsIgnoreCase(AlephConstants.REPLY_CODE_NODE) && replyCodeReached) {
-			replyCodeReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE) && replyTextReached) {
-			replyTextReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && noteReached) {
-			noteReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && z37requestNumberReached) {
-			z37requestNumberReached = false;
-		}
+		replyCodeReached = false;
+		replyTextReached = false;
+		noteReached = false;
+		z37requestNumberReached = false;
 	}
 
 	@Override

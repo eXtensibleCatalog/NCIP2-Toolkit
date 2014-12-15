@@ -19,7 +19,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Jiří Kozlovský (MZK)
  *
  */
-public class AlephUserHandler extends DefaultHandler {
+public class AlephLookupUserHandler extends DefaultHandler {
 
 	private LocalConfig localConfig;
 
@@ -73,7 +73,7 @@ public class AlephUserHandler extends DefaultHandler {
 	 * @param userPrivilegeDesired
 	 * @throws AlephException
 	 */
-	public AlephUserHandler(LookupUserInitiationData initData, LocalConfig localConfig) throws AlephException {
+	public AlephLookupUserHandler(LookupUserInitiationData initData, LocalConfig localConfig) throws AlephException {
 
 		this.localConfig = localConfig;
 
@@ -267,27 +267,27 @@ public class AlephUserHandler extends DefaultHandler {
 		return user;
 	}
 
-	public AlephUserHandler parseAddress() {
+	public AlephLookupUserHandler parseAddress() {
 		parsingAddress = true;
 		return this;
 	}
 
-	public AlephUserHandler parseCirculations() {
+	public AlephLookupUserHandler parseCirculations() {
 		parsingCirculations = true;
 		return this;
 	}
 
-	public AlephUserHandler parseCash() {
+	public AlephLookupUserHandler parseCash() {
 		parsingCash = true;
 		return this;
 	}
 
-	public AlephUserHandler parseBlockOrTraps() {
+	public AlephLookupUserHandler parseBlockOrTraps() {
 		parsingBlockOrTraps = true;
 		return this;
 	}
 
-	public AlephUserHandler parseRegistration() {
+	public AlephLookupUserHandler parseRegistration() {
 		parsingRegistration = true;
 		return this;
 	}

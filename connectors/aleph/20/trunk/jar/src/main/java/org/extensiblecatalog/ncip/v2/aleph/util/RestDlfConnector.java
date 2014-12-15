@@ -27,9 +27,10 @@ import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephItemHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLoanHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupRequestsHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephLookupUserHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephRenewHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephURLsHandler;
-import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephUserHandler;
+import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephUpdateUserHandler;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
@@ -51,6 +52,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
@@ -372,7 +374,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		if (atLeastOneDesired) {
 
-			AlephUserHandler userHandler = new AlephUserHandler(initData, localConfig);
+			AlephLookupUserHandler userHandler = new AlephLookupUserHandler(initData, localConfig);
 
 			InputSource streamSource;
 
@@ -832,6 +834,32 @@ public class RestDlfConnector extends AlephMediator {
 			renewItem.setProblem(problem);
 		}
 		return renewItem;
+	}
+
+	public boolean updateUser(UpdateUserInitiationData initData) throws IOException, AlephException, SAXException {
+
+		String patronId = initData.getUserId().getUserIdentifierValue();
+
+		// First parse mandatory fields to update with Rest Dlf - which are z304-address-1, z304-date-from & z304-date-to at patron address
+		URL addressLink = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
+				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
+
+		InputSource streamSource = new InputSource(addressLink.openStream());
+
+		AlephUpdateUserHandler updateUserHandler = new AlephUpdateUserHandler();
+
+		parser.parse(streamSource, updateUserHandler);
+
+		// TODO: now parse values of z304-address-1 & z304-date-from & z304-date-to .. to correctly build post_xml
+		/*
+		 * example: post_xml=<?xml version="1.0" encoding="UTF-8"?> <get-pat-adrs> <reply-text>ok</reply-text> <reply-code>0000</reply-code> <address-information
+		 * updateable="Y"><z304-address-1>00201872492476</z304-address-1><z304-date-from>20140411</z304-date-from><z304-date-to>20991231</z304-date-to> <z304-email-address>kozlovsky@mzk.cz</z304-email-address> </address-information>
+		 * </get-pat-adrs>
+		 */
+		
+		// TODO: Then post it & parse reply-code or reply-text 
+
+		return updateUserHandler.isSuccess();
 	}
 
 	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {

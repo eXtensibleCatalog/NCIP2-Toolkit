@@ -6,11 +6,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemService;
+import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
+import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
 import org.xml.sax.SAXException;
 
 /**
