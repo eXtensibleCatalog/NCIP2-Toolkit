@@ -201,7 +201,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			z37openDateReached = false;
 		} else if (z37openHourReached) {
 			String hourPlacedParsed = new String(ch, start, length);
-			if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
+			if (!hourPlacedParsed.matches("0000")) {
 				GregorianCalendar datePlaced = currentRequestedItem.getDatePlaced();
 
 				int hours = Integer.parseInt(hourPlacedParsed.substring(0, 2));

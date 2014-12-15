@@ -25,6 +25,8 @@ public class AlephURLsHandler extends DefaultHandler {
 
 	/**
 	 * AlephURLsHandler is a SAX parser used to parse links from href attributes within &lt;item&gt; node in defined range.<br>
+	 * <br>
+	 * Basically it is used with LookupItemSetService in which there could be set MaximumItemsCount declaring desired count of items to output.
 	 *
 	 * @param {@link Integer} fromIndex
 	 * @param {@link Integer} maxLinks

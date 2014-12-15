@@ -11,7 +11,7 @@ public class AlephDoRequestHandler extends DefaultHandler {
 	private String replyText;
 	private String noteValue;
 	private String requestIdVal;
-	private String itemIdToLookForSeqNumber;
+	private String itemIdToLookFor;
 
 	private String link;
 
@@ -21,11 +21,11 @@ public class AlephDoRequestHandler extends DefaultHandler {
 	private boolean replyCodeReached = false;
 	private boolean replyTextReached = false;
 	private boolean noteReached = false;
-	private boolean requestNumberReached = false;
+	private boolean z37requestNumberReached = false;
 	private boolean holdRequestFound = false;
 
 	public AlephDoRequestHandler(String itemIdVal) {
-		itemIdToLookForSeqNumber = itemIdVal;
+		itemIdToLookFor = itemIdVal;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class AlephDoRequestHandler extends DefaultHandler {
 		if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 
 			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
-			if (link != null && link.contains(itemIdToLookForSeqNumber)) {
+			if (link != null && link.contains(itemIdToLookFor)) {
 				holdRequestFound = true;
 
 				this.link = link;
@@ -52,7 +52,7 @@ public class AlephDoRequestHandler extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE)) {
 			noteReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE)) {
-			requestNumberReached = true;
+			z37requestNumberReached = true;
 		}
 	}
 
@@ -64,8 +64,8 @@ public class AlephDoRequestHandler extends DefaultHandler {
 			replyTextReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && noteReached) {
 			noteReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && requestNumberReached) {
-			requestNumberReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z37_REQUEST_NUMBER_NODE) && z37requestNumberReached) {
+			z37requestNumberReached = false;
 		}
 	}
 
@@ -84,9 +84,9 @@ public class AlephDoRequestHandler extends DefaultHandler {
 		} else if (noteReached) {
 			noteValue = new String(ch, start, length);
 			noteReached = false;
-		} else if (requestNumberReached) {
+		} else if (z37requestNumberReached) {
 			requestIdVal = new String(ch, start, length);
-			requestNumberReached = false;
+			z37requestNumberReached = false;
 		}
 	}
 

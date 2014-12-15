@@ -29,7 +29,6 @@ import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemDescriptionLevel;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
@@ -40,7 +39,6 @@ import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
-import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
@@ -54,10 +52,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.SAXException;
 
 public class AlephUtil {

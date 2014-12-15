@@ -565,9 +565,6 @@ public class RestDlfConnector extends AlephMediator {
 				String needBeforeDate = AlephUtil.convertToAlephDate(initData.getNeedBeforeDate());
 				String earliestDateNeeded = AlephUtil.convertToAlephDate(initData.getEarliestDateNeeded());
 
-				// Build e.g. this: MZK50001365071000010
-				// String alephItemId = admLibrary + recordId.substring(AlephConstants.LIBRARY_PARAM_LENGTH) + sequenceNumber;
-
 				// We need to put HTML PUT request to e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/record/MZK01001330134/holds/MZK50001365071000010
 				URL holdUrl = new URLBuilder()
 						.setBase(localConfig.getServerName(), localConfig.getServerPort())

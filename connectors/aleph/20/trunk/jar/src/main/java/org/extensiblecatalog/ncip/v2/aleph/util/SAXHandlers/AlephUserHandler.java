@@ -34,22 +34,25 @@ public class AlephUserHandler extends DefaultHandler {
 	private boolean blockOrTrapDesired;
 	private boolean userFiscalAccountDesired;
 	private boolean userPrivilegeDesired;
-	private boolean userIdReached = false;
-	private boolean nameInformationReached = false;
-	private boolean userAddressReached = false;
-	private boolean userCityReached = false;
-	private boolean cashReached = false;
-	private boolean borStatusReached = false;
-	private boolean userMailReached = false;
-	private boolean phoneNoReached = false;
-	private boolean blockOrTrapReached = false;
-	private boolean agencyReached = false;
-	private boolean validUntilDateReached = false;
-	private boolean validFromDateReached = false;
-	private boolean netSumReached = false;
-	private boolean fineDateReached = false;
-	private boolean descriptionReached = false;
-	private boolean cashTypeNoteReached = false;
+	
+	private boolean z304address1Reached = false;
+	private boolean z304address2Reached = false;
+	private boolean z304address3Reached = false;
+	private boolean z304address4Reached = false;
+	private boolean z305borStatusReached = false;
+	private boolean z304emailReached = false;
+	private boolean z304telephone1Reached = false;
+	private boolean z304dateToReached = false;
+	private boolean z304dateFromReached = false;
+	
+	private boolean z31netSumReached = false;
+	private boolean z31fineDateReached = false;
+	private boolean z31descriptionReached = false;
+	
+	private boolean patronOrConsortialblockReached = false;
+	private boolean translateChangeActiveLibraryReached = false;
+	private boolean noteWithCashParamReached = false;
+	private boolean openSumReached = false;
 
 	private boolean agenciesSetToBlockOrTraps = false;
 
@@ -79,43 +82,43 @@ public class AlephUserHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_1_NODE) && userIdDesired) {
-			userIdReached = true;
+			z304address1Reached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_2_NODE) && nameInformationDesired) {
-			nameInformationReached = true;
+			z304address2Reached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE) && userAddressInformationDesired) {// Adress
-			userAddressReached = true;
+			z304address3Reached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE) && userAddressInformationDesired) {// City
-			userCityReached = true;
+			z304address4Reached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE) && userAddressInformationDesired) {// E-mails
-			userMailReached = true;
+			z304emailReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE) && userAddressInformationDesired) {// Phone No.
-			phoneNoReached = true;
+			z304telephone1Reached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_NODE) && userFiscalAccountDesired) {
 			fineDate = null;
 			fineSum = null;
 			fineDescription = null;
 		} else if (qName.equalsIgnoreCase(AlephConstants.OPEN_SUM_NODE) && userFiscalAccountDesired) {
-			cashReached = true;
+			openSumReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_NET_SUM_NODE) && userFiscalAccountDesired) {
-			netSumReached = true;
+			z31netSumReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_FINE_DATE_NODE) && userFiscalAccountDesired) {
-			fineDateReached = true;
+			z31fineDateReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION_NODE) && userFiscalAccountDesired) {
-			descriptionReached = true;
+			z31descriptionReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && userFiscalAccountDesired) {
 			String type = attributes.getValue(AlephConstants.TYPE_NODE_ATTR);
 			if (type.equalsIgnoreCase(AlephConstants.PARAM_CASH))
-				cashTypeNoteReached = true;
+				noteWithCashParamReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z305_BOR_STATUS_NODE) && userPrivilegeDesired) {
-			borStatusReached = true;
+			z305borStatusReached = true;
 		} else if ((qName.equalsIgnoreCase(AlephConstants.PATRON_BLOCK_NODE) || qName.equalsIgnoreCase(AlephConstants.CONSORTIAL_BLOCK_NODE)) && blockOrTrapDesired) {
-			blockOrTrapReached = true;
+			patronOrConsortialblockReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE)) {
-			agencyReached = true;
+			translateChangeActiveLibraryReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_TO_NODE) && userPrivilegeDesired) {
-			validUntilDateReached = true;
+			z304dateToReached = true;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_FROM_NODE) && userPrivilegeDesired) {
-			validFromDateReached = true;
+			z304dateFromReached = true;
 		}
 	}
 
@@ -123,41 +126,41 @@ public class AlephUserHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		// Element can be empty, therefore it is needed to falsificate bools set to true
 
-		if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_1_NODE) && userIdReached) {
-			userIdReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_2_NODE) && nameInformationReached) {
-			nameInformationReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE) && userAddressReached) {// Adress
-			userAddressReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE) && userCityReached) {// City
-			userCityReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE) && userMailReached) {// Mail
-			userMailReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE) && phoneNoReached) {// Phone No.
-			phoneNoReached = false;
+		if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_1_NODE) && z304address1Reached) {
+			z304address1Reached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_2_NODE) && z304address2Reached) {
+			z304address2Reached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE) && z304address3Reached) {// Adress
+			z304address3Reached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE) && z304address4Reached) {// City
+			z304address4Reached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE) && z304emailReached) {// Mail
+			z304emailReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE) && z304telephone1Reached) {// Phone No.
+			z304telephone1Reached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.OPEN_SUM_NODE) && openSumReached) {
+			openSumReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_NET_SUM_NODE) && z31netSumReached) {
+			z31netSumReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_FINE_DATE_NODE) && z31fineDateReached) {
+			z31fineDateReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION_NODE) && z31descriptionReached) {
+			fineDescription = "";
+			z31descriptionReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE) && noteWithCashParamReached) {
+			noteWithCashParamReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z305_BOR_STATUS_NODE) && z305borStatusReached) {
+			z305borStatusReached = false;
+		} else if ((qName.equalsIgnoreCase(AlephConstants.PATRON_BLOCK_NODE) || qName.equalsIgnoreCase(AlephConstants.CONSORTIAL_BLOCK_NODE)) && patronOrConsortialblockReached) {
+			patronOrConsortialblockReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && translateChangeActiveLibraryReached) {
+			translateChangeActiveLibraryReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_TO_NODE) && z304dateToReached) {
+			z304dateToReached = false;
+		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_FROM_NODE) && z304dateFromReached) {
+			z304dateFromReached = false;
 		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_NODE) && fineDate != null && fineSum != null) {
 			user.addAccountDetails(fineDate, fineSum, fineDescription);
-		} else if (qName.equalsIgnoreCase(AlephConstants.OPEN_SUM_NODE) && cashReached) {
-			cashReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_NET_SUM_NODE) && netSumReached) {
-			netSumReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_FINE_DATE_NODE) && fineDateReached) {
-			fineDateReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z31_DESCRIPTION_NODE) && descriptionReached) {
-			fineDescription = "";
-			descriptionReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE)) {
-			cashTypeNoteReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z305_BOR_STATUS_NODE) && borStatusReached) {
-			borStatusReached = false;
-		} else if ((qName.equalsIgnoreCase(AlephConstants.PATRON_BLOCK_NODE) || qName.equalsIgnoreCase(AlephConstants.CONSORTIAL_BLOCK_NODE)) && blockOrTrapReached) {
-			blockOrTrapReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE) && agencyReached) {
-			agencyReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_TO_NODE) && validUntilDateReached) {
-			validUntilDateReached = false;
-		} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_FROM_NODE) && validFromDateReached) {
-			validFromDateReached = false;
 		}
 
 	}
@@ -165,65 +168,65 @@ public class AlephUserHandler extends DefaultHandler {
 	@Override
 	public void characters(char ch[], int start, int length) throws SAXException {
 
-		if (userIdReached) {
+		if (z304address1Reached) {
 			user.setUserId(new String(ch, start, length));
-			userIdReached = false;
-		} else if (nameInformationReached) {
+			z304address1Reached = false;
+		} else if (z304address2Reached) {
 			user.setFullName(new String(ch, start, length));
-			nameInformationReached = false;
-		} else if (userAddressReached) {// Adress
+			z304address2Reached = false;
+		} else if (z304address3Reached) {// Adress
 			address = new String(ch, start, length);
 			if (city != null && !city.isEmpty())
 				user.setPhysicalAddress(address + ", " + city);
-			userAddressReached = false;
-		} else if (userCityReached) {// City
+			z304address3Reached = false;
+		} else if (z304address4Reached) {// City
 			city = new String(ch, start, length);
 			if (address != null && !address.isEmpty())
 				user.setPhysicalAddress(address + ", " + city);
-			userCityReached = false;
-		} else if (userMailReached) {// mail
+			z304address4Reached = false;
+		} else if (z304emailReached) {// mail
 			user.setEmailAddress(new String(ch, start, length));
-			userMailReached = false;
-		} else if (phoneNoReached) {// Phone No.
+			z304emailReached = false;
+		} else if (z304telephone1Reached) {// Phone No.
 			user.setPhoneNumber(new String(ch, start, length));
-			phoneNoReached = false;
-		} else if (cashReached) {
+			z304telephone1Reached = false;
+		} else if (openSumReached) {
 			user.setAccountBalance(new String(ch, start, length));
-			cashReached = false;
-		} else if (netSumReached) {
+			openSumReached = false;
+		} else if (z31netSumReached) {
 			fineSum = new String(ch, start, length);
-			netSumReached = false;
-		} else if (fineDateReached) {
+			z31netSumReached = false;
+		} else if (z31fineDateReached) {
 			fineDate = new String(ch, start, length);
-			fineDateReached = false;
-		} else if (descriptionReached) {
+			z31fineDateReached = false;
+		} else if (z31descriptionReached) {
 			fineDescription = new String(ch, start, length);
-			descriptionReached = false;
-		} else if (cashTypeNoteReached) {
+			z31descriptionReached = false;
+		} else if (noteWithCashParamReached) {
 			user.setCashTypeNote(new String(ch, start, length));
-			cashTypeNoteReached = false;
-		} else if (borStatusReached) {
+			noteWithCashParamReached = false;
+		} else if (z305borStatusReached) {
 			user.setBorStatus(new String(ch, start, length));
-			borStatusReached = false;
-		} else if (blockOrTrapReached) {
+			z305borStatusReached = false;
+		} else if (patronOrConsortialblockReached) {
 			String parsedBlock = new String(ch, start, length);
 			BlockOrTrap bot = AlephUtil.parseBlockOrTrap(parsedBlock);
 			blockOrTraps.add(bot);
-			blockOrTrapReached = false;
-		} else if (agencyReached) {
+			patronOrConsortialblockReached = false;
+		} else if (translateChangeActiveLibraryReached) {
 			String parsedAgencyId = new String(ch, start, length);
-			agencyId = new AgencyId("http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm", parsedAgencyId);
-			agencyReached = false;
-		} else if (validUntilDateReached) {
+			agencyId = AlephUtil.createAgencyId(parsedAgencyId);
+			translateChangeActiveLibraryReached = false;
+		} else if (z304dateToReached) {
 			user.setValidToDate(new String(ch, start, length));
-			validUntilDateReached = false;
-		} else if (validFromDateReached) {
+			z304dateToReached = false;
+		} else if (z304dateFromReached) {
 			user.setValidFromDate(new String(ch, start, length));
-			validFromDateReached = false;
+			z304dateFromReached = false;
 		}
 
 	}
-	
+
 	public AlephRestDlfUser getAlephUser() {
 		// Iterate over blockOrTraps list & set parsed agencyId
 		if (!agenciesSetToBlockOrTraps) {
