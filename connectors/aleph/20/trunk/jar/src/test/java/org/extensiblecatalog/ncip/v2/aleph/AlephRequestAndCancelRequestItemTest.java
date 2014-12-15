@@ -46,9 +46,7 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		AgencyId agencyId = new AgencyId("MZK");
 
 		// Test multiple Requests
-		// If those are already requested, switch to these:
-		// "MZK01001423167-MZK50001458979000050", "MZK01001423167-MZK50001458979000030"
-		String[] itemIdVals = { "MZK01001423167-MZK50001458979000010", "MZK01001139082-MZK50001170565000060", "MZK01001139082-MZK50001170565000070" };
+		String[] itemIdVals = { "MZK01001139082-MZK50001170565000060", "MZK01001423167-MZK50001458979000030" };
 
 		String userIdVal = "701";
 
@@ -107,7 +105,8 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 
 			requestItemResponseData = requestItemService.performService(requestItemInitData, null, serviceManager);
 
-			assertEquals("Unexpected presence of ns1:Problem element.", true, requestItemResponseData.getProblems() == null || requestItemResponseData.getProblems().get(0) == null);
+			assertEquals("Unexpected presence of ns1:Problem element with value.", true, requestItemResponseData.getProblems() == null
+					|| requestItemResponseData.getProblems().get(0) == null);
 
 			assertEquals("Unexpected UserId returned.", userIdVal, requestItemResponseData.getUserId().getUserIdentifierValue());
 
@@ -184,11 +183,9 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 		AgencyId agencyId = new AgencyId("MZK");
 
 		// Test multiple Requests
-		// If those first three Ids are already requested, switch to these:
-		// "MZK01001423167-MZK50001458979000050", "MZK01001423167-MZK50001458979000030"
-		String[] itemIdVals = { "MZK01001423167-MZK50001458979000010", "MZK01001139082-MZK50001170565000060", "MZK01001139082-MZK50001170565000070",
-				"MZK01000000000-MZK50000000000000000", "MZK01001423230-MZK50001458432000020", "" };
-		int itemIdsCountAboutToFailRequest = 3;
+		String[] itemIdVals = { "MZK01001139082-MZK50001170565000060", "MZK01001423167-MZK50001458979000030", "MZK01001139082-MZK50001170565000070" };
+
+		int itemIdsCountAboutToFailRequest = 1;
 
 		String userIdVal = "701";
 
@@ -330,7 +327,7 @@ public class AlephRequestAndCancelRequestItemTest extends TestCase {
 
 			cancelRequestItemResponseData = cancelRequestItemService.performService(cancelRequestItemInitData, null, serviceManager);
 
-			assertEquals("Unexpected presence of ns1:Problem element.", true, cancelRequestItemResponseData.getProblems() == null
+			assertEquals("Unexpected presence of ns1:Problem element with value.", true, cancelRequestItemResponseData.getProblems() == null
 					|| cancelRequestItemResponseData.getProblems().get(0) == null);
 
 			assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), cancelRequestItemResponseData.getResponseHeader().getToAgencyId().getAgencyId()
