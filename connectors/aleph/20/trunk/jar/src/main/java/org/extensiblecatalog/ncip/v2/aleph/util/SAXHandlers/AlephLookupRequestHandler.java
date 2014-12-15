@@ -1,13 +1,11 @@
 package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephRequestItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
@@ -48,8 +46,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 
 	// Required to decide whether is set second call number the one we need
 	private String secondCallNoType;
-
-	private TimeZone localTimeZone;
 
 	private boolean localizationDesired = false;
 
@@ -110,8 +106,6 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 		setDesiredServices(initData);
 
 		this.itemIdToLookFor = itemIdToLookFor;
-
-		localTimeZone = TimeZone.getTimeZone("ECT");
 
 		requestDetails = new RequestDetails();
 		alephRequestItem.setRequestDetails(requestDetails);
@@ -309,16 +303,12 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 				String hourPlacedParsed = new String(ch, start, length);
 				if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
 					GregorianCalendar datePlaced = requestDetails.getDatePlaced();
-					GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
 
-					try {
-						hourPlaced.setTime(AlephConstants.ALEPH_HOUR_FORMATTER.parse(hourPlacedParsed));
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
+					int hours = Integer.parseInt(hourPlacedParsed.substring(0, 2));
+					int minutes = Integer.parseInt(hourPlacedParsed.substring(2));
 
-					datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY));
-					datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
+					datePlaced.add(Calendar.HOUR_OF_DAY, hours);
+					datePlaced.add(Calendar.MINUTE, minutes);
 
 					// Note that this is not duplicate of the above "setDatePlaced", it just adds hours if any
 					requestDetails.setDatePlaced(datePlaced);

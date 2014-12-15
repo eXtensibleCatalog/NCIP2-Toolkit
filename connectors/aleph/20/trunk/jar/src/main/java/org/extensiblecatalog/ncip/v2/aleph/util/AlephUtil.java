@@ -446,7 +446,9 @@ public class AlephUtil {
 			try {
 				gregorianCalendarDate.setTime(AlephConstants.ALEPH_DATE_FORMATTER.parse(alephDateParsed));
 				if (inDaylightTime())
-					gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 2);
+					gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 3);
+				else
+					gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 1);
 			} catch (ParseException e) {
 				throw new SAXException(e);
 			}

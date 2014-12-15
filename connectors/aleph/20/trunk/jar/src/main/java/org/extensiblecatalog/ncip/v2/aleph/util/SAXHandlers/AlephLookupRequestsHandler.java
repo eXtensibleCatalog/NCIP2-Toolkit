@@ -24,12 +24,9 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class AlephLookupRequestsHandler extends DefaultHandler {
-
-	private TimeZone localTimeZone = TimeZone.getTimeZone("ECT");
 
 	private BibliographicDescription bibliographicDescription;
 
@@ -206,18 +203,12 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 			String hourPlacedParsed = new String(ch, start, length);
 			if (!hourPlacedParsed.equalsIgnoreCase("00000000")) {
 				GregorianCalendar datePlaced = currentRequestedItem.getDatePlaced();
-				GregorianCalendar hourPlaced = new GregorianCalendar(localTimeZone);
 
-				try {
-					hourPlaced.setTime(AlephConstants.ALEPH_HOUR_FORMATTER.parse(hourPlacedParsed));
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+				int hours = Integer.parseInt(hourPlacedParsed.substring(0, 2));
+				int minutes = Integer.parseInt(hourPlacedParsed.substring(2));
 
-				datePlaced.add(Calendar.HOUR_OF_DAY, hourPlaced.get(Calendar.HOUR_OF_DAY) - 1);
-				datePlaced.add(Calendar.MINUTE, hourPlaced.get(Calendar.MINUTE));
-
-				currentRequestedItem.setDatePlaced(datePlaced);
+				datePlaced.add(Calendar.HOUR_OF_DAY, hours);
+				datePlaced.add(Calendar.MINUTE, minutes);
 			}
 			z37openHourReached = false;
 		} else if (z37requestDateReached) {
