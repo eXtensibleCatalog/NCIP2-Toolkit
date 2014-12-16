@@ -139,7 +139,7 @@ public class AlephLookupUserHandler extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		// If was node empty, we need to set it's boolean to false
+		// If was node empty, we now need to set it's boolean to false
 		if (parsingAddress) {
 			z304address1Reached = false;
 			z304address2Reached = false;

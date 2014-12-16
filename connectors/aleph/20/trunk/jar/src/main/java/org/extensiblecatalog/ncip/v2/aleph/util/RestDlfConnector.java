@@ -40,6 +40,7 @@ import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.DeleteUserFields;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
@@ -54,10 +55,13 @@ import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
@@ -109,6 +113,16 @@ public class RestDlfConnector extends AlephMediator {
 			localConfig.setTokenExpirationTime(Integer.parseInt(alephConfig.getProperty(AlephConstants.NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
 
 			localConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
+
+			localConfig.setZ304address1(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_1_NODE));
+			localConfig.setZ304address2(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_2_NODE));
+			localConfig.setZ304address3(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_3_NODE));
+			localConfig.setZ304address4(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_4_NODE));
+
+			localConfig.setZ304telephone1(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_1_NODE));
+			localConfig.setZ304telephone2(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_2_NODE));
+			localConfig.setZ304telephone3(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_3_NODE));
+			localConfig.setZ304telephone4(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_4_NODE));
 
 			try {
 				localConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
@@ -860,10 +874,50 @@ public class RestDlfConnector extends AlephMediator {
 
 		if (updateUserHandler.isUpdateable() && updateUserHandler.parsedAllMandatoryFields()) {
 
-			DeleteUserFields deleteUserFields = initData.getDeleteUserFields();
+			// TODO: Think about handling DeleteUserFields
+
 			AddUserFields addUserFields = initData.getAddUserFields();
 
-			// TODO: add to xmlRequestDesiredValues from AddUserFields ..
+			StructuredPersonalUserName addUserName = null;
+
+			// If StructuredPersonalUserName is set, that means user was renamed or just gained university degree
+			if (addUserFields.getNameInformation() != null && addUserFields.getNameInformation().getPersonalNameInformation() != null)
+				addUserName = addUserFields.getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName();
+
+			List<ElectronicAddress> emails = null;
+			ElectronicAddress phone = null;
+			PhysicalAddress physicalAddress = null;
+
+			// Here we iterate over all UserAddressInformations to determine the type
+			// We are currently able to add multiple emails, but only one phone & one address
+			// Note that ability of adding more of these depends on your Aleph configuration - feel free to modify under MIT license
+			// (we have real street address saved in only one element z304-address-2 & city in z304-address-3)
+			for (UserAddressInformation uai : addUserFields.getUserAddressInformations()) {
+				if (uai.getElectronicAddress() != null) {
+					String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
+
+					if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
+
+						if (emails == null)
+							emails = new ArrayList<ElectronicAddress>();
+
+						emails.add(uai.getElectronicAddress());
+
+					} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
+						if (phone == null)
+							phone = uai.getElectronicAddress();
+						else
+							return "Cannot process more than one ElectronicAddress of type \"tel\"";
+					} else
+						return "Cannot process ElectronicAddress of type \"" + typeValue + "\"";
+
+				} else if (uai.getPhysicalAddress() != null) {
+					if (physicalAddress == null)
+						physicalAddress = uai.getPhysicalAddress();
+					else
+						return "Cannot process more than one PhycisalAddress";
+				}
+			}
 
 			// @formatter:off
 			XMLBuilder xmlRequest = XMLBuilder.create(AlephConstants.GET_PAT_ADRS_NODE).elem(AlephConstants.ADDRESS_INFORMATION_NODE)

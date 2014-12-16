@@ -20,6 +20,17 @@ public class LocalConfig {
 	private String bibLibrary;
 	private String admLibrary;
 
+	// Aleph API's patron -> address configuration
+	private String z304address1;
+	private String z304address2;
+	private String z304address3;
+	private String z304address4;
+
+	private String z304telephone1;
+	private String z304telephone2;
+	private String z304telephone3;
+	private String z304telephone4;
+
 	private int maxItemPreparationTimeDelay;
 
 	private int tokenExpirationTime;
@@ -208,10 +219,6 @@ public class LocalConfig {
 		return admLibrary;
 	}
 
-	public int getBibLibraryLength() {
-		return bibLibraryLength;
-	}
-
 	/**
 	 * @param admLibrary
 	 *            the admLibrary to set
@@ -220,6 +227,122 @@ public class LocalConfig {
 		this.admLibrary = admLibrary;
 	}
 
+
+	/**
+	 * @return the z304address1
+	 */
+	public String getZ304address1() {
+		return z304address1;
+	}
+
+	/**
+	 * @param z304address1 the z304address1 to set
+	 */
+	public void setZ304address1(String z304address1) {
+		this.z304address1 = z304address1;
+	}
+
+	/**
+	 * @return the z304address2
+	 */
+	public String getZ304address2() {
+		return z304address2;
+	}
+
+	/**
+	 * @param z304address2 the z304address2 to set
+	 */
+	public void setZ304address2(String z304address2) {
+		this.z304address2 = z304address2;
+	}
+
+	/**
+	 * @return the z304address3
+	 */
+	public String getZ304address3() {
+		return z304address3;
+	}
+
+	/**
+	 * @param z304address3 the z304address3 to set
+	 */
+	public void setZ304address3(String z304address3) {
+		this.z304address3 = z304address3;
+	}
+
+	/**
+	 * @return the z304address4
+	 */
+	public String getZ304address4() {
+		return z304address4;
+	}
+
+	/**
+	 * @param z304address4 the z304address4 to set
+	 */
+	public void setZ304address4(String z304address4) {
+		this.z304address4 = z304address4;
+	}
+
+	/**
+	 * @return the z304telephone1
+	 */
+	public String getZ304telephone1() {
+		return z304telephone1;
+	}
+
+	/**
+	 * @param z304telephone1 the z304telephone1 to set
+	 */
+	public void setZ304telephone1(String z304telephone1) {
+		this.z304telephone1 = z304telephone1;
+	}
+
+	/**
+	 * @return the z304telephone2
+	 */
+	public String getZ304telephone2() {
+		return z304telephone2;
+	}
+
+	/**
+	 * @param z304telephone2 the z304telephone2 to set
+	 */
+	public void setZ304telephone2(String z304telephone2) {
+		this.z304telephone2 = z304telephone2;
+	}
+
+	/**
+	 * @return the z304telephone3
+	 */
+	public String getZ304telephone3() {
+		return z304telephone3;
+	}
+
+	/**
+	 * @param z304telephone3 the z304telephone3 to set
+	 */
+	public void setZ304telephone3(String z304telephone3) {
+		this.z304telephone3 = z304telephone3;
+	}
+
+	/**
+	 * @return the z304telephone4
+	 */
+	public String getZ304telephone4() {
+		return z304telephone4;
+	}
+
+	/**
+	 * @param z304telephone4 the z304telephone4 to set
+	 */
+	public void setZ304telephone4(String z304telephone4) {
+		this.z304telephone4 = z304telephone4;
+	}
+
+	public int getBibLibraryLength() {
+		return bibLibraryLength;
+	}
 	/**
 	 * @return the maxItemPreparationTimeDelay
 	 */
