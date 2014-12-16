@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+	ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+
+	<ns1:UpdateUser>
+		<ns1:UserId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">MZK</ns1:AgencyId>			
+			<ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
+			<ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+		</ns1:UserId>
+
+<!-- Note that all elements within DeleteUserFields or AddUserFields are optional. This example shows what is required within those elements if desired to change. -->
+		<ns1:AddUserFields>
+			<ns1:NameInformation>
+				<ns1:PersonalNameInformation>
+					<ns1:StructuredPersonalUserName>
+						<ns1:Surname>Blanka Protrhlá</ns1:Surname>
+					</ns1:StructuredPersonalUserName>
+				</ns1:PersonalNameInformation>
+			</ns1:NameInformation>
+			<ns1:UserAddressInformation>
+				<ns1:UserAddressRoleType ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Notice</ns1:UserAddressRoleType>
+				<ns1:ElectronicAddress>
+					<ns1:ElectronicAddressType ns1:Scheme="http://www.iana.org/assignments/uri-schemes">mailserver</ns1:ElectronicAddressType>
+					<ns1:ElectronicAddressData>protrhla.blanka@blanky.cz</ns1:ElectronicAddressData>
+				</ns1:ElectronicAddress>
+			</ns1:UserAddressInformation>
+		</ns1:AddUserFields>
+	</ns1:UpdateUser>
+</ns1:NCIPMessage>

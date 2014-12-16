@@ -127,6 +127,7 @@ public class AlephConstants {
 	public static final String PAT_CASH_LIST_NODE = "pat-cash-list";
 	public static final String HOLD_REQUESTS_NODE = "hold-requests";
 	public static final String CONSORTIAL_BLOCK_NODE = "consortial-block";
+	public static final String ADDRESS_INFORMATION_NODE = "address-information";
 	public static final String TRANSLATE_CHANGE_ACTIVE_LIBRARY_NODE = "translate-change-active-library";
 
 	public static final String Z13_NODE = "z13";
@@ -264,6 +265,7 @@ public class AlephConstants {
 	public static final String LABEL_ATTRIBUTE = "label";
 	public static final String RENEW_NODE_ATTR = "renew";
 	public static final String DELETE_NODE_ATTR = "delete";
+	public static final String UPDATEABLE_NODE_ATTR = "updateable";
 
 	// XML Attribute values:
 	public static final String BIB_ID_NODE_ATTR_VALUE = "b";

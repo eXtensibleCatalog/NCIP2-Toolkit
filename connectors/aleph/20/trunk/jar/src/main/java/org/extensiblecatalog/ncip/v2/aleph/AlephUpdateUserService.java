@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
@@ -81,6 +83,8 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 
 			try {
 				if (initData.getUserId() == null) {
+					// Here is AuthenticationInput set
+
 					AlephXServicesUser alephUser = alephRemoteServiceManager.updateUser(patronId, password, initData);
 					if (alephUser == null)
 						throw new AlephException("AlephXServicesUser returned by responder is null");
@@ -91,8 +95,16 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 						responseData.setUserId(id);
 					}
 				} else {
-					boolean alephUserUpdated = alephRemoteServiceManager.updateUser(initData);
-					responseData.setUserId(initData.getUserId());
+					// Here is UserId set .. no authentication
+
+					String updateUserReplytext = alephRemoteServiceManager.updateUser(initData);
+
+					if (updateUserReplytext != null && updateUserReplytext.equalsIgnoreCase(AlephConstants.STATUS_OK))
+						responseData.setUserId(initData.getUserId());
+					else {
+						Problem p = new Problem(new ProblemType("UpdateUserService failed."), null, null, updateUserReplytext);
+						responseData.setProblems(Arrays.asList(p));
+					}
 				}
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -105,6 +117,13 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 				responseData.setProblems(Arrays.asList(p));
 			} catch (ParserConfigurationException pce) {
 				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				responseData.setProblems(Arrays.asList(p));
+			} catch (FactoryConfigurationError fce) {
+				Problem p = new Problem(new ProblemType("Processing FactoryConfigurationError."), null, fce.getMessage(), "Error initializing XMLBuilder.");
+				responseData.setProblems(Arrays.asList(p));
+			} catch (TransformerException te) {
+				Problem p = new Problem(new ProblemType("Processing TransformerException error."), null, te.getMessage(),
+						"Couldn't convert XMLBuilder to String using asString() method.");
 				responseData.setProblems(Arrays.asList(p));
 			} catch (Exception e) {
 				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());

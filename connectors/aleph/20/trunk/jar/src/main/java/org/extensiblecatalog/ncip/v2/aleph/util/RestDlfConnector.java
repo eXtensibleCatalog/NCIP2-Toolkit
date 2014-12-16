@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerException;
 
 import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
@@ -33,9 +35,11 @@ import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephURLsHandler;
 import org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers.AlephUpdateUserHandler;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
+import org.extensiblecatalog.ncip.v2.service.AddUserFields;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.DeleteUserFields;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
@@ -59,6 +63,8 @@ import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.jamesmurty.utils.XMLBuilder;
 
 public class RestDlfConnector extends AlephMediator {
 
@@ -836,7 +842,8 @@ public class RestDlfConnector extends AlephMediator {
 		return renewItem;
 	}
 
-	public boolean updateUser(UpdateUserInitiationData initData) throws IOException, AlephException, SAXException {
+	public String updateUser(UpdateUserInitiationData initData) throws IOException, AlephException, SAXException, ParserConfigurationException, FactoryConfigurationError,
+			TransformerException {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
@@ -848,18 +855,48 @@ public class RestDlfConnector extends AlephMediator {
 
 		AlephUpdateUserHandler updateUserHandler = new AlephUpdateUserHandler();
 
-		parser.parse(streamSource, updateUserHandler);
+		// Parse values of z304-address-1 & z304-date-from & z304-date-to .. to correctly build post_xml with mandatory fields
+		parser.parse(streamSource, updateUserHandler.setParsingMandatoryFields());
 
-		// TODO: now parse values of z304-address-1 & z304-date-from & z304-date-to .. to correctly build post_xml
-		/*
-		 * example: post_xml=<?xml version="1.0" encoding="UTF-8"?> <get-pat-adrs> <reply-text>ok</reply-text> <reply-code>0000</reply-code> <address-information
-		 * updateable="Y"><z304-address-1>00201872492476</z304-address-1><z304-date-from>20140411</z304-date-from><z304-date-to>20991231</z304-date-to> <z304-email-address>kozlovsky@mzk.cz</z304-email-address> </address-information>
-		 * </get-pat-adrs>
-		 */
-		
-		// TODO: Then post it & parse reply-code or reply-text 
+		if (updateUserHandler.isUpdateable() && updateUserHandler.parsedAllMandatoryFields()) {
 
-		return updateUserHandler.isSuccess();
+			DeleteUserFields deleteUserFields = initData.getDeleteUserFields();
+			AddUserFields addUserFields = initData.getAddUserFields();
+
+			// TODO: add to xmlRequestDesiredValues from AddUserFields ..
+
+			// @formatter:off
+			XMLBuilder xmlRequest = XMLBuilder.create(AlephConstants.GET_PAT_ADRS_NODE).elem(AlephConstants.ADDRESS_INFORMATION_NODE)
+					.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(updateUserHandler.getZ304address1())
+					.up()
+					.elem(AlephConstants.Z304_DATE_FROM_NODE).text(updateUserHandler.getZ304dateFrom())
+					.up()
+					.elem(AlephConstants.Z304_DATE_TO_NODE).text(updateUserHandler.getZ304dateTo());
+
+			// @formatter:on
+
+			String xmlToPost = "post_xml=" + xmlRequest.asString();
+
+			HttpURLConnection httpCon = (HttpURLConnection) addressLink.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("POST");
+
+			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
+			outWriter.write(xmlToPost);
+			outWriter.close();
+
+			streamSource = new InputSource(httpCon.getInputStream());
+
+			// Parse reply-code or reply-text
+			parser.parse(streamSource, updateUserHandler);
+
+			return updateUserHandler.getReplyText();
+
+		} else if (!updateUserHandler.isUpdateable())
+			return "Parameter updateable is set to \"N\".";
+
+		else
+			return "Could not parse all mandatory fields, thus cannot build valid XML.";
 	}
 
 	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {
