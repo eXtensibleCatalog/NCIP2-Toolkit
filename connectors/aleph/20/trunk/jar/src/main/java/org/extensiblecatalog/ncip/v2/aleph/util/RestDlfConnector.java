@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -18,6 +19,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.extensiblecatalog.ncip.v2.aleph.AlephLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.aleph.AlephXServices.AlephMediator;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
@@ -55,7 +57,6 @@ import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
@@ -65,6 +66,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
+import org.springframework.util.StringUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -110,23 +112,9 @@ public class RestDlfConnector extends AlephMediator {
 
 			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
 
-			LocalConfig.setZ304address1formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_1_NODE));
-			LocalConfig.setZ304address2formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_2_NODE));
-			LocalConfig.setZ304address3formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_3_NODE));
-			LocalConfig.setZ304address4formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_4_NODE));
-
-			LocalConfig.setZ304telephone1formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_1_NODE));
-			LocalConfig.setZ304telephone2formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_2_NODE));
-			LocalConfig.setZ304telephone3formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_3_NODE));
-			LocalConfig.setZ304telephone4formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_4_NODE));
-
-			LocalConfig.setUserNameFormatting(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_FORMATTING_NAME));
-
-			LocalConfig.setUserCityStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_CITY));
+			LocalConfig.setUserPostalAndCityStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_POSTAL_AND_CITY));
 			LocalConfig.setUserIdCardStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_IDENTITY_CARD));
-			LocalConfig.setUserNameStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_NAME));
 			LocalConfig.setUserPhoneStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_PHONE));
-			LocalConfig.setUserPostalStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_POSTAL_CODE));
 			LocalConfig.setUserStreetStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_STREET));
 
 			try {
@@ -875,123 +863,304 @@ public class RestDlfConnector extends AlephMediator {
 		if (updateUserHandler.isUpdateable() && updateUserHandler.parsedAllMandatoryFields()) {
 
 			// Parse all other values in order to be capable of particular modifications in each element
+			streamSource = new InputSource(addressLink.openStream());
 			parser.parse(streamSource, updateUserHandler);
 
 			AlephPatronAddress parsedPatronAddress = updateUserHandler.getPatronAddress();
 
 			AddUserFields addUserFields = initData.getAddUserFields();
-			DeleteUserFields deleteUserFields = initData.getDeleteUserFields();
-
-			StructuredPersonalUserName structuredPersonalNameToAdd = null;
-			StructuredPersonalUserName structuredPersonalNameToDelete = null;
-
-			// Parse AddUserField's NameInformation's StructuredPersonalName
-			if (addUserFields.getNameInformation() != null && addUserFields.getNameInformation().getPersonalNameInformation() != null)
-				structuredPersonalNameToAdd = addUserFields.getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName();
-
-			// Parse DeleteUserField's NameInformation's StructuredPersonalName
-			if (deleteUserFields.getNameInformation() != null && deleteUserFields.getNameInformation().getPersonalNameInformation() != null)
-				structuredPersonalNameToDelete = deleteUserFields.getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName();
 
 			List<ElectronicAddress> emailsToAdd = null;
 			List<ElectronicAddress> phonesToAdd = null;
 			PhysicalAddress physicalAddressToAdd = null;
 
+			if (addUserFields != null) {
+
+				/*
+				 Here we iterate over all UserAddressInformations to determine it's type.
+				 
+				 Now we have to parse values about to be added, in the next step we add those values using appropriate formatting
+				  into z304-address-x based on configuration in toolkit.properties.
+				 */
+				for (UserAddressInformation uai : addUserFields.getUserAddressInformations()) {
+					if (uai.getElectronicAddress() != null) {
+						String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
+
+						if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
+
+							if (emailsToAdd == null)
+								emailsToAdd = new ArrayList<ElectronicAddress>();
+
+							emailsToAdd.add(uai.getElectronicAddress());
+
+						} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
+
+							if (phonesToAdd == null)
+								phonesToAdd = new ArrayList<ElectronicAddress>();
+
+							phonesToAdd.add(uai.getElectronicAddress());
+
+						} else
+							return "Cannot process ElectronicAddress of type \"" + typeValue + "\". It was found within AddUserField.";
+
+					} else if (uai.getPhysicalAddress() != null) {
+						if (physicalAddressToAdd == null)
+							physicalAddressToAdd = uai.getPhysicalAddress();
+						else
+							return "Cannot process more than one PhysicalAddress. It was found within AddUserField.";
+					}
+				}
+
+			}
+
+			DeleteUserFields deleteUserFields = initData.getDeleteUserFields();
+
 			List<ElectronicAddress> emailsToDelete = null;
 			List<ElectronicAddress> phonesToDelete = null;
 			PhysicalAddress physicalAddressToDelete = null;
 
-			/*
-			 Here we iterate over all UserAddressInformations to determine it's type.
-			 
-			 Now we have to parse values about to be added/deleted, in the next step we add/delete those values using appropriate formatting
-			  into z304-address-x based on configuration in toolkit.properties.
-			 */
-			for (UserAddressInformation uai : addUserFields.getUserAddressInformations()) {
+			if (deleteUserFields != null) {
 
-				// Iterating over AddUserFields
+				/*
+				 Here we iterate over all UserAddressInformations to determine it's type.
+				 
+				 Now we have to parse values about to be deleted, in the next step we delete those values using appropriate formatting
+				  into z304-address-x based on configuration in toolkit.properties.
+				 */
+				for (UserAddressInformation uai : deleteUserFields.getUserAddressInformations()) {
+					if (uai.getElectronicAddress() != null) {
+						String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
 
-				if (uai.getElectronicAddress() != null) {
-					String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
+						if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
 
-					if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
+							if (emailsToDelete == null)
+								emailsToDelete = new ArrayList<ElectronicAddress>();
 
-						if (emailsToAdd == null)
-							emailsToAdd = new ArrayList<ElectronicAddress>();
+							emailsToDelete.add(uai.getElectronicAddress());
 
-						emailsToAdd.add(uai.getElectronicAddress());
+						} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
 
-					} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
+							if (phonesToDelete == null)
+								phonesToDelete = new ArrayList<ElectronicAddress>();
 
-						if (phonesToAdd == null)
-							phonesToAdd = new ArrayList<ElectronicAddress>();
+							phonesToDelete.add(uai.getElectronicAddress());
 
-						phonesToAdd.add(uai.getElectronicAddress());
+						} else
+							return "Cannot process ElectronicAddress of type \"" + typeValue + "\". It was found within DeleteUserField.";
 
-					} else
-						return "Cannot process ElectronicAddress of type \"" + typeValue + "\". It was found within AddUserField.";
-
-				} else if (uai.getPhysicalAddress() != null) {
-					if (physicalAddressToAdd == null)
-						physicalAddressToAdd = uai.getPhysicalAddress();
-					else
-						return "Cannot process more than one PhysicalAddress. It was found within AddUserField.";
+					} else if (uai.getPhysicalAddress() != null) {
+						if (physicalAddressToDelete == null)
+							physicalAddressToDelete = uai.getPhysicalAddress();
+						else
+							return "Cannot process more than one PhysicalAddress. It was found within DeleteUserField.";
+					}
 				}
 			}
 
-			for (UserAddressInformation uai : deleteUserFields.getUserAddressInformations()) {
+			List<String> emails = null;
+			List<String> phones = null;
 
-				// Iterating over DeleteUserFields
+			String street = null;
+			String postalCodeAndCity = null;
 
-				if (uai.getElectronicAddress() != null) {
-					String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
-
-					if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
-
-						if (emailsToDelete == null)
-							emailsToDelete = new ArrayList<ElectronicAddress>();
-
-						emailsToDelete.add(uai.getElectronicAddress());
-
-					} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
-
-						if (phonesToDelete == null)
-							phonesToDelete = new ArrayList<ElectronicAddress>();
-
-						phonesToDelete.add(uai.getElectronicAddress());
-
-					} else
-						return "Cannot process ElectronicAddress of type \"" + typeValue + "\". It was found within DeleteUserField.";
-
-				} else if (uai.getPhysicalAddress() != null) {
-					if (physicalAddressToDelete == null)
-						physicalAddressToDelete = uai.getPhysicalAddress();
-					else
-						return "Cannot process more than one PhysicalAddress. It was found within DeleteUserField.";
-				}
-			}
-
-			if (structuredPersonalNameToAdd != null || structuredPersonalNameToDelete != null) {
-				String currentUserName;
-
-				// FIXME: implement this method: parsedPatronAddress.get(LocalConfig.getUserNameStoredIn()) using Map class
-
-				// TODO: modify currentUserName using LocalConfig.getUserNameFormatting()
-
-				// return "Your toolkit.properties configuration is wrong - cannot assing UserNameStoredIn to any of z304-address-x for x = <1,5>";
-
-			}
-
+			// Process Emails Deletion / Addition
 			if (emailsToAdd != null || emailsToDelete != null) {
 
+				String parsedEmails = parsedPatronAddress.getZ304emailAddress();
+
+				if (parsedEmails != null) {
+					String[] parsedEmailsArray = StringUtils.trimArrayElements(parsedEmails.split(AlephConstants.PATRON_ADDRESS_DELIMITER));
+
+					emails = new ArrayList<String>(Arrays.asList(parsedEmailsArray));
+
+					// Delete emails desired to delete
+					if (emailsToDelete != null) {
+						for (ElectronicAddress emailToDelete : emailsToDelete) {
+							emails.remove(emailToDelete.getElectronicAddressData());
+						}
+					}
+				}
+
+				// Add emails desired to add
+				if (emailsToAdd != null) {
+					if (parsedEmails == null)
+						emails = new ArrayList<String>();
+
+					for (ElectronicAddress emailToAdd : emailsToAdd) {
+						if (!emailToAdd.getElectronicAddressData().isEmpty())
+							emails.add(emailToAdd.getElectronicAddressData());
+						else
+							return "You have specified empty ElectornicAddressData of type \"mailto\" in AddUserFields.";
+					}
+				}
+
 			}
 
+			// Process Phones Deletion / Addition
 			if (phonesToAdd != null || phonesToDelete != null) {
 
+				String parsedPhones = parsedPatronAddress.get(LocalConfig.getNodeUserPhoneStoredIn());
+
+				if (parsedPhones != null) {
+					String[] parsedPhonesArray = StringUtils.trimArrayElements(parsedPhones.split(AlephConstants.PATRON_ADDRESS_DELIMITER));
+
+					phones = new ArrayList<String>(Arrays.asList(parsedPhonesArray));
+
+					if (phonesToDelete != null) {
+						for (ElectronicAddress phoneToDelete : phonesToDelete) {
+							phones.remove(phoneToDelete.getElectronicAddressData());
+						}
+					}
+				}
+
+				if (phonesToAdd != null) {
+					if (parsedPhones == null)
+						phones = new ArrayList<String>();
+
+					for (ElectronicAddress phoneToAdd : phonesToAdd) {
+						if (!phoneToAdd.getElectronicAddressData().isEmpty())
+							phones.add(phoneToAdd.getElectronicAddressData());
+						else
+							return "You have specified empty ElectronicAddressData of type \"tel\" in AddUserFields.";
+					}
+				}
 			}
 
+			// Process PhysicalAddress Deletion / Addition
 			if (physicalAddressToAdd != null || physicalAddressToDelete != null) {
 
+				street = parsedPatronAddress.get(LocalConfig.getNodeUserStreetStoredIn());
+
+				postalCodeAndCity = parsedPatronAddress.get(LocalConfig.getNodeUserPostalAndCityStoredIn());
+
+				String newPostal = null;
+				String newCity = null;
+
+				boolean postalDeleted = false;
+				boolean cityDeleted = false;
+
+				boolean postalDeletionDesired = false;
+				boolean cityDeletionDesired = false;
+
+				boolean postalAdditionDesired = false;
+				boolean cityAdditionDesired = false;
+
+				// Process Deletion
+				if (physicalAddressToDelete != null && physicalAddressToDelete.getStructuredAddress() != null) {
+
+					if (street != null) {
+
+						String streetToDelete = physicalAddressToDelete.getStructuredAddress().getStreet();
+
+						if (streetToDelete != null) {
+
+							if (streetToDelete.isEmpty())
+								return "You have specified empty Street in DeleteUserFields.";
+
+							street.replace(streetToDelete, "");
+
+							street.trim();
+						}
+					}
+
+					if (postalCodeAndCity != null) {
+
+						String cityToDelete = physicalAddressToDelete.getStructuredAddress().getLocality();
+
+						if (cityToDelete != null) {
+
+							if (!cityToDelete.isEmpty())
+								cityDeletionDesired = true;
+							else
+								return "You have specified empty City in DeleteUserFields.";
+
+							// Save the length of current state
+							int postalCodeAndCityLength = postalCodeAndCity.length();
+
+							postalCodeAndCity.replace(cityToDelete, "");
+
+							// Was it deleted?
+							cityDeleted = postalCodeAndCity.length() == postalCodeAndCityLength - cityToDelete.length();
+						}
+
+						String postalToDelete = physicalAddressToDelete.getStructuredAddress().getPostalCode();
+
+						if (postalToDelete != null) {
+
+							if (!postalToDelete.isEmpty())
+								postalDeletionDesired = true;
+							else
+								return "You have specified empty PostalCode in DeleteUserFields.";
+
+							// Save the length of current state
+							int postalCodeAndCityLength = postalCodeAndCity.length();
+
+							postalCodeAndCity.replace(postalToDelete, "");
+
+							// Was it deleted?
+							postalDeleted = postalCodeAndCity.length() == postalCodeAndCityLength - postalToDelete.length();
+						}
+
+						postalCodeAndCity.trim();
+					}
+				}
+
+				// Process Addition
+				if (physicalAddressToAdd != null && physicalAddressToAdd.getStructuredAddress() != null) {
+					String streetToAdd = physicalAddressToAdd.getStructuredAddress().getStreet();
+					if (streetToAdd != null) {
+						if (street != null || !street.isEmpty())
+							return "Cannot rewrite not empty street. First delete it using DeleteUserFields to submit you want this.";
+						else {
+							if (!streetToAdd.isEmpty())
+								street = streetToAdd;
+							else
+								return "You have specified empty Street in AddUserFields.";
+						}
+					}
+
+					String postalCodeToAdd = physicalAddressToAdd.getStructuredAddress().getPostalCode();
+					if (postalCodeToAdd != null) {
+						if (!postalCodeToAdd.isEmpty()) {
+							postalAdditionDesired = true;
+
+							if (postalDeletionDesired) {
+								newPostal = postalCodeToAdd;
+							} else
+								return "You have to first delete PostalCode before adding another.";
+						} else
+							return "You have specified empty PostalCode in AddUserFields.";
+					}
+
+					String cityToAdd = physicalAddressToAdd.getStructuredAddress().getLocality();
+					if (cityToAdd != null) {
+						if (!cityToAdd.isEmpty()) {
+							cityAdditionDesired = true;
+
+							if (cityDeletionDesired) {
+								newCity = cityToAdd;
+							} else
+								return "You have to first delete City before adding another.";
+						} else
+							return "You have specified empty City in AddUserFields.";
+					}
+
+				}
+
+				if (cityDeletionDesired && !cityAdditionDesired)
+					return "You have to specify City to be replaced after desired City deletion is done.";
+
+				if (postalDeletionDesired && !postalAdditionDesired)
+					return "You have to specify PostalCode to be replaced after desired PostalCode deletion is done.";
+
+				if (cityAdditionDesired && postalAdditionDesired) {
+					postalCodeAndCity = newPostal + " " + newCity;
+				} else if (cityAdditionDesired) {
+					postalCodeAndCity += " " + newCity;
+				} else {
+					postalCodeAndCity = newPostal + " " + postalCodeAndCity;
+				}
+				// TODO: Debug this (where comment "Process PhysicalAddress Deletion / Addition" starts)
 			}
 
 			// @formatter:off

@@ -18,22 +18,8 @@ public class LocalConfig {
 	private static String admLibrary;
 
 	// Aleph API's patron -> address mapping
-	private static String z304address1formatting;
-	private static String z304address2formatting;
-	private static String z304address3formatting;
-	private static String z304address4formatting;
-
-	private static String z304telephone1formatting;
-	private static String z304telephone2formatting;
-	private static String z304telephone3formatting;
-	private static String z304telephone4formatting;
-
-	private static String userNameStoredIn;
-	private static String userNameFormatting;
-
 	private static String userStreetStoredIn;
-	private static String userPostalStoredIn;
-	private static String userCityStoredIn;
+	private static String userPostalAndCityStoredIn;
 
 	private static String userPhoneStoredIn;
 	private static String userIdCardStoredIn;
@@ -226,159 +212,9 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @return the z304address1formatting
-	 */
-	public static String getZ304address1formatting() {
-		return z304address1formatting;
-	}
-
-	/**
-	 * @param z304address1formatting
-	 *            the z304address1formatting to set
-	 */
-	public static void setZ304address1formatting(String z304address1formatting) {
-		LocalConfig.z304address1formatting = z304address1formatting;
-	}
-
-	/**
-	 * @return the z304address2formatting
-	 */
-	public static String getZ304address2formatting() {
-		return z304address2formatting;
-	}
-
-	/**
-	 * @param z304address2formatting
-	 *            the z304address2formatting to set
-	 */
-	public static void setZ304address2formatting(String z304address2formatting) {
-		LocalConfig.z304address2formatting = z304address2formatting;
-	}
-
-	/**
-	 * @return the z304address3formatting
-	 */
-	public static String getZ304address3formatting() {
-		return z304address3formatting;
-	}
-
-	/**
-	 * @param z304address3formatting
-	 *            the z304address3formatting to set
-	 */
-	public static void setZ304address3formatting(String z304address3formatting) {
-		LocalConfig.z304address3formatting = z304address3formatting;
-	}
-
-	/**
-	 * @return the z304address4formatting
-	 */
-	public static String getZ304address4formatting() {
-		return z304address4formatting;
-	}
-
-	/**
-	 * @param z304address4formatting
-	 *            the z304address4formatting to set
-	 */
-	public static void setZ304address4formatting(String z304address4formatting) {
-		LocalConfig.z304address4formatting = z304address4formatting;
-	}
-
-	/**
-	 * @return the z304telephone1formatting
-	 */
-	public static String getZ304telephone1formatting() {
-		return z304telephone1formatting;
-	}
-
-	/**
-	 * @param z304telephone1formatting
-	 *            the z304telephone1formatting to set
-	 */
-	public static void setZ304telephone1formatting(String z304telephone1formatting) {
-		LocalConfig.z304telephone1formatting = z304telephone1formatting;
-	}
-
-	/**
-	 * @return the z304telephone2formatting
-	 */
-	public static String getZ304telephone2formatting() {
-		return z304telephone2formatting;
-	}
-
-	/**
-	 * @param z304telephone2formatting
-	 *            the z304telephone2formatting to set
-	 */
-	public static void setZ304telephone2formatting(String z304telephone2formatting) {
-		LocalConfig.z304telephone2formatting = z304telephone2formatting;
-	}
-
-	/**
-	 * @return the z304telephone3formatting
-	 */
-	public static String getZ304telephone3formatting() {
-		return z304telephone3formatting;
-	}
-
-	/**
-	 * @param z304telephone3formatting
-	 *            the z304telephone3formatting to set
-	 */
-	public static void setZ304telephone3formatting(String z304telephone3formatting) {
-		LocalConfig.z304telephone3formatting = z304telephone3formatting;
-	}
-
-	/**
-	 * @return the z304telephone4formatting
-	 */
-	public static String getZ304telephone4formatting() {
-		return z304telephone4formatting;
-	}
-
-	/**
-	 * @param z304telephone4formatting
-	 *            the z304telephone4formatting to set
-	 */
-	public static void setZ304telephone4formatting(String z304telephone4formatting) {
-		LocalConfig.z304telephone4formatting = z304telephone4formatting;
-	}
-
-	/**
-	 * @return the userNameStoredIn
-	 */
-	public static String getUserNameStoredIn() {
-		return userNameStoredIn;
-	}
-
-	/**
-	 * @param userNameStoredIn
-	 *            the userNameStoredIn to set
-	 */
-	public static void setUserNameStoredIn(String userNameStoredIn) {
-		LocalConfig.userNameStoredIn = userNameStoredIn;
-	}
-
-	/**
-	 * @return the userNameFormatting
-	 */
-	public static String getUserNameFormatting() {
-		return userNameFormatting;
-	}
-
-	/**
-	 * @param userNameFormatting
-	 *            the userNameFormatting to set
-	 */
-	public static void setUserNameFormatting(String userNameFormatting) {
-		LocalConfig.userNameFormatting = userNameFormatting;
-	}
-
-	/**
 	 * @return the userStreetStoredIn
 	 */
-	public static String getUserStreetStoredIn() {
+	public static String getNodeUserStreetStoredIn() {
 		return userStreetStoredIn;
 	}
 
@@ -393,37 +229,22 @@ public class LocalConfig {
 	/**
 	 * @return the userPostalStoredIn
 	 */
-	public static String getUserPostalStoredIn() {
-		return userPostalStoredIn;
+	public static String getNodeUserPostalAndCityStoredIn() {
+		return userPostalAndCityStoredIn;
 	}
 
 	/**
 	 * @param userPostalStoredIn
 	 *            the userPostalStoredIn to set
 	 */
-	public static void setUserPostalStoredIn(String userPostalStoredIn) {
-		LocalConfig.userPostalStoredIn = userPostalStoredIn;
-	}
-
-	/**
-	 * @return the userCityStoredIn
-	 */
-	public static String getUserCityStoredIn() {
-		return userCityStoredIn;
-	}
-
-	/**
-	 * @param userCityStoredIn
-	 *            the userCityStoredIn to set
-	 */
-	public static void setUserCityStoredIn(String userCityStoredIn) {
-		LocalConfig.userCityStoredIn = userCityStoredIn;
+	public static void setUserPostalAndCityStoredIn(String userPostalStoredIn) {
+		LocalConfig.userPostalAndCityStoredIn = userPostalStoredIn;
 	}
 
 	/**
 	 * @return the userPhoneStoredIn
 	 */
-	public static String getUserPhoneStoredIn() {
+	public static String getNodeUserPhoneStoredIn() {
 		return userPhoneStoredIn;
 	}
 

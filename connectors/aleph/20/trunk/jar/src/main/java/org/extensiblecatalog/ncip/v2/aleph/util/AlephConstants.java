@@ -84,6 +84,7 @@ public class AlephConstants {
 
 	// Both Aleph (RESTful APIs & X-Services) nodes:
 	public static final String Z304_NODE = "z304";
+	public static final String Z304_ZIP_NODE = "z304-zip";
 	public static final String Z304_DATE_TO_NODE = "z304-date-to";
 	public static final String Z304_EMAIL_NODE = "z304-email-address";
 	public static final String Z304_DATE_FROM_NODE = "z304-date-from";
@@ -92,6 +93,7 @@ public class AlephConstants {
 	public static final String Z304_ADDRESS_3_NODE = "z304-address-3";
 	public static final String Z304_ADDRESS_4_NODE = "z304-address-4";
 	public static final String Z304_ADDRESS_5_NODE = "z304-address-5";
+	public static final String Z304_SMS_NUMBER_NODE = "z304-sms-number";
 	public static final String Z304_TELEPHONE_1_NODE = "z304-telephone-1";
 	public static final String Z304_TELEPHONE_2_NODE = "z304-telephone-2";
 	public static final String Z304_TELEPHONE_3_NODE = "z304-telephone-3";
@@ -217,9 +219,11 @@ public class AlephConstants {
 
 	public static final String Z303_ID_NODE = "z303-id";
 	public static final String Z303_NAME_NODE = "z303-name";
+	public static final String Z303_WANT_SMS_NODE = "z303-want-sms";
 	public static final String Z303_FIELD_NOTE_1_NODE = "z303-field-1";
 	public static final String Z303_FIELD_NOTE_2_NODE = "z303-field-2";
 	public static final String Z303_FIELD_NOTE_3_NODE = "z303-field-3";
+	public static final String Z303_PLAIN_HTML_NODE = "z303-plain-html";
 	public static final String Z303_DELINQUENCY_1_NODE = "z303-delinq-1";
 	public static final String Z303_DELINQUENCY_2_NODE = "z303-delinq-2";
 	public static final String Z303_DELINQUENCY_3_NODE = "z303-delinq-3";
@@ -405,25 +409,19 @@ public class AlephConstants {
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
 
 	// Toolkit's Mapping Patron -> Address
-	public static final String PATRON_ADDRESS_FORMATTING_NAME = "UserNameFormatting";
-	public static final String PATRON_ADDRESS_MAPPING_NAME = "UserNameStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_STREET = "UserStreetStoredIn";
-	public static final String PATRON_ADDRESS_MAPPING_POSTAL_CODE = "UserPostalStoredIn";
-	public static final String PATRON_ADDRESS_MAPPING_CITY = "UserCityStoredIn";
+	public static final String PATRON_ADDRESS_MAPPING_POSTAL_AND_CITY = "UserPostalCodeAndCityStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_PHONE = "UserPhoneStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_IDENTITY_CARD = "UserIdCardStoredIn";
 
-	public static final String PATRON_ADDRESS_BARCODE_PARAM = "barCode";
-	public static final String PATRON_ADDRESS_USERNAME_PARAM = "userName";
 	public static final String PATRON_ADDRESS_STREET_PARAM = "streetAddress";
 	public static final String PATRON_ADDRESS_POSTAL_CODE_PARAM = "postalCode";
 	public static final String PATRON_ADDRESS_PHONE_PARAM = "phone";
 	public static final String PATRON_ADDRESS_ID_CARD_PARAM = "identityCard";
 
-	public static final String PATRON_ADDRESS_FORMATTING_NAME_PREFIX_PARAM = "prefix";
-	public static final String PATRON_ADDRESS_FORMATTING_NAME_GIVENNAME_PARAM = "givenName";
-	public static final String PATRON_ADDRESS_FORMATTING_NAME_SURNAME_PARAM = "surname";
-	public static final String PATRON_ADDRESS_FORMATTING_NAME_SUFFIX_PARAM = "suffix";
+	public static final String PATRON_ADDRESS_DELIMITER = ", ";
+	
+	public static final int PATRON_ADDRESS_MAX_POSTAL_CODE_LENGTH = 6;
 
 	public static final char REQUEST_ID_DELIMITER = ';';
 
