@@ -29,6 +29,8 @@ public class LocalConfig {
 	private static String z304telephone4formatting;
 
 	private static String userNameStoredIn;
+	private static String userNameFormatting;
+
 	private static String userStreetStoredIn;
 	private static String userPostalStoredIn;
 	private static String userCityStoredIn;
@@ -356,6 +358,21 @@ public class LocalConfig {
 	 */
 	public static void setUserNameStoredIn(String userNameStoredIn) {
 		LocalConfig.userNameStoredIn = userNameStoredIn;
+	}
+
+	/**
+	 * @return the userNameFormatting
+	 */
+	public static String getUserNameFormatting() {
+		return userNameFormatting;
+	}
+
+	/**
+	 * @param userNameFormatting
+	 *            the userNameFormatting to set
+	 */
+	public static void setUserNameFormatting(String userNameFormatting) {
+		LocalConfig.userNameFormatting = userNameFormatting;
 	}
 
 	/**

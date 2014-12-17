@@ -92,12 +92,10 @@ public class AlephConstants {
 	public static final String Z304_ADDRESS_3_NODE = "z304-address-3";
 	public static final String Z304_ADDRESS_4_NODE = "z304-address-4";
 	public static final String Z304_ADDRESS_5_NODE = "z304-address-5";
-	public static final String Z304_ADDRESS_6_NODE = "z304-address-6";
 	public static final String Z304_TELEPHONE_1_NODE = "z304-telephone-1";
 	public static final String Z304_TELEPHONE_2_NODE = "z304-telephone-2";
 	public static final String Z304_TELEPHONE_3_NODE = "z304-telephone-3";
 	public static final String Z304_TELEPHONE_4_NODE = "z304-telephone-4";
-	public static final String Z304_TELEPHONE_5_NODE = "z304-telephone-5";
 
 	// XML Aleph RESTful APIs Nodes:
 	public static final String NOTE_NODE = "note";
@@ -406,13 +404,26 @@ public class AlephConstants {
 
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
 
-	// Toolkit's Mapping Patron -> Address 
+	// Toolkit's Mapping Patron -> Address
+	public static final String PATRON_ADDRESS_FORMATTING_NAME = "UserNameFormatting";
 	public static final String PATRON_ADDRESS_MAPPING_NAME = "UserNameStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_STREET = "UserStreetStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_POSTAL_CODE = "UserPostalStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_CITY = "UserCityStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_PHONE = "UserPhoneStoredIn";
 	public static final String PATRON_ADDRESS_MAPPING_IDENTITY_CARD = "UserIdCardStoredIn";
+
+	public static final String PATRON_ADDRESS_BARCODE_PARAM = "barCode";
+	public static final String PATRON_ADDRESS_USERNAME_PARAM = "userName";
+	public static final String PATRON_ADDRESS_STREET_PARAM = "streetAddress";
+	public static final String PATRON_ADDRESS_POSTAL_CODE_PARAM = "postalCode";
+	public static final String PATRON_ADDRESS_PHONE_PARAM = "phone";
+	public static final String PATRON_ADDRESS_ID_CARD_PARAM = "identityCard";
+
+	public static final String PATRON_ADDRESS_FORMATTING_NAME_PREFIX_PARAM = "prefix";
+	public static final String PATRON_ADDRESS_FORMATTING_NAME_GIVENNAME_PARAM = "givenName";
+	public static final String PATRON_ADDRESS_FORMATTING_NAME_SURNAME_PARAM = "surname";
+	public static final String PATRON_ADDRESS_FORMATTING_NAME_SUFFIX_PARAM = "suffix";
 
 	public static final char REQUEST_ID_DELIMITER = ';';
 

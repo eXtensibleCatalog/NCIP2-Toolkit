@@ -120,6 +120,15 @@ public class RestDlfConnector extends AlephMediator {
 			LocalConfig.setZ304telephone3formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_3_NODE));
 			LocalConfig.setZ304telephone4formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_4_NODE));
 
+			LocalConfig.setUserNameFormatting(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_FORMATTING_NAME));
+
+			LocalConfig.setUserCityStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_CITY));
+			LocalConfig.setUserIdCardStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_IDENTITY_CARD));
+			LocalConfig.setUserNameStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_NAME));
+			LocalConfig.setUserPhoneStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_PHONE));
+			LocalConfig.setUserPostalStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_POSTAL_CODE));
+			LocalConfig.setUserStreetStoredIn(alephConfig.getProperty(AlephConstants.PATRON_ADDRESS_MAPPING_STREET));
+
 			try {
 				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
 			} catch (Exception e) {
@@ -868,7 +877,7 @@ public class RestDlfConnector extends AlephMediator {
 			// Parse all other values in order to be capable of particular modifications in each element
 			parser.parse(streamSource, updateUserHandler);
 
-			AlephPatronAddress patronAddress = updateUserHandler.getPatronAddress();
+			AlephPatronAddress parsedPatronAddress = updateUserHandler.getPatronAddress();
 
 			AddUserFields addUserFields = initData.getAddUserFields();
 			DeleteUserFields deleteUserFields = initData.getDeleteUserFields();
@@ -963,6 +972,13 @@ public class RestDlfConnector extends AlephMediator {
 			}
 
 			if (structuredPersonalNameToAdd != null || structuredPersonalNameToDelete != null) {
+				String currentUserName;
+
+				// FIXME: implement this method: parsedPatronAddress.get(LocalConfig.getUserNameStoredIn()) using Map class
+
+				// TODO: modify currentUserName using LocalConfig.getUserNameFormatting()
+
+				// return "Your toolkit.properties configuration is wrong - cannot assing UserNameStoredIn to any of z304-address-x for x = <1,5>";
 
 			}
 
@@ -983,11 +999,11 @@ public class RestDlfConnector extends AlephMediator {
 			// Build XML POST request with mandatory fields filled in
 			XMLBuilder xmlRequest = XMLBuilder.create(AlephConstants.GET_PAT_ADRS_NODE)
 					.elem(AlephConstants.ADDRESS_INFORMATION_NODE)
-						.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(patronAddress.getZ304address1())
+						.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(parsedPatronAddress.getZ304address1())
 							.up()
-						.elem(AlephConstants.Z304_DATE_FROM_NODE).text(patronAddress.getZ304dateFrom())
+						.elem(AlephConstants.Z304_DATE_FROM_NODE).text(parsedPatronAddress.getZ304dateFrom())
 							.up()
-						.elem(AlephConstants.Z304_DATE_TO_NODE).text(patronAddress.getZ304dateTo());
+						.elem(AlephConstants.Z304_DATE_TO_NODE).text(parsedPatronAddress.getZ304dateTo());
 
 			
 			
