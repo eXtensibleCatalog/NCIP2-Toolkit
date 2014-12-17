@@ -76,8 +76,6 @@ public class RestDlfConnector extends AlephMediator {
 
 	private static SAXParser parser;
 
-	private static LocalConfig localConfig;
-
 	private Random random = new Random();
 
 	public RestDlfConnector() throws ServiceException {
@@ -93,39 +91,37 @@ public class RestDlfConnector extends AlephMediator {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			AlephConfiguration alephConfig = new AlephConfiguration(config);
 
-			localConfig = new LocalConfig();
+			LocalConfig.setServerName(alephConfig.getProperty(AlephConstants.REST_DLF_SERVER));
+			LocalConfig.setServerPort(alephConfig.getProperty(AlephConstants.REST_DLF_PORT));
+			LocalConfig.setServerSuffix(alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX));
 
-			localConfig.setServerName(alephConfig.getProperty(AlephConstants.REST_DLF_SERVER));
-			localConfig.setServerPort(alephConfig.getProperty(AlephConstants.REST_DLF_PORT));
-			localConfig.setServerSuffix(alephConfig.getProperty(AlephConstants.REST_DLF_SUFFIX));
+			LocalConfig.setBibLibrary(alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY));
+			LocalConfig.setAdmLibrary(alephConfig.getProperty(AlephConstants.ALEPH_ADMINISTRATIVE_LIBRARY));
 
-			localConfig.setBibLibrary(alephConfig.getProperty(AlephConstants.BIBLIOGRAPHIC_LIBRARY));
-			localConfig.setAdmLibrary(alephConfig.getProperty(AlephConstants.ALEPH_ADMINISTRATIVE_LIBRARY));
+			LocalConfig.setDefaultAgency(alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY));
 
-			localConfig.setDefaultAgency(alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY));
+			LocalConfig.setAgencyAddress(alephConfig.getProperty(AlephConstants.AGENCY_UNSTRUCTURED_ADDRESS));
+			LocalConfig.setAgencyName(alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME));
 
-			localConfig.setAgencyAddress(alephConfig.getProperty(AlephConstants.AGENCY_UNSTRUCTURED_ADDRESS));
-			localConfig.setAgencyName(alephConfig.getProperty(AlephConstants.AGENCY_TRANSLATED_NAME));
+			LocalConfig.setUserRegistrationLink(alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK));
+			LocalConfig.setAuthDataFormatType(alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE));
 
-			localConfig.setUserRegistrationLink(alephConfig.getProperty(AlephConstants.USER_REGISTRATION_LINK));
-			localConfig.setAuthDataFormatType(alephConfig.getProperty(AlephConstants.AUTH_DATA_FORMAT_TYPE));
+			LocalConfig.setTokenExpirationTime(Integer.parseInt(alephConfig.getProperty(AlephConstants.NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
 
-			localConfig.setTokenExpirationTime(Integer.parseInt(alephConfig.getProperty(AlephConstants.NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
+			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
 
-			localConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(alephConfig.getProperty(AlephConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
+			LocalConfig.setZ304address1formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_1_NODE));
+			LocalConfig.setZ304address2formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_2_NODE));
+			LocalConfig.setZ304address3formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_3_NODE));
+			LocalConfig.setZ304address4formatting(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_4_NODE));
 
-			localConfig.setZ304address1(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_1_NODE));
-			localConfig.setZ304address2(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_2_NODE));
-			localConfig.setZ304address3(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_3_NODE));
-			localConfig.setZ304address4(alephConfig.getProperty(AlephConstants.Z304_ADDRESS_4_NODE));
-
-			localConfig.setZ304telephone1(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_1_NODE));
-			localConfig.setZ304telephone2(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_2_NODE));
-			localConfig.setZ304telephone3(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_3_NODE));
-			localConfig.setZ304telephone4(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_4_NODE));
+			LocalConfig.setZ304telephone1formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_1_NODE));
+			LocalConfig.setZ304telephone2formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_2_NODE));
+			LocalConfig.setZ304telephone3formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_3_NODE));
+			LocalConfig.setZ304telephone4formatting(alephConfig.getProperty(AlephConstants.Z304_TELEPHONE_4_NODE));
 
 			try {
-				localConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
+				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(alephConfig.getProperty(AlephConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -134,10 +130,6 @@ public class RestDlfConnector extends AlephMediator {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
 		}
 
-	}
-
-	public LocalConfig getLocalConfig() {
-		return localConfig;
 	}
 
 	public AlephItem lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, AlephException {
@@ -161,8 +153,8 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
-		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibraryLength());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
+		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId || !isCorrectItemId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -174,8 +166,8 @@ public class RestDlfConnector extends AlephMediator {
 
 		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
 
-		URL url = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-				.setPath(localConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS, itemId).addRequest("lang", lang).toURL();
+		URL url = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+				.setPath(LocalConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS, itemId).addRequest("lang", lang).toURL();
 
 		InputSource streamSource = new InputSource(url.openStream());
 
@@ -202,7 +194,7 @@ public class RestDlfConnector extends AlephMediator {
 	public List<AlephItem> lookupItems(String recordId, LookupItemInitiationData lookupItemInitData, AlephLookupItemSetService service) throws ParserConfigurationException,
 			IOException, SAXException, AlephException {
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
@@ -230,8 +222,8 @@ public class RestDlfConnector extends AlephMediator {
 
 			AlephURLsHandler urlsHandler = new AlephURLsHandler(startFrom, maxLinks);
 
-			url = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS).toURL();
+			url = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS).toURL();
 
 			streamSource = new InputSource(url.openStream());
 
@@ -290,8 +282,8 @@ public class RestDlfConnector extends AlephMediator {
 
 		} else {
 
-			url = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS).addRequest("view", "full")
+			url = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.ITEM_PATH_ELEMENT, recordId, AlephConstants.PARAM_ITEMS).addRequest("view", "full")
 					.addRequest("lang", lang).toURL();
 
 			streamSource = new InputSource(url.openStream());
@@ -336,18 +328,18 @@ public class RestDlfConnector extends AlephMediator {
 		URL addressUrl = null;
 		if (personalInfoDesired) {
 			atLeastOneDesired = true;
-			addressUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
+			addressUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
 		}
 
 		URL circulationsUrl = null;
 		URL cashUrl = null;
 		if (userFiscalAccountDesired) {
 			atLeastOneDesired = true;
-			circulationsUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS).toURL();
-			cashUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, "cash").addRequest("view", "full")
+			circulationsUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS).toURL();
+			cashUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, "cash").addRequest("view", "full")
 					.toURL();
 		}
 
@@ -357,12 +349,12 @@ public class RestDlfConnector extends AlephMediator {
 			atLeastOneDesired = true;
 			if (!loanedItemsDesiredOnly) {
 				// If there is not history expected, parse regular loans
-				loansUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
+				loansUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+						.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
 						.addRequest("view", "full").addRequest("lang", lang).toURL();
 			} else {
-				loansHistoryUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
+				loansHistoryUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+						.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS)
 						.addRequest("view", "full").addRequest("type", "history").addRequest("lang", lang).toURL();
 			}
 		}
@@ -372,35 +364,35 @@ public class RestDlfConnector extends AlephMediator {
 			atLeastOneDesired = true;
 			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full
 			requestsUrl = new URLBuilder()
-					.setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
+					.setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 							AlephConstants.PARAM_HOLDS).addRequest("view", "full").addRequest("lang", lang).toURL();
 		}
 
 		URL blocksOrTrapsUrl = null;
 		if (blockOrTrapDesired) {
 			atLeastOneDesired = true;
-			blocksOrTrapsUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_STATUS, AlephConstants.PARAM_BLOCKS).toURL();
+			blocksOrTrapsUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_STATUS, AlephConstants.PARAM_BLOCKS).toURL();
 		}
 
 		URL registrationUrl = null;
 		if (userPrivilegeDesired) {
 			atLeastOneDesired = true;
-			registrationUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-					.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_STATUS, AlephConstants.PARAM_REGISTRATION)
+			registrationUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_STATUS, AlephConstants.PARAM_REGISTRATION)
 					.toURL();
 		}
 
 		if (atLeastOneDesired) {
 
-			AlephLookupUserHandler userHandler = new AlephLookupUserHandler(initData, localConfig);
+			AlephLookupUserHandler userHandler = new AlephLookupUserHandler(initData);
 
 			InputSource streamSource;
 
 			if (loansUrl != null || loansHistoryUrl != null) {
 
-				AlephLoanHandler loanHandler = new AlephLoanHandler(localConfig);
+				AlephLoanHandler loanHandler = new AlephLoanHandler();
 
 				if (appProfileType != null && !appProfileType.isEmpty())
 					loanHandler.setLocalizationDesired(true);
@@ -416,7 +408,7 @@ public class RestDlfConnector extends AlephMediator {
 			}
 
 			if (requestsUrl != null) {
-				AlephLookupRequestsHandler requestItemHandler = new AlephLookupRequestsHandler(localConfig);
+				AlephLookupRequestsHandler requestItemHandler = new AlephLookupRequestsHandler();
 
 				if (appProfileType != null && !appProfileType.isEmpty())
 					requestItemHandler.setLocalizationDesired(true);
@@ -431,12 +423,12 @@ public class RestDlfConnector extends AlephMediator {
 				if (requestedItems.size() > 0) {
 
 					// If there is set default item preparation delay, set it to all requested items
-					if (localConfig.getMaxItemPreparationTimeDelay() != 0)
+					if (LocalConfig.getMaxItemPreparationTimeDelay() != 0)
 						for (RequestedItem requestedItem : requestedItems) {
 							if (requestedItem.getDatePlaced() != null) {
 								// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
 								GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
-								pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
+								pickupDate.add(Calendar.DAY_OF_MONTH, LocalConfig.getMaxItemPreparationTimeDelay());
 								requestedItem.setPickupDate(pickupDate);
 							}
 						}
@@ -483,7 +475,7 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -498,8 +490,8 @@ public class RestDlfConnector extends AlephMediator {
 		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
 
 		URL holdsUrl = new URLBuilder()
-				.setBase(localConfig.getServerName(), localConfig.getServerPort())
-				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
+				.setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+				.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 						AlephConstants.PARAM_HOLDS).addRequest("lang", lang).toURL();
 
 		AlephLookupRequestHandler requestHandler = new AlephLookupRequestHandler(initData, itemId);
@@ -519,9 +511,9 @@ public class RestDlfConnector extends AlephMediator {
 
 			RequestDetails requestDetails = requestHandler.getAlephRequestItem().getRequestDetails();
 
-			if (localConfig.getMaxItemPreparationTimeDelay() != 0 && requestDetails.getDatePlaced() != null) {
+			if (LocalConfig.getMaxItemPreparationTimeDelay() != 0 && requestDetails.getDatePlaced() != null) {
 				GregorianCalendar pickupDate = (GregorianCalendar) requestDetails.getDatePlaced().clone();
-				pickupDate.add(Calendar.DAY_OF_MONTH, localConfig.getMaxItemPreparationTimeDelay());
+				pickupDate.add(Calendar.DAY_OF_MONTH, LocalConfig.getMaxItemPreparationTimeDelay());
 				requestDetails.setPickupDate(pickupDate);
 			}
 
@@ -569,8 +561,8 @@ public class RestDlfConnector extends AlephMediator {
 				String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 				String itemIdVal = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-				boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
-				boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemIdVal, localConfig.getBibLibraryLength());
+				boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
+				boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemIdVal, LocalConfig.getBibLibraryLength());
 
 				if (!isCorrectRecordId || !isCorrectItemId) {
 					throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -585,8 +577,8 @@ public class RestDlfConnector extends AlephMediator {
 
 				// We need to put HTML PUT request to e.g. http://aleph.mzk.cz:1892/rest-dlf/patron/700/record/MZK01001330134/holds/MZK50001365071000010
 				URL holdUrl = new URLBuilder()
-						.setBase(localConfig.getServerName(), localConfig.getServerPort())
-						.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_RECORD, recordId, AlephConstants.PARAM_HOLDS,
+						.setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+						.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_RECORD, recordId, AlephConstants.PARAM_HOLDS,
 								itemIdVal).toURL();
 
 				String firstNote = null;
@@ -618,8 +610,8 @@ public class RestDlfConnector extends AlephMediator {
 
 					// Parse sequence number
 					URL holdsUrl = new URLBuilder()
-							.setBase(localConfig.getServerName(), localConfig.getServerPort())
-							.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
+							.setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+							.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 									AlephConstants.PARAM_HOLDS).toURL();
 
 					streamSource = new InputSource(holdsUrl.openStream());
@@ -682,8 +674,8 @@ public class RestDlfConnector extends AlephMediator {
 		String recordId = AlephUtil.parseRecordIdFromAlephItemId(alephItemId);
 		String itemId = AlephUtil.parseItemIdFromAlephItemId(alephItemId);
 
-		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, localConfig.getBibLibraryLength());
-		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, localConfig.getBibLibraryLength());
+		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
+		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId || !isCorrectItemId) {
 			throw new AlephException("Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
@@ -695,8 +687,8 @@ public class RestDlfConnector extends AlephMediator {
 
 		// Parse sequence number
 		URL holdsUrl = new URLBuilder()
-				.setBase(localConfig.getServerName(), localConfig.getServerPort())
-				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
+				.setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+				.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_REQUESTS,
 						AlephConstants.PARAM_HOLDS).toURL();
 
 		AlephDoRequestHandler requestItemHandler = new AlephDoRequestHandler(itemId);
@@ -742,7 +734,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		String alephLoanId = initData.getItemId().getItemIdentifierValue();
 
-		boolean isCorrectLoanId = AlephUtil.isCorrectLoanId(alephLoanId, localConfig.getBibLibraryLength());
+		boolean isCorrectLoanId = AlephUtil.isCorrectLoanId(alephLoanId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectLoanId) {
 			throw new AlephException("Loan Id is accepted only in strict format with strict length. e.g. MZK50004929137");
@@ -752,8 +744,8 @@ public class RestDlfConnector extends AlephMediator {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		URL loansUrl = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS).toURL();
+		URL loansUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+				.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS, AlephConstants.PARAM_LOANS).toURL();
 
 		AlephRenewHandler renewHandler = new AlephRenewHandler(alephLoanId, renewItem);
 
@@ -817,8 +809,7 @@ public class RestDlfConnector extends AlephMediator {
 					parser.parse(streamSource, renewHandler);
 
 					if (renewHandler.isFullIdFound()) {
-						String alephItemId = AlephUtil.buildAlephItemId(localConfig, renewHandler.getBibDocNumber(), renewHandler.getItemDocNumber(),
-								renewHandler.getItemSequenceNumber());
+						String alephItemId = AlephUtil.buildAlephItemId(renewHandler.getBibDocNumber(), renewHandler.getItemDocNumber(), renewHandler.getItemSequenceNumber());
 
 						LookupItemInitiationData LIinitData = new LookupItemInitiationData();
 						ItemId itemId = new ItemId();
@@ -862,8 +853,8 @@ public class RestDlfConnector extends AlephMediator {
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
 		// First parse mandatory fields to update with Rest Dlf - which are z304-address-1, z304-date-from & z304-date-to at patron address
-		URL addressLink = new URLBuilder().setBase(localConfig.getServerName(), localConfig.getServerPort())
-				.setPath(localConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
+		URL addressLink = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
+				.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
 
 		InputSource streamSource = new InputSource(addressLink.openStream());
 
@@ -874,59 +865,133 @@ public class RestDlfConnector extends AlephMediator {
 
 		if (updateUserHandler.isUpdateable() && updateUserHandler.parsedAllMandatoryFields()) {
 
-			// TODO: Think about handling DeleteUserFields
+			// Parse all other values in order to be capable of particular modifications in each element
+			parser.parse(streamSource, updateUserHandler);
+
+			AlephPatronAddress patronAddress = updateUserHandler.getPatronAddress();
 
 			AddUserFields addUserFields = initData.getAddUserFields();
+			DeleteUserFields deleteUserFields = initData.getDeleteUserFields();
 
-			StructuredPersonalUserName addUserName = null;
+			StructuredPersonalUserName structuredPersonalNameToAdd = null;
+			StructuredPersonalUserName structuredPersonalNameToDelete = null;
 
-			// If StructuredPersonalUserName is set, that means user was renamed or just gained university degree
+			// Parse AddUserField's NameInformation's StructuredPersonalName
 			if (addUserFields.getNameInformation() != null && addUserFields.getNameInformation().getPersonalNameInformation() != null)
-				addUserName = addUserFields.getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName();
+				structuredPersonalNameToAdd = addUserFields.getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName();
 
-			List<ElectronicAddress> emails = null;
-			ElectronicAddress phone = null;
-			PhysicalAddress physicalAddress = null;
+			// Parse DeleteUserField's NameInformation's StructuredPersonalName
+			if (deleteUserFields.getNameInformation() != null && deleteUserFields.getNameInformation().getPersonalNameInformation() != null)
+				structuredPersonalNameToDelete = deleteUserFields.getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName();
 
-			// Here we iterate over all UserAddressInformations to determine the type
-			// We are currently able to add multiple emails, but only one phone & one address
-			// Note that ability of adding more of these depends on your Aleph configuration - feel free to modify under MIT license
-			// (we have real street address saved in only one element z304-address-2 & city in z304-address-3)
+			List<ElectronicAddress> emailsToAdd = null;
+			List<ElectronicAddress> phonesToAdd = null;
+			PhysicalAddress physicalAddressToAdd = null;
+
+			List<ElectronicAddress> emailsToDelete = null;
+			List<ElectronicAddress> phonesToDelete = null;
+			PhysicalAddress physicalAddressToDelete = null;
+
+			/*
+			 Here we iterate over all UserAddressInformations to determine it's type.
+			 
+			 Now we have to parse values about to be added/deleted, in the next step we add/delete those values using appropriate formatting
+			  into z304-address-x based on configuration in toolkit.properties.
+			 */
 			for (UserAddressInformation uai : addUserFields.getUserAddressInformations()) {
+
+				// Iterating over AddUserFields
+
 				if (uai.getElectronicAddress() != null) {
 					String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
 
 					if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
 
-						if (emails == null)
-							emails = new ArrayList<ElectronicAddress>();
+						if (emailsToAdd == null)
+							emailsToAdd = new ArrayList<ElectronicAddress>();
 
-						emails.add(uai.getElectronicAddress());
+						emailsToAdd.add(uai.getElectronicAddress());
 
 					} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
-						if (phone == null)
-							phone = uai.getElectronicAddress();
-						else
-							return "Cannot process more than one ElectronicAddress of type \"tel\"";
+
+						if (phonesToAdd == null)
+							phonesToAdd = new ArrayList<ElectronicAddress>();
+
+						phonesToAdd.add(uai.getElectronicAddress());
+
 					} else
-						return "Cannot process ElectronicAddress of type \"" + typeValue + "\"";
+						return "Cannot process ElectronicAddress of type \"" + typeValue + "\". It was found within AddUserField.";
 
 				} else if (uai.getPhysicalAddress() != null) {
-					if (physicalAddress == null)
-						physicalAddress = uai.getPhysicalAddress();
+					if (physicalAddressToAdd == null)
+						physicalAddressToAdd = uai.getPhysicalAddress();
 					else
-						return "Cannot process more than one PhycisalAddress";
+						return "Cannot process more than one PhysicalAddress. It was found within AddUserField.";
 				}
 			}
 
-			// @formatter:off
-			XMLBuilder xmlRequest = XMLBuilder.create(AlephConstants.GET_PAT_ADRS_NODE).elem(AlephConstants.ADDRESS_INFORMATION_NODE)
-					.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(updateUserHandler.getZ304address1())
-					.up()
-					.elem(AlephConstants.Z304_DATE_FROM_NODE).text(updateUserHandler.getZ304dateFrom())
-					.up()
-					.elem(AlephConstants.Z304_DATE_TO_NODE).text(updateUserHandler.getZ304dateTo());
+			for (UserAddressInformation uai : deleteUserFields.getUserAddressInformations()) {
 
+				// Iterating over DeleteUserFields
+
+				if (uai.getElectronicAddress() != null) {
+					String typeValue = uai.getElectronicAddress().getElectronicAddressType().getValue();
+
+					if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.MAILTO.getValue())) { // If type is MAILTO
+
+						if (emailsToDelete == null)
+							emailsToDelete = new ArrayList<ElectronicAddress>();
+
+						emailsToDelete.add(uai.getElectronicAddress());
+
+					} else if (typeValue.equalsIgnoreCase(Version1ElectronicAddressType.TEL.getValue())) { // If type is TEL
+
+						if (phonesToDelete == null)
+							phonesToDelete = new ArrayList<ElectronicAddress>();
+
+						phonesToDelete.add(uai.getElectronicAddress());
+
+					} else
+						return "Cannot process ElectronicAddress of type \"" + typeValue + "\". It was found within DeleteUserField.";
+
+				} else if (uai.getPhysicalAddress() != null) {
+					if (physicalAddressToDelete == null)
+						physicalAddressToDelete = uai.getPhysicalAddress();
+					else
+						return "Cannot process more than one PhysicalAddress. It was found within DeleteUserField.";
+				}
+			}
+
+			if (structuredPersonalNameToAdd != null || structuredPersonalNameToDelete != null) {
+
+			}
+
+			if (emailsToAdd != null || emailsToDelete != null) {
+
+			}
+
+			if (phonesToAdd != null || phonesToDelete != null) {
+
+			}
+
+			if (physicalAddressToAdd != null || physicalAddressToDelete != null) {
+
+			}
+
+			// @formatter:off
+			
+			// Build XML POST request with mandatory fields filled in
+			XMLBuilder xmlRequest = XMLBuilder.create(AlephConstants.GET_PAT_ADRS_NODE)
+					.elem(AlephConstants.ADDRESS_INFORMATION_NODE)
+						.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(patronAddress.getZ304address1())
+							.up()
+						.elem(AlephConstants.Z304_DATE_FROM_NODE).text(patronAddress.getZ304dateFrom())
+							.up()
+						.elem(AlephConstants.Z304_DATE_TO_NODE).text(patronAddress.getZ304dateTo());
+
+			
+			
+			
 			// @formatter:on
 
 			String xmlToPost = "post_xml=" + xmlRequest.asString();
@@ -960,7 +1025,7 @@ public class RestDlfConnector extends AlephMediator {
 
 		UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
 
-		unstructuredAddress.setUnstructuredAddressData(localConfig.getAgencyAddress());
+		unstructuredAddress.setUnstructuredAddressData(LocalConfig.getAgencyAddress());
 		unstructuredAddress.setUnstructuredAddressType(Version1UnstructuredAddressType.NEWLINE_DELIMITED_TEXT);
 
 		physicalAddress.setUnstructuredAddress(unstructuredAddress);
@@ -978,7 +1043,7 @@ public class RestDlfConnector extends AlephMediator {
 		List<OrganizationNameInformation> organizationNameInformations = new ArrayList<OrganizationNameInformation>();
 		OrganizationNameInformation organizationNameInfo = new OrganizationNameInformation();
 
-		organizationNameInfo.setOrganizationName(localConfig.getAgencyName());
+		organizationNameInfo.setOrganizationName(LocalConfig.getAgencyName());
 		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;

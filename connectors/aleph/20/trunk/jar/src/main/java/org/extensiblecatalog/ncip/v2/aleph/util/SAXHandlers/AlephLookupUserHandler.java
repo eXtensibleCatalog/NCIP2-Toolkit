@@ -7,7 +7,6 @@ import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
@@ -17,11 +16,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Jiří Kozlovský (MZK)
- *
  */
 public class AlephLookupUserHandler extends DefaultHandler {
-
-	private LocalConfig localConfig;
 
 	private AlephRestDlfUser user;
 	private String address;
@@ -73,9 +69,7 @@ public class AlephLookupUserHandler extends DefaultHandler {
 	 * @param userPrivilegeDesired
 	 * @throws AlephException
 	 */
-	public AlephLookupUserHandler(LookupUserInitiationData initData, LocalConfig localConfig) throws AlephException {
-
-		this.localConfig = localConfig;
+	public AlephLookupUserHandler(LookupUserInitiationData initData) throws AlephException {
 
 		userAddressInformationDesired = initData.getUserAddressInformationDesired();
 		nameInformationDesired = initData.getNameInformationDesired();
@@ -237,7 +231,7 @@ public class AlephLookupUserHandler extends DefaultHandler {
 			user.setCashTypeNote(new String(ch, start, length));
 			noteWithCashParamReached = false;
 		} else if (z305borStatusReached) {
-			user.setBorStatus(new String(ch, start, length), localConfig);
+			user.setBorStatus(new String(ch, start, length));
 			z305borStatusReached = false;
 		} else if (patronOrConsortialblockReached) {
 			BlockOrTrap bot = AlephUtil.parseBlockOrTrap(new String(ch, start, length));

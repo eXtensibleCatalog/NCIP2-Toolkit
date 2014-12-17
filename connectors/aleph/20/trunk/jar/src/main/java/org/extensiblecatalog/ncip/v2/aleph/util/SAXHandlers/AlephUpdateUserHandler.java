@@ -1,15 +1,17 @@
 package org.extensiblecatalog.ncip.v2.aleph.util.SAXHandlers;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
+import org.extensiblecatalog.ncip.v2.aleph.util.AlephPatronAddress;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Jiří Kozlovský (MZK)
- *
  */
 public class AlephUpdateUserHandler extends DefaultHandler {
+
+	private AlephPatronAddress patronAddress;
 
 	private boolean isUpdateable = false;
 
@@ -21,22 +23,27 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 	private boolean z304dateFromReached = false;
 	private boolean z304dateToReached = false;
 
-	// Values of mandatory fields
-	private String z304address1;
-	private String z304dateFrom;
-	private String z304dateTo;
-
 	// Optional Fields
 	private boolean z304address2Reached = false;
 	private boolean z304address3Reached = false;
 	private boolean z304address4Reached = false;
-	private boolean z304emailReached = false;
+	private boolean z304address5Reached = false;
+
 	private boolean z304telephone1Reached = false;
+	private boolean z304telephone2Reached = false;
+	private boolean z304telephone3Reached = false;
+	private boolean z304telephone4Reached = false;
+
+	private boolean z304emailAddressReached = false;
 
 	private boolean replyCodeReached = false;
 	private boolean replyTextReached = false;
 
 	private boolean parsingMandatoryFields;
+
+	public AlephUpdateUserHandler() {
+		patronAddress = new AlephPatronAddress();
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -56,20 +63,29 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 				replyTextReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_2_NODE)) {
 				z304address2Reached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE)) {// Adress
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE)) {
 				z304address3Reached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE)) {// City
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE)) {
 				z304address4Reached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE)) {// E-mails
-				z304emailReached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE)) {// Phone No.
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_5_NODE)) {
+				z304address5Reached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE)) {
 				z304telephone1Reached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_2_NODE)) {
+				z304telephone2Reached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_3_NODE)) {
+				z304telephone3Reached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_4_NODE)) {
+				z304telephone4Reached = true;
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE)) {
+				z304emailAddressReached = true;
 			}
 		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
+		// Set all booleans of type "Reached something" to false in order to prevent bugs caused by empty nodes
 		if (parsingMandatoryFields) {
 			z304address1Reached = false;
 			z304dateFromReached = false;
@@ -81,11 +97,18 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 		} else {
 			replyCodeReached = false;
 			replyTextReached = false;
+			
 			z304address2Reached = false;
 			z304address3Reached = false;
 			z304address4Reached = false;
+			z304address5Reached = false;
+			
 			z304telephone1Reached = false;
-			z304emailReached = false;
+			z304telephone2Reached = false;
+			z304telephone3Reached = false;
+			z304telephone4Reached = false;
+			
+			z304emailAddressReached = false;
 		}
 	}
 
@@ -93,13 +116,13 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (parsingMandatoryFields) {
 			if (z304address1Reached) {
-				z304address1 = new String(ch, start, length);
+				patronAddress.setZ304address1(new String(ch, start, length));
 				z304address1Reached = false;
 			} else if (z304dateFromReached) {
-				z304dateFrom = new String(ch, start, length);
+				patronAddress.setZ304dateFrom(new String(ch, start, length));
 				z304dateFromReached = false;
 			} else if (z304dateToReached) {
-				z304dateTo = new String(ch, start, length);
+				patronAddress.setZ304dateTo(new String(ch, start, length));
 				z304dateToReached = false;
 			}
 		} else {
@@ -113,20 +136,40 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 				replyTextReached = false;
 
 			} else if (z304address2Reached) {
-
+				patronAddress.setZ304address2(new String(ch, start, length));
 				z304address2Reached = false;
-			} else if (z304address3Reached) {// Adress
 
+			} else if (z304address3Reached) {
+				patronAddress.setZ304address3(new String(ch, start, length));
 				z304address3Reached = false;
-			} else if (z304address4Reached) {// City
 
+			} else if (z304address4Reached) {
+				patronAddress.setZ304address4(new String(ch, start, length));
 				z304address4Reached = false;
-			} else if (z304emailReached) {// mail
 
-				z304emailReached = false;
-			} else if (z304telephone1Reached) {// Phone No.
+			} else if (z304address5Reached) {
+				patronAddress.setZ304address5(new String(ch, start, length));
+				z304address5Reached = false;
 
+			} else if (z304telephone1Reached) {
+				patronAddress.setZ304telephone1(new String(ch, start, length));
 				z304telephone1Reached = false;
+
+			} else if (z304telephone2Reached) {
+				patronAddress.setZ304telephone2(new String(ch, start, length));
+				z304telephone2Reached = false;
+
+			} else if (z304telephone3Reached) {
+				patronAddress.setZ304telephone3(new String(ch, start, length));
+				z304telephone3Reached = false;
+
+			} else if (z304telephone4Reached) {
+				patronAddress.setZ304telephone4(new String(ch, start, length));
+				z304telephone4Reached = false;
+
+			} else if (z304emailAddressReached) {
+				patronAddress.setZ304emailAddress(new String(ch, start, length));
+				z304emailAddressReached = false;
 			}
 		}
 	}
@@ -144,16 +187,8 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 		return replyText;
 	}
 
-	public String getZ304address1() {
-		return z304address1;
-	}
-
-	public String getZ304dateFrom() {
-		return z304dateFrom;
-	}
-
-	public String getZ304dateTo() {
-		return z304dateTo;
+	public AlephPatronAddress getPatronAddress() {
+		return patronAddress;
 	}
 
 	public boolean isUpdateable() {
@@ -161,7 +196,7 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 	}
 
 	public boolean parsedAllMandatoryFields() {
-		return !isNullOrEmpty(z304address1) && !isNullOrEmpty(z304dateFrom) && !isNullOrEmpty(z304dateTo);
+		return !isNullOrEmpty(patronAddress.getZ304address1()) && !isNullOrEmpty(patronAddress.getZ304dateFrom()) && !isNullOrEmpty(patronAddress.getZ304dateTo());
 	}
 
 	private boolean isNullOrEmpty(String string) {

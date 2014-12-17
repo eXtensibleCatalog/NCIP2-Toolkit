@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 
 /**
  * This class defines several constants as public static final variables which may be used throughout the NCIP Toolkit
- * 
  */
 public class AlephConstants {
 	// Aleph configuration
@@ -405,8 +404,15 @@ public class AlephConstants {
 	public static final String MAX_ITEM_PREPARATION_TIME_DELAY = "MaxItemPreparationTimeDelay";
 	public static final String NEXT_ITEM_TOKEN_EXPIRATION_TIME = "NextItemTokenExpirationTime";
 
-	public static final String REQUIRE_AT_LEAST_ONE_SERVICE = "RequiredAtLeastOneService";
 	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
+
+	// Toolkit's Mapping Patron -> Address 
+	public static final String PATRON_ADDRESS_MAPPING_NAME = "UserNameStoredIn";
+	public static final String PATRON_ADDRESS_MAPPING_STREET = "UserStreetStoredIn";
+	public static final String PATRON_ADDRESS_MAPPING_POSTAL_CODE = "UserPostalStoredIn";
+	public static final String PATRON_ADDRESS_MAPPING_CITY = "UserCityStoredIn";
+	public static final String PATRON_ADDRESS_MAPPING_PHONE = "UserPhoneStoredIn";
+	public static final String PATRON_ADDRESS_MAPPING_IDENTITY_CARD = "UserIdCardStoredIn";
 
 	public static final char REQUEST_ID_DELIMITER = ';';
 

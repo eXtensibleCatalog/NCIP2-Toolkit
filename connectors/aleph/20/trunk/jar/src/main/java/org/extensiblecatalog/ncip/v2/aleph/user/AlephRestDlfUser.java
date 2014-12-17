@@ -43,7 +43,6 @@ import org.xml.sax.SAXException;
  * A user that exists within Aleph. This is most likely returned by the authenticate or lookup methods within the AlephAPI class
  * 
  * @author rjohns14
- *
  */
 
 public class AlephRestDlfUser implements Serializable {
@@ -516,7 +515,7 @@ public class AlephRestDlfUser implements Serializable {
 		this.userPrivileges = userPrivileges;
 	}
 
-	public void setBorStatus(String string, LocalConfig localConfig) throws SAXException {
+	public void setBorStatus(String string) throws SAXException {
 
 		if (userPrivilege == null)
 			userPrivilege = new UserPrivilege();
@@ -525,7 +524,7 @@ public class AlephRestDlfUser implements Serializable {
 		userPrivilege.setUserPrivilegeDescription(string);
 		userPrivilege.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm",
 				"MZK type"));
-		userPrivilege.setAgencyId(new AgencyId(localConfig.getDefaultAgency()));
+		userPrivilege.setAgencyId(new AgencyId(LocalConfig.getDefaultAgency()));
 
 		if (userPrivilege.getValidFromDate() != null)
 			userPrivileges.add(userPrivilege);

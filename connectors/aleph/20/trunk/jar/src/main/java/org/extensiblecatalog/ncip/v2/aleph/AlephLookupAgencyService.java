@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
@@ -19,7 +20,6 @@ import org.extensiblecatalog.ncip.v2.service.PromptOutput;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationDataFormatType;
@@ -76,8 +76,8 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 				if (responseHeader != null)
 					responseData.setResponseHeader(responseHeader);
 
-				String localAgencyId = alephSvcMgr.getLocalConfig().getDefaultAgency();
-				String registrationLink = alephSvcMgr.getLocalConfig().getUserRegistrationLink();
+				String localAgencyId = LocalConfig.getDefaultAgency();
+				String registrationLink = LocalConfig.getUserRegistrationLink();
 
 				if (getAgencyAddressInformation)
 					responseData.setAgencyAddressInformations(Arrays.asList(alephSvcMgr.getAgencyPhysicalAddressInformation()));
@@ -102,7 +102,7 @@ public class AlephLookupAgencyService implements LookupAgencyService {
 					AuthenticationDataFormatType authenticationDataFormatType;
 
 					String authenticationDataFormatTypeScheme = Version1AuthenticationDataFormatType.VERSION_1_AUTHENTICATION_DATA_FORMAT_TYPE;
-					String authenticationDataFormatTypeValue = alephSvcMgr.getLocalConfig().getAuthDataFormatType();
+					String authenticationDataFormatTypeValue = LocalConfig.getAuthDataFormatType();
 
 					authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
 					promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);

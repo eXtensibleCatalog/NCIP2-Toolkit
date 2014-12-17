@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
-import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -37,7 +36,6 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 	private String bibDocNumber;
 	private String itemSequence;
 	private String itemDocNumber;
-	private LocalConfig localConfig;
 	private boolean itemFullIdFound;
 
 	// Dates
@@ -70,8 +68,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 	private boolean z37requestNumberReached = false;
 
-	public AlephLookupRequestsHandler(LocalConfig localConfig) {
-		this.localConfig = localConfig;
+	public AlephLookupRequestsHandler() {
 		requestedItems = new ArrayList<RequestedItem>();
 	}
 
@@ -131,7 +128,7 @@ public class AlephLookupRequestsHandler extends DefaultHandler {
 
 		if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 			if (itemFullIdFound) {
-				String itemIdVal = AlephUtil.buildAlephItemId(localConfig, bibDocNumber, itemDocNumber, itemSequence);
+				String itemIdVal = AlephUtil.buildAlephItemId(bibDocNumber, itemDocNumber, itemSequence);
 
 				ItemId itemId = new ItemId();
 				itemId.setItemIdentifierValue(itemIdVal);

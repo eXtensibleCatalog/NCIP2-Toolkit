@@ -14,6 +14,7 @@ import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
 import org.extensiblecatalog.ncip.v2.aleph.util.ItemToken;
+import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
@@ -142,7 +143,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 */
 	private void parseBibIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
-		boolean wantSeeAllProblems = alephSvcMgr.getLocalConfig().isEchoParticularProblemsToLUIS();
+		boolean wantSeeAllProblems = LocalConfig.isEchoParticularProblemsToLUIS();
 
 		List<BibliographicId> bibIds = initData.getBibliographicIds();
 
@@ -338,7 +339,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	 */
 	private void parseItemIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, AlephRemoteServiceManager alephSvcMgr, ItemToken nextItemToken) {
 
-		boolean wantSeeAllProblems = alephSvcMgr.getLocalConfig().isEchoParticularProblemsToLUIS();
+		boolean wantSeeAllProblems = LocalConfig.isEchoParticularProblemsToLUIS();
 
 		List<ItemId> itemIds = initData.getItemIds();
 
@@ -454,7 +455,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	}
 
 	/**
-	 * 
 	 * Parses response from requested ItemId (we know for sure there is only one item to parse)
 	 * 
 	 * @param alephItem
@@ -485,7 +485,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 	}
 
 	/**
-	 * 
 	 * Parses response from requested RecordId
 	 * 
 	 * @param alephItems
@@ -541,7 +540,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 
 		if (tokenKey != null && !tokenKey.isEmpty()) {
 
-			AlephUtil.markExpiredTokens(tokens, alephSvcMgr.getLocalConfig().getTokenExpirationTime());
+			AlephUtil.markExpiredTokens(tokens, LocalConfig.getTokenExpirationTime());
 
 			nextItemToken = tokens.get(tokenKey);
 			if (nextItemToken != null && !nextItemToken.isExpired()) {

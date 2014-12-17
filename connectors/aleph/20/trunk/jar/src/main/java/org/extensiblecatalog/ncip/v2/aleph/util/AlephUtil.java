@@ -412,8 +412,8 @@ public class AlephUtil {
 	 * @param itemSequenceNumber
 	 * @return
 	 */
-	public static String buildAlephItemId(LocalConfig localConfig, String documentRecordNumber, String documentItemNumber, String itemSequenceNumber) {
-		String itemId = localConfig.getBibLibrary() + documentRecordNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + localConfig.getAdmLibrary() + documentItemNumber
+	public static String buildAlephItemId(String documentRecordNumber, String documentItemNumber, String itemSequenceNumber) {
+		String itemId = LocalConfig.getBibLibrary() + documentRecordNumber + AlephConstants.UNIQUE_ITEM_ID_SEPARATOR + LocalConfig.getAdmLibrary() + documentItemNumber
 				+ itemSequenceNumber;
 		return itemId;
 	}

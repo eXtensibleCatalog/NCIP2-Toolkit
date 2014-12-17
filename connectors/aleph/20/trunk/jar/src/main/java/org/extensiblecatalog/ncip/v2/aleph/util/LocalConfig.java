@@ -1,50 +1,51 @@
 package org.extensiblecatalog.ncip.v2.aleph.util;
 
-import org.extensiblecatalog.ncip.v2.service.ServiceError;
-import org.extensiblecatalog.ncip.v2.service.ServiceException;
-
 public class LocalConfig {
 
-	private boolean echoParticularProblemsToLUIS;
+	private static boolean echoParticularProblemsToLUIS;
 
-	private String defaultAgency;
-	private String agencyAddress;
-	private String agencyName;
-	private String NCIPVersion;
-	private String userRegistrationLink;
-	private String authDataFormatType;
+	private static String defaultAgency;
+	private static String agencyAddress;
+	private static String agencyName;
+	private static String NCIPVersion;
+	private static String userRegistrationLink;
+	private static String authDataFormatType;
 
-	private String serverName;
-	private String serverPort;
-	private String serverSuffix;
-	private String bibLibrary;
-	private String admLibrary;
+	private static String serverName;
+	private static String serverPort;
+	private static String serverSuffix;
+	private static String bibLibrary;
+	private static String admLibrary;
 
-	// Aleph API's patron -> address configuration
-	private String z304address1;
-	private String z304address2;
-	private String z304address3;
-	private String z304address4;
+	// Aleph API's patron -> address mapping
+	private static String z304address1formatting;
+	private static String z304address2formatting;
+	private static String z304address3formatting;
+	private static String z304address4formatting;
 
-	private String z304telephone1;
-	private String z304telephone2;
-	private String z304telephone3;
-	private String z304telephone4;
+	private static String z304telephone1formatting;
+	private static String z304telephone2formatting;
+	private static String z304telephone3formatting;
+	private static String z304telephone4formatting;
 
-	private int maxItemPreparationTimeDelay;
+	private static String userNameStoredIn;
+	private static String userStreetStoredIn;
+	private static String userPostalStoredIn;
+	private static String userCityStoredIn;
 
-	private int tokenExpirationTime;
+	private static String userPhoneStoredIn;
+	private static String userIdCardStoredIn;
 
-	private int bibLibraryLength;
+	private static int maxItemPreparationTimeDelay = 0;
 
-	public LocalConfig() {
-		maxItemPreparationTimeDelay = 0;
-	}
+	private static int tokenExpirationTime;
+
+	private static int bibLibraryLength;
 
 	/**
 	 * @return the echoParticularProblemsToLUIS
 	 */
-	public boolean isEchoParticularProblemsToLUIS() {
+	public static boolean isEchoParticularProblemsToLUIS() {
 		return echoParticularProblemsToLUIS;
 	}
 
@@ -52,14 +53,14 @@ public class LocalConfig {
 	 * @param echoParticularProblemsToLUIS
 	 *            the echoParticularProblemsToLUIS to set
 	 */
-	public void setEchoParticularProblemsToLUIS(boolean echoParticularProblemsToLUIS) {
-		this.echoParticularProblemsToLUIS = echoParticularProblemsToLUIS;
+	public static void setEchoParticularProblemsToLUIS(boolean echoParticularProblemsToLUIS) {
+		LocalConfig.echoParticularProblemsToLUIS = echoParticularProblemsToLUIS;
 	}
 
 	/**
 	 * @return the defaultAgency
 	 */
-	public String getDefaultAgency() {
+	public static String getDefaultAgency() {
 		return defaultAgency;
 	}
 
@@ -67,14 +68,14 @@ public class LocalConfig {
 	 * @param defaultAgency
 	 *            the defaultAgency to set
 	 */
-	public void setDefaultAgency(String defaultAgency) {
-		this.defaultAgency = defaultAgency;
+	public static void setDefaultAgency(String defaultAgency) {
+		LocalConfig.defaultAgency = defaultAgency;
 	}
 
 	/**
 	 * @return the agencyAddress
 	 */
-	public String getAgencyAddress() {
+	public static String getAgencyAddress() {
 		return agencyAddress;
 	}
 
@@ -82,14 +83,14 @@ public class LocalConfig {
 	 * @param agencyAddress
 	 *            the agencyAddress to set
 	 */
-	public void setAgencyAddress(String agencyAddress) {
-		this.agencyAddress = agencyAddress;
+	public static void setAgencyAddress(String agencyAddress) {
+		LocalConfig.agencyAddress = agencyAddress;
 	}
 
 	/**
 	 * @return the agencyName
 	 */
-	public String getAgencyName() {
+	public static String getAgencyName() {
 		return agencyName;
 	}
 
@@ -97,14 +98,14 @@ public class LocalConfig {
 	 * @param agencyName
 	 *            the agencyName to set
 	 */
-	public void setAgencyName(String agencyName) {
-		this.agencyName = agencyName;
+	public static void setAgencyName(String agencyName) {
+		LocalConfig.agencyName = agencyName;
 	}
 
 	/**
 	 * @return the nCIPVersion
 	 */
-	public String getNCIPVersion() {
+	public static String getNCIPVersion() {
 		return NCIPVersion;
 	}
 
@@ -112,14 +113,14 @@ public class LocalConfig {
 	 * @param nCIPVersion
 	 *            the nCIPVersion to set
 	 */
-	public void setNCIPVersion(String nCIPVersion) {
+	public static void setNCIPVersion(String nCIPVersion) {
 		NCIPVersion = nCIPVersion;
 	}
 
 	/**
 	 * @return the userRegistrationLink
 	 */
-	public String getUserRegistrationLink() {
+	public static String getUserRegistrationLink() {
 		return userRegistrationLink;
 	}
 
@@ -127,14 +128,14 @@ public class LocalConfig {
 	 * @param userRegistrationLink
 	 *            the userRegistrationLink to set
 	 */
-	public void setUserRegistrationLink(String userRegistrationLink) {
-		this.userRegistrationLink = userRegistrationLink;
+	public static void setUserRegistrationLink(String userRegistrationLink) {
+		LocalConfig.userRegistrationLink = userRegistrationLink;
 	}
 
 	/**
 	 * @return the authDataFormatType
 	 */
-	public String getAuthDataFormatType() {
+	public static String getAuthDataFormatType() {
 		return authDataFormatType;
 	}
 
@@ -142,32 +143,29 @@ public class LocalConfig {
 	 * @param authDataFormatType
 	 *            the authDataFormatType to set
 	 */
-	public void setAuthDataFormatType(String authDataFormatType) {
-		this.authDataFormatType = authDataFormatType;
+	public static void setAuthDataFormatType(String authDataFormatType) {
+		LocalConfig.authDataFormatType = authDataFormatType;
 	}
 
 	/**
 	 * @return the serverName
 	 */
-	public String getServerName() {
+	public static String getServerName() {
 		return serverName;
 	}
 
 	/**
 	 * @param serverName
 	 *            the serverName to set
-	 * @throws ServiceException
 	 */
-	public void setServerName(String serverName) throws ServiceException {
-		if (serverName == null || serverName.isEmpty())
-			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Server name is not set. Can be set up in toolkit.properties");
-		this.serverName = serverName;
+	public static void setServerName(String serverName) {
+		LocalConfig.serverName = serverName;
 	}
 
 	/**
 	 * @return the serverPort
 	 */
-	public String getServerPort() {
+	public static String getServerPort() {
 		return serverPort;
 	}
 
@@ -175,16 +173,14 @@ public class LocalConfig {
 	 * @param serverPort
 	 *            the serverPort to set
 	 */
-	public void setServerPort(String serverPort) throws ServiceException {
-		if (serverPort == null || serverPort.isEmpty())
-			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Server port is not set. Can be set up in toolkit.properties");
-		this.serverPort = serverPort;
+	public static void setServerPort(String serverPort) {
+		LocalConfig.serverPort = serverPort;
 	}
 
 	/**
 	 * @return the serverSuffix
 	 */
-	public String getServerSuffix() {
+	public static String getServerSuffix() {
 		return serverSuffix;
 	}
 
@@ -192,14 +188,14 @@ public class LocalConfig {
 	 * @param serverSuffix
 	 *            the serverSuffix to set
 	 */
-	public void setServerSuffix(String serverSuffix) {
-		this.serverSuffix = serverSuffix;
+	public static void setServerSuffix(String serverSuffix) {
+		LocalConfig.serverSuffix = serverSuffix;
 	}
 
 	/**
 	 * @return the bibLibrary
 	 */
-	public String getBibLibrary() {
+	public static String getBibLibrary() {
 		return bibLibrary;
 	}
 
@@ -207,15 +203,15 @@ public class LocalConfig {
 	 * @param bibLibrary
 	 *            the bibLibrary to set
 	 */
-	public void setBibLibrary(String bibLibrary) {
-		bibLibraryLength = bibLibrary.length();
-		this.bibLibrary = bibLibrary;
+	public static void setBibLibrary(String bibLibrary) {
+		LocalConfig.bibLibraryLength = bibLibrary.length();
+		LocalConfig.bibLibrary = bibLibrary;
 	}
 
 	/**
 	 * @return the admLibrary
 	 */
-	public String getAdmLibrary() {
+	public static String getAdmLibrary() {
 		return admLibrary;
 	}
 
@@ -223,130 +219,224 @@ public class LocalConfig {
 	 * @param admLibrary
 	 *            the admLibrary to set
 	 */
-	public void setAdmLibrary(String admLibrary) {
-		this.admLibrary = admLibrary;
-	}
-
-
-	/**
-	 * @return the z304address1
-	 */
-	public String getZ304address1() {
-		return z304address1;
+	public static void setAdmLibrary(String admLibrary) {
+		LocalConfig.admLibrary = admLibrary;
 	}
 
 	/**
-	 * @param z304address1 the z304address1 to set
+	 * @return the z304address1formatting
 	 */
-	public void setZ304address1(String z304address1) {
-		this.z304address1 = z304address1;
+	public static String getZ304address1formatting() {
+		return z304address1formatting;
 	}
 
 	/**
-	 * @return the z304address2
+	 * @param z304address1formatting
+	 *            the z304address1formatting to set
 	 */
-	public String getZ304address2() {
-		return z304address2;
+	public static void setZ304address1formatting(String z304address1formatting) {
+		LocalConfig.z304address1formatting = z304address1formatting;
 	}
 
 	/**
-	 * @param z304address2 the z304address2 to set
+	 * @return the z304address2formatting
 	 */
-	public void setZ304address2(String z304address2) {
-		this.z304address2 = z304address2;
+	public static String getZ304address2formatting() {
+		return z304address2formatting;
 	}
 
 	/**
-	 * @return the z304address3
+	 * @param z304address2formatting
+	 *            the z304address2formatting to set
 	 */
-	public String getZ304address3() {
-		return z304address3;
+	public static void setZ304address2formatting(String z304address2formatting) {
+		LocalConfig.z304address2formatting = z304address2formatting;
 	}
 
 	/**
-	 * @param z304address3 the z304address3 to set
+	 * @return the z304address3formatting
 	 */
-	public void setZ304address3(String z304address3) {
-		this.z304address3 = z304address3;
+	public static String getZ304address3formatting() {
+		return z304address3formatting;
 	}
 
 	/**
-	 * @return the z304address4
+	 * @param z304address3formatting
+	 *            the z304address3formatting to set
 	 */
-	public String getZ304address4() {
-		return z304address4;
+	public static void setZ304address3formatting(String z304address3formatting) {
+		LocalConfig.z304address3formatting = z304address3formatting;
 	}
 
 	/**
-	 * @param z304address4 the z304address4 to set
+	 * @return the z304address4formatting
 	 */
-	public void setZ304address4(String z304address4) {
-		this.z304address4 = z304address4;
+	public static String getZ304address4formatting() {
+		return z304address4formatting;
 	}
 
 	/**
-	 * @return the z304telephone1
+	 * @param z304address4formatting
+	 *            the z304address4formatting to set
 	 */
-	public String getZ304telephone1() {
-		return z304telephone1;
+	public static void setZ304address4formatting(String z304address4formatting) {
+		LocalConfig.z304address4formatting = z304address4formatting;
 	}
 
 	/**
-	 * @param z304telephone1 the z304telephone1 to set
+	 * @return the z304telephone1formatting
 	 */
-	public void setZ304telephone1(String z304telephone1) {
-		this.z304telephone1 = z304telephone1;
+	public static String getZ304telephone1formatting() {
+		return z304telephone1formatting;
 	}
 
 	/**
-	 * @return the z304telephone2
+	 * @param z304telephone1formatting
+	 *            the z304telephone1formatting to set
 	 */
-	public String getZ304telephone2() {
-		return z304telephone2;
+	public static void setZ304telephone1formatting(String z304telephone1formatting) {
+		LocalConfig.z304telephone1formatting = z304telephone1formatting;
 	}
 
 	/**
-	 * @param z304telephone2 the z304telephone2 to set
+	 * @return the z304telephone2formatting
 	 */
-	public void setZ304telephone2(String z304telephone2) {
-		this.z304telephone2 = z304telephone2;
+	public static String getZ304telephone2formatting() {
+		return z304telephone2formatting;
 	}
 
 	/**
-	 * @return the z304telephone3
+	 * @param z304telephone2formatting
+	 *            the z304telephone2formatting to set
 	 */
-	public String getZ304telephone3() {
-		return z304telephone3;
+	public static void setZ304telephone2formatting(String z304telephone2formatting) {
+		LocalConfig.z304telephone2formatting = z304telephone2formatting;
 	}
 
 	/**
-	 * @param z304telephone3 the z304telephone3 to set
+	 * @return the z304telephone3formatting
 	 */
-	public void setZ304telephone3(String z304telephone3) {
-		this.z304telephone3 = z304telephone3;
+	public static String getZ304telephone3formatting() {
+		return z304telephone3formatting;
 	}
 
 	/**
-	 * @return the z304telephone4
+	 * @param z304telephone3formatting
+	 *            the z304telephone3formatting to set
 	 */
-	public String getZ304telephone4() {
-		return z304telephone4;
+	public static void setZ304telephone3formatting(String z304telephone3formatting) {
+		LocalConfig.z304telephone3formatting = z304telephone3formatting;
 	}
 
 	/**
-	 * @param z304telephone4 the z304telephone4 to set
+	 * @return the z304telephone4formatting
 	 */
-	public void setZ304telephone4(String z304telephone4) {
-		this.z304telephone4 = z304telephone4;
+	public static String getZ304telephone4formatting() {
+		return z304telephone4formatting;
 	}
 
-	public int getBibLibraryLength() {
-		return bibLibraryLength;
+	/**
+	 * @param z304telephone4formatting
+	 *            the z304telephone4formatting to set
+	 */
+	public static void setZ304telephone4formatting(String z304telephone4formatting) {
+		LocalConfig.z304telephone4formatting = z304telephone4formatting;
 	}
+
+	/**
+	 * @return the userNameStoredIn
+	 */
+	public static String getUserNameStoredIn() {
+		return userNameStoredIn;
+	}
+
+	/**
+	 * @param userNameStoredIn
+	 *            the userNameStoredIn to set
+	 */
+	public static void setUserNameStoredIn(String userNameStoredIn) {
+		LocalConfig.userNameStoredIn = userNameStoredIn;
+	}
+
+	/**
+	 * @return the userStreetStoredIn
+	 */
+	public static String getUserStreetStoredIn() {
+		return userStreetStoredIn;
+	}
+
+	/**
+	 * @param userStreetStoredIn
+	 *            the userStreetStoredIn to set
+	 */
+	public static void setUserStreetStoredIn(String userStreetStoredIn) {
+		LocalConfig.userStreetStoredIn = userStreetStoredIn;
+	}
+
+	/**
+	 * @return the userPostalStoredIn
+	 */
+	public static String getUserPostalStoredIn() {
+		return userPostalStoredIn;
+	}
+
+	/**
+	 * @param userPostalStoredIn
+	 *            the userPostalStoredIn to set
+	 */
+	public static void setUserPostalStoredIn(String userPostalStoredIn) {
+		LocalConfig.userPostalStoredIn = userPostalStoredIn;
+	}
+
+	/**
+	 * @return the userCityStoredIn
+	 */
+	public static String getUserCityStoredIn() {
+		return userCityStoredIn;
+	}
+
+	/**
+	 * @param userCityStoredIn
+	 *            the userCityStoredIn to set
+	 */
+	public static void setUserCityStoredIn(String userCityStoredIn) {
+		LocalConfig.userCityStoredIn = userCityStoredIn;
+	}
+
+	/**
+	 * @return the userPhoneStoredIn
+	 */
+	public static String getUserPhoneStoredIn() {
+		return userPhoneStoredIn;
+	}
+
+	/**
+	 * @param userPhoneStoredIn
+	 *            the userPhoneStoredIn to set
+	 */
+	public static void setUserPhoneStoredIn(String userPhoneStoredIn) {
+		LocalConfig.userPhoneStoredIn = userPhoneStoredIn;
+	}
+
+	/**
+	 * @return the userIdCardStoredIn
+	 */
+	public static String getUserIdCardStoredIn() {
+		return userIdCardStoredIn;
+	}
+
+	/**
+	 * @param userIdCardStoredIn
+	 *            the userIdCardStoredIn to set
+	 */
+	public static void setUserIdCardStoredIn(String userIdCardStoredIn) {
+		LocalConfig.userIdCardStoredIn = userIdCardStoredIn;
+	}
+
 	/**
 	 * @return the maxItemPreparationTimeDelay
 	 */
-	public int getMaxItemPreparationTimeDelay() {
+	public static int getMaxItemPreparationTimeDelay() {
 		return maxItemPreparationTimeDelay;
 	}
 
@@ -354,16 +444,30 @@ public class LocalConfig {
 	 * @param maxItemPreparationTimeDelay
 	 *            the maxItemPreparationTimeDelay to set
 	 */
-	public void setMaxItemPreparationTimeDelay(int maxItemPreparationTimeDelay) {
-		this.maxItemPreparationTimeDelay = maxItemPreparationTimeDelay;
+	public static void setMaxItemPreparationTimeDelay(int maxItemPreparationTimeDelay) {
+		LocalConfig.maxItemPreparationTimeDelay = maxItemPreparationTimeDelay;
 	}
 
-	public int getTokenExpirationTime() {
+	/**
+	 * @return the tokenExpirationTime
+	 */
+	public static int getTokenExpirationTime() {
 		return tokenExpirationTime;
 	}
 
-	public void setTokenExpirationTime(int tokenExpirationTime) {
-		this.tokenExpirationTime = tokenExpirationTime;
+	/**
+	 * @param tokenExpirationTime
+	 *            the tokenExpirationTime to set
+	 */
+	public static void setTokenExpirationTime(int tokenExpirationTime) {
+		LocalConfig.tokenExpirationTime = tokenExpirationTime;
+	}
+
+	/**
+	 * @return the bibLibraryLength
+	 */
+	public static int getBibLibraryLength() {
+		return bibLibraryLength;
 	}
 
 }

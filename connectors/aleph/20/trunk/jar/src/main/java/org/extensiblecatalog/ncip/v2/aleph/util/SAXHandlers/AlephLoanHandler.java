@@ -20,11 +20,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Jiří Kozlovský (MZK)
- *
  */
 public class AlephLoanHandler extends DefaultHandler {
-
-	private LocalConfig localConfig;
 
 	private List<LoanedItem> loanedItems;
 	private LoanedItem currentLoanedItem;
@@ -64,8 +61,7 @@ public class AlephLoanHandler extends DefaultHandler {
 	/**
 	 * This initializes SAX parser for parsing loans.
 	 */
-	public AlephLoanHandler(LocalConfig localConfig) {
-		this.localConfig = localConfig;
+	public AlephLoanHandler() {
 		loanedItems = new ArrayList<LoanedItem>();
 	}
 
@@ -114,7 +110,7 @@ public class AlephLoanHandler extends DefaultHandler {
 		if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 			if (itemFullIdFound) {
 				// Create unique bibliographic item id from bibLibrary, bibDocNo, admLibrary, itemDocNo & itemSequence
-				String bibliographicItemIdentifier = AlephUtil.buildAlephItemId(localConfig, bibDocNumber, itemDocNumber, itemSequenceNumber);
+				String bibliographicItemIdentifier = AlephUtil.buildAlephItemId(bibDocNumber, itemDocNumber, itemSequenceNumber);
 
 				BibliographicItemId bibliographicItemId = AlephUtil.createBibliographicItemIdAsURI(bibliographicItemIdentifier);
 
@@ -125,7 +121,7 @@ public class AlephLoanHandler extends DefaultHandler {
 
 			if (renewable && loanNumber != null) {
 				// Loan number is needed to apply RenewItemService
-				itemId.setItemIdentifierValue(localConfig.getAdmLibrary() + loanNumber);
+				itemId.setItemIdentifierValue(LocalConfig.getAdmLibrary() + loanNumber);
 			} else {
 				// This will be significant for loaned items marked as not renewable
 				itemId.setItemIdentifierValue("-1");
