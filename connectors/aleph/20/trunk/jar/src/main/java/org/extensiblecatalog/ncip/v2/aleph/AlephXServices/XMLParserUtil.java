@@ -65,7 +65,7 @@ public class XMLParserUtil implements Serializable{
 	public static String getValueFromMarcField(Node marcField, String subfieldAttributeName, String subfieldAttributeValue, char delimiter){
 		String value = null;
 		boolean first = true;
-		if (subfieldAttributeName==null) subfieldAttributeName = AlephConstants.LABEL_ATTRIBUTE;
+		if (subfieldAttributeName==null) subfieldAttributeName = AlephConstants.LABEL_NODE_ATTRIBUTE;
 		if (marcField.hasChildNodes()){
 			NodeList subFields = marcField.getChildNodes();
 			if (subFields.getLength()>0){

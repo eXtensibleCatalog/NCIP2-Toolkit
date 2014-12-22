@@ -32,13 +32,13 @@ public class AlephDoRequestHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
 
-			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTRIBUTE);
 			if (link != null && link.contains(itemIdToLookFor)) {
 				holdRequestFound = true;
 
 				this.link = link;
 
-				String deleteAttr = attributes.getValue(AlephConstants.DELETE_NODE_ATTR);
+				String deleteAttr = attributes.getValue(AlephConstants.DELETE_NODE_ATTRIBUTE);
 				if (deleteAttr.equalsIgnoreCase(AlephConstants.YES)) {
 					deletable = true;
 				} else

@@ -93,7 +93,7 @@ public class AlephLookupUserHandler extends DefaultHandler {
 					z304address3Reached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE)) {// City
 					z304address4Reached = true;
-				} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE)) {// E-mails
+				} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_ADDRESS_NODE)) {// E-mails
 					z304emailReached = true;
 				} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE)) {// Phone No.
 					z304telephone1Reached = true;
@@ -101,7 +101,7 @@ public class AlephLookupUserHandler extends DefaultHandler {
 			}
 		} else if (parsingCirculations) {
 			if (qName.equalsIgnoreCase(AlephConstants.NOTE_NODE)) {
-				String type = attributes.getValue(AlephConstants.TYPE_NODE_ATTR);
+				String type = attributes.getValue(AlephConstants.TYPE_NODE_ATTRIBUTE);
 
 				if (type != null && type.equalsIgnoreCase(AlephConstants.PARAM_CASH))
 					noteWithCashParamReached = true;

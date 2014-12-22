@@ -45,7 +45,7 @@ public class AlephURLsHandler extends DefaultHandler {
 		if (qName.equalsIgnoreCase(AlephConstants.ITEM_NODE)) {
 			++atLinkIndex;
 			if (!parsedMax && atLinkIndex >= fromIndex) {
-				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTRIBUTE);
 				if (link != null && !link.isEmpty()) {
 					links.add(link);
 					parsedMax = maxLinks == links.size();

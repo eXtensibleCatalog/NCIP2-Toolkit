@@ -56,13 +56,13 @@ public class AlephRenewHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (qName.equalsIgnoreCase(AlephConstants.LOAN_ITEM_NODE)) {
 
-			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+			String link = attributes.getValue(AlephConstants.HREF_NODE_ATTRIBUTE);
 
 			if (link != null && link.contains(itemIdToLookFor)) {
 				loanLink = link;
 				loanFound = true;
 
-				String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
+				String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTRIBUTE);
 
 				if (renewAttr != null && renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
 					renewable = true;

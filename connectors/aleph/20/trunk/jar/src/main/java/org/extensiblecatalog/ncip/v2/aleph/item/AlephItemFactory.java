@@ -554,7 +554,7 @@ public class AlephItemFactory implements Serializable{
 					Node varfield = varfields.item(i);
 					if (varfield!=null&&varfield.hasAttributes()){
 						NamedNodeMap varAtt = varfield.getAttributes();
-						Node id = varAtt.getNamedItem(AlephConstants.ID_NODE_ATTR);
+						Node id = varAtt.getNamedItem(AlephConstants.ID_NODE_ATTRIBUTE);
 						if (id!=null){
 							if (AlephConstants.AUTHOR_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
 								String author = XMLParserUtil.getValueFromMarcField(varfield);
@@ -566,8 +566,8 @@ public class AlephItemFactory implements Serializable{
 								String title = XMLParserUtil.getValueFromMarcField(varfield);
 								if (title!=null) item.setTitle(title);
 							} else if (AlephConstants.CALL_NUMBER_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String callNumber1 = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL1_ATTR_VALUE);
-								String callNumber2 = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL2_ATTR_VALUE);
+								String callNumber1 = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_NODE_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL1_ATTR_VALUE);
+								String callNumber2 = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_NODE_ATTRIBUTE,AlephConstants.CALL_NUMBER_LABEL2_ATTR_VALUE);
 								if (callNumber1!=null&&callNumber2==null){
 									item.setCallNumber(callNumber1);
 								} else if (callNumber1==null&&callNumber2!=null){
@@ -590,10 +590,10 @@ public class AlephItemFactory implements Serializable{
 									}
 								}
 							} else if (AlephConstants.Z30_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String location = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.LOCATION_LABEL_ATTR_VALUE);
+								String location = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_NODE_ATTRIBUTE,AlephConstants.LOCATION_LABEL_ATTR_VALUE);
 								if (location!=null) item.setLocation(location);
 								//set medium type
-								String medium = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.MEDIUM_LABEL_ATTR_VALUE);
+								String medium = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_NODE_ATTRIBUTE,AlephConstants.MEDIUM_LABEL_ATTR_VALUE);
 								if (medium!=null) item.setMediumType(AlephUtil.detectMediumType(medium));
 							} else if (AlephConstants.SERIES_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
 								String series = XMLParserUtil.getValueFromMarcField(varfield);
@@ -602,7 +602,7 @@ public class AlephItemFactory implements Serializable{
 								String eresource = XMLParserUtil.getValueFromMarcField(varfield, ',');
 								if (eresource!=null) item.setElectronicResource(eresource);
 							} else if (AlephConstants.BIB_ID_NODE_ID.equalsIgnoreCase(id.getNodeValue())){
-								String bib_id = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_ATTRIBUTE,AlephConstants.BIB_ID_NODE_ATTR_VALUE);
+								String bib_id = XMLParserUtil.getValueFromMarcField(varfield,AlephConstants.LABEL_NODE_ATTRIBUTE,AlephConstants.BIB_ID_NODE_ATTR_VALUE);
 								if (bib_id!=null) item.setBibId(bib_id);
 							}
 						}

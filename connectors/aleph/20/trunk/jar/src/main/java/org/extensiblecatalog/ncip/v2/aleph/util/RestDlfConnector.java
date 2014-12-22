@@ -866,13 +866,18 @@ public class RestDlfConnector extends AlephMediator {
 			streamSource = new InputSource(addressLink.openStream());
 			parser.parse(streamSource, updateUserHandler);
 
-			AlephPatronAddress parsedPatronAddress = updateUserHandler.getPatronAddress();
+			AlephPatronAddress patronAddressParsed = updateUserHandler.getPatronAddress();
 
 			AddUserFields addUserFields = initData.getAddUserFields();
 
 			List<ElectronicAddress> emailsToAdd = null;
 			List<ElectronicAddress> phonesToAdd = null;
 			PhysicalAddress physicalAddressToAdd = null;
+
+			String nodeUserPhoneStoredIn = LocalConfig.getNodeUserPhoneStoredIn();
+			String nodeUserStreetStoredIn = LocalConfig.getNodeUserStreetStoredIn();
+			String nodeUserPostalAndCityStoredIn = LocalConfig.getNodeUserPostalAndCityStoredIn();
+			String nodeUserEmailStoredIn = AlephConstants.Z304_EMAIL_ADDRESS_NODE;
 
 			if (addUserFields != null) {
 
@@ -966,7 +971,7 @@ public class RestDlfConnector extends AlephMediator {
 			// Process Emails Deletion / Addition
 			if (emailsToAdd != null || emailsToDelete != null) {
 
-				String parsedEmails = parsedPatronAddress.getZ304emailAddress();
+				String parsedEmails = patronAddressParsed.getZ304emailAddress();
 
 				if (parsedEmails != null) {
 					String[] parsedEmailsArray = StringUtils.trimArrayElements(parsedEmails.split(AlephConstants.PATRON_ADDRESS_DELIMITER));
@@ -999,7 +1004,7 @@ public class RestDlfConnector extends AlephMediator {
 			// Process Phones Deletion / Addition
 			if (phonesToAdd != null || phonesToDelete != null) {
 
-				String parsedPhones = parsedPatronAddress.get(LocalConfig.getNodeUserPhoneStoredIn());
+				String parsedPhones = patronAddressParsed.get(nodeUserPhoneStoredIn);
 
 				if (parsedPhones != null) {
 					String[] parsedPhonesArray = StringUtils.trimArrayElements(parsedPhones.split(AlephConstants.PATRON_ADDRESS_DELIMITER));
@@ -1029,19 +1034,18 @@ public class RestDlfConnector extends AlephMediator {
 			// Process PhysicalAddress Deletion / Addition
 			if (physicalAddressToAdd != null || physicalAddressToDelete != null) {
 
-				street = parsedPatronAddress.get(LocalConfig.getNodeUserStreetStoredIn());
+				street = patronAddressParsed.get(nodeUserStreetStoredIn);
 
-				postalCodeAndCity = parsedPatronAddress.get(LocalConfig.getNodeUserPostalAndCityStoredIn());
+				postalCodeAndCity = patronAddressParsed.get(nodeUserPostalAndCityStoredIn);
 
 				String newPostal = null;
 				String newCity = null;
 
-				boolean postalDeleted = false;
-				boolean cityDeleted = false;
-
+				boolean streetDeletionDesired = false;
 				boolean postalDeletionDesired = false;
 				boolean cityDeletionDesired = false;
 
+				boolean streetAdditionDesired = false;
 				boolean postalAdditionDesired = false;
 				boolean cityAdditionDesired = false;
 
@@ -1054,12 +1058,18 @@ public class RestDlfConnector extends AlephMediator {
 
 						if (streetToDelete != null) {
 
-							if (streetToDelete.isEmpty())
+							if (!streetToDelete.isEmpty())
+								streetDeletionDesired = true;
+							else
 								return "You have specified empty Street in DeleteUserFields.";
 
-							street.replace(streetToDelete, "");
+							street = street.replace(streetToDelete, "");
 
-							street.trim();
+							street = street.trim();
+
+							if (!street.isEmpty()) {
+								return "Street you have specified to delete could not be deleted. Please check it matches the street you have assigned now.";
+							}
 						}
 					}
 
@@ -1077,10 +1087,14 @@ public class RestDlfConnector extends AlephMediator {
 							// Save the length of current state
 							int postalCodeAndCityLength = postalCodeAndCity.length();
 
-							postalCodeAndCity.replace(cityToDelete, "");
+							postalCodeAndCity = postalCodeAndCity.replace(cityToDelete, "");
 
 							// Was it deleted?
-							cityDeleted = postalCodeAndCity.length() == postalCodeAndCityLength - cityToDelete.length();
+							boolean cityDeleted = postalCodeAndCity.length() == postalCodeAndCityLength - cityToDelete.length();
+
+							if (!cityDeleted) {
+								return "City you have specified to delete could not be deleted. Please check it matches the city you have assigned now.";
+							}
 						}
 
 						String postalToDelete = physicalAddressToDelete.getStructuredAddress().getPostalCode();
@@ -1095,13 +1109,17 @@ public class RestDlfConnector extends AlephMediator {
 							// Save the length of current state
 							int postalCodeAndCityLength = postalCodeAndCity.length();
 
-							postalCodeAndCity.replace(postalToDelete, "");
+							postalCodeAndCity = postalCodeAndCity.replace(postalToDelete, "");
 
 							// Was it deleted?
-							postalDeleted = postalCodeAndCity.length() == postalCodeAndCityLength - postalToDelete.length();
+							boolean postalDeleted = postalCodeAndCity.length() == postalCodeAndCityLength - postalToDelete.length();
+
+							if (!postalDeleted) {
+								return "Postal Code you have specified to delete could not be deleted. Please check it matches the postal you have assigned now.";
+							}
 						}
 
-						postalCodeAndCity.trim();
+						postalCodeAndCity = postalCodeAndCity.trim();
 					}
 				}
 
@@ -1109,14 +1127,17 @@ public class RestDlfConnector extends AlephMediator {
 				if (physicalAddressToAdd != null && physicalAddressToAdd.getStructuredAddress() != null) {
 					String streetToAdd = physicalAddressToAdd.getStructuredAddress().getStreet();
 					if (streetToAdd != null) {
-						if (street != null || !street.isEmpty())
-							return "Cannot rewrite not empty street. First delete it using DeleteUserFields to submit you want this.";
-						else {
-							if (!streetToAdd.isEmpty())
+						if (!streetToAdd.isEmpty()) {
+							streetAdditionDesired = true;
+
+							// Do not allow Adding a street if not deleted recently for security reasons
+							if (streetDeletionDesired) {
 								street = streetToAdd;
-							else
-								return "You have specified empty Street in AddUserFields.";
-						}
+							} else
+								return "You have to first delete Street before adding another.";
+						} else
+							return "You have specified empty Street in AddUserFields.";
+
 					}
 
 					String postalCodeToAdd = physicalAddressToAdd.getStructuredAddress().getPostalCode();
@@ -1124,6 +1145,7 @@ public class RestDlfConnector extends AlephMediator {
 						if (!postalCodeToAdd.isEmpty()) {
 							postalAdditionDesired = true;
 
+							// Do not allow Adding a postal if not deleted recently for security reasons
 							if (postalDeletionDesired) {
 								newPostal = postalCodeToAdd;
 							} else
@@ -1137,6 +1159,7 @@ public class RestDlfConnector extends AlephMediator {
 						if (!cityToAdd.isEmpty()) {
 							cityAdditionDesired = true;
 
+							// Do not allow Adding a city if not deleted recently for security reasons
 							if (cityDeletionDesired) {
 								newCity = cityToAdd;
 							} else
@@ -1145,22 +1168,27 @@ public class RestDlfConnector extends AlephMediator {
 							return "You have specified empty City in AddUserFields.";
 					}
 
+					// Do not allow Deleting a street if not deleted recently for security reasons
+					if (streetDeletionDesired && !streetAdditionDesired)
+						return "You have to specify Street to be replaced after desired Street deletion is done.";
+
+					// Do not allow Deleting a city if not deleted recently for security reasons
+					if (cityDeletionDesired && !cityAdditionDesired)
+						return "You have to specify City to be replaced after desired City deletion is done.";
+
+					// Do not allow Deleting a postal if not deleted recently for security reasons
+					if (postalDeletionDesired && !postalAdditionDesired)
+						return "You have to specify PostalCode to be replaced after desired PostalCode deletion is done.";
+
+					// Handle joining city & postal into one String
+					if (cityAdditionDesired && postalAdditionDesired) {
+						postalCodeAndCity = newPostal + " " + newCity;
+					} else if (cityAdditionDesired) {
+						postalCodeAndCity += " " + newCity;
+					} else {
+						postalCodeAndCity = newPostal + " " + postalCodeAndCity;
+					}
 				}
-
-				if (cityDeletionDesired && !cityAdditionDesired)
-					return "You have to specify City to be replaced after desired City deletion is done.";
-
-				if (postalDeletionDesired && !postalAdditionDesired)
-					return "You have to specify PostalCode to be replaced after desired PostalCode deletion is done.";
-
-				if (cityAdditionDesired && postalAdditionDesired) {
-					postalCodeAndCity = newPostal + " " + newCity;
-				} else if (cityAdditionDesired) {
-					postalCodeAndCity += " " + newCity;
-				} else {
-					postalCodeAndCity = newPostal + " " + postalCodeAndCity;
-				}
-				// TODO: Debug this (where comment "Process PhysicalAddress Deletion / Addition" starts)
 			}
 
 			// @formatter:off
@@ -1168,16 +1196,99 @@ public class RestDlfConnector extends AlephMediator {
 			// Build XML POST request with mandatory fields filled in
 			XMLBuilder xmlRequest = XMLBuilder.create(AlephConstants.GET_PAT_ADRS_NODE)
 					.elem(AlephConstants.ADDRESS_INFORMATION_NODE)
-						.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(parsedPatronAddress.getZ304address1())
+						.elem(AlephConstants.Z304_ADDRESS_1_NODE).text(patronAddressParsed.getZ304address1())
 							.up()
-						.elem(AlephConstants.Z304_DATE_FROM_NODE).text(parsedPatronAddress.getZ304dateFrom())
+						.elem(AlephConstants.Z304_DATE_FROM_NODE).text(patronAddressParsed.getZ304dateFrom())
 							.up()
-						.elem(AlephConstants.Z304_DATE_TO_NODE).text(parsedPatronAddress.getZ304dateTo());
-
-			
-			
+						.elem(AlephConstants.Z304_DATE_TO_NODE).text(patronAddressParsed.getZ304dateTo());
 			
 			// @formatter:on
+
+			if (street != null) {
+
+				// Check street length against max_len attribute of element in which is street stored in (this we know from toolkit.properties)
+				String maxLengthParsed = patronAddressParsed.get(nodeUserStreetStoredIn + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLengthParsed != null) {
+
+					int streetMaxLength = Integer.parseInt(maxLengthParsed);
+
+					if (street.length() > streetMaxLength)
+						return "Cannot save " + street.length() + " chars to " + nodeUserStreetStoredIn + ". Maximum is " + maxLengthParsed
+								+ " chars. (This means removal of some characters in Street is neccessary)";
+				}
+
+				xmlRequest.up().elem(nodeUserStreetStoredIn).text(street);
+			}
+
+			if (postalCodeAndCity != null) {
+
+				// Check PostalCodeAndCity string length against max_len attribute of element in which is postal & city stored in (this we know from toolkit.properties)
+				String maxLengthParsed = patronAddressParsed.get(nodeUserPostalAndCityStoredIn + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLengthParsed != null) {
+
+					int postalCodeAndCityMaxLength = Integer.parseInt(maxLengthParsed);
+
+					if (postalCodeAndCity.length() > postalCodeAndCityMaxLength)
+						return "Cannot save " + postalCodeAndCity.length() + " chars to " + nodeUserPostalAndCityStoredIn + ". Maximum is " + maxLengthParsed
+								+ " chars. (This means removal of some characters in Postal Code or City is neccessary)";
+				}
+
+				xmlRequest.up().elem(nodeUserPostalAndCityStoredIn).text(postalCodeAndCity);
+			}
+
+			if (phones != null) {
+				String phonesJoined = "";
+
+				// Join all phones
+				for (int i = 0; i < phones.size(); ++i) {
+					phonesJoined += phones.get(i);
+
+					if (i != phones.size() - 1)
+						phonesJoined += AlephConstants.PATRON_ADDRESS_DELIMITER;
+				}
+
+				// Check phones joined string length against max_len attribute of element in which are phones stored in (this we know from toolkit.properties)
+				String maxLengthParsed = patronAddressParsed.get(nodeUserPhoneStoredIn + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLengthParsed != null) {
+					int phonesMaxLength = Integer.parseInt(maxLengthParsed);
+
+					if (phonesJoined.length() > phonesMaxLength)
+						return "Cannot save " + phonesJoined.length() + " chars to " + nodeUserPhoneStoredIn + ". Maximum is " + maxLengthParsed
+								+ " chars. (This means removal of some phones is neccessary)";
+				}
+
+				// Set joined phones to our XML
+				xmlRequest.up().elem(nodeUserPhoneStoredIn).text(phonesJoined);
+			}
+
+			if (emails != null) {
+				String emailsJoined = "";
+
+				// Join all emails
+				for (int i = 0; i < emails.size(); ++i) {
+					emailsJoined += emails.get(i);
+
+					if (i != emails.size() - 1)
+						emailsJoined += AlephConstants.PATRON_ADDRESS_DELIMITER;
+				}
+
+				// Check if there can be saved so long email String
+				String maxLengthParsed = patronAddressParsed.getZ304emailAddressMaxLength();
+
+				if (maxLengthParsed != null) {
+					int emailsMaxLength = Integer.parseInt(patronAddressParsed.getZ304emailAddressMaxLength());
+
+					if (emailsJoined.length() > emailsMaxLength)
+						return "Cannot save " + emailsJoined.length() + " chars to " + nodeUserEmailStoredIn + ". Maximum is " + maxLengthParsed
+								+ " chars. (This means removal of some emails is neccessary)";
+				}
+
+				// Set joined emails to our XML
+				xmlRequest.up().elem(nodeUserEmailStoredIn).text(emailsJoined);
+			}
 
 			String xmlToPost = "post_xml=" + xmlRequest.asString();
 
@@ -1196,11 +1307,11 @@ public class RestDlfConnector extends AlephMediator {
 
 			return updateUserHandler.getReplyText();
 
-		} else if (!updateUserHandler.isUpdateable())
+		} else if (!updateUserHandler.isUpdateable()) {
 			return "Parameter updateable is set to \"N\".";
-
-		else
+		} else
 			return "Could not parse all mandatory fields, thus cannot build valid XML.";
+
 	}
 
 	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {

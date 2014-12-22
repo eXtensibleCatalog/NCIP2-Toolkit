@@ -49,8 +49,13 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (parsingMandatoryFields) {
 			if (qName.equalsIgnoreCase(AlephConstants.ADDRESS_INFORMATION_NODE)) {
-				isUpdateable = attributes.getValue(AlephConstants.UPDATEABLE_NODE_ATTR).equalsIgnoreCase(AlephConstants.YES);
+				isUpdateable = attributes.getValue(AlephConstants.UPDATEABLE_NODE_ATTRIBUTE).equalsIgnoreCase(AlephConstants.YES);
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_1_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304address1MaxLength(maxLength);
+
 				z304address1Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_DATE_FROM_NODE)) {
 				z304dateFromReached = true;
@@ -62,22 +67,67 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 			} else if (qName.equalsIgnoreCase(AlephConstants.REPLY_TEXT_NODE)) {
 				replyTextReached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_2_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304address2MaxLength(maxLength);
+
 				z304address2Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_3_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304address3MaxLength(maxLength);
+
 				z304address3Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_4_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304address4MaxLength(maxLength);
+
 				z304address4Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_ADDRESS_5_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304address5MaxLength(maxLength);
+
 				z304address5Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_1_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304telephone1MaxLength(maxLength);
+
 				z304telephone1Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_2_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304telephone2MaxLength(maxLength);
+
 				z304telephone2Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_3_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304telephone3MaxLength(maxLength);
+
 				z304telephone3Reached = true;
 			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_TELEPHONE_4_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304telephone4MaxLength(maxLength);
+
 				z304telephone4Reached = true;
-			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_NODE)) {
+			} else if (qName.equalsIgnoreCase(AlephConstants.Z304_EMAIL_ADDRESS_NODE)) {
+				String maxLength = attributes.getValue(AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+
+				if (maxLength != null)
+					patronAddress.setZ304emailAddressMaxLength(maxLength);
+
 				z304emailAddressReached = true;
 			}
 		}
@@ -97,17 +147,17 @@ public class AlephUpdateUserHandler extends DefaultHandler {
 		} else {
 			replyCodeReached = false;
 			replyTextReached = false;
-			
+
 			z304address2Reached = false;
 			z304address3Reached = false;
 			z304address4Reached = false;
 			z304address5Reached = false;
-			
+
 			z304telephone1Reached = false;
 			z304telephone2Reached = false;
 			z304telephone3Reached = false;
 			z304telephone4Reached = false;
-			
+
 			z304emailAddressReached = false;
 		}
 	}

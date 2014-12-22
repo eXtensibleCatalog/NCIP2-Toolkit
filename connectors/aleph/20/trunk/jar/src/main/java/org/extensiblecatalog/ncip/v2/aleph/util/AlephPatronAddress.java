@@ -244,7 +244,7 @@ public class AlephPatronAddress {
 	 * @return the z304emailAddress
 	 */
 	public String getZ304emailAddress() {
-		return keyValuePairs.get(AlephConstants.Z304_EMAIL_NODE);
+		return keyValuePairs.get(AlephConstants.Z304_EMAIL_ADDRESS_NODE);
 	}
 
 	/**
@@ -252,7 +252,187 @@ public class AlephPatronAddress {
 	 *            the z304emailAddress to set
 	 */
 	public void setZ304emailAddress(String z304emailAddress) {
-		keyValuePairs.put(AlephConstants.Z304_EMAIL_NODE, z304emailAddress);
+		keyValuePairs.put(AlephConstants.Z304_EMAIL_ADDRESS_NODE, z304emailAddress);
+	}
+
+	/**
+	 * @return the z304address1
+	 */
+	public String getZ304address1MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_ADDRESS_1_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304address1MaxLength
+	 *            the z304address1 to set
+	 */
+	public void setZ304address1MaxLength(String z304address1MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_ADDRESS_1_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304address1MaxLength);
+	}
+
+	/**
+	 * @return the z304address2
+	 */
+	public String getZ304address2MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_ADDRESS_2_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304address2MaxLength
+	 *            the z304address2 to set
+	 */
+	public void setZ304address2MaxLength(String z304address2MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_ADDRESS_2_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304address2MaxLength);
+	}
+
+	/**
+	 * @return the z304address3
+	 */
+	public String getZ304address3MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_ADDRESS_3_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304address3MaxLength
+	 *            the z304address3 to set
+	 */
+	public void setZ304address3MaxLength(String z304address3MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_ADDRESS_3_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304address3MaxLength);
+	}
+
+	/**
+	 * @return the z304address4
+	 */
+	public String getZ304address4MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_ADDRESS_4_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304address4MaxLength
+	 *            the z304address4 to set
+	 */
+	public void setZ304address4MaxLength(String z304address4MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_ADDRESS_4_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304address4MaxLength);
+	}
+
+	/**
+	 * @return the z304address5
+	 */
+	public String getZ304address5MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_ADDRESS_5_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304address5MaxLength
+	 *            the z304address5 to set
+	 */
+	public void setZ304address5MaxLength(String z304address5MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_ADDRESS_5_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304address5MaxLength);
+	}
+
+	/**
+	 * @return the z304zip
+	 */
+	public String getZ304zipMaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_ZIP_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304zipMaxLength
+	 *            the z304zip to set
+	 */
+	public void setZ304zipMaxLength(String z304zipMaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_ZIP_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304zipMaxLength);
+	}
+
+	/**
+	 * @return the z304telephone1
+	 */
+	public String getZ304telephone1MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_TELEPHONE_1_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304telephone1MaxLength
+	 *            the z304telephone1 to set
+	 */
+	public void setZ304telephone1MaxLength(String z304telephone1MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_TELEPHONE_1_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304telephone1MaxLength);
+	}
+
+	/**
+	 * @return the z304telephone2
+	 */
+	public String getZ304telephone2MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_TELEPHONE_2_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304telephone2MaxLength
+	 *            the z304telephone2 to set
+	 */
+	public void setZ304telephone2MaxLength(String z304telephone2MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_TELEPHONE_2_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304telephone2MaxLength);
+	}
+
+	/**
+	 * @return the z304telephone3
+	 */
+	public String getZ304telephone3MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_TELEPHONE_3_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304telephone3MaxLength
+	 *            the z304telephone3 to set
+	 */
+	public void setZ304telephone3MaxLength(String z304telephone3MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_TELEPHONE_3_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304telephone3MaxLength);
+	}
+
+	/**
+	 * @return the z304telephone4
+	 */
+	public String getZ304telephone4MaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_TELEPHONE_4_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304telephone4MaxLength
+	 *            the z304telephone4 to set
+	 */
+	public void setZ304telephone4MaxLength(String z304telephone4MaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_TELEPHONE_4_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304telephone4MaxLength);
+	}
+
+	/**
+	 * @return the z304smsNumber
+	 */
+	public String getZ304smsNumberMaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_SMS_NUMBER_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304smsNumberMaxLength
+	 *            the z304smsNumber to set
+	 */
+	public void setZ304smsNumberMaxLength(String z304smsNumberMaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_SMS_NUMBER_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304smsNumberMaxLength);
+	}
+
+	/**
+	 * @return the z304emailAddress max_len attribute value
+	 */
+	public String getZ304emailAddressMaxLength() {
+		return keyValuePairs.get(AlephConstants.Z304_EMAIL_ADDRESS_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE);
+	}
+
+	/**
+	 * @param z304emailAddressMaxLength
+	 *            the z304emailAddress max_len to set
+	 */
+	public void setZ304emailAddressMaxLength(String z304emailAddressMaxLength) {
+		keyValuePairs.put(AlephConstants.Z304_EMAIL_ADDRESS_NODE + AlephConstants.MAX_LEN_NODE_ATTRIBUTE, z304emailAddressMaxLength);
 	}
 
 }

@@ -86,7 +86,7 @@ public class AlephConstants {
 	public static final String Z304_NODE = "z304";
 	public static final String Z304_ZIP_NODE = "z304-zip";
 	public static final String Z304_DATE_TO_NODE = "z304-date-to";
-	public static final String Z304_EMAIL_NODE = "z304-email-address";
+	public static final String Z304_EMAIL_ADDRESS_NODE = "z304-email-address";
 	public static final String Z304_DATE_FROM_NODE = "z304-date-from";
 	public static final String Z304_ADDRESS_1_NODE = "z304-address-1";
 	public static final String Z304_ADDRESS_2_NODE = "z304-address-2";
@@ -258,15 +258,16 @@ public class AlephConstants {
 	public static final String Z305_DELINQUENCY_3_UPDATE_DATE_NODE = "z305-delinq-3-update-date";
 
 	// XML Attributes:
-	public static final String ID_NODE_ATTR = "id";
-	public static final String TAG_ATTRIBUTE = "tag";
-	public static final String HREF_NODE_ATTR = "href";
-	public static final String TYPE_NODE_ATTR = "type";
-	public static final String CODE_ATTRIBUTE = "code";
-	public static final String LABEL_ATTRIBUTE = "label";
-	public static final String RENEW_NODE_ATTR = "renew";
-	public static final String DELETE_NODE_ATTR = "delete";
-	public static final String UPDATEABLE_NODE_ATTR = "updateable";
+	public static final String ID_NODE_ATTRIBUTE = "id";
+	public static final String TAG_NODE_ATTRIBUTE = "tag";
+	public static final String HREF_NODE_ATTRIBUTE = "href";
+	public static final String TYPE_NODE_ATTRIBUTE = "type";
+	public static final String CODE_NODE_ATTRIBUTE = "code";
+	public static final String LABEL_NODE_ATTRIBUTE = "label";
+	public static final String RENEW_NODE_ATTRIBUTE = "renew";
+	public static final String DELETE_NODE_ATTRIBUTE = "delete";
+	public static final String MAX_LEN_NODE_ATTRIBUTE = "max_len";
+	public static final String UPDATEABLE_NODE_ATTRIBUTE = "updateable";
 
 	// XML Attribute values:
 	public static final String BIB_ID_NODE_ATTR_VALUE = "b";
@@ -420,7 +421,7 @@ public class AlephConstants {
 	public static final String PATRON_ADDRESS_ID_CARD_PARAM = "identityCard";
 
 	public static final String PATRON_ADDRESS_DELIMITER = ", ";
-	
+
 	public static final int PATRON_ADDRESS_MAX_POSTAL_CODE_LENGTH = 6;
 
 	public static final char REQUEST_ID_DELIMITER = ';';

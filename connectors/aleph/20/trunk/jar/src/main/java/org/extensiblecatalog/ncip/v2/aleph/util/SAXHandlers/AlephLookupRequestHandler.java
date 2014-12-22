@@ -214,7 +214,7 @@ public class AlephLookupRequestHandler extends DefaultHandler {
 			}
 		} else {
 			if (qName.equalsIgnoreCase(AlephConstants.HOLD_REQUEST_NODE)) {
-				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+				String link = attributes.getValue(AlephConstants.HREF_NODE_ATTRIBUTE);
 				if (link.contains(itemIdToLookFor)) {
 					requestLink = link;
 					holdRequestFound = true;

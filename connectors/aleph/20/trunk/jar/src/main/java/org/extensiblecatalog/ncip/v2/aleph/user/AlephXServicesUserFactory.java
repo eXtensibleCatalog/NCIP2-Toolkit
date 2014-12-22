@@ -69,7 +69,7 @@ public class AlephXServicesUserFactory implements Serializable {
 				throw new AlephException(AlephConstants.ERROR_GLOBAL_PATRON_RECORD_MISSING);
 			}
 
-			String email = XMLParserUtil.getNodeTextValue(doc, AlephConstants.Z304_EMAIL_NODE);
+			String email = XMLParserUtil.getNodeTextValue(doc, AlephConstants.Z304_EMAIL_ADDRESS_NODE);
 			if (email!=null){
 				user.setEmailAddress(email);
 				//do not throw error if null since not required

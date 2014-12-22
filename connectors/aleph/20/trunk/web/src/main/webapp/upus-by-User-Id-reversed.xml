@@ -13,30 +13,6 @@
 		</ns1:UserId>
 
 		<ns1:DeleteUserFields>
-			<ns1:UserAddressInformation>
-				<ns1:UserAddressRoleType
-					ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Home</ns1:UserAddressRoleType>
-				<ns1:PhysicalAddress>
-					<ns1:StructuredAddress>
-						<ns1:Street>Trvalá ulice 123</ns1:Street>
-						<ns1:Locality>Trvalé</ns1:Locality>
-						<ns1:PostalCode>12345</ns1:PostalCode>
-					</ns1:StructuredAddress>
-					<ns1:PhysicalAddressType
-						ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Street Address</ns1:PhysicalAddressType>
-				</ns1:PhysicalAddress>
-			</ns1:UserAddressInformation>
-			<ns1:UserAddressInformation>
-				<ns1:UserAddressRoleType
-					ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Notice</ns1:UserAddressRoleType>
-				<ns1:ElectronicAddress>
-					<ns1:ElectronicAddressType
-						ns1:Scheme="http://www.iana.org/assignments/uri-schemes">mailto</ns1:ElectronicAddressType>
-					<ns1:ElectronicAddressData>test@mzk.cz</ns1:ElectronicAddressData>
-				</ns1:ElectronicAddress>
-			</ns1:UserAddressInformation>
-		</ns1:DeleteUserFields>
-		<ns1:AddUserFields>
 		<ns1:UserAddressInformation>
 				<ns1:UserAddressRoleType
 					ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Notice</ns1:UserAddressRoleType>
@@ -85,6 +61,30 @@
 					<ns1:PhysicalAddressType
 						ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Street Address</ns1:PhysicalAddressType>
 				</ns1:PhysicalAddress>
+			</ns1:UserAddressInformation>
+		</ns1:DeleteUserFields>
+		<ns1:AddUserFields>
+			<ns1:UserAddressInformation>
+				<ns1:UserAddressRoleType
+					ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Home</ns1:UserAddressRoleType>
+				<ns1:PhysicalAddress>
+					<ns1:StructuredAddress>
+						<ns1:Street>Trvalá ulice 123</ns1:Street>
+						<ns1:Locality>Trvalé</ns1:Locality>
+						<ns1:PostalCode>12345</ns1:PostalCode>
+					</ns1:StructuredAddress>
+					<ns1:PhysicalAddressType
+						ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Street Address</ns1:PhysicalAddressType>
+				</ns1:PhysicalAddress>
+			</ns1:UserAddressInformation>
+			<ns1:UserAddressInformation>
+				<ns1:UserAddressRoleType
+					ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Notice</ns1:UserAddressRoleType>
+				<ns1:ElectronicAddress>
+					<ns1:ElectronicAddressType
+						ns1:Scheme="http://www.iana.org/assignments/uri-schemes">mailto</ns1:ElectronicAddressType>
+					<ns1:ElectronicAddressData>test@mzk.cz</ns1:ElectronicAddressData>
+				</ns1:ElectronicAddress>
 			</ns1:UserAddressInformation>
 		</ns1:AddUserFields>
 	</ns1:UpdateUser>

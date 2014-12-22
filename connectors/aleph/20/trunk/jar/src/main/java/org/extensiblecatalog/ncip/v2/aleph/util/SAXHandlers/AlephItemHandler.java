@@ -90,7 +90,7 @@ public class AlephItemHandler extends DefaultHandler {
 			secondCallNoType = null;
 			currentAlephItem = new AlephItem();
 
-			String itemLink = attributes.getValue(AlephConstants.HREF_NODE_ATTR);
+			String itemLink = attributes.getValue(AlephConstants.HREF_NODE_ATTRIBUTE);
 
 			if (itemLink != null) {
 				// This occurs if it is parsing link with view=full parameter (e.g. using LookupItemSet with BibRecId)

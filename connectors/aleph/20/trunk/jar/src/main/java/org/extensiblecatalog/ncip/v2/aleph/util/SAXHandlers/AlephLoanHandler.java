@@ -72,7 +72,7 @@ public class AlephLoanHandler extends DefaultHandler {
 			bibliographicDescription = new BibliographicDescription();
 			currentLoanedItem = new LoanedItem();
 
-			String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTR);
+			String renewAttr = attributes.getValue(AlephConstants.RENEW_NODE_ATTRIBUTE);
 			if (renewAttr != null && renewAttr.equalsIgnoreCase(AlephConstants.YES)) {
 				renewable = true;
 			} else
