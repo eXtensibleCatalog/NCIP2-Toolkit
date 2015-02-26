@@ -311,8 +311,6 @@ public class RestDlfConnector extends AlephMediator {
 
 		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired();
 
-		boolean atLeastOneDesired = false;
-
 		// If there are only loanedItems desired, that means to include loans history to output
 		// Better suggestions how to forward loaned items history, please send to kozlovsky@mzk.cz
 		boolean loanedItemsDesiredOnly = loanedItemsDesired && !(blockOrTrapDesired || requestedItemsDesired || userFiscalAccountDesired || personalInfoDesired);
@@ -326,7 +324,6 @@ public class RestDlfConnector extends AlephMediator {
 		// Create URL request only if specified service was desired
 		URL addressUrl = null;
 		if (personalInfoDesired) {
-			atLeastOneDesired = true;
 			addressUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
 					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_INFO, AlephConstants.PARAM_ADDRESS).toURL();
 		}
@@ -334,7 +331,6 @@ public class RestDlfConnector extends AlephMediator {
 		URL circulationsUrl = null;
 		URL cashUrl = null;
 		if (userFiscalAccountDesired) {
-			atLeastOneDesired = true;
 			circulationsUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
 					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_CIRC_ACTIONS).toURL();
 			cashUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
@@ -345,7 +341,6 @@ public class RestDlfConnector extends AlephMediator {
 		URL loansUrl = null;
 		URL loansHistoryUrl = null;
 		if (loanedItemsDesired) {
-			atLeastOneDesired = true;
 			if (!loanedItemsDesiredOnly) {
 				// If there is not history expected, parse regular loans
 				loansUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
@@ -360,7 +355,6 @@ public class RestDlfConnector extends AlephMediator {
 
 		URL requestsUrl = null;
 		if (requestedItemsDesired) {
-			atLeastOneDesired = true;
 			// We suppose desired requests are at http://aleph.mzk.cz:1892/rest-dlf/patron/930118BXGO/circulationActions/requests/holds?view=full
 			requestsUrl = new URLBuilder()
 					.setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
@@ -370,101 +364,95 @@ public class RestDlfConnector extends AlephMediator {
 
 		URL blocksOrTrapsUrl = null;
 		if (blockOrTrapDesired) {
-			atLeastOneDesired = true;
 			blocksOrTrapsUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
 					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_STATUS, AlephConstants.PARAM_BLOCKS).toURL();
 		}
 
 		URL registrationUrl = null;
 		if (userPrivilegeDesired) {
-			atLeastOneDesired = true;
 			registrationUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort())
 					.setPath(LocalConfig.getServerSuffix(), AlephConstants.USER_PATH_ELEMENT, patronId, AlephConstants.PARAM_PATRON_STATUS, AlephConstants.PARAM_REGISTRATION)
 					.toURL();
 		}
 
-		if (atLeastOneDesired) {
+		AlephLookupUserHandler userHandler = new AlephLookupUserHandler(initData);
 
-			AlephLookupUserHandler userHandler = new AlephLookupUserHandler(initData);
+		InputSource streamSource;
 
-			InputSource streamSource;
+		if (loansUrl != null || loansHistoryUrl != null) {
 
-			if (loansUrl != null || loansHistoryUrl != null) {
+			AlephLoanHandler loanHandler = new AlephLoanHandler();
 
-				AlephLoanHandler loanHandler = new AlephLoanHandler();
+			if (appProfileType != null && !appProfileType.isEmpty())
+				loanHandler.setLocalizationDesired(true);
 
-				if (appProfileType != null && !appProfileType.isEmpty())
-					loanHandler.setLocalizationDesired(true);
+			if (loansUrl != null) {
+				streamSource = new InputSource(loansUrl.openStream());
+			} else
+				streamSource = new InputSource(loansHistoryUrl.openStream());
 
-				if (loansUrl != null) {
-					streamSource = new InputSource(loansUrl.openStream());
-				} else
-					streamSource = new InputSource(loansHistoryUrl.openStream());
+			parser.parse(streamSource, loanHandler);
+			userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
 
-				parser.parse(streamSource, loanHandler);
-				userHandler.getAlephUser().setLoanedItems(loanHandler.getListOfLoanedItems());
+		}
 
-			}
+		if (requestsUrl != null) {
+			AlephLookupRequestsHandler requestItemHandler = new AlephLookupRequestsHandler();
 
-			if (requestsUrl != null) {
-				AlephLookupRequestsHandler requestItemHandler = new AlephLookupRequestsHandler();
+			if (appProfileType != null && !appProfileType.isEmpty())
+				requestItemHandler.setLocalizationDesired(true);
 
-				if (appProfileType != null && !appProfileType.isEmpty())
-					requestItemHandler.setLocalizationDesired(true);
+			streamSource = new InputSource(requestsUrl.openStream());
 
-				streamSource = new InputSource(requestsUrl.openStream());
+			// Here parser parses all available info saveable into RequestItem class
+			parser.parse(streamSource, requestItemHandler);
 
-				// Here parser parses all available info saveable into RequestItem class
-				parser.parse(streamSource, requestItemHandler);
+			List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
 
-				List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
+			if (requestedItems.size() > 0) {
 
-				if (requestedItems.size() > 0) {
-
-					// If there is set default item preparation delay, set it to all requested items
-					if (LocalConfig.getMaxItemPreparationTimeDelay() != 0)
-						for (RequestedItem requestedItem : requestedItems) {
-							if (requestedItem.getDatePlaced() != null) {
-								// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
-								GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
-								pickupDate.add(Calendar.DAY_OF_MONTH, LocalConfig.getMaxItemPreparationTimeDelay());
-								requestedItem.setPickupDate(pickupDate);
-							}
+				// If there is set default item preparation delay, set it to all requested items
+				if (LocalConfig.getMaxItemPreparationTimeDelay() != 0)
+					for (RequestedItem requestedItem : requestedItems) {
+						if (requestedItem.getDatePlaced() != null) {
+							// Because Aleph does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
+							GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
+							pickupDate.add(Calendar.DAY_OF_MONTH, LocalConfig.getMaxItemPreparationTimeDelay());
+							requestedItem.setPickupDate(pickupDate);
 						}
+					}
 
-					userHandler.getAlephUser().setRequestedItems(requestedItems);
-				}
+				userHandler.getAlephUser().setRequestedItems(requestedItems);
 			}
+		}
 
-			if (addressUrl != null) {
-				streamSource = new InputSource(addressUrl.openStream());
+		if (addressUrl != null) {
+			streamSource = new InputSource(addressUrl.openStream());
 
-				parser.parse(streamSource, userHandler.parseAddress());
-			}
-			if (cashUrl != null) {
-				streamSource = new InputSource(cashUrl.openStream());
+			parser.parse(streamSource, userHandler.parseAddress());
+		}
+		if (cashUrl != null) {
+			streamSource = new InputSource(cashUrl.openStream());
 
-				parser.parse(streamSource, userHandler.parseCash());
-			}
-			if (circulationsUrl != null) {
-				streamSource = new InputSource(circulationsUrl.openStream());
+			parser.parse(streamSource, userHandler.parseCash());
+		}
+		if (circulationsUrl != null) {
+			streamSource = new InputSource(circulationsUrl.openStream());
 
-				parser.parse(streamSource, userHandler.parseCirculations());
-			}
-			if (blocksOrTrapsUrl != null) {
-				streamSource = new InputSource(blocksOrTrapsUrl.openStream());
+			parser.parse(streamSource, userHandler.parseCirculations());
+		}
+		if (blocksOrTrapsUrl != null) {
+			streamSource = new InputSource(blocksOrTrapsUrl.openStream());
 
-				parser.parse(streamSource, userHandler.parseBlockOrTraps());
-			}
-			if (registrationUrl != null) {
-				streamSource = new InputSource(registrationUrl.openStream());
+			parser.parse(streamSource, userHandler.parseBlockOrTraps());
+		}
+		if (registrationUrl != null) {
+			streamSource = new InputSource(registrationUrl.openStream());
 
-				parser.parse(streamSource, userHandler.parseRegistration());
-			}
+			parser.parse(streamSource, userHandler.parseRegistration());
+		}
 
-			return userHandler.getAlephUser();
-		} else
-			throw new AlephException("You haven't desired anything. Cannot forward empty LookupUserResponseData.");
+		return userHandler.getAlephUser();
 	}
 
 	public AlephRequestItem lookupRequest(LookupRequestInitiationData initData) throws AlephException, IOException, SAXException, ParserConfigurationException, ServiceException {
