@@ -1,0 +1,13 @@
+		<ns1:InitiationHeader>
+			<ns1:FromAgencyId>
+				<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH-VuFind</ns1:AgencyId>
+			</ns1:FromAgencyId>
+			<ns1:ToAgencyId>
+				<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH-Koha</ns1:AgencyId>
+			</ns1:ToAgencyId>
+			<ns1:ApplicationProfileType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/applicationprofiletype/applicationprofiletype.scm">cze</ns1:ApplicationProfileType>
+		</ns1:InitiationHeader>
+		
+<!-- To properly validate against schema, append this right after MessageType e.g. <ns1:LookupItemSet> <ns1:InitiationHeader>
+
+	NOTE THAT THIS IS GENERAL LANGUAGE LOCALIZATION SPECIFICATION, THERE COULD BE ALSO "en" INSTEAD OF "cze"  -->

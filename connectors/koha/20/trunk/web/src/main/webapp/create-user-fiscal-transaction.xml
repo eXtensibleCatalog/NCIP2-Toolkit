@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+	ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+
+	<ns1:CreateUserFiscalTransaction>
+		<ns1:UserId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH</ns1:AgencyId>			
+			<ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
+			<ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+		</ns1:UserId>
+		<ns1:FiscalTransactionInformation>
+			<ns1:FiscalActionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/fiscalactiontype/fiscalactiontype.scm">Payment</ns1:FiscalActionType>
+			<ns1:FiscalTransactionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/fiscaltransactiontype/fiscaltransactiontype.scm">Interlibrary Loan Fee</ns1:FiscalTransactionType>
+			<ns1:Amount>
+				<ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">CZK</ns1:CurrencyCode>
+				<ns1:MonetaryValue>10</ns1:MonetaryValue>
+			</ns1:Amount>
+			<ns1:PaymentMethodType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/paymentmethodtype/paymentmethodtype.scm">Bank Draft</ns1:PaymentMethodType>
+			<ns1:FiscalTransactionDescription>Whatever user wants to say goes here.</ns1:FiscalTransactionDescription>
+			<ns1:RequestId>
+				<ns1:RequestIdentifierValue>005033321</ns1:RequestIdentifierValue>
+			</ns1:RequestId>
+		</ns1:FiscalTransactionInformation>
+	</ns1:CreateUserFiscalTransaction>
+</ns1:NCIPMessage>

@@ -1,0 +1,26 @@
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+	ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+	<ns1:RequestItemResponse>
+		<ns1:RequestId>
+			<!-- It is a good habit to let initiator know about which items were not requested & why. Also please keep in mind to respect current RequestId separator defined in KohaConstants - which is ";" here -->
+			<ns1:RequestIdentifierValue>005102983;Failed to create request - Patron has already requested this item.;Failed to create request - Empty ItemIdentifierValue was specified here.</ns1:RequestIdentifierValue>
+		</ns1:RequestId>
+		<ns1:ItemId>
+			<ns1:ItemIdentifierType
+				ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+			<ns1:ItemIdentifierValue>KOH01000947740-KOH50000947740000010;KOH01000065021-KOH50000065021000010;null</ns1:ItemIdentifierValue>
+			<!-- null here means initiator forgot to specify ItemIdentifierValue on input -->
+		</ns1:ItemId>
+		<ns1:UserId>
+			<ns1:AgencyId
+				ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH</ns1:AgencyId>
+			<ns1:UserIdentifierType
+				ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
+			<ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+		</ns1:UserId>
+		<ns1:RequestType
+			ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Hold</ns1:RequestType>
+		<ns1:RequestScopeType
+			ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/requestscopetype.scm">Item</ns1:RequestScopeType>
+	</ns1:RequestItemResponse>
+</ns1:NCIPMessage>

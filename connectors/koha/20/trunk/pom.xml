@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<!-- This is a version 4 POM file. -->
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- The project details. -->
+	<groupId>org.extensiblecatalog.ncip.v2</groupId>
+	<artifactId>koha-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>NCIP V2 Koha Parent</name>
+	<description>NCIP V2 Koha Parent</description>
+
+	<properties>
+		<javaVersion>1.7.0-03</javaVersion>
+		<javaSourceVersion>1.7</javaSourceVersion>
+		<javaTargetVersion>1.7</javaTargetVersion>
+		<mavenVersion>3.0.4</mavenVersion>
+		<highJavaVersion>7.0</highJavaVersion> <!-- The 1.4 = 2.4; 1.5 = 5.0; 1.6 = 6.0 -->
+		<servletVersion>2.5</servletVersion>
+		<springVersion>2.5.6</springVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<toolkitVersion>1.2-SNAPSHOT</toolkitVersion>
+		<kohaConnectorVersion>0.0.1-SNAPSHOT</kohaConnectorVersion>
+	</properties>
+
+	<!-- The list of child modules. -->
+	<modules>
+		<module>web</module>
+		<module>jar</module>
+	</modules>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<artifactId>common</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<artifactId>binding-jar</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<artifactId>responder</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<artifactId>service</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<artifactId>initiator</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>binding-ncipv2_01</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>binding-ncipv2_02</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>binding-ilsdiv1_0</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>binding-wclv1_0</artifactId>
+			<version>${toolkitVersion}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${springVersion}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${springVersion}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${springVersion}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<configuration>
+						<reportPlugins>
+							<plugin>
+								<groupId>org.codehaus.mojo</groupId>
+								<artifactId>findbugs-maven-plugin</artifactId>
+							</plugin>
+						</reportPlugins>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+					<configuration>
+						<url>http://cpk-devel.mzk.cz:7080/manager/text</url>
+						<server>TomcatDevel</server>
+						<path>/koha</path>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

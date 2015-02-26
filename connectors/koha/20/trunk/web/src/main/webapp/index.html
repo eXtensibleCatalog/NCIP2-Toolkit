@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en">
+<head>
+
+     <title>NCIP Toolkit v2. Responder test</title>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     <script src="js/jquery-1.8.0.min.js"></script>
+	<script src="js/xslt.js"></script>
+     <style type="text/css">
+         body {
+             background-color: #fefefe;
+         }
+
+         #main  {
+             width: 95%;
+             margin: 0 auto;
+             border: 1px solid #999;
+             border-radius: 3px;
+         }
+
+         #header {
+             width: 100%;
+             margin: 1em auto;
+             padding: .5em;
+             clear: both;
+         }
+
+         #header h1 {
+             float: left;
+             margin-top: 0;
+             padding-left: 1em;
+         }
+
+         #header img {
+             float: left;
+         }
+
+         #content {
+             float: left;
+             margin-top: .5em;
+             width: 75%;
+         }
+
+         #content textarea {
+             width: 85%;
+         }
+
+         #samples {
+             float: right;
+             width: 23%;
+             padding: .2em;
+             margin-top: 1em;
+             background-color: #efefef;
+             border: 2px solid #600;
+         }
+
+         .clearfix {
+            clear: both;
+         }
+   </style>
+     <script>
+
+         $(document).ready(
+                 function() {
+                     var transformer;
+                     if ( !window.ActiveXObject ) {
+                         // Look!  Standards!
+                        var xhr = $.get("./stylesheet.xsl", {}, function(data,responseText,jqXHR) {
+                            transformer = new XSLTransformer(data);
+                        }, "xml");
+                        //xhr.done( function() { console.log("XSLT loaded", transformer.stylesheet ); });
+                     } else {
+                         // IE has its own way of doing things that is manifestly
+                         // inferior.
+                         transformer = new XSLTransformer("./stylesheet.xsl");
+                         //transformer.load();
+                         //console.log("XSLT Loaded (IE)");
+                     }
+                     var formBox = $("#ncipDoc");
+                     $("#samples button").each(
+                             function() {
+                                 var button = $(this);
+                                 var tgt = button.data('target');
+                                 if ( tgt !== undefined ) {
+                                     button.click(
+                                        function() {
+                                            $.get( tgt,
+                                                 {},
+                                                 function(data) {
+                                                    formBox.val(data);
+                                                },
+                                                'text'
+                                            );
+                                        }
+                                     );
+                                 }
+                             }
+                     ); // template filler
+
+
+
+                 $("#messageInput").on("submit",
+                    function(evt) {
+                        var $form = $(this);
+                        evt.preventDefault();
+                        var $input = $("#ncipDoc");
+						var $msg = $input.val();
+						var $tgt = $("#msgLine");
+
+						var successCallback = function(data,textStatus,jqXHR) {
+                            var out = transformer.transform(data);
+                            if ( out ) {
+                                if ( $tgt.get(0).nodeName.toLowerCase() == 'textarea') {
+                                    $tgt.val(out);
+                                } else {
+                                    $tgt.text(out);
+                                }
+                            }
+						}
+
+
+                       $tgt.val("Sending request to responder ...");
+                        jQuery.post($form.attr('action'),
+                            $input.val(),
+                               successCallback,
+                                "xml");
+
+                        return false;
+                 });
+         });
+     </script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+
+	<body>
+
+    <div id="main">
+        <div id="header">
+
+            <img src="logo.jpg" />
+            <h1>NCIP Toolkit Responder Test Page</h1>
+            <div class="clearfix">
+            <p>To test, enter your NCIP Initiation message in the first text area below and click the 'Submit' button.
+            Your message will be sent to the NCIP Responder
+            and the response message will be displayed in the second text area below.
+            </p>
+                </div>
+    </div>
+        <div class="clearfix"></div>
+    <div id="content">
+    <form id="messageInput" name="ajax" method="POST" action="./NCIPResponder">
+
+  <p>
+    <input type="submit" value="Submit" />
+  </p>
+  <p>
+    <textarea rows="15" cols="180" name="ncipDoc" id="ncipDoc">Enter NCIP message here.</textarea>
+  </p>
+    <textarea rows="30" cols="240" name="msgLine" id="msgLine">Status/Response:</textarea>
+</form>
+
+    </div>
+
+    <div id="samples">
+    <h1>Sample Documents</h1>
+    <hr>
+    <h3>Lookups</h3>
+    <button id="lookupItem1" data-target="loookup-item-itemid.xml">Lookup Item (Item Id)</button>
+	<button id="luis1" data-target="luis-all-possibilities.xml">LUIS - All</button>
+	<button id="luis2" data-target="luis-itemid-only.xml">LUIS - ItemId</button>
+	<button id="luis3" data-target="luis-recordid-only.xml">LUIS - RecordId</button>
+	<button id="la" data-target="lookup-agency.xml">Lookup Agency</button> 
+    <button id="luai" data-target="user-lookup-by-AuthInput.xml">Lookup User by AuthInput</button>
+    <button id="luui" data-target="user-lookup-by-UserId.xml">Lookup User by UserId</button>
+	<button id="luli" data-target="user-lookup-loaned-items-history.xml">Lookup User's LIHistory</button>
+    <button id="lrid" data-target="lookup-request-itemid.xml">Lookup Request by ItemId</button>
+    <hr>
+    <h3>Other requests</h3>
+	<button id="upusai" data-target="upus-by-AuthInput.xml">Update User by AuthInput</button>
+	<button id="upusui" data-target="upus-by-User-Id.xml">Update User by UserId</button>
+	<button id="upusui" data-target="upus-by-User-Id-reversed.xml">Update User by UserId (Reversed)</button>
+    <button id="cuft" data-target="create-user-fiscal-transaction.xml">Create User Fiscal Transaction</button>
+	<button id="renew" data-target="renew-item-by-User-id.xml">Renew Item by UserId</button> 
+	<button id="request" data-target="request-item-by-User-id.xml">Request Item</button>
+	<button id="cancel-request" data-target="cancel-request-item.xml">Cancel request Item</button><br />
+	<hr>
+	<button id="localization" data-target="localizationSpecification.xml">Localization Specification</button>
+	
+        <!--
+
+	Not yet used services
+        <button id="lookupItem2" data-target="loookup-item-requestid.xml" title="Máte identifikátor žádosti a chcete najít předmět s ní spojený (pouze x-services)">Lookup Item (Request Id)</button>
+        <button id="luaimd5" data-target="user-lookup-by-AuthInput(password-encrypted-with-md5).xml">Lookup User by AuthInput(MD5)</button>
+        
+	Update user
+	
+	<button id="upus1" data-target="upus-structuredPhysicalAdreess-1.xml" title="Updates user with a structured physical address, where is specified maximum descriptive information.">Update User 1</button>
+	<button id="upus2" data-target="upus-structuredPhysicalAdreess-2.xml" title="Updates user with a structured physical address, with two lines, which are optionally formatted.">Update User 2</button>
+	<button id="upus3" data-target="upus-requiredFieldsOnly.xml" title="Specifies which elements are required after you decide what you want to update.">Update User 3</button>
+	-->
+    </div>
+
+    </div>
+
+  </body>
+</html>

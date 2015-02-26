@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+    <ns1:RenewItem>
+        
+		<ns1:UserId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH</ns1:AgencyId>			
+			<ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
+			<ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+		</ns1:UserId>
+                
+		<ns1:ItemId>
+			<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH</ns1:AgencyId>
+			<ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
+			<ns1:ItemIdentifierValue>KOH50004929137</ns1:ItemIdentifierValue>
+		</ns1:ItemId>
+		
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Bibliographic Description</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Hold Queue Length</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Circulation Status</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Electronic Resource</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Use Restriction Type</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Location</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Physical Condition</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Security Marker</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Item Description</ns1:ItemElementType>
+		<ns1:ItemElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm">Sensitization Flag</ns1:ItemElementType>
+		
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Authentication Input</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Block Or Trap</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Date Of Birth</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Address Information</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Language</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Privilege</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Id</ns1:UserElementType>
+		<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Previous User Id</ns1:UserElementType>
+        
+        <ns1:DesiredDateDue>2014-09-17T00:00:00</ns1:DesiredDateDue>
+        <ns1:DesiredDateForReturn>2014-09-25T00:00:00</ns1:DesiredDateForReturn>
+        <ns1:AcknowledgedFeeAmount>
+        	<ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">CZK</ns1:CurrencyCode>
+        	<ns1:MonetaryValue>10</ns1:MonetaryValue>
+        </ns1:AcknowledgedFeeAmount>
+        <ns1:PaidFeeAmount>
+           	<ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">CZK</ns1:CurrencyCode>
+        	<ns1:MonetaryValue>10</ns1:MonetaryValue>
+        </ns1:PaidFeeAmount>
+        
+        <ns1:AcknowledgedItemUseRestrictionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemuserestrictiontype/itemuserestrictiontype.scm">No Reproduction</ns1:AcknowledgedItemUseRestrictionType>
+        <ns1:AcknowledgedItemUseRestrictionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemuserestrictiontype/itemuserestrictiontype.scm">User Signature Required</ns1:AcknowledgedItemUseRestrictionType>
+        <ns1:AcknowledgedItemUseRestrictionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemuserestrictiontype/itemuserestrictiontype.scm">Limited Circulation, Short Loan Period</ns1:AcknowledgedItemUseRestrictionType>
+        
+    </ns1:RenewItem>
+</ns1:NCIPMessage>
