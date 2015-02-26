@@ -32,9 +32,11 @@ import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
 /**
- * This class implements the Lookup Item service for the Aleph back-end connector. Basically this just calls the AlephRemoteServiceManager to get hard-coded data (e.g. title, call #, etc.).
+ * This class implements the Lookup Item service for the Aleph back-end connector. Basically this just calls the AlephRemoteServiceManager to get hard-coded data (e.g. title, call
+ * #, etc.).
  * <p/>
- * Note: If you're looking for a model of how to code your own ILS's NCIPService classes, do not use this class as an example. See the NCIP toolkit Connector developer's documentation for guidance.
+ * Note: If you're looking for a model of how to code your own ILS's NCIPService classes, do not use this class as an example. See the NCIP toolkit Connector developer's
+ * documentation for guidance.
  */
 public class AlephLookupItemService implements LookupItemService {
 
@@ -110,10 +112,6 @@ public class AlephLookupItemService implements LookupItemService {
 		}
 
 		responseData.setItemOptionalFields(iof);
-
-		ItemTransaction itemTransaction = AlephUtil.parseItemTransaction(alephItem);
-		responseData.setItemTransaction(itemTransaction);
-
 	}
 
 }

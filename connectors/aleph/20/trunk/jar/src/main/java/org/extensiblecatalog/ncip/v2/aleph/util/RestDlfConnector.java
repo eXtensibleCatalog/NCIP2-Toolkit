@@ -196,6 +196,8 @@ public class RestDlfConnector extends AlephMediator {
 		if (!isCorrectRecordId) {
 			throw new AlephException("Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
 		}
+
+		// AppProfileType is currently used for language specification
 		String appProfileType = null;
 		if (lookupItemInitData.getInitiationHeader() != null && lookupItemInitData.getInitiationHeader().getApplicationProfileType() != null)
 			appProfileType = lookupItemInitData.getInitiationHeader().getApplicationProfileType().getValue();

@@ -46,8 +46,7 @@ public class AlephRenewItemService implements RenewItemService {
 
 			if (itemIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null,
-						"Cannot renew unknown item.");
+				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null, "Cannot renew unknown item.");
 				problems.add(p);
 
 			}

@@ -53,7 +53,7 @@ public class AlephLookupUserService implements LookupUserService {
 
 		String patronId = null;
 		String password = null;
-		boolean authenticateOnly = false;
+		boolean authenticationIncluded = false;
 
 		if (initData.getUserId() != null)
 			patronId = initData.getUserId().getUserIdentifierValue();
@@ -65,7 +65,7 @@ public class AlephLookupUserService implements LookupUserService {
 					password = authInput.getAuthenticationInputData();
 				}
 			}
-			authenticateOnly = true;
+			authenticationIncluded = true;
 		}
 
 		boolean userIdIsEmpty = patronId.isEmpty();
@@ -74,7 +74,7 @@ public class AlephLookupUserService implements LookupUserService {
 		if (userIdIsEmpty || authIsSetAndPwIsEmpty) {
 			List<Problem> problems = new ArrayList<Problem>();
 
-			if (!authenticateOnly) {
+			if (!authenticationIncluded) {
 
 				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Element UserIdentifierValue is empty.");
 				problems.add(p);
@@ -99,7 +99,7 @@ public class AlephLookupUserService implements LookupUserService {
 			responseData.setProblems(problems);
 		} else {
 
-			if (authenticateOnly) {
+			if (authenticationIncluded) {
 				// Just authenticate patronId with password input through X-Services ..
 
 				AgencyId suppliedAgencyId;
@@ -115,12 +115,12 @@ public class AlephLookupUserService implements LookupUserService {
 
 					String username = alephRemoteServiceManager.authenticateUser(suppliedAgencyId, patronId, password);
 
-					UserId userId = new UserId();
-					userId.setAgencyId(suppliedAgencyId);
-					userId.setUserIdentifierValue(username);
-					userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+					// Later is UserId from initData copied to responseData - we need to overwrite AuthInputs
+					initData.setUserId(createUserId(suppliedAgencyId, username));					
 
-					responseData.setUserId(userId);
+					AlephRestDlfUser alephUser = alephRemoteServiceManager.lookupUser(username, initData);
+
+					updateResponseData(initData, responseData, alephUser, alephRemoteServiceManager);
 
 				} catch (IOException ie) {
 					Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -261,5 +261,15 @@ public class AlephLookupUserService implements LookupUserService {
 			if (includeUserOptionalFields)
 				responseData.setUserOptionalFields(uof);
 		}
+	}
+	
+	private UserId createUserId(AgencyId suppliedAgencyId, String userName) {
+
+		UserId userId = new UserId();
+		userId.setAgencyId(suppliedAgencyId);
+		userId.setUserIdentifierValue(userName);
+		userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+		
+		return userId;
 	}
 }
