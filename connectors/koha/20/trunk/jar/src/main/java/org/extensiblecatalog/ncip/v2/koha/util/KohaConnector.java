@@ -18,6 +18,7 @@ import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
 import org.extensiblecatalog.ncip.v2.koha.item.KohaRenewItem;
 import org.extensiblecatalog.ncip.v2.koha.item.KohaRequestItem;
 import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
+import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupItemHandler;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupUserHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
@@ -170,8 +171,17 @@ public class KohaConnector {
 	}
 
 	public KohaItem lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+		KohaLookupItemHandler itemHandler = new KohaLookupItemHandler();
+
+		String itemId = initData.getItemId().getItemIdentifierValue();
+		
+		URL url = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort()).setPath(LocalConfig.getIlsDiSuffix()).addRequest(KohaConstants.PARAM_SERVICE, KohaConstants.ILS_DI_LOOKUP_ITEM).addRequest(KohaConstants.PARAM_ID, itemId).toURL();
+		
+		InputSource streamSource = new InputSource(url.openStream());
+		
+		parser.parse(streamSource, itemHandler);
+		
+		return itemHandler.getKohaItem();
 	}
 
 	public List<KohaItem> lookupItems(String id, LookupItemSetInitiationData initData, KohaLookupItemSetService kohaLookupItemSetService) throws KohaException, IOException,

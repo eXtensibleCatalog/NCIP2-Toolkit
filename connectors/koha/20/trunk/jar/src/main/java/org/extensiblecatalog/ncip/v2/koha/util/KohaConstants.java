@@ -60,8 +60,11 @@ public class KohaConstants {
 	
 	public static final SimpleDateFormat KOHA_DATE_FORMATTER = new SimpleDateFormat("yyy-MM-dd");
 	
-	// lookup user param values
+	public static final String PARAM_SERVICE = "service";
+	public static final String PARAM_ID = "id";
+	
 	public static final String ILS_DI_LOOKUP_USER = "GetPatronInfo";
+	public static final String ILS_DI_LOOKUP_ITEM = "GetRecords";
 
 	public static final String STATUS_OK = "ok";
 

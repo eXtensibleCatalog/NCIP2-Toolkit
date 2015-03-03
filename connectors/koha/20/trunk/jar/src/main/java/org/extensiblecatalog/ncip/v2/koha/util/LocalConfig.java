@@ -30,6 +30,8 @@ public class LocalConfig {
 
 	private static int bibLibraryLength;
 
+	private static String ilsDiSuffix;
+
 	/**
 	 * @return the echoParticularProblemsToLUIS
 	 */
@@ -307,5 +309,13 @@ public class LocalConfig {
 	public static int getBibLibraryLength() {
 		return bibLibraryLength;
 	}
+	
+	public static void setIlsDiSuffix(String ilsDiSuffix) {
+		LocalConfig.ilsDiSuffix = ilsDiSuffix;
+	}
 
+	public static String getIlsDiSuffix() {
+		return ilsDiSuffix;
+	}
+	
 }
