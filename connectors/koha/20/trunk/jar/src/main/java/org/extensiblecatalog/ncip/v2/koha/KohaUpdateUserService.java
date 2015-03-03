@@ -110,10 +110,6 @@ public class KohaUpdateUserService implements NCIPService<UpdateUserInitiationDa
 			} catch (FactoryConfigurationError fce) {
 				Problem p = new Problem(new ProblemType("Processing FactoryConfigurationError."), null, fce.getMessage(), "Error initializing XMLBuilder.");
 				responseData.setProblems(Arrays.asList(p));
-			} catch (TransformerException te) {
-				Problem p = new Problem(new ProblemType("Processing TransformerException error."), null, te.getMessage(),
-						"Couldn't convert XMLBuilder to String using asString() method.");
-				responseData.setProblems(Arrays.asList(p));
 			} catch (Exception e) {
 				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
 				responseData.setProblems(Arrays.asList(p));

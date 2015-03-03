@@ -54,7 +54,7 @@ public class KohaLookupUserService implements LookupUserService {
 
 		String patronId = null;
 		String password = null;
-		boolean authenticateOnly = false;
+		boolean authenticationIncluded = false;
 
 		if (initData.getUserId() != null)
 			patronId = initData.getUserId().getUserIdentifierValue();
@@ -66,7 +66,7 @@ public class KohaLookupUserService implements LookupUserService {
 					password = authInput.getAuthenticationInputData();
 				}
 			}
-			authenticateOnly = true;
+			authenticationIncluded = true;
 		}
 
 		boolean userIdIsEmpty = patronId.isEmpty();
@@ -75,7 +75,7 @@ public class KohaLookupUserService implements LookupUserService {
 		if (userIdIsEmpty || authIsSetAndPwIsEmpty) {
 			List<Problem> problems = new ArrayList<Problem>();
 
-			if (!authenticateOnly) {
+			if (!authenticationIncluded) {
 
 				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Element UserIdentifierValue is empty.");
 				problems.add(p);
@@ -100,7 +100,7 @@ public class KohaLookupUserService implements LookupUserService {
 			responseData.setProblems(problems);
 		} else {
 
-			if (authenticateOnly) {
+			if (authenticationIncluded) {
 				// Just authenticate patronId with password input through X-Services ..
 
 				AgencyId suppliedAgencyId;

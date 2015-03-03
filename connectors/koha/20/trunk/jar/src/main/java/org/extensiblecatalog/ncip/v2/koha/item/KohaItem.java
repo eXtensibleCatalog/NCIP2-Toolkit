@@ -12,7 +12,6 @@ import java.util.List;
 import org.extensiblecatalog.ncip.v2.koha.agency.KohaAgency;
 import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
-import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants.Availability;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
@@ -40,7 +39,6 @@ public class KohaItem implements Serializable {
 
 	private List<ItemUseRestrictionType> itemUseRestrictionTypes;
 
-	private Availability availability;
 
 	private int holdQueueLength = -1;
 
@@ -105,9 +103,6 @@ public class KohaItem implements Serializable {
 		this.collection = collection;
 	}
 
-	public void addItemRestriction(String itemRestriction) {
-		itemUseRestrictionTypes.add(KohaUtil.parseItemUseRestrictionType(itemRestriction));
-	}
 
 	public List<ItemUseRestrictionType> getItemUseRestrictionTypes() {
 		return itemUseRestrictionTypes;
@@ -120,19 +115,6 @@ public class KohaItem implements Serializable {
 		return bibId;
 	}
 
-	/**
-	 * @param bibId
-	 *            the bibId to set
-	 */
-	public void setBibId(String bibId) {
-		this.bibId = bibId;
-		if (this.bibId != null && this.bibId.length() < KohaConstants.BIB_ID_LENGTH) {
-			// ensure at least 9 characters, if not pad zeros on front
-			while (this.bibId.length() < KohaConstants.BIB_ID_LENGTH) {
-				this.bibId = "0" + this.bibId;
-			}
-		}
-	}
 
 	/**
 	 * @return the admId
@@ -356,20 +338,6 @@ public class KohaItem implements Serializable {
 	}
 
 	/**
-	 * @param holdingsId
-	 *            the holdingsId to set
-	 */
-	public void setHoldingsId(String holdingsId) {
-		this.holdingsId = holdingsId;
-		if (this.holdingsId != null && this.holdingsId.length() < KohaConstants.HOLDINGS_ID_LENGTH) {
-			// ensure at least 9 characters, if not pad zeros on front
-			while (this.holdingsId.length() < KohaConstants.HOLDINGS_ID_LENGTH) {
-				this.holdingsId = "0" + this.holdingsId;
-			}
-		}
-	}
-
-	/**
 	 * @return the holdingsId
 	 */
 	public String getHoldingsId() {
@@ -463,14 +431,6 @@ public class KohaItem implements Serializable {
 		this.dateHoldRequested = dateHoldRequested;
 	}
 
-	public void setDateHoldRequested(String date) throws ParseException {
-		// assume date in right format and parse, ignore empty values
-		if (date != null && date.length() > 0) {
-			SimpleDateFormat dateFormatter = new SimpleDateFormat(KohaConstants.HOLD_DATE_FORMAT);
-			setDateHoldRequested(dateFormatter.parse(date));
-		}
-	}
-
 	/**
 	 * @return the dateHoldRequested
 	 */
@@ -486,34 +446,12 @@ public class KohaItem implements Serializable {
 		this.dateAvailablePickup = dateAvailablePickup;
 	}
 
-	public void setDateAvailablePickup(String date) throws ParseException {
-		// assume date in right format and parse, ignore empty values
-		if (date != null && date.length() > 0) {
-			SimpleDateFormat dateFormatter = new SimpleDateFormat(KohaConstants.HOLD_DATE_FORMAT);
-			setDateAvailablePickup(dateFormatter.parse(date));
-		}
-	}
 
 	/**
 	 * @return the dateAvailablePickup
 	 */
 	public Date getDateAvailablePickup() {
 		return dateAvailablePickup;
-	}
-
-	/**
-	 * @param available
-	 *            the available to set
-	 */
-	public void setAvailability(Availability available) {
-		this.availability = available;
-	}
-
-	/**
-	 * @return the available
-	 */
-	public Availability getAvailability() {
-		return availability;
 	}
 
 	/**
@@ -524,25 +462,6 @@ public class KohaItem implements Serializable {
 		this.dueDate = dueDate;
 	}
 
-	/**
-	 * Parse date from string and set to value if parsing successful
-	 * 
-	 * @param date
-	 * @throws ParseException
-	 */
-	public void setDueDateRenewal(String date) throws ParseException {
-		setDueDate(date, KohaConstants.RENEW_DUE_DATE_FORMAT);
-	}
-
-	/**
-	 * Parse date from string and set to value if parsing successful
-	 * 
-	 * @param date
-	 * @throws ParseException
-	 */
-	public void setDueDateLoan(String date) throws ParseException {
-		setDueDate(date, KohaConstants.LOAN_DUE_DATE_FORMAT);
-	}
 
 	/**
 	 * Parse date from string and set to value if parsing successful
@@ -607,20 +526,6 @@ public class KohaItem implements Serializable {
 	 */
 	public Date getFineAccrualDate() {
 		return fineAccrualDate;
-	}
-
-	/**
-	 * Parse date from string and set to value if parsing successful
-	 * 
-	 * @param date
-	 * @throws ParseException
-	 */
-	public void setFineAccrualDate(String date) throws ParseException {
-		// assume date in right format and parse, ignore empty values
-		if (date != null && date.length() > 0) {
-			SimpleDateFormat dateFormatter = new SimpleDateFormat(KohaConstants.FINE_ACCRUAL_DATE_FORMAT);
-			setFineAccrualDate(dateFormatter.parse(date));
-		}
 	}
 
 	/**
@@ -696,14 +601,8 @@ public class KohaItem implements Serializable {
 			if (item.getAuthor() != null) {
 				this.setAuthor(item.getAuthor());
 			}
-			if (item.getAvailability() != null) {
-				this.setAvailability(item.getAvailability());
-			}
 			if (item.getBarcode() != null) {
 				this.setBarcode(item.getBarcode());
-			}
-			if (item.getBibId() != null) {
-				this.setBibId(item.getBibId());
 			}
 			if (item.getBorrowingUsers() != null) {
 				for (KohaUser user : item.getBorrowingUsers()) {
@@ -742,9 +641,6 @@ public class KohaItem implements Serializable {
 			}
 			if (item.getFineStatus() != null) {
 				this.setFineStatus(item.getFineStatus());
-			}
-			if (item.getHoldingsId() != null) {
-				this.setHoldingsId(item.getHoldingsId());
 			}
 			if (item.getHoldQueueLength() != this.getHoldQueueLength()) {
 				this.setHoldQueueLength(item.getHoldQueueLength());
@@ -801,7 +697,6 @@ public class KohaItem implements Serializable {
 		sb.append("[Series:" + (getSeries() != null ? getSeries() : "null") + "],");
 		sb.append("[Title:" + (getTitle() != null ? getTitle() : "null") + "],");
 		sb.append("[CirculationStatus:" + (getCirculationStatus() != null ? getCirculationStatus() : "null") + "],");
-		sb.append("[Availability:" + (getAvailability() != null ? getAvailability() : "null") + "],");
 		sb.append("[ElectronicResource:" + (getElectronicResource() != null ? getElectronicResource() : "null") + "],");
 		sb.append("[HoldRequestID:" + (getHoldRequestId() != null ? getHoldRequestId() : "null") + "],");
 		sb.append("[DateHoldRequested:" + (getDateHoldRequested() != null ? getDateHoldRequested() : "null") + "],");

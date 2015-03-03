@@ -50,40 +50,6 @@ import org.xml.sax.SAXException;
 
 public class KohaUtil {
 
-	private static Map<String, List<String>> itemRestrictionClasses;
-	private static boolean itemRestrictionClassesInitialized = false;
-
-	private static void initializeItemRestrictionClasses() {
-		itemRestrictionClasses = new HashMap<String, List<String>>();
-
-		// Define & add list of item statuses defining restriction 'In Library Use Only'
-		List<String> inLibraryUseOnly = new ArrayList<String>();
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_TO_THE_MUSIC_CORNER_ONLY_4F);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_IN_HOUSE_LOAN);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_REFERENCE_ONLY);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_REFERENCE_ONLY_SPN_2F);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_REFERENCE_ONLY_ST_4F);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_REFERENCE_SHELF);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_STUDY_ROOM);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_IN_HOUSE_ILL);
-		inLibraryUseOnly.add(KohaConstants.ITEM_STATUS_RETRO);
-		itemRestrictionClasses.put(KohaConstants.ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY, inLibraryUseOnly);
-
-		// Define & add list of item statuses defining restrictions of type 'Loan Period'
-		List<String> loanPeriods = new ArrayList<String>();
-		loanPeriods.add(KohaConstants.ITEM_STATUS_OPEN_STOCK_MONTH);
-		loanPeriods.add(KohaConstants.ITEM_STATUS_LONG_TERM_LOAN);
-		loanPeriods.add(KohaConstants.ITEM_STATUS_MONTH);
-		loanPeriods.add(KohaConstants.ITEM_STATUS_WEEK);
-		loanPeriods.add(KohaConstants.ITEM_STATUS_14_DAYS);
-		loanPeriods.add(KohaConstants.ITEM_STATUS_7_DAYS);
-		loanPeriods.add(KohaConstants.ITEM_STATUS_2_HOURS);
-		itemRestrictionClasses.put(KohaConstants.ITEM_RESTRICTION_LOAN_PERIOD, loanPeriods);
-
-		// Note that other item statuses returned by Koha RESTful APIs ILS are non-restrictive
-		itemRestrictionClassesInitialized = true;
-	}
-
 	public static AgencyId createAgencyId(String agencyId) {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
@@ -219,44 +185,6 @@ public class KohaUtil {
 		return locationNameInstance;
 	}
 
-	public static ItemUseRestrictionType parseItemUseRestrictionType(String itemRestriction) {
-		ItemUseRestrictionType itemUseRestrictionType = null;
-
-		if (!itemRestrictionClassesInitialized)
-			initializeItemRestrictionClasses();
-
-		boolean isLibraryOnlyRestrictionType = itemRestrictionClasses.get(KohaConstants.ITEM_RESTRICTION_IN_LIBRARY_USE_ONLY).contains(itemRestriction);
-		boolean isLoanPeriodRestrictionType = itemRestrictionClasses.get(KohaConstants.ITEM_RESTRICTION_LOAN_PERIOD).contains(itemRestriction);
-
-		if (isLibraryOnlyRestrictionType) {
-
-			if (itemRestriction.equals(KohaConstants.ITEM_STATUS_TO_THE_MUSIC_CORNER_ONLY_4F))
-				itemUseRestrictionType = Version1ItemUseRestrictionType.SUPERVISION_REQUIRED;
-
-			else if (itemRestriction.equals(KohaConstants.ITEM_STATUS_REFERENCE_ONLY_SPN_2F))
-				itemUseRestrictionType = Version1ItemUseRestrictionType.USE_ONLY_IN_CONTROLLED_ACCESS;
-
-			else if (itemRestriction.equals(KohaConstants.ITEM_STATUS_RETRO))
-				itemUseRestrictionType = Version1ItemUseRestrictionType.NOT_FOR_LOAN;
-			else
-				itemUseRestrictionType = Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY;
-
-		} else if (isLoanPeriodRestrictionType) {
-
-			if (itemRestriction.equals(KohaConstants.ITEM_STATUS_LONG_TERM_LOAN))
-				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_LONG_LOAN_PERIOD;
-
-			else if (itemRestriction.equals(KohaConstants.ITEM_STATUS_MONTH) || itemRestriction.equals(KohaConstants.ITEM_STATUS_OPEN_STOCK_MONTH))
-				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_NORMAL_LOAN_PERIOD;
-
-			else
-				itemUseRestrictionType = Version1ItemUseRestrictionType.LIMITED_CIRCULATION_SHORT_LOAN_PERIOD;
-		} else
-			itemUseRestrictionType = new ItemUseRestrictionType("localized", itemRestriction);
-
-		return itemUseRestrictionType;
-	}
-
 	public static boolean inDaylightTime() {
 		return TimeZone.getDefault().inDaylightTime(new Date());
 	}
@@ -273,14 +201,6 @@ public class KohaUtil {
 		if (day.length() < 2)
 			day = "0" + day;
 		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
-	}
-
-	public static String parseRecordIdFromKohaItemId(String itemId) {
-		return itemId.split(KohaConstants.UNIQUE_ITEM_ID_SEPARATOR)[0];
-	}
-
-	public static String parseItemIdFromKohaItemId(String itemId) {
-		return itemId.split(KohaConstants.UNIQUE_ITEM_ID_SEPARATOR)[1];
 	}
 
 	public static MediumType detectMediumType(String mediumTypeParsed) {
@@ -310,63 +230,6 @@ public class KohaUtil {
 		return mediumType;
 	}
 
-	public static PhysicalAddress parsePhysicalAddress(String address) {
-
-		PhysicalAddress physicalAddress = new PhysicalAddress();
-		StructuredAddress structuredAddress = new StructuredAddress();
-
-		String[] addressParts = address.split(KohaConstants.UNSTRUCTURED_ADDRESS_SEPARATOR);
-
-		int addressPartsLength = addressParts.length;
-
-		if (addressPartsLength > 2) {
-			// In this case address = "Vysokoškolské koleje VUT - Kolejní 2, A05/237, 612 00 Brno";
-			structuredAddress.setStreet(addressParts[0]);
-			structuredAddress.setPostOfficeBox(addressParts[1]);
-
-			String postalCode = addressParts[2].substring(0, KohaConstants.POSTAL_CODE_LENGTH);
-			structuredAddress.setPostalCode(postalCode);
-
-			String city = addressParts[2].substring(KohaConstants.POSTAL_CODE_LENGTH);
-			structuredAddress.setLocality(city.trim());
-		} else if (addressPartsLength > 1) {
-			// F.e. Trvalá ulice 123, 12345 Trvalé
-			structuredAddress.setStreet(addressParts[0]);
-
-			String postalCode = addressParts[1].substring(0, KohaConstants.POSTAL_CODE_LENGTH);
-			structuredAddress.setPostalCode(postalCode);
-
-			String city = addressParts[1].substring(KohaConstants.POSTAL_CODE_LENGTH);
-			structuredAddress.setLocality(city.trim());
-		} else
-			structuredAddress.setStreet(addressParts[0]);
-
-		physicalAddress.setStructuredAddress(structuredAddress);
-		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.POSTAL_ADDRESS);
-
-		return physicalAddress;
-	}
-
-	/**
-	 * Pattern for building unique item Id from document number & item sequence item is:<br/>
-	 * bibLibrary + docRecordNumber + "-" + admLibrary + docItemNumber + itemSequenceNumber<br/>
-	 * <br/>
-	 * 
-	 * Output should look like this example:<br />
-	 * KOH01000000421-KOH50000062021000010 <br />
-	 * 
-	 * @param localConfig
-	 * @param docRecordNumber
-	 * @param docItemNumber
-	 * @param itemSequenceNumber
-	 * @return
-	 */
-	public static String buildKohaItemId(String documentRecordNumber, String documentItemNumber, String itemSequenceNumber) {
-		String itemId = LocalConfig.getBibLibrary() + documentRecordNumber + KohaConstants.UNIQUE_ITEM_ID_SEPARATOR + LocalConfig.getAdmLibrary() + documentItemNumber
-				+ itemSequenceNumber;
-		return itemId;
-	}
-
 	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {
 		BlockOrTrap blockOrTrap = new BlockOrTrap();
 
@@ -384,7 +247,7 @@ public class KohaUtil {
 	 * @throws SAXException
 	 */
 	public static GregorianCalendar parseGregorianCalendarFromKohaDate(String kohaDateParsed) throws SAXException {
-		if (!kohaDateParsed.equalsIgnoreCase("00000000")) {
+		if (!kohaDateParsed.equalsIgnoreCase("0000-00-00")) {
 			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
 
 			try {
@@ -400,22 +263,6 @@ public class KohaUtil {
 			return gregorianCalendarDate;
 		} else
 			return null;
-	}
-
-	public static CirculationStatus parseCirculationStatus(String circulationStatusVal) {
-		CirculationStatus circulationStatus;
-		if (circulationStatusVal.matches(KohaConstants.CIRC_STATUS_ON_SHELF + "|" + KohaConstants.CIRC_STATUS_REQUESTED + "|" + KohaConstants.CIRC_STATUS_PROCESSING)) {
-			if (circulationStatusVal.equalsIgnoreCase(KohaConstants.CIRC_STATUS_ON_SHELF)) {
-				circulationStatus = Version1CirculationStatus.AVAILABLE_ON_SHELF;
-			} else if (circulationStatusVal.equalsIgnoreCase(KohaConstants.CIRC_STATUS_REQUESTED)) {
-				circulationStatus = Version1CirculationStatus.ON_LOAN;
-			} else
-				// Status = processing
-				circulationStatus = Version1CirculationStatus.IN_PROCESS;
-
-		} else
-			circulationStatus = new CirculationStatus("localized", circulationStatusVal);
-		return circulationStatus;
 	}
 
 	public static ResponseHeader reverseInitiationHeader(NCIPInitiationData initData) {
@@ -445,25 +292,6 @@ public class KohaUtil {
 			}
 		}
 		return responseHeader;
-	}
-
-	public static boolean isCorrectRecordId(String recordId, int bibLibLength) {
-		if (recordId.length() == KohaConstants.BIB_ID_LENGTH + bibLibLength) {
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean isCorrectItemId(String sequenceNumber, int bibLibLength) {
-		if (sequenceNumber.length() == KohaConstants.BIB_ID_LENGTH + bibLibLength + KohaConstants.ITEM_ID_UNIQUE_PART_LENGTH) {
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean isCorrectLoanId(String kohaLoanId, int bibLibLength) {
-		// Loan Id has the same length specifications as Record Id
-		return isCorrectRecordId(kohaLoanId, bibLibLength);
 	}
 
 	/**
@@ -519,9 +347,7 @@ public class KohaUtil {
 
 	/**
 	 * Builds an XML POST in order to send it as a Http request to renew an item.
-	 * 
 	 * You can set desired due date - but your Koha settings may not be compatible with
-	 * 
 	 * setting custom due date & will add by default let's say 5 days to old due date.<br>
 	 * <br>
 	 * That's why you can set it's argument to null & nothing extra will happen

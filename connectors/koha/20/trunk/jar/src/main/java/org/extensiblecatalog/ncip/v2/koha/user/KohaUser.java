@@ -107,16 +107,6 @@ public class KohaUser implements Serializable {
 	}
 
 	/**
-	 * Set the full name
-	 * 
-	 * @param fullName
-	 */
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-		setNameInformation(fullName);
-	}
-
-	/**
 	 * Get the full name
 	 * 
 	 * @return full name
@@ -134,7 +124,6 @@ public class KohaUser implements Serializable {
 
 		UserAddressInformation uai = new UserAddressInformation();
 
-		uai.setPhysicalAddress(KohaUtil.parsePhysicalAddress(address));
 
 		uai.setUserAddressRoleType(Version1UserAddressRoleType.SHIP_TO);
 
@@ -142,29 +131,6 @@ public class KohaUser implements Serializable {
 
 	}
 
-	/**
-	 * Set the email address
-	 * 
-	 * @param emailAddress
-	 */
-	public void setEmailAddress(String emailAddress) {
-
-		String[] emailAddresses = emailAddress.split(KohaConstants.UNSTRUCTURED_ADDRESS_SEPARATOR);
-		for (String email : emailAddresses) {
-			UserAddressInformation uai = new UserAddressInformation();
-			ElectronicAddress electronicAddress = new ElectronicAddress();
-
-			electronicAddress.setElectronicAddressData(email);
-			electronicAddress.setElectronicAddressType(Version1ElectronicAddressType.MAILSERVER);
-
-			uai.setElectronicAddress(electronicAddress);
-
-			uai.setUserAddressRoleType(Version1UserAddressRoleType.NOTICE);
-
-			userAddrInfos.add(uai);
-		}
-
-	}
 
 	/**
 	 * Set the session id for the current session of this authenticated Koha User
@@ -456,24 +422,7 @@ public class KohaUser implements Serializable {
 		return nameInfo;
 	}
 
-	public void setNameInformation(String nameInfo) {
-		PersonalNameInformation pni = new PersonalNameInformation();
-		StructuredPersonalUserName spun = new StructuredPersonalUserName();
-		String[] nameInfos = nameInfo.split(KohaConstants.UNSTRUCTURED_NAME_SEPARATOR);
-		if (nameInfos.length > 0) {
-			if (KohaConstants.FIRST_SURNAME) {
-				spun.setSurname(nameInfos[0].trim());
-				if (nameInfos.length > 1)
-					spun.setGivenName(nameInfos[1].trim());
-			} else {
-				spun.setGivenName(nameInfos[0].trim());
-				if (nameInfos.length > 1)
-					spun.setSurname(nameInfos[1].trim());
-			}
-		}
-		pni.setStructuredPersonalUserName(spun);
-		this.nameInfo.setPersonalNameInformation(pni);
-	}
+	
 
 	public List<BlockOrTrap> getBlockOrTraps() {
 		return blockOrTraps;
