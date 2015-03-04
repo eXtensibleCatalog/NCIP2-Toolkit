@@ -12,10 +12,14 @@ public class LocalConfig {
 	private static String authDataFormatType;
 
 	private static String serverName;
-	private static String serverPort;
-	private static String serverSuffix;
+	private static String opacPort;
+	private static String svcPort;
+	private static String svcSuffix;
 	private static String bibLibrary;
 	private static String admLibrary;
+	
+	private static String adminName;
+	private static String adminPass;
 
 	// Koha API's patron -> address mapping
 	private static String userStreetStoredIn;
@@ -148,7 +152,7 @@ public class LocalConfig {
 	 * @param serverName
 	 *            the serverName to set
 	 */
-	public static void setServerName(String serverName) {
+	public static void setOpacServerName(String serverName) {
 		LocalConfig.serverName = serverName;
 	}
 
@@ -156,30 +160,15 @@ public class LocalConfig {
 	 * @return the serverPort
 	 */
 	public static String getServerPort() {
-		return serverPort;
+		return opacPort;
 	}
 
 	/**
 	 * @param serverPort
 	 *            the serverPort to set
 	 */
-	public static void setServerPort(String serverPort) {
-		LocalConfig.serverPort = serverPort;
-	}
-
-	/**
-	 * @return the serverSuffix
-	 */
-	public static String getServerSuffix() {
-		return serverSuffix;
-	}
-
-	/**
-	 * @param serverSuffix
-	 *            the serverSuffix to set
-	 */
-	public static void setServerSuffix(String serverSuffix) {
-		LocalConfig.serverSuffix = serverSuffix;
+	public static void setOpacServerPort(String serverPort) {
+		LocalConfig.opacPort = serverPort;
 	}
 
 	/**
@@ -317,5 +306,61 @@ public class LocalConfig {
 	public static String getIlsDiSuffix() {
 		return ilsDiSuffix;
 	}
-	
+
+	/**
+	 * @return the svcSuffix
+	 */
+	public static String getSvcSuffix() {
+		return svcSuffix;
+	}
+
+	/**
+	 * @param svcSuffix the svcSuffix to set
+	 */
+	public static void setSvcSuffix(String svcSuffix) {
+		LocalConfig.svcSuffix = svcSuffix;
+	}
+
+	/**
+	 * @return the svcPort
+	 */
+	public static String getSvcServerPort() {
+		return svcPort;
+	}
+
+	/**
+	 * @param svcPort the svcPort to set
+	 */
+	public static void setSvcServerPort(String svcPort) {
+		LocalConfig.svcPort = svcPort;
+	}
+
+	/**
+	 * @return the adminName
+	 */
+	public static String getAdminName() {
+		return adminName;
+	}
+
+	/**
+	 * @param adminName the adminName to set
+	 */
+	public static void setAdminName(String adminName) {
+		LocalConfig.adminName = adminName;
+	}
+
+	/**
+	 * @return the adminPass
+	 */
+	public static String getAdminPass() {
+		return adminPass;
+	}
+
+	/**
+	 * @param adminPass the adminPass to set
+	 */
+	public static void setAdminPass(String adminPass) {
+		LocalConfig.adminPass = adminPass;
+	}
+
 }

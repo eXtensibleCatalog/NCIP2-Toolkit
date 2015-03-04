@@ -49,10 +49,10 @@ AuthDataFormatType=text/plain
 
 OPACServer=188.166.14.82
 OPACPort=80
-SeviceSuffix=svc
-ILSDISuffix=cgi-bin/koha/ilsdi.pl
+SVCPort=8080
 
-DefaultAgency=KOH01
+SVCSuffix=cgi-bin/koha/svc
+ILSDISuffix=cgi-bin/koha/ilsdi.pl
 
 KohaCurrencyCode=CZK
 

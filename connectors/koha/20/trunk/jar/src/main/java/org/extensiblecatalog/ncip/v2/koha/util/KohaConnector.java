@@ -23,6 +23,7 @@ import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupUserHandler
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
@@ -64,15 +65,16 @@ public class KohaConnector {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
 
-			LocalConfig.setServerName(kohaConfig.getProperty(KohaConstants.OPAC_SERVER));
-			LocalConfig.setServerPort(kohaConfig.getProperty(KohaConstants.OPAC_PORT));
-			LocalConfig.setServerSuffix(kohaConfig.getProperty(KohaConstants.ILS_DI_SUFFIX));
-			/*
-						LocalConfig.setBibLibrary(kohaConfig.getProperty(KohaConstants.BIBLIOGRAPHIC_LIBRARY));
-						LocalConfig.setAdmLibrary(kohaConfig.getProperty(KohaConstants.KOHA_ADMINISTRATIVE_LIBRARY));
+			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.OPAC_SERVER));
+			LocalConfig.setOpacServerPort(kohaConfig.getProperty(KohaConstants.OPAC_PORT));
+			LocalConfig.setSvcServerPort(kohaConfig.getProperty(KohaConstants.SVC_PORT));
 
-						LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.DEFAULT_AGENCY));
-			*/
+			LocalConfig.setAdminName(kohaConfig.getProperty(KohaConstants.ADMIN_NAME));
+			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.ADMIN_PASS));
+
+			LocalConfig.setIlsDiSuffix(kohaConfig.getProperty(KohaConstants.ILS_DI_SUFFIX));
+			LocalConfig.setSvcSuffix(kohaConfig.getProperty(KohaConstants.SVC_SUFFIX));
+
 			LocalConfig.setAgencyAddress(kohaConfig.getProperty(KohaConstants.AGENCY_UNSTRUCTURED_ADDRESS));
 			LocalConfig.setAgencyName(kohaConfig.getProperty(KohaConstants.AGENCY_TRANSLATED_NAME));
 
@@ -120,8 +122,7 @@ public class KohaConnector {
 		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
 
 		// Create URL request only if specified service was desired
-		URL addressUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort()).setPath(LocalConfig.getServerSuffix())
-				.addRequest(KohaConstants.ILS_DI_LOOKUP_USER, patronId).toURL();
+		URL addressUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort()).setPath(LocalConfig.getSvcSuffix()).toURL();
 
 		KohaLookupUserHandler userHandler = new KohaLookupUserHandler(initData);
 
@@ -174,13 +175,14 @@ public class KohaConnector {
 		KohaLookupItemHandler itemHandler = new KohaLookupItemHandler();
 
 		String itemId = initData.getItemId().getItemIdentifierValue();
-		
-		URL url = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort()).setPath(LocalConfig.getIlsDiSuffix()).addRequest(KohaConstants.PARAM_SERVICE, KohaConstants.ILS_DI_LOOKUP_ITEM).addRequest(KohaConstants.PARAM_ID, itemId).toURL();
-		
+
+		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_BIB, itemId).toURL();
+
 		InputSource streamSource = new InputSource(url.openStream());
-		
+
+		// TODO: need to authenticate first
 		parser.parse(streamSource, itemHandler);
-		
+
 		return itemHandler.getKohaItem();
 	}
 
@@ -190,9 +192,18 @@ public class KohaConnector {
 		return null;
 	}
 
-	public KohaItem lookupItem(String id, LookupItemSetInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+	public KohaItem lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException {
+		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue(id);
+		LIinitData.setItemId(itemId);
+		LIinitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
+		LIinitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
+		LIinitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
+		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
+		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
+		LIinitData.setLocationDesired(initData.getLocationDesired());
+		return lookupItem(LIinitData);
 	}
 
 	public KohaRequestItem lookupRequest(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException {
@@ -244,5 +255,9 @@ public class KohaConnector {
 		organizationNameInfo.setOrganizationNameType(Version1OrganizationNameType.TRANSLATED_NAME);
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;
+	}
+
+	private URLBuilder getCommonSvcURLBuilder() {
+		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getSvcServerPort()).setPath(LocalConfig.getSvcSuffix());
 	}
 }

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.ArrayUtils;
+
 public class URLBuilder {
 
 	Map<String, String> params = new HashMap<String, String>();
@@ -17,6 +19,11 @@ public class URLBuilder {
 
 	public URLBuilder setPath(String... path) {
 		this.path = path;
+		return this;
+	}
+	
+	public URLBuilder appendPath(String... path) {
+		this.path = (String[]) ArrayUtils.addAll(this.path, path);
 		return this;
 	}
 
