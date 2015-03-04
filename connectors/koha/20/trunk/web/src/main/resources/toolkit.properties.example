@@ -54,6 +54,9 @@ SVCPort=8080
 SVCSuffix=cgi-bin/koha/svc
 ILSDISuffix=cgi-bin/koha/ilsdi.pl
 
+AdminName=userName
+AdminPass=userPassword
+
 KohaCurrencyCode=CZK
 
 # If there is a problem looking up an item from lookup item set, this defines whether to ouput those problems.

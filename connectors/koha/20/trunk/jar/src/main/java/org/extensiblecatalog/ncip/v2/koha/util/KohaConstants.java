@@ -62,4 +62,19 @@ public class KohaConstants {
 	public static final String SVC_MEMBERS_SEARCH = "members/search";
 
 	public static final String STATUS_OK = "ok";
+	
+	//
+	// XML PARSING SECTION
+	//
+	
+	public static final String XML_AUTH_STATUS = "auth_status";
+	public static final String XML_STATUS = "status";
+	
+	// Possible XML responses
+	
+	public static final String XML_VAL_STATUS_EXPIRED = "expired";
+	public static final String XML_VAL_STATUS_OK = "ok";
+	public static final Object XML_CONTROLFIELD = "controlfield";
+
+	public static final String XML_ATTR_TAG = "tag";
 }
