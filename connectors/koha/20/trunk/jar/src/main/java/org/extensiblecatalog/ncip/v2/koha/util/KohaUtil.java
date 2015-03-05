@@ -28,7 +28,8 @@ import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
-import org.extensiblecatalog.ncip.v2.service.MediumType;
+import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
@@ -39,7 +40,6 @@ import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifier
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
-import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.xml.sax.SAXException;
 
@@ -47,10 +47,6 @@ public class KohaUtil {
 
 	public static AgencyId createAgencyId(String agencyId) {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
-	}
-
-	public static BibliographicDescription parseBibliographicDescription(MarcItem marcItem) {
-		return parseBibliographicDescription(marcItem, false);
 	}
 
 	public static ComponentId createComponentIdAsAccessionNumber(String barcodeValue) {
@@ -82,66 +78,6 @@ public class KohaUtil {
 		return location;
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(MarcItem kohaItem) {
-		ItemOptionalFields iof = new ItemOptionalFields();
-		/*
-				if (kohaItem.getCirculationStatus() != null)
-					iof.setCirculationStatus(kohaItem.getCirculationStatus());
-
-				if (kohaItem.getHoldQueueLength() >= 0)
-					iof.setHoldQueueLength(new BigDecimal(kohaItem.getHoldQueueLength()));
-
-				if (kohaItem.getElectronicResource() != null)
-					iof.setElectronicResource(kohaItem.getElectronicResource());
-
-				if (kohaItem.getCallNumber() != null || kohaItem.getCopyNumber() != null || kohaItem.getDescription() != null) {
-					ItemDescription description = new ItemDescription();
-
-					if (kohaItem.getCallNumber() != null)
-						description.setCallNumber(kohaItem.getCallNumber());
-
-					if (kohaItem.getCopyNumber() != null)
-						description.setCopyNumber(kohaItem.getCopyNumber());
-
-					if (kohaItem.getDescription() != null)
-						description.setHoldingsInformation(kohaItem.getDescription());
-
-					if (kohaItem.getNumberOfPieces() != null)
-						description.setNumberOfPieces(kohaItem.getNumberOfPieces());
-
-					iof.setItemDescription(description);
-				}
-
-				if (kohaItem.getItemUseRestrictionTypes().size() > 0)
-					iof.setItemUseRestrictionTypes(kohaItem.getItemUseRestrictionTypes());
-
-				if (kohaItem.getLocation() != null || kohaItem.getCollection() != null) {
-					Location location = new Location();
-
-					LocationName locationName = new LocationName();
-
-					List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
-
-					if (kohaItem.getLocation() != null)
-						locationNameInstances.add(createLocationNameInstance(kohaItem.getLocation(), new BigDecimal(1)));
-
-					if (kohaItem.getCollection() != null)
-						locationNameInstances.add(createLocationNameInstance(kohaItem.getCollection(), new BigDecimal(2)));
-
-					locationName.setLocationNameInstances(locationNameInstances);
-
-					location.setLocationName(locationName);
-					location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
-
-					iof.setLocations(Arrays.asList(location));
-				}
-
-				if (kohaItem.getBarcode() != null)
-					iof.setBibliographicDescription(kohaItem.getBarcode());
-		*/
-		return iof;
-	}
-
 	public static LocationNameInstance createLocationNameInstance(String locationNameValue, BigDecimal locationNameLevel) {
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
 		locationNameInstance.setLocationNameValue(locationNameValue);
@@ -170,6 +106,7 @@ public class KohaUtil {
 	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {
 		BlockOrTrap blockOrTrap = new BlockOrTrap();
 
+		// TODO: Revise this
 		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", parsedBlock));
 
 		return blockOrTrap;
@@ -282,28 +219,6 @@ public class KohaUtil {
 		return bibliographicItemId;
 	}
 
-	/**
-	 * Builds an XML POST in order to send it as a Http request to renew an item.
-	 * You can set desired due date - but your Koha settings may not be compatible with
-	 * setting custom due date & will add by default let's say 5 days to old due date.<br>
-	 * <br>
-	 * That's why you can set it's argument to null & nothing extra will happen
-	 * 
-	 * @param desiredDueDate
-	 * @return renewXMLtoPOST
-	 */
-	public static String buildRenewPOSTXml(GregorianCalendar desiredDueDate) {
-		if (desiredDueDate != null)
-			return buildRenewPOSTXml(KohaUtil.convertToKohaDate(desiredDueDate));
-		else
-			return buildRenewPOSTXml("20991231");
-	}
-
-	private static String buildRenewPOSTXml(String desiredDueDate) {
-		return "<?xml version = \"1.0\" encoding = \"UTF-8\"?>" + "<get-pat-loan><loan renew=\"Y\"><z36><z36-due-date>" + desiredDueDate
-				+ "</z36-due-date></z36></loan></get-pat-loan>";
-	}
-
 	public static RequestStatusType parseRequestStatusTypeFromZ37StatusNode(String value) {
 		RequestStatusType requestStatusType;
 		if (value == "S")
@@ -319,7 +234,102 @@ public class KohaUtil {
 		return holdingsInformation;
 	}
 
-	public static BibliographicDescription parseBibliographicDescription(MarcItem marcItem, boolean includeComponentIdWithBarcode) {
+	/**
+	 * Converts LookupItemInitiationData to LookupItemSetInitiationData with respect only to desired services.
+	 * 
+	 * @param initData
+	 * @return luisInitData
+	 */
+	public static LookupItemSetInitiationData lookupItemInitDataToLUISInitData(LookupItemInitiationData initData) {
+		LookupItemSetInitiationData luisInitData = new LookupItemSetInitiationData();
+
+		luisInitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
+		luisInitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
+		luisInitData.setCurrentBorrowerDesired(initData.getCurrentBorrowerDesired());
+		luisInitData.setCurrentRequestersDesired(initData.getCurrentRequestersDesired());
+		luisInitData.setElectronicResourceDesired(initData.getElectronicResourceDesired());
+		luisInitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
+		luisInitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
+		luisInitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
+		luisInitData.setLocationDesired(initData.getLocationDesired());
+		luisInitData.setPhysicalConditionDesired(initData.getPhysicalConditionDesired());
+		luisInitData.setSecurityMarkerDesired(initData.getSecurityMarkerDesired());
+		luisInitData.setSensitizationFlagDesired(initData.getSensitizationFlagDesired());
+
+		return luisInitData;
+	}
+
+	public static ItemOptionalFields parseItemOptionalFields(LookupItemInitiationData initData, MarcItem marcItem) {
+		return parseItemOptionalFields(lookupItemInitDataToLUISInitData(initData), marcItem);
+	}
+
+	public static ItemOptionalFields parseItemOptionalFields(LookupItemSetInitiationData initData, MarcItem marcItem) {
+		ItemOptionalFields iof = new ItemOptionalFields();
+		/*
+				if (kohaItem.getCirculationStatus() != null)
+					iof.setCirculationStatus(kohaItem.getCirculationStatus());
+		/*
+				if (kohaItem.getHoldQueueLength() >= 0)
+					iof.setHoldQueueLength(new BigDecimal(kohaItem.getHoldQueueLength()));
+
+				if (kohaItem.getElectronicResource() != null)
+					iof.setElectronicResource(kohaItem.getElectronicResource());
+
+				if (kohaItem.getCallNumber() != null || kohaItem.getCopyNumber() != null || kohaItem.getDescription() != null) {
+					ItemDescription description = new ItemDescription();
+
+					if (kohaItem.getCallNumber() != null)
+						description.setCallNumber(kohaItem.getCallNumber());
+
+					if (kohaItem.getCopyNumber() != null)
+						description.setCopyNumber(kohaItem.getCopyNumber());
+
+					if (kohaItem.getDescription() != null)
+						description.setHoldingsInformation(kohaItem.getDescription());
+
+					if (kohaItem.getNumberOfPieces() != null)
+						description.setNumberOfPieces(kohaItem.getNumberOfPieces());
+
+					iof.setItemDescription(description);
+				}
+
+				if (kohaItem.getItemUseRestrictionTypes().size() > 0)
+					iof.setItemUseRestrictionTypes(kohaItem.getItemUseRestrictionTypes());
+
+				if (kohaItem.getLocation() != null || kohaItem.getCollection() != null) {
+					Location location = new Location();
+
+					LocationName locationName = new LocationName();
+
+					List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+
+					if (kohaItem.getLocation() != null)
+						locationNameInstances.add(createLocationNameInstance(kohaItem.getLocation(), new BigDecimal(1)));
+
+					if (kohaItem.getCollection() != null)
+						locationNameInstances.add(createLocationNameInstance(kohaItem.getCollection(), new BigDecimal(2)));
+
+					locationName.setLocationNameInstances(locationNameInstances);
+
+					location.setLocationName(locationName);
+					location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+
+					iof.setLocations(Arrays.asList(location));
+				}
+
+				if (kohaItem.getBarcode() != null)
+					iof.setBibliographicDescription(kohaItem.getBarcode());
+		*/
+
+		if (initData.getBibliographicDescriptionDesired()) {
+			BibliographicDescription bibDesc = parseBibliographicDescription(marcItem);
+
+			iof.setBibliographicDescription(bibDesc);
+		}
+		return iof;
+	}
+
+	public static BibliographicDescription parseBibliographicDescription(MarcItem marcItem) {
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 
 		Map<String, String> authorDataField = marcItem.getDataField(KohaConstants.DATAFIELD_AUTHOR_RELATED_TAG);
@@ -361,6 +371,12 @@ public class KohaUtil {
 		if (editionDataField != null) {
 			String edition = editionDataField.get(KohaConstants.SUBFIELD_EDITION_STATEMENT_CODE);
 			bibliographicDescription.setEdition(edition);
+		}
+
+		Map<String, String> paginationDataField = marcItem.getDataField(KohaConstants.DATAFIELD_PHYSICAL_DESCRIPTION_TAG);
+		if (paginationDataField != null) {
+			String pagination = paginationDataField.get(KohaConstants.SUBFIELD_PAGINATION_CODE);
+			bibliographicDescription.setPagination(pagination);
 		}
 
 		return bibliographicDescription;

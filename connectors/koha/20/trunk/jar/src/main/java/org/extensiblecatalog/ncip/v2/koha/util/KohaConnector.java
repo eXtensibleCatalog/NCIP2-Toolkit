@@ -48,8 +48,6 @@ import org.xml.sax.SAXException;
 
 public class KohaConnector {
 
-	private static final long serialVersionUID = -4425639616999642735L;
-
 	private static SAXParser parser;
 
 	private static InputSource streamSource;
@@ -64,9 +62,7 @@ public class KohaConnector {
 
 		try {
 			parser = SAXParserFactory.newInstance().newSAXParser();
-		} catch (ParserConfigurationException e1) {
-			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory.");
-		} catch (SAXException e1) {
+		} catch (Exception e1) {
 			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory.");
 		}
 		try {

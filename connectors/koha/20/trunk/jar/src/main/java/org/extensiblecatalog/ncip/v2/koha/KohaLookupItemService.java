@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0.jaxb.elements.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -67,7 +68,6 @@ public class KohaLookupItemService implements LookupItemService {
 			try {
 				MarcItem kohaItem = kohaRemoteServiceManager.lookupItem(initData);
 
-				// update NCIP response data with koha item data
 				if (kohaItem != null) {
 					updateResponseData(initData, responseData, kohaItem);
 				} else {
@@ -104,11 +104,7 @@ public class KohaLookupItemService implements LookupItemService {
 
 		responseData.setItemId(KohaUtil.parseItemId(marcItem));
 
-		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(marcItem);
-
-		if (initData.getBibliographicDescriptionDesired()) {
-			iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(marcItem, true));
-		}
+		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(initData, marcItem);
 
 		responseData.setItemOptionalFields(iof);
 	}
