@@ -15,7 +15,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.KohaRenewItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -63,12 +63,12 @@ public class KohaRenewItemService implements RenewItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				KohaRenewItem renewItem = kohaRemoteServiceManager.renewItem(initData);
+				MarcItem renewItem = kohaRemoteServiceManager.renewItem(initData);
 
-				if (renewItem.getProblem() == null) {
+				if (KohaUtil.parseProblems(renewItem) != null) {
 					updateResponseData(responseData, initData, renewItem);
 				} else
-					responseData.setProblems(Arrays.asList(renewItem.getProblem()));
+					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(renewItem)));
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -90,7 +90,7 @@ public class KohaRenewItemService implements RenewItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, KohaRenewItem renewItem) {
+	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, MarcItem renewItem) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
@@ -99,6 +99,7 @@ public class KohaRenewItemService implements RenewItemService {
 
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());
+		/*
 		responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
 		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo());
@@ -108,5 +109,6 @@ public class KohaRenewItemService implements RenewItemService {
 		responseData.setRenewalCount(renewItem.getRenewalCount());
 		responseData.setRequiredFeeAmount(renewItem.getRequiredFeeAmount());
 		responseData.setRequiredItemUseRestrictionTypes(renewItem.getRequiredItemUseRestrictionTypes());
+		*/
 	}
 }

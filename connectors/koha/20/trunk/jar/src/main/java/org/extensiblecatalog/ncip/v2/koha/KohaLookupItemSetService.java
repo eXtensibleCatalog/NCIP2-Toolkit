@@ -9,7 +9,6 @@ import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
 import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.ItemToken;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;

@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.KohaRequestItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -57,14 +57,16 @@ public class KohaRequestItemService implements RequestItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				KohaRequestItem requestItem = kohaRemoteServiceManager.requestItem(initData);
+				MarcItem requestItem = kohaRemoteServiceManager.requestItem(initData);
 
-				if (requestItem.getProblem() == null) {
+				if (KohaUtil.parseProblems(requestItem) == null) {
 					updateResponseData(responseData, initData, requestItem);
 				} else {
-					responseData.setProblems(Arrays.asList(requestItem.getProblem()));
+					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(requestItem)));
+					/*
 					responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
 					responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
+					*/
 				}
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -86,10 +88,7 @@ public class KohaRequestItemService implements RequestItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, KohaRequestItem requestItem) {
-
-		requestItem.setRequestType(initData.getRequestType());
-		requestItem.setRequestScopeType(initData.getRequestScopeType());
+	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, MarcItem requestItem) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
@@ -120,20 +119,21 @@ public class KohaRequestItemService implements RequestItemService {
 			responseData.setItemId(itemId);
 		} else
 			responseData.setItemId(initData.getItemId(0));
+		/*
+				responseData.setRequestScopeType(requestItem.getRequestScopeType());
+				responseData.setRequestType(requestItem.getRequestType());
+				responseData.setRequestId(requestItem.getRequestId());
+				responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
+				responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
+				responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
 
-		responseData.setRequestScopeType(requestItem.getRequestScopeType());
-		responseData.setRequestType(requestItem.getRequestType());
-		responseData.setRequestId(requestItem.getRequestId());
-		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
-
-		// Not implemented services, most of them probably even not implementable in Koha logic
-		responseData.setDateAvailable(requestItem.getDateAvailable());
-		responseData.setHoldPickupDate(requestItem.getHoldPickupDate());
-		responseData.setHoldQueueLength(requestItem.getHoldQueueLength());
-		responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-		responseData.setShippingInformation(requestItem.getShippingInformation());
+				// Not implemented services, most of them probably even not implementable in Koha logic
+				responseData.setDateAvailable(requestItem.getDateAvailable());
+				responseData.setHoldPickupDate(requestItem.getHoldPickupDate());
+				responseData.setHoldQueueLength(requestItem.getHoldQueueLength());
+				responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
+				responseData.setShippingInformation(requestItem.getShippingInformation());
+			*/
 		responseData.setUserId(initData.getUserId());
 	}
 }

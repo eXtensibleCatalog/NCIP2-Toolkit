@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.KohaRequestItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -57,12 +57,12 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				KohaRequestItem requestItem = kohaRemoteServiceManager.cancelRequestItem(initData);
+				MarcItem requestItem = kohaRemoteServiceManager.cancelRequestItem(initData);
 
-				if (requestItem.getProblem() == null) {
+				if (KohaUtil.parseProblems(requestItem) == null) {
 					updateResponseData(responseData, initData, requestItem);
 				} else
-					responseData.setProblems(Arrays.asList(requestItem.getProblem()));
+					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(requestItem)));
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -84,7 +84,7 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(CancelRequestItemResponseData responseData, CancelRequestItemInitiationData initData, KohaRequestItem requestItem) {
+	private void updateResponseData(CancelRequestItemResponseData responseData, CancelRequestItemInitiationData initData, MarcItem requestItem) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
@@ -93,9 +93,11 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 
 		responseData.setUserId(initData.getUserId());
 		responseData.setItemId(initData.getItemId());
+		/*
 		responseData.setRequestId(requestItem.getRequestId());
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
 		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
+		*/
 	}
 }

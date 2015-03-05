@@ -18,14 +18,10 @@ import javax.xml.parsers.SAXParserFactory;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService;
-import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
-import org.extensiblecatalog.ncip.v2.koha.item.KohaRenewItem;
-import org.extensiblecatalog.ncip.v2.koha.item.KohaRequestItem;
 import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupItemHandler;
-import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupUserHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
@@ -76,7 +72,7 @@ public class KohaConnector {
 		try {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
-			
+
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.DEFAULT_AGENCY));
 
 			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.OPAC_SERVER));
@@ -168,65 +164,23 @@ public class KohaConnector {
 	 * @throws SAXException
 	 */
 	public KohaUser lookupUser(String patronId, LookupUserInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
+		/*
+				boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+				boolean loanedItemsDesired = initData.getLoanedItemsDesired();
+				boolean requestedItemsDesired = initData.getRequestedItemsDesired();
+				boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+				boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
 
-		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
-		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
-		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
-		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
-		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+				boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired();
 
-		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired();
-
-		String appProfileType = null;
-		if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
-			appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
-
-		String lang = (appProfileType == null || appProfileType.isEmpty()) ? "en" : appProfileType;
-
-		// Create URL request only if specified service was desired
-		URL addressUrl = new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getServerPort()).setPath(LocalConfig.getSvcSuffix()).toURL();
-
-		KohaLookupUserHandler userHandler = new KohaLookupUserHandler(initData);
-
-		/* Parse Requests
-					KohaLookupRequestsHandler requestItemHandler = new KohaLookupRequestsHandler();
-LocalConfig.setDefaultAgency(alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY));
-					if (appProfileType != null && !appProfileType.isEmpty())
-						requestItemHandler.setLocalizationDesired(true);
-
-					streamSource = new InputSource(requestsUrl.openStream());
-
-					// Here parser parses all available info saveable into RequestItem class
-					parser.parse(streamSource, requestItemHandler);
-
-					List<RequestedItem> requestedItems = requestItemHandler.getRequestedItems();
-
-					if (requestedItems.size() > 0) {
-
-						// If there is set default item preparation delay, set it to all requested items
-						if (LocalConfig.getMaxItemPreparationTimeDelay() != 0)
-							for (RequestedItem requestedItem : requestedItems) {
-								if (requestedItem.getDatePlaced() != null) {
-									// Because Koha does not support default delay between pickupDate and datePlaced, we will use custom configuration to set it
-									GregorianCalendar pickupDate = (GregorianCalendar) requestedItem.getDatePlaced().clone();
-									pickupDate.add(Calendar.DAY_OF_MONTH, LocalConfig.getMaxItemPreparationTimeDelay());
-									requestedItem.setPickupDate(pickupDate);
-								}
-							}
-
-						userHandler.getKohaUser().setRequestedItems(requestedItems);
-					}
+				String appProfileType = null;
+				if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
+					appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
 		*/
-		if (addressUrl != null) {
-			streamSource = new InputSource(addressUrl.openStream());
-
-			parser.parse(streamSource, userHandler);
-		}
-
-		return userHandler.getKohaUser();
+		return null;
 	}
 
-	public KohaRequestItem cancelRequestItem(CancelRequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
+	public MarcItem cancelRequestItem(CancelRequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -275,17 +229,17 @@ LocalConfig.setDefaultAgency(alephConfig.getProperty(AlephConstants.DEFAULT_AGEN
 		return lookupItem(LIinitData);
 	}
 
-	public KohaRequestItem lookupRequest(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException {
+	public MarcItem lookupRequest(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public KohaRenewItem renewItem(RenewItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
+	public MarcItem renewItem(RenewItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public KohaRequestItem requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
+	public MarcItem requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -7,8 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.koha.agency.KohaAgency;
-import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
-import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
 import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
@@ -23,9 +22,7 @@ import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionType;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.NameInformation;
-import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
-import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccountSummary;
@@ -54,7 +51,7 @@ public class KohaUser implements Serializable {
 
 	private List<RequestedItem> requestedItems;
 	private List<LoanedItem> loanedItems;
-	private List<KohaItem> fineItems;
+	private List<MarcItem> fineItems;
 	private List<String> blocks;
 	private List<String> notes;
 
@@ -124,13 +121,11 @@ public class KohaUser implements Serializable {
 
 		UserAddressInformation uai = new UserAddressInformation();
 
-
 		uai.setUserAddressRoleType(Version1UserAddressRoleType.SHIP_TO);
 
 		userAddrInfos.add(uai);
 
 	}
-
 
 	/**
 	 * Set the session id for the current session of this authenticated Koha User
@@ -182,7 +177,8 @@ public class KohaUser implements Serializable {
 	 * 
 	 * @param user
 	 */
-	public void addRequestedItem(KohaItem item) {
+	public void addRequestedItem(MarcItem item) {
+		// FIXME ??
 		RequestedItem reqItem = new RequestedItem();
 
 		if (!requestedItems.contains(reqItem)) {
@@ -362,16 +358,16 @@ public class KohaUser implements Serializable {
 	 * @param fineItems
 	 *            the fineItems to set
 	 */
-	public void setFineItems(List<KohaItem> fineItems) {
+	public void setFineItems(List<MarcItem> fineItems) {
 		this.fineItems = fineItems;
 	}
 
 	/**
 	 * @return the fineItems
 	 */
-	public List<KohaItem> getFineItems() {
+	public List<MarcItem> getFineItems() {
 		if (fineItems == null)
-			fineItems = new ArrayList<KohaItem>();
+			fineItems = new ArrayList<MarcItem>();
 		return fineItems;
 	}
 
@@ -380,9 +376,9 @@ public class KohaUser implements Serializable {
 	 * 
 	 * @param user
 	 */
-	public void addFineItem(KohaItem item) {
+	public void addFineItem(MarcItem item) {
 		if (fineItems == null)
-			fineItems = new ArrayList<KohaItem>();
+			fineItems = new ArrayList<MarcItem>();
 		if (!fineItems.contains(item)) {
 			fineItems.add(item);
 		}
@@ -421,8 +417,6 @@ public class KohaUser implements Serializable {
 	public NameInformation getNameInformation() {
 		return nameInfo;
 	}
-
-	
 
 	public List<BlockOrTrap> getBlockOrTraps() {
 		return blockOrTraps;

@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.KohaRequestItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -60,12 +60,12 @@ public class KohaLookupRequestService implements LookupRequestService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				KohaRequestItem requestItem = kohaRemoteServiceManager.lookupRequest(initData);
+				MarcItem requestItem = kohaRemoteServiceManager.lookupRequest(initData);
 
-				if (requestItem.getProblem() == null) {
+				if (KohaUtil.parseProblems(requestItem) == null) {
 					updateResponseData(responseData, initData, requestItem);
 				} else
-					responseData.setProblems(Arrays.asList(requestItem.getProblem()));
+					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(requestItem)));
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -90,27 +90,27 @@ public class KohaLookupRequestService implements LookupRequestService {
 		return responseData;
 	}
 
-	private void updateResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, KohaRequestItem requestItem) {
+	private void updateResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, MarcItem requestItem) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		RequestDetails requestDetails = requestItem.getRequestDetails();
+		RequestDetails requestDetails = KohaUtil.parseRequestDetails(requestItem);
 
 		for (RequestElementType desiredService : initData.getRequestElementTypes()) {
 
 			if (desiredService.equals(Version1RequestElementType.ACKNOWLEDGED_FEE_AMOUNT)) {
 				responseData.setAcknowledgedFeeAmount(requestDetails.getAcknowledgedFeeAmout());
 			} else if (desiredService.equals(Version1RequestElementType.DATE_AVAILABLE)) {
-				responseData.setDateAvailable(requestItem.getDateAvailable());
+				// responseData.setDateAvailable(requestItem.getDateAvailable());
 			} else if (desiredService.equals(Version1RequestElementType.DATE_OF_USER_REQUEST)) {
 				responseData.setDateOfUserRequest(requestDetails.getDatePlaced());
 			} else if (desiredService.equals(Version1RequestElementType.EARLIEST_DATE_NEEDED)) {
 				responseData.setEarliestDateNeeded(requestDetails.getEarliestDateNeeded());
 			} else if (desiredService.equals(Version1RequestElementType.HOLD_QUEUE_POSITION)) {
-				responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
+				// responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
 			} else if (desiredService.equals(Version1RequestElementType.NEED_BEFORE_DATE)) {
 				responseData.setNeedBeforeDate(requestDetails.getNeedBeforeDate());
 			} else if (desiredService.equals(Version1RequestElementType.PAID_FEE_AMOUNT)) {
@@ -128,19 +128,19 @@ public class KohaLookupRequestService implements LookupRequestService {
 			} else if (desiredService.equals(Version1RequestElementType.REQUEST_TYPE)) {
 				responseData.setRequestType(initData.getRequestType());
 			} else if (desiredService.equals(Version1RequestElementType.SHIPPING_INFORMATION)) {
-				responseData.setShippingInformation(requestItem.getShippingInformation());
+				// responseData.setShippingInformation(requestItem.getShippingInformation());
 			} else if (desiredService.equals(Version1RequestElementType.USER_ID)) {
-				responseData.setUserId(initData.getUserId());				
+				responseData.setUserId(initData.getUserId());
 			}
 		}
-		
+
 		responseData.setItemId(initData.getItemId());
+		/*
 		responseData.setRequestId(requestItem.getRequestId());
-		
+
 		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		
+
 		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-
-
+		*/
 	}
 }

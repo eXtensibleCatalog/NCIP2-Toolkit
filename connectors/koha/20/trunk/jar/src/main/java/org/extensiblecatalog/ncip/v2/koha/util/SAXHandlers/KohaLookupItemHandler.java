@@ -80,10 +80,10 @@ public class KohaLookupItemHandler extends DefaultHandler {
 	public void characters(char ch[], int start, int length) throws SAXException {
 		if (marcSubFieldReached) {
 			String subFieldVal = new String(ch, start, length);
-			currentSubFieldMap.put(currentCodeVal, subFieldVal); // Add double quotes due to string containing comma bug
+			currentSubFieldMap.put(currentCodeVal, subFieldVal);
 		} else if (marcControlFieldReached) {
 			String controlFieldVal = new String(ch, start, length);
-			marcItem.addControlField(currentTagVal, controlFieldVal); // Add double quotes due to string containing comma bug
+			marcItem.addControlField(currentTagVal, controlFieldVal);
 			currentTagVal = null;
 		} else if (marcLeaderReached) {
 			marcItem.setLeader(new String(ch, start, length));

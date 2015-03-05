@@ -12,22 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
 import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
-import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
-import org.extensiblecatalog.ncip.v2.service.EditionSubstitutionType;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
-import org.extensiblecatalog.ncip.v2.service.HoldingsChronology;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Location;
@@ -35,14 +30,13 @@ import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
+import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
-import org.extensiblecatalog.ncip.v2.service.StructuredHoldingsData;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
@@ -67,12 +61,12 @@ public class KohaUtil {
 		return componentId;
 	}
 
-	public static Location parseLocation(KohaItem kohaItem) {
+	public static Location parseLocation(MarcItem kohaItem) {
 		Location location = new Location();
-		kohaItem.getLocation();
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
 
-		locationNameInstance.setLocationNameValue(kohaItem.getLocation());
+		String locationVal = "";
+		locationNameInstance.setLocationNameValue(locationVal);
 		// TODO: more to come from requirement for level
 		locationNameInstance.setLocationNameLevel(new BigDecimal("1"));// temporarily set to 1.
 
@@ -88,63 +82,63 @@ public class KohaUtil {
 		return location;
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(KohaItem kohaItem) {
+	public static ItemOptionalFields parseItemOptionalFields(MarcItem kohaItem) {
 		ItemOptionalFields iof = new ItemOptionalFields();
+		/*
+				if (kohaItem.getCirculationStatus() != null)
+					iof.setCirculationStatus(kohaItem.getCirculationStatus());
 
-		if (kohaItem.getCirculationStatus() != null)
-			iof.setCirculationStatus(kohaItem.getCirculationStatus());
+				if (kohaItem.getHoldQueueLength() >= 0)
+					iof.setHoldQueueLength(new BigDecimal(kohaItem.getHoldQueueLength()));
 
-		if (kohaItem.getHoldQueueLength() >= 0)
-			iof.setHoldQueueLength(new BigDecimal(kohaItem.getHoldQueueLength()));
+				if (kohaItem.getElectronicResource() != null)
+					iof.setElectronicResource(kohaItem.getElectronicResource());
 
-		if (kohaItem.getElectronicResource() != null)
-			iof.setElectronicResource(kohaItem.getElectronicResource());
+				if (kohaItem.getCallNumber() != null || kohaItem.getCopyNumber() != null || kohaItem.getDescription() != null) {
+					ItemDescription description = new ItemDescription();
 
-		if (kohaItem.getCallNumber() != null || kohaItem.getCopyNumber() != null || kohaItem.getDescription() != null) {
-			ItemDescription description = new ItemDescription();
+					if (kohaItem.getCallNumber() != null)
+						description.setCallNumber(kohaItem.getCallNumber());
 
-			if (kohaItem.getCallNumber() != null)
-				description.setCallNumber(kohaItem.getCallNumber());
+					if (kohaItem.getCopyNumber() != null)
+						description.setCopyNumber(kohaItem.getCopyNumber());
 
-			if (kohaItem.getCopyNumber() != null)
-				description.setCopyNumber(kohaItem.getCopyNumber());
+					if (kohaItem.getDescription() != null)
+						description.setHoldingsInformation(kohaItem.getDescription());
 
-			if (kohaItem.getDescription() != null)
-				description.setHoldingsInformation(kohaItem.getDescription());
+					if (kohaItem.getNumberOfPieces() != null)
+						description.setNumberOfPieces(kohaItem.getNumberOfPieces());
 
-			if (kohaItem.getNumberOfPieces() != null)
-				description.setNumberOfPieces(kohaItem.getNumberOfPieces());
+					iof.setItemDescription(description);
+				}
 
-			iof.setItemDescription(description);
-		}
+				if (kohaItem.getItemUseRestrictionTypes().size() > 0)
+					iof.setItemUseRestrictionTypes(kohaItem.getItemUseRestrictionTypes());
 
-		if (kohaItem.getItemUseRestrictionTypes().size() > 0)
-			iof.setItemUseRestrictionTypes(kohaItem.getItemUseRestrictionTypes());
+				if (kohaItem.getLocation() != null || kohaItem.getCollection() != null) {
+					Location location = new Location();
 
-		if (kohaItem.getLocation() != null || kohaItem.getCollection() != null) {
-			Location location = new Location();
+					LocationName locationName = new LocationName();
 
-			LocationName locationName = new LocationName();
+					List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
 
-			List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+					if (kohaItem.getLocation() != null)
+						locationNameInstances.add(createLocationNameInstance(kohaItem.getLocation(), new BigDecimal(1)));
 
-			if (kohaItem.getLocation() != null)
-				locationNameInstances.add(createLocationNameInstance(kohaItem.getLocation(), new BigDecimal(1)));
+					if (kohaItem.getCollection() != null)
+						locationNameInstances.add(createLocationNameInstance(kohaItem.getCollection(), new BigDecimal(2)));
 
-			if (kohaItem.getCollection() != null)
-				locationNameInstances.add(createLocationNameInstance(kohaItem.getCollection(), new BigDecimal(2)));
+					locationName.setLocationNameInstances(locationNameInstances);
 
-			locationName.setLocationNameInstances(locationNameInstances);
+					location.setLocationName(locationName);
+					location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
 
-			location.setLocationName(locationName);
-			location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+					iof.setLocations(Arrays.asList(location));
+				}
 
-			iof.setLocations(Arrays.asList(location));
-		}
-
-		if (kohaItem.getBarcode() != null)
-			iof.setBibliographicDescription(kohaItem.getBarcode());
-
+				if (kohaItem.getBarcode() != null)
+					iof.setBibliographicDescription(kohaItem.getBarcode());
+		*/
 		return iof;
 	}
 
@@ -171,33 +165,6 @@ public class KohaUtil {
 		if (day.length() < 2)
 			day = "0" + day;
 		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
-	}
-
-	public static MediumType detectMediumType(String mediumTypeParsed) {
-		return detectMediumType(mediumTypeParsed, false);
-	}
-
-	public static MediumType detectMediumType(String mediumTypeParsed, boolean localizationDesired) {
-		MediumType mediumType = null;
-
-		// TODO: Find out Koha non-localized values & change these KohaLocalization.SOMETHING to KohaConstants.SOMETHING ...
-
-		if (localizationDesired) {
-			mediumType = new MediumType("localized", mediumTypeParsed);
-		} else {
-			if (mediumTypeParsed.matches(KohaLocalization.BOOK + "|" + KohaLocalization.GRAPHICS + "|" + KohaLocalization.MAP))
-				mediumType = Version1MediumType.BOOK;
-			else if (mediumTypeParsed.matches(KohaLocalization.MAGAZINE1 + "|" + KohaLocalization.MAGAZINE2))
-				mediumType = Version1MediumType.MAGAZINE;
-			else if (mediumTypeParsed.equalsIgnoreCase(KohaLocalization.COMPACT_DISC))
-				mediumType = Version1MediumType.CD_ROM;
-			else if (mediumTypeParsed.equalsIgnoreCase(KohaLocalization.AUDIO_TAPE))
-				mediumType = Version1MediumType.AUDIO_TAPE;
-			else {
-				mediumType = new MediumType("localized", mediumTypeParsed);
-			}
-		}
-		return mediumType;
 	}
 
 	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {
@@ -352,22 +319,6 @@ public class KohaUtil {
 		return holdingsInformation;
 	}
 
-	public static int parseHoldQueueLengthFromStatusNode(String parsedStatus) {
-		// Parsing this : Waiting in position 1 in queue; current due date 05/Jan/2015
-		// Or this: In process - in this case return -1
-		String[] words = parsedStatus.split("\\s+");
-		if (words.length < 6)
-			return -1;
-		else
-			return Integer.parseInt(words[3]);
-	}
-
-	public static ItemOptionalFields parseItemOptionalFields(MarcItem marcItem) {
-		ItemOptionalFields iof = new ItemOptionalFields();
-
-		return iof;
-	}
-
 	public static BibliographicDescription parseBibliographicDescription(MarcItem marcItem, boolean includeComponentIdWithBarcode) {
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 
@@ -407,7 +358,6 @@ public class KohaUtil {
 		}
 
 		Map<String, String> editionDataField = marcItem.getDataField(KohaConstants.DATAFIELD_EDITION_TAG);
-
 		if (editionDataField != null) {
 			String edition = editionDataField.get(KohaConstants.SUBFIELD_EDITION_STATEMENT_CODE);
 			bibliographicDescription.setEdition(edition);
@@ -427,5 +377,15 @@ public class KohaUtil {
 		itemId.setItemIdentifierValue(itemIdVal);
 
 		return itemId;
+	}
+
+	public static Problem parseProblems(MarcItem renewItem) {
+		// FIXME
+		return null;
+	}
+
+	public static RequestDetails parseRequestDetails(MarcItem requestItem) {
+		// FIXME
+		return null;
 	}
 }
