@@ -14,11 +14,11 @@ import java.util.Arrays;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemService;
@@ -66,7 +66,7 @@ public class KohaLookupItemService implements LookupItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				KohaItem kohaItem = kohaRemoteServiceManager.lookupItem(initData);
+				MarcItem kohaItem = kohaRemoteServiceManager.lookupItem(initData);
 
 				// update NCIP response data with koha item data
 				if (kohaItem != null) {
@@ -96,19 +96,19 @@ public class KohaLookupItemService implements LookupItemService {
 		return responseData;
 	}
 
-	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, KohaItem kohaItem) throws ServiceException {
+	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, MarcItem marcItem) throws ServiceException, KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		responseData.setItemId(initData.getItemId());
+		responseData.setItemId(KohaUtil.parseItemId(marcItem));
 
-		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(kohaItem);
+		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(marcItem);
 
 		if (initData.getBibliographicDescriptionDesired()) {
-			iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(kohaItem, true));
+			iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(marcItem, true));
 		}
 
 		responseData.setItemOptionalFields(iof);

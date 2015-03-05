@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
@@ -21,30 +22,30 @@ import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.EditionSubstitutionType;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.HoldingsChronology;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
-import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
-import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
+import org.extensiblecatalog.ncip.v2.service.StructuredHoldingsData;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
-import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.xml.sax.SAXException;
 
@@ -54,39 +55,8 @@ public class KohaUtil {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
 
-	public static BibliographicDescription parseBibliographicDescription(KohaItem kohaItem) {
-		return parseBibliographicDescription(kohaItem, false);
-	}
-
-	public static BibliographicDescription parseBibliographicDescription(KohaItem kohaItem, boolean includeComponentIdWithBarcode) {
-
-		BibliographicDescription bibliographicDescription = new BibliographicDescription();
-
-		if (kohaItem.getAuthor() != null)
-			bibliographicDescription.setAuthor(kohaItem.getAuthor());
-
-		if (kohaItem.getMediumType() != null)
-			bibliographicDescription.setMediumType(kohaItem.getMediumType());
-
-		if (kohaItem.getPublisher() != null)
-			bibliographicDescription.setPublisher(kohaItem.getPublisher());
-
-		if (kohaItem.getSeries() != null)
-			bibliographicDescription.setSeriesTitleNumber(kohaItem.getSeries());
-
-		if (kohaItem.getTitle() != null)
-			bibliographicDescription.setTitle(kohaItem.getTitle());
-
-		if (includeComponentIdWithBarcode && kohaItem.getBarcodeValue() != null) {
-			ComponentId componentId = createComponentIdAsAccessionNumber(kohaItem.getBarcodeValue());
-			bibliographicDescription.setComponentId(componentId);
-		}
-
-		if (kohaItem.getIsbn() != null)
-			bibliographicDescription.setBibliographicItemIds(Arrays.asList(kohaItem.getIsbn()));
-
-		// FIXME: NCIP JAXB translator cuts off all BibliographicRecordIds - that's why we're using componentId to transfer barcode
-		return bibliographicDescription;
+	public static BibliographicDescription parseBibliographicDescription(MarcItem marcItem) {
+		return parseBibliographicDescription(marcItem, false);
 	}
 
 	public static ComponentId createComponentIdAsAccessionNumber(String barcodeValue) {
@@ -390,5 +360,72 @@ public class KohaUtil {
 			return -1;
 		else
 			return Integer.parseInt(words[3]);
+	}
+
+	public static ItemOptionalFields parseItemOptionalFields(MarcItem marcItem) {
+		ItemOptionalFields iof = new ItemOptionalFields();
+
+		return iof;
+	}
+
+	public static BibliographicDescription parseBibliographicDescription(MarcItem marcItem, boolean includeComponentIdWithBarcode) {
+		BibliographicDescription bibliographicDescription = new BibliographicDescription();
+
+		Map<String, String> authorDataField = marcItem.getDataField(KohaConstants.DATAFIELD_AUTHOR_RELATED_TAG);
+		if (authorDataField != null) {
+			String author = authorDataField.get(KohaConstants.SUBFIELD_AUTHOR_NAME_CODE);
+			bibliographicDescription.setAuthor(author);
+		}
+
+		Map<String, String> isbnDataField = marcItem.getDataField(KohaConstants.DATAFIELD_ISBN_RELATED_TAG);
+		if (isbnDataField != null) {
+			String isbnVal = isbnDataField.get(KohaConstants.SUBFIELD_ISBN_CODE);
+			if (isbnVal != null) {
+				bibliographicDescription.setBibliographicItemIds(Arrays.asList(createBibliographicItemIdAsISBN(isbnVal)));
+			}
+		}
+
+		Map<String, String> titleDataField = marcItem.getDataField(KohaConstants.DATAFIELD_TITLE_RELATED_TAG);
+		if (titleDataField != null) {
+			String title = titleDataField.get(KohaConstants.SUBFIELD_TITLE_CODE);
+			bibliographicDescription.setTitle(title);
+
+			String titleOfComponent = titleDataField.get(KohaConstants.SUBFIELD_TITLE_OF_COMPONENT_CODE);
+			bibliographicDescription.setTitleOfComponent(titleOfComponent);
+		}
+
+		Map<String, String> publicationDataField = marcItem.getDataField(KohaConstants.DATAFIELD_PUBLICATION_RELATED_TAG);
+		if (publicationDataField != null) {
+			String publisher = publicationDataField.get(KohaConstants.SUBFIELD_PUBLISHER_NAME_CODE);
+			bibliographicDescription.setPublisher(publisher);
+
+			String publicationPlace = publicationDataField.get(KohaConstants.SUBFIELD_PUBLICATION_PLACE_CODE);
+			bibliographicDescription.setPlaceOfPublication(publicationPlace);
+
+			String publicationDate = publicationDataField.get(KohaConstants.SUBFIELD_PUBLICATION_DATE_CODE);
+			bibliographicDescription.setPublicationDate(publicationDate);
+		}
+
+		Map<String, String> editionDataField = marcItem.getDataField(KohaConstants.DATAFIELD_EDITION_TAG);
+
+		if (editionDataField != null) {
+			String edition = editionDataField.get(KohaConstants.SUBFIELD_EDITION_STATEMENT_CODE);
+			bibliographicDescription.setEdition(edition);
+		}
+
+		return bibliographicDescription;
+	}
+
+	public static ItemId parseItemId(MarcItem marcItem) throws KohaException {
+
+		String itemIdVal = marcItem.getControlField(KohaConstants.CONTROLFIELD_ITEM_ID_TAG);
+		if (itemIdVal == null || itemIdVal.isEmpty())
+			throw new KohaException("Koha svc have returned empty itemId (tag 001)");
+
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+		itemId.setItemIdentifierValue(itemIdVal);
+
+		return itemId;
 	}
 }

@@ -22,6 +22,7 @@ import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
+import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
@@ -110,7 +111,7 @@ public class KohaLookupUserService implements LookupUserService {
 				if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null)
 					suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
 				else
-					suppliedAgencyId = new AgencyId(KohaConstants.DEFAULT_AGENCY);
+					suppliedAgencyId = new AgencyId(LocalConfig.getDefaultAgency());
 
 				try {
 

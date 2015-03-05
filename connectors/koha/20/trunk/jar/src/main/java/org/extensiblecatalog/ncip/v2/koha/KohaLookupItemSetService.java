@@ -10,10 +10,11 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
+import org.extensiblecatalog.ncip.v2.koha.util.ItemToken;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
-import org.extensiblecatalog.ncip.v2.koha.util.ItemToken;
 import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
@@ -149,8 +150,8 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 		BibInformation bibInformation;
 
-		List<KohaItem> kohaItems;
-		KohaItem kohaItem;
+		List<MarcItem> marcItems;
+		MarcItem marcItem;
 
 		List<HoldingsSet> holdingSets;
 
@@ -178,13 +179,13 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 					bibInformation = new BibInformation();
 
-					kohaItems = kohaSvcMgr.lookupItems(id, initData, this);
+					marcItems = kohaSvcMgr.lookupItems(id, initData, this);
 
 					bibInformation.setBibliographicId(bibId);
 
-					if (kohaItems != null && kohaItems.size() > 0) {
+					if (marcItems != null && marcItems.size() > 0) {
 
-						holdingSets = parseHoldingsSets(kohaItems, initData);
+						holdingSets = parseHoldingsSets(marcItems, initData);
 
 						bibInformation.setHoldingsSets(holdingSets);
 
@@ -241,10 +242,10 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 					bibInformation.setBibliographicId(bibId);
 
-					kohaItem = kohaSvcMgr.lookupItem(id, initData);
-					if (kohaItem != null) {
+					marcItem = kohaSvcMgr.lookupItem(id, initData);
+					if (marcItem != null) {
 
-						holdingSets = Arrays.asList(parseHoldingsSet(kohaItem, initData));
+						holdingSets = Arrays.asList(parseHoldingsSet(marcItem, initData));
 
 						bibInformation.setHoldingsSets(holdingSets);
 
@@ -258,7 +259,8 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 							ItemToken itemToken = new ItemToken();
 							itemToken.setBibliographicId(id);
-							itemToken.setItemId(kohaItem.getItemId().getItemIdentifierValue());
+
+							itemToken.setItemId(KohaUtil.parseItemId(marcItem).getItemIdentifierValue());
 
 							int newToken = random.nextInt();
 
@@ -345,7 +347,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 		BibInformation bibInformation;
 
-		KohaItem kohaItem;
+		MarcItem marcItem;
 
 		List<HoldingsSet> holdingsSets;
 
@@ -368,9 +370,9 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 			bibInformation = new BibInformation();
 
 			try {
-				kohaItem = kohaSvcMgr.lookupItem(id, initData);
+				marcItem = kohaSvcMgr.lookupItem(id, initData);
 
-				kohaItem.setItemId(id);
+				// marcItem.setItemId(id);
 
 				BibliographicId bibliographicId = new BibliographicId();
 				BibliographicItemId bibliographicItemId = KohaUtil.createBibliographicItemIdAsLegalDepositNumber(id);
@@ -378,9 +380,9 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 				bibInformation.setBibliographicId(bibliographicId);
 
-				if (kohaItem != null) {
+				if (marcItem != null) {
 
-					holdingsSets = Arrays.asList(parseHoldingsSet(kohaItem, initData));
+					holdingsSets = Arrays.asList(parseHoldingsSet(marcItem, initData));
 
 					bibInformation.setHoldingsSets(holdingsSets);
 
@@ -457,27 +459,28 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	/**
 	 * Parses response from requested ItemId (we know for sure there is only one item to parse)
 	 * 
-	 * @param kohaItem
+	 * @param marcItem
 	 * @param suppliedAgencyId
 	 * @param getBibDescription
 	 * @param getCircStatus
 	 * @param getHoldQueueLength
 	 * @param getItemDescription
 	 * @return {@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}
+	 * @throws KohaException
 	 */
-	private HoldingsSet parseHoldingsSet(KohaItem kohaItem, LookupItemSetInitiationData initData) {
+	private HoldingsSet parseHoldingsSet(MarcItem marcItem, LookupItemSetInitiationData initData) throws KohaException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
 		if (initData.getBibliographicDescriptionDesired()) {
-			BibliographicDescription bDesc = KohaUtil.parseBibliographicDescription(kohaItem);
+			BibliographicDescription bDesc = KohaUtil.parseBibliographicDescription(marcItem);
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
 		ItemInformation info = new ItemInformation();
 
-		info.setItemId(kohaItem.getItemId());
+		info.setItemId(KohaUtil.parseItemId(marcItem));
 
-		info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(kohaItem));
+		info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(marcItem));
 
 		holdingsSet.setItemInformations(Arrays.asList(info));
 
@@ -487,20 +490,21 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	/**
 	 * Parses response from requested RecordId
 	 * 
-	 * @param kohaItems
+	 * @param marcItems
 	 * @param suppliedAgencyId
 	 * @param getBibDescription
 	 * @param getCircStatus
 	 * @param getHoldQueueLength
 	 * @param getItemDescription
 	 * @return List<{@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}>
+	 * @throws KohaException
 	 */
-	private List<HoldingsSet> parseHoldingsSets(List<KohaItem> kohaItems, LookupItemSetInitiationData initData) {
+	private List<HoldingsSet> parseHoldingsSets(List<MarcItem> marcItems, LookupItemSetInitiationData initData) throws KohaException {
 
 		HoldingsSet holdingsSet = new HoldingsSet();
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
 
-		for (KohaItem item : kohaItems) {
+		for (MarcItem item : marcItems) {
 
 			if (initData.getBibliographicDescriptionDesired()) {
 				BibliographicDescription bDesc = KohaUtil.parseBibliographicDescription(item);
@@ -509,7 +513,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 			ItemInformation info = new ItemInformation();
 
-			info.setItemId(item.getItemId());
+			info.setItemId(KohaUtil.parseItemId(item));
 
 			info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(item));
 

@@ -7,6 +7,7 @@ import java.util.List;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
+import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.Amount;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
@@ -93,7 +94,7 @@ public class KohaCreateUserFiscalTransactionService implements NCIPService<Creat
 
 			FiscalTransactionReferenceId fiscalTransactionReferenceId = new FiscalTransactionReferenceId();
 
-			AgencyId agencyId = new AgencyId(KohaConstants.DEFAULT_AGENCY);
+			AgencyId agencyId = new AgencyId(LocalConfig.getDefaultAgency());
 			fiscalTransactionReferenceId.setAgencyId(agencyId);
 
 			String uniquePaymentIdentifier = createUniquePaymentIdentifier(initData, patronId);

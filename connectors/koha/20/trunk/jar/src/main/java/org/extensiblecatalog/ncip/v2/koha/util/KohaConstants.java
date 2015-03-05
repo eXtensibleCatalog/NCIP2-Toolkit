@@ -28,6 +28,7 @@ public class KohaConstants {
 	public static final String SVC_PORT = "SVCPort";
 	public static final String ILS_DI_SUFFIX = "ILSDISuffix";
 	public static final String SVC_SUFFIX = "SVCSuffix";
+	public static final String DEFAULT_AGENCY = "AgencyId";
 	public static final String AUTH_DATA_FORMAT_TYPE = "AuthDataFormatType";
 	public static final String USER_REGISTRATION_LINK = "UserRegistrationLink";
 	public static final String AGENCY_UNSTRUCTURED_ADDRESS = "AgencyUnstructuredAddress";
@@ -62,19 +63,47 @@ public class KohaConstants {
 	public static final String SVC_MEMBERS_SEARCH = "members/search";
 
 	public static final String STATUS_OK = "ok";
-	
+
 	//
 	// XML PARSING SECTION
 	//
-	
+
 	public static final String XML_AUTH_STATUS = "auth_status";
 	public static final String XML_STATUS = "status";
-	
-	// Possible XML responses
-	
-	public static final String XML_VAL_STATUS_EXPIRED = "expired";
-	public static final String XML_VAL_STATUS_OK = "ok";
-	public static final Object XML_CONTROLFIELD = "controlfield";
+	public static final String XML_CONTROLFIELD = "controlfield";
+	public static final String XML_DATAFIELD = "datafield";
+	public static final String XML_SUBFIELD = "subfield";
+	public static final String XML_LEADER = "leader";
+
+	// ATTRS
 
 	public static final String XML_ATTR_TAG = "tag";
+	public static final String XML_ATTR_CODE = "code";
+
+	// Possible XML responses
+
+	public static final String XML_VAL_STATUS_EXPIRED = "expired";
+	public static final String XML_VAL_STATUS_OK = "ok";
+
+	// Tags human readable
+	public static final String CONTROLFIELD_ITEM_ID_TAG = "001";
+
+	// datafields
+	public static final String DATAFIELD_AUTHOR_RELATED_TAG = "100";
+	public static final String DATAFIELD_ISBN_RELATED_TAG = "020";
+	public static final String DATAFIELD_TITLE_RELATED_TAG = "245";
+	public static final String DATAFIELD_PUBLICATION_RELATED_TAG = "260";
+	public static final String DATAFIELD_EDITION_TAG = "250";
+
+	// subfields
+	public static final String SUBFIELD_AUTHOR_NAME_CODE = "a";
+	public static final String SUBFIELD_ISBN_CODE = SUBFIELD_AUTHOR_NAME_CODE;
+	public static final String SUBFIELD_TITLE_CODE = SUBFIELD_AUTHOR_NAME_CODE;
+	public static final String SUBFIELD_PUBLICATION_PLACE_CODE = SUBFIELD_AUTHOR_NAME_CODE;
+	public static final String SUBFIELD_EDITION_STATEMENT_CODE = SUBFIELD_AUTHOR_NAME_CODE;
+
+	public static final String SUBFIELD_TITLE_OF_COMPONENT_CODE = "b";
+	public static final String SUBFIELD_PUBLISHER_NAME_CODE = SUBFIELD_TITLE_OF_COMPONENT_CODE;
+
+	public static final String SUBFIELD_PUBLICATION_DATE_CODE = "c";
 }

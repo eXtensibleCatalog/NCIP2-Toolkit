@@ -1,7 +1,6 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -16,13 +15,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.koha.item.KohaItem;
 import org.extensiblecatalog.ncip.v2.koha.item.KohaRenewItem;
 import org.extensiblecatalog.ncip.v2.koha.item.KohaRequestItem;
+import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupItemHandler;
@@ -48,7 +47,6 @@ import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
-import org.xml.sax.HandlerBase;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -78,6 +76,8 @@ public class KohaConnector {
 		try {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
+			
+			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.DEFAULT_AGENCY));
 
 			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.OPAC_SERVER));
 			LocalConfig.setOpacServerPort(kohaConfig.getProperty(KohaConstants.OPAC_PORT));
@@ -190,7 +190,7 @@ public class KohaConnector {
 
 		/* Parse Requests
 					KohaLookupRequestsHandler requestItemHandler = new KohaLookupRequestsHandler();
-
+LocalConfig.setDefaultAgency(alephConfig.getProperty(AlephConstants.DEFAULT_AGENCY));
 					if (appProfileType != null && !appProfileType.isEmpty())
 						requestItemHandler.setLocalizationDesired(true);
 
@@ -231,7 +231,7 @@ public class KohaConnector {
 		return null;
 	}
 
-	public KohaItem lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
+	public MarcItem lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
 		KohaLookupItemHandler itemHandler = new KohaLookupItemHandler();
 
 		String itemId = initData.getItemId().getItemIdentifierValue();
@@ -252,16 +252,16 @@ public class KohaConnector {
 		// TODO: need to authenticate first
 		parser.parse(streamSource, itemHandler);
 
-		return itemHandler.getKohaItem();
+		return itemHandler.getMarcItem();
 	}
 
-	public List<KohaItem> lookupItems(String id, LookupItemSetInitiationData initData, KohaLookupItemSetService kohaLookupItemSetService) throws KohaException, IOException,
+	public List<MarcItem> lookupItems(String id, LookupItemSetInitiationData initData, KohaLookupItemSetService kohaLookupItemSetService) throws KohaException, IOException,
 			SAXException, ParserConfigurationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public KohaItem lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException {
+	public MarcItem lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException {
 		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
 		ItemId itemId = new ItemId();
 		itemId.setItemIdentifierValue(id);

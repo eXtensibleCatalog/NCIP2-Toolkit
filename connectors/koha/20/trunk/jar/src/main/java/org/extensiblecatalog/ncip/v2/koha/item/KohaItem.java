@@ -728,10 +728,4 @@ public class KohaItem implements Serializable {
 	public void setCopyNumber(String copyNumber) {
 		this.copyNumber = copyNumber;
 	}
-
-	public ItemOptionalFields getItemOptionalFields() {
-		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(this);
-		iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(this));
-		return iof;
-	}
 }

@@ -41,6 +41,7 @@ CoreConfiguration.IncludeStackTracesInProblemResponses=true
 # Koha Configuration
 AgencyUnstructuredAddress=Kounicova 65a, 601 87 Brno
 AgencyTranslatedName=Moravian Library
+AgencyId=KOHALIB1
 
 # Set this link to your client's registration site
 UserRegistrationLink=https://www.mzk.cz/predregistrace
