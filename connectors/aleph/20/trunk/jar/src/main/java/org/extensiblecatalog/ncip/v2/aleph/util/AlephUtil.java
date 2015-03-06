@@ -331,7 +331,7 @@ public class AlephUtil {
 	}
 
 	public static String parseItemIdFromAlephItemId(String itemId) {
-		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPARATOR)[1];
+		return itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPARATOR).length > 1 ? itemId.split(AlephConstants.UNIQUE_ITEM_ID_SEPARATOR)[1] : null;
 	}
 
 	public static MediumType detectMediumType(String mediumTypeParsed) {
@@ -402,7 +402,6 @@ public class AlephUtil {
 	 * Pattern for building unique item Id from document number & item sequence item is:<br/>
 	 * bibLibrary + docRecordNumber + "-" + admLibrary + docItemNumber + itemSequenceNumber<br/>
 	 * <br/>
-	 * 
 	 * Output should look like this example:<br />
 	 * MZK01000000421-MZK50000062021000010 <br />
 	 * 
@@ -499,14 +498,14 @@ public class AlephUtil {
 	}
 
 	public static boolean isCorrectRecordId(String recordId, int bibLibLength) {
-		if (recordId.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength) {
+		if (recordId != null && recordId.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength) {
 			return true;
 		}
 		return false;
 	}
 
 	public static boolean isCorrectItemId(String sequenceNumber, int bibLibLength) {
-		if (sequenceNumber.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength + AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH) {
+		if (sequenceNumber != null && sequenceNumber.length() == AlephConstants.BIB_ID_LENGTH + bibLibLength + AlephConstants.ITEM_ID_UNIQUE_PART_LENGTH) {
 			return true;
 		}
 		return false;
@@ -570,9 +569,7 @@ public class AlephUtil {
 
 	/**
 	 * Builds an XML POST in order to send it as a Http request to renew an item.
-	 * 
 	 * You can set desired due date - but your Aleph settings may not be compatible with
-	 * 
 	 * setting custom due date & will add by default let's say 5 days to old due date.<br>
 	 * <br>
 	 * That's why you can set it's argument to null & nothing extra will happen
