@@ -17,7 +17,7 @@ public class LocalConfig {
 	private static String svcSuffix;
 	private static String bibLibrary;
 	private static String admLibrary;
-	
+
 	private static String adminName;
 	private static String adminPass;
 
@@ -35,6 +35,8 @@ public class LocalConfig {
 	private static int bibLibraryLength;
 
 	private static String ilsDiSuffix;
+
+	private static String marcItemDescField;
 
 	/**
 	 * @return the echoParticularProblemsToLUIS
@@ -298,7 +300,7 @@ public class LocalConfig {
 	public static int getBibLibraryLength() {
 		return bibLibraryLength;
 	}
-	
+
 	public static void setIlsDiSuffix(String ilsDiSuffix) {
 		LocalConfig.ilsDiSuffix = ilsDiSuffix;
 	}
@@ -315,7 +317,8 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @param svcSuffix the svcSuffix to set
+	 * @param svcSuffix
+	 *            the svcSuffix to set
 	 */
 	public static void setSvcSuffix(String svcSuffix) {
 		LocalConfig.svcSuffix = svcSuffix;
@@ -329,7 +332,8 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @param svcPort the svcPort to set
+	 * @param svcPort
+	 *            the svcPort to set
 	 */
 	public static void setSvcServerPort(String svcPort) {
 		LocalConfig.svcPort = svcPort;
@@ -343,7 +347,8 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @param adminName the adminName to set
+	 * @param adminName
+	 *            the adminName to set
 	 */
 	public static void setAdminName(String adminName) {
 		LocalConfig.adminName = adminName;
@@ -357,10 +362,19 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @param adminPass the adminPass to set
+	 * @param adminPass
+	 *            the adminPass to set
 	 */
 	public static void setAdminPass(String adminPass) {
 		LocalConfig.adminPass = adminPass;
+	}
+
+	public static String getMarcItemDescriptionField() {
+		return marcItemDescField;
+	}
+
+	public static void setMarcItemDescriptionField(String marcItemDescField) {
+		LocalConfig.marcItemDescField = marcItemDescField;
 	}
 
 }

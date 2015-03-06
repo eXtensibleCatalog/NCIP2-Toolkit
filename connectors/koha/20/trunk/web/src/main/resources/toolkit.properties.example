@@ -52,6 +52,8 @@ OPACServer=188.166.14.82
 OPACPort=80
 SVCPort=8080
 
+MarcItemDescriptionField=993
+
 SVCSuffix=cgi-bin/koha/svc
 ILSDISuffix=cgi-bin/koha/ilsdi.pl
 

@@ -23,23 +23,24 @@ public class KohaConstants {
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 
 	// Constants for parsing from toolkit.properties
-	public static final String OPAC_PORT = "OPACPort";
-	public static final String OPAC_SERVER = "OPACServer";
-	public static final String SVC_PORT = "SVCPort";
-	public static final String ILS_DI_SUFFIX = "ILSDISuffix";
-	public static final String SVC_SUFFIX = "SVCSuffix";
-	public static final String DEFAULT_AGENCY = "AgencyId";
-	public static final String AUTH_DATA_FORMAT_TYPE = "AuthDataFormatType";
-	public static final String USER_REGISTRATION_LINK = "UserRegistrationLink";
-	public static final String AGENCY_UNSTRUCTURED_ADDRESS = "AgencyUnstructuredAddress";
-	public static final String AGENCY_TRANSLATED_NAME = "AgencyTranslatedName";
-	public static final String NCIP_TOOLKIT_VERSION = "NCIPToolkitVersion";
-	public static final String MAX_ITEM_PREPARATION_TIME_DELAY = "MaxItemPreparationTimeDelay";
-	public static final String NEXT_ITEM_TOKEN_EXPIRATION_TIME = "NextItemTokenExpirationTime";
-	public static final String INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
-	public static final String CONFIG_KOHA_CURRENCY_CODE = "KohaCurrencyCode";
-	public static final String ADMIN_NAME = "AdminName";
-	public static final String ADMIN_PASS = "AdminPass";
+	public static final String CONF_OPAC_PORT = "OPACPort";
+	public static final String CONF_OPAC_SERVER = "OPACServer";
+	public static final String CONF_SVC_PORT = "SVCPort";
+	public static final String CONF_ILS_DI_SUFFIX = "ILSDISuffix";
+	public static final String CONF_SVC_SUFFIX = "SVCSuffix";
+	public static final String CONF_DEFAULT_AGENCY = "AgencyId";
+	public static final String CONF_AUTH_DATA_FORMAT_TYPE = "AuthDataFormatType";
+	public static final String CONF_USER_REGISTRATION_LINK = "UserRegistrationLink";
+	public static final String CONF_AGENCY_UNSTRUCTURED_ADDRESS = "AgencyUnstructuredAddress";
+	public static final String CONF_AGENCY_TRANSLATED_NAME = "AgencyTranslatedName";
+	public static final String CONF_NCIP_TOOLKIT_VERSION = "NCIPToolkitVersion";
+	public static final String CONF_MAX_ITEM_PREPARATION_TIME_DELAY = "MaxItemPreparationTimeDelay";
+	public static final String CONF_NEXT_ITEM_TOKEN_EXPIRATION_TIME = "NextItemTokenExpirationTime";
+	public static final String CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
+	public static final String CONF_CONFIG_KOHA_CURRENCY_CODE = "KohaCurrencyCode";
+	public static final String CONF_MARC_ITEM_DESC_FIELD = "MarcItemDescriptionField";
+	public static final String CONF_ADMIN_NAME = "AdminName";
+	public static final String CONF_ADMIN_PASS = "AdminPass";
 
 	public static final String REQUEST_ID_DELIMITER = ";";
 
@@ -64,6 +65,10 @@ public class KohaConstants {
 
 	public static final String STATUS_OK = "ok";
 
+	// HTML ATTRS
+
+	public static final String ATTR_ITEMS = "items";
+
 	//
 	// XML PARSING SECTION
 	//
@@ -75,7 +80,7 @@ public class KohaConstants {
 	public static final String XML_SUBFIELD = "subfield";
 	public static final String XML_LEADER = "leader";
 
-	// ATTRS
+	// XML ATTRS
 
 	public static final String XML_ATTR_TAG = "tag";
 	public static final String XML_ATTR_CODE = "code";

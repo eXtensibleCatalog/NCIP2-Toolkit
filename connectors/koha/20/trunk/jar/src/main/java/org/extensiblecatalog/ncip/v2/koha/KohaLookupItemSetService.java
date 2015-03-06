@@ -479,7 +479,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 		info.setItemId(KohaUtil.parseItemId(marcItem));
 
-		info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(marcItem));
+		info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(initData, marcItem));
 
 		holdingsSet.setItemInformations(Arrays.asList(info));
 
@@ -514,7 +514,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 			info.setItemId(KohaUtil.parseItemId(item));
 
-			info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(item));
+			info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(initData, item));
 
 			itemInfoList.add(info);
 		}

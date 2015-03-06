@@ -69,30 +69,32 @@ public class KohaConnector {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
 
-			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.DEFAULT_AGENCY));
+			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));
 
-			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.OPAC_SERVER));
-			LocalConfig.setOpacServerPort(kohaConfig.getProperty(KohaConstants.OPAC_PORT));
-			LocalConfig.setSvcServerPort(kohaConfig.getProperty(KohaConstants.SVC_PORT));
+			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.CONF_OPAC_SERVER));
+			LocalConfig.setOpacServerPort(kohaConfig.getProperty(KohaConstants.CONF_OPAC_PORT));
+			LocalConfig.setSvcServerPort(kohaConfig.getProperty(KohaConstants.CONF_SVC_PORT));
 
-			LocalConfig.setAdminName(kohaConfig.getProperty(KohaConstants.ADMIN_NAME));
-			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.ADMIN_PASS));
+			LocalConfig.setAdminName(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_NAME));
+			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_PASS));
 
-			LocalConfig.setIlsDiSuffix(kohaConfig.getProperty(KohaConstants.ILS_DI_SUFFIX));
-			LocalConfig.setSvcSuffix(kohaConfig.getProperty(KohaConstants.SVC_SUFFIX));
+			LocalConfig.setIlsDiSuffix(kohaConfig.getProperty(KohaConstants.CONF_ILS_DI_SUFFIX));
+			LocalConfig.setSvcSuffix(kohaConfig.getProperty(KohaConstants.CONF_SVC_SUFFIX));
 
-			LocalConfig.setAgencyAddress(kohaConfig.getProperty(KohaConstants.AGENCY_UNSTRUCTURED_ADDRESS));
-			LocalConfig.setAgencyName(kohaConfig.getProperty(KohaConstants.AGENCY_TRANSLATED_NAME));
+			LocalConfig.setAgencyAddress(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_UNSTRUCTURED_ADDRESS));
+			LocalConfig.setAgencyName(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_TRANSLATED_NAME));
 
-			LocalConfig.setUserRegistrationLink(kohaConfig.getProperty(KohaConstants.USER_REGISTRATION_LINK));
-			LocalConfig.setAuthDataFormatType(kohaConfig.getProperty(KohaConstants.AUTH_DATA_FORMAT_TYPE));
+			LocalConfig.setUserRegistrationLink(kohaConfig.getProperty(KohaConstants.CONF_USER_REGISTRATION_LINK));
+			LocalConfig.setAuthDataFormatType(kohaConfig.getProperty(KohaConstants.CONF_AUTH_DATA_FORMAT_TYPE));
 
-			LocalConfig.setTokenExpirationTime(Integer.parseInt(kohaConfig.getProperty(KohaConstants.NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
+			LocalConfig.setTokenExpirationTime(Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
 
-			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
+			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
+
+			LocalConfig.setMarcItemDescriptionField(kohaConfig.getProperty(KohaConstants.CONF_MARC_ITEM_DESC_FIELD));
 
 			try {
-				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(kohaConfig.getProperty(KohaConstants.MAX_ITEM_PREPARATION_TIME_DELAY)));
+				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_MAX_ITEM_PREPARATION_TIME_DELAY)));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -111,8 +113,6 @@ public class KohaConnector {
 
 	/**
 	 * Logins definer admin user (from settings in toolkit.properties) & saves cookies to be able to continue parsing requests as logged user.<br>
-	 * <br>
-	 * Assings to {@link InputSource} streamSource opened {@link URL} url as {@link URL.openStream()}
 	 * 
 	 * @param streamSource
 	 * @param url
@@ -186,7 +186,7 @@ public class KohaConnector {
 
 		String itemId = initData.getItemId().getItemIdentifierValue();
 
-		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_BIB, itemId).toURL();
+		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_BIB, itemId).addRequest(KohaConstants.ATTR_ITEMS, "1").toURL();
 
 		try {
 			streamSource = createInputSourceWithCookie(url);
