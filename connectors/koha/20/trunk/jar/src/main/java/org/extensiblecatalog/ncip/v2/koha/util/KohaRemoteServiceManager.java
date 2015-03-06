@@ -48,6 +48,6 @@ public class KohaRemoteServiceManager extends KohaConnector implements RemoteSer
 	}
 
 	public String getCurrencyCode() {
-		return kohaConfig.getProperty(KohaConstants.CONFIG_KOHA_CURRENCY_CODE);
+		return kohaConfig.getProperty(KohaConstants.CONF_KOHA_CURRENCY_CODE);
 	}
 }

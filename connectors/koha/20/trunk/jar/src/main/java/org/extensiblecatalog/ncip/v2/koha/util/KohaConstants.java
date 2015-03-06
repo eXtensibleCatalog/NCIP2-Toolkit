@@ -37,7 +37,7 @@ public class KohaConstants {
 	public static final String CONF_MAX_ITEM_PREPARATION_TIME_DELAY = "MaxItemPreparationTimeDelay";
 	public static final String CONF_NEXT_ITEM_TOKEN_EXPIRATION_TIME = "NextItemTokenExpirationTime";
 	public static final String CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
-	public static final String CONF_CONFIG_KOHA_CURRENCY_CODE = "KohaCurrencyCode";
+	public static final String CONF_KOHA_CURRENCY_CODE = "KohaCurrencyCode";
 	public static final String CONF_MARC_ITEM_DESC_FIELD = "MarcItemDescriptionField";
 	public static final String CONF_ADMIN_NAME = "AdminName";
 	public static final String CONF_ADMIN_PASS = "AdminPass";
