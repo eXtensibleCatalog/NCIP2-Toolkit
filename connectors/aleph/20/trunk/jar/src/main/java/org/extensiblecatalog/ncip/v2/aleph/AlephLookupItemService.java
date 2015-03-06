@@ -83,7 +83,7 @@ public class AlephLookupItemService implements LookupItemService {
 				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (AlephException ae) {
-				Problem p = new Problem(new ProblemType("Processing AlephException error."), null, ae.getMessage());
+				Problem p = new Problem(new ProblemType(ae.getShortMessage()), null, ae.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (ParserConfigurationException pce) {
 				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
