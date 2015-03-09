@@ -100,7 +100,8 @@ public class KohaConstants {
 	public static final String DATAFIELD_PUBLICATION_RELATED_TAG = "260";
 	public static final String DATAFIELD_EDITION_TAG = "250";
 	public static final String DATAFIELD_PHYSICAL_DESCRIPTION_TAG = "300";
-	public static final String DATAFIELD_SIGLA_PARENT_TAG = "910"; // TODO: Implement SIGLA parsing
+	public static final String DATAFIELD_AUTHOR_OF_COMPONENT_RELATED_TAG = "700";
+	public static final String DATAFIELD_SIGLA_PARENT_TAG = "910";
 
 	// subfields
 	public static final String SUBFIELD_AUTHOR_NAME_CODE = "a";
@@ -115,4 +116,6 @@ public class KohaConstants {
 	public static final String SUBFIELD_PUBLISHER_NAME_CODE = SUBFIELD_TITLE_OF_COMPONENT_CODE;
 
 	public static final String SUBFIELD_PUBLICATION_DATE_CODE = "c";
+	public static final Object SUBFIELD_TITLE_OF_SECOND_COMPONENT_CODE = SUBFIELD_PUBLICATION_DATE_CODE;
+
 }

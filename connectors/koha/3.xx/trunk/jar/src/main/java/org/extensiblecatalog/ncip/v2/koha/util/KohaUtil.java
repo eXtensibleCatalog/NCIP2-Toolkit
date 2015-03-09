@@ -338,6 +338,12 @@ public class KohaUtil {
 			bibliographicDescription.setAuthor(author);
 		}
 
+		Map<String, String> authorOfComponentDataField = marcItem.getDataField(KohaConstants.DATAFIELD_AUTHOR_OF_COMPONENT_RELATED_TAG);
+		if (authorOfComponentDataField != null) {
+			String authorOfComponent = authorOfComponentDataField.get(KohaConstants.SUBFIELD_AUTHOR_NAME_CODE);
+			bibliographicDescription.setAuthorOfComponent(authorOfComponent);
+		}
+
 		Map<String, String> isbnDataField = marcItem.getDataField(KohaConstants.DATAFIELD_ISBN_RELATED_TAG);
 		if (isbnDataField != null) {
 			String isbnVal = isbnDataField.get(KohaConstants.SUBFIELD_ISBN_CODE);
@@ -352,6 +358,10 @@ public class KohaUtil {
 			bibliographicDescription.setTitle(title);
 
 			String titleOfComponent = titleDataField.get(KohaConstants.SUBFIELD_TITLE_OF_COMPONENT_CODE);
+
+			if (titleOfComponent == null || titleOfComponent.trim().isEmpty())
+				titleOfComponent = titleDataField.get(KohaConstants.SUBFIELD_TITLE_OF_SECOND_COMPONENT_CODE);
+
 			bibliographicDescription.setTitleOfComponent(titleOfComponent);
 		}
 
@@ -392,7 +402,20 @@ public class KohaUtil {
 		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 		itemId.setItemIdentifierValue(itemIdVal);
 
+		itemId.setAgencyId(parseAgencyId(marcItem));
+
 		return itemId;
+	}
+
+	public static AgencyId parseAgencyId(MarcItem marcItem) {
+		Map<String, String> agencyDataField = marcItem.getDataField(KohaConstants.DATAFIELD_SIGLA_PARENT_TAG);
+		if (agencyDataField != null) {
+			String agencyIdVal = agencyDataField.get(KohaConstants.SUBFIELD_SIGLA_CODE);
+
+			if (agencyIdVal != null && !agencyIdVal.trim().isEmpty())
+				return createAgencyId(agencyIdVal);
+		}
+		return createAgencyId(LocalConfig.getDefaultAgency());
 	}
 
 	public static Problem parseProblems(MarcItem renewItem) {

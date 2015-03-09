@@ -202,7 +202,6 @@ public class KohaConnector {
 				throw e;
 		}
 
-		// TODO: need to authenticate first
 		parser.parse(streamSource, itemHandler);
 
 		return itemHandler.getMarcItem();
