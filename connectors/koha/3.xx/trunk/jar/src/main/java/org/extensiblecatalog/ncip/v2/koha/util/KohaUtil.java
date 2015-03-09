@@ -25,6 +25,7 @@ import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.Language;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
@@ -39,6 +40,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1Language;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.xml.sax.SAXException;
@@ -344,6 +346,17 @@ public class KohaUtil {
 			bibliographicDescription.setAuthorOfComponent(authorOfComponent);
 		}
 
+		// FIXME: datafield 996 -> code "y" -> val KN = Book .. mapping?
+		bibliographicDescription.setMediumType(null);
+
+		String flde = marcItem.getControlField(KohaConstants.CONTROLFIELD_FLDE_TAG);
+		if (flde != null && flde.length() > 37) {
+			// Language is at position 35-37
+			String langVal = (String) flde.subSequence(35, 38);
+			Language lang = new Language(Version1Language.VERSION_1_LANGUAGE, langVal);
+			bibliographicDescription.setLanguage(lang);
+		}
+
 		Map<String, String> isbnDataField = marcItem.getDataField(KohaConstants.DATAFIELD_ISBN_RELATED_TAG);
 		if (isbnDataField != null) {
 			String isbnVal = isbnDataField.get(KohaConstants.SUBFIELD_ISBN_CODE);
@@ -360,7 +373,7 @@ public class KohaUtil {
 			String titleOfComponent = titleDataField.get(KohaConstants.SUBFIELD_TITLE_OF_COMPONENT_CODE);
 
 			if (titleOfComponent == null || titleOfComponent.trim().isEmpty())
-				titleOfComponent = titleDataField.get(KohaConstants.SUBFIELD_TITLE_OF_SECOND_COMPONENT_CODE);
+				titleOfComponent = titleDataField.get(KohaConstants.SUBFIELD_TITLE_OF_COMPONENT_SECOND_CODE);
 
 			bibliographicDescription.setTitleOfComponent(titleOfComponent);
 		}

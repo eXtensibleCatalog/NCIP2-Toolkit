@@ -22,6 +22,9 @@ public class KohaConstants {
 
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 
+	private static final String COMMA_DELIMITER = ",";
+	private static final String SEMICOLON_DELIMITER = ";";
+
 	// Constants for parsing from toolkit.properties
 	public static final String CONF_OPAC_PORT = "OPACPort";
 	public static final String CONF_OPAC_SERVER = "OPACServer";
@@ -90,8 +93,13 @@ public class KohaConstants {
 	public static final String XML_VAL_STATUS_EXPIRED = "expired";
 	public static final String XML_VAL_STATUS_OK = "ok";
 
-	// Tags human readable
+	// controlfields
 	public static final String CONTROLFIELD_ITEM_ID_TAG = "001";
+	/**
+	 * 008 - Fixed-Length Data Elements-General Information (NR)<br>
+	 * http://www.loc.gov/marc/bibliographic/bd008.html
+	 */
+	public static final String CONTROLFIELD_FLDE_TAG = "008";
 
 	// datafields
 	public static final String DATAFIELD_AUTHOR_RELATED_TAG = "100";
@@ -103,19 +111,72 @@ public class KohaConstants {
 	public static final String DATAFIELD_AUTHOR_OF_COMPONENT_RELATED_TAG = "700";
 	public static final String DATAFIELD_SIGLA_PARENT_TAG = "910";
 
-	// subfields
-	public static final String SUBFIELD_AUTHOR_NAME_CODE = "a";
-	public static final String SUBFIELD_ISBN_CODE = SUBFIELD_AUTHOR_NAME_CODE;
-	public static final String SUBFIELD_TITLE_CODE = SUBFIELD_AUTHOR_NAME_CODE;
-	public static final String SUBFIELD_PUBLICATION_PLACE_CODE = SUBFIELD_AUTHOR_NAME_CODE;
-	public static final String SUBFIELD_EDITION_STATEMENT_CODE = SUBFIELD_AUTHOR_NAME_CODE;
-	public static final String SUBFIELD_PAGINATION_CODE = SUBFIELD_AUTHOR_NAME_CODE;
-	public static final String SUBFIELD_SIGLA_CODE = SUBFIELD_AUTHOR_NAME_CODE;
+	// subfield codes
+	private static final String SUBFIELD_CODE_A = "a";
+	public static final String SUBFIELD_AUTHOR_NAME_CODE = SUBFIELD_CODE_A;
+	public static final String SUBFIELD_ISBN_CODE = SUBFIELD_CODE_A;
+	public static final String SUBFIELD_TITLE_CODE = SUBFIELD_CODE_A;
+	public static final String SUBFIELD_PUBLICATION_PLACE_CODE = SUBFIELD_CODE_A;
+	public static final String SUBFIELD_EDITION_STATEMENT_CODE = SUBFIELD_CODE_A;
+	public static final String SUBFIELD_PAGINATION_CODE = SUBFIELD_CODE_A;
+	public static final String SUBFIELD_SIGLA_CODE = SUBFIELD_CODE_A;
 
-	public static final String SUBFIELD_TITLE_OF_COMPONENT_CODE = "b";
-	public static final String SUBFIELD_PUBLISHER_NAME_CODE = SUBFIELD_TITLE_OF_COMPONENT_CODE;
+	private static final String SUBFIELD_CODE_B = "b";
+	public static final String SUBFIELD_TITLE_OF_COMPONENT_CODE = SUBFIELD_CODE_B;
+	public static final String SUBFIELD_PUBLISHER_NAME_CODE = SUBFIELD_CODE_B;
+	public static final String SUBFIELD_HOLDINGS_ITEM_BARCODE_CODE = SUBFIELD_CODE_B;
 
-	public static final String SUBFIELD_PUBLICATION_DATE_CODE = "c";
-	public static final Object SUBFIELD_TITLE_OF_SECOND_COMPONENT_CODE = SUBFIELD_PUBLICATION_DATE_CODE;
+	private static final String SUBFIELD_CODE_C = "c";
+	public static final String SUBFIELD_PUBLICATION_DATE_CODE = SUBFIELD_CODE_C;
+	public static final String SUBFIELD_TITLE_OF_COMPONENT_SECOND_CODE = SUBFIELD_CODE_C;
+	public static final String SUBFIELD_HOLDINGS_ITEM_STORAGE_SIGNATURE = SUBFIELD_CODE_C;
+
+	private static final String SUBFIELD_CODE_D = "d";
+	public static final String SUBFIELD_HOLDINGS_ITEM_VOLUME_DESCRIPTION_CODE = SUBFIELD_CODE_D;
+
+	private static final String SUBFIELD_CODE_F = "f";
+	public static final String SUBFIELD_HOLDINGS_ITEM_CURRENT_LOCATION_CODE = SUBFIELD_CODE_F;
+
+	private static final String SUBFIELD_CODE_G = "g";
+	public static final String SUBFIELD_HOLDINGS_ITEM_RECORD_SIGNATURE_CODE = SUBFIELD_CODE_G;
+
+	private static final String SUBFIELD_CODE_H = "h";
+	public static final String SUBFIELD_HOLDINGS_ITEM_SIGNATURE_CODE = SUBFIELD_CODE_H;
+
+	private static final String SUBFIELD_CODE_I = "i";
+	public static final String SUBFIELD_HOLDINGS_ITEM_NUMBER_CODE = SUBFIELD_CODE_I; // Periodics only
+
+	private static final String SUBFIELD_CODE_K = "k";
+
+	private static final String SUBFIELD_CODE_L = "l";
+	public static final String SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_AGENCY_LEVEL_CODE = SUBFIELD_CODE_L;
+
+	private static final String SUBFIELD_CODE_R = "r";
+	public static final String SUBFIELD_HOLDINGS_ITEM_EDITION_INFO_CODE = SUBFIELD_CODE_R;
+
+	private static final String SUBFIELD_CODE_S = "s";
+	public static final String SUBFIELD_HOLDINGS_ITEM_STATUS_CODE = SUBFIELD_CODE_S;
+
+	private static final String SUBFIELD_CODE_V = "v";
+	public static final String SUBFIELD_HOLDINGS_ITEM_EDITION_NUMBERS_CODE = SUBFIELD_CODE_V; // Periodics only
+
+	private static final String SUBFIELD_CODE_W = "w";
+	public static final String SUBFIELD_HOLDINGS_ITEM_PRICE_VALID_FROM_CODE = SUBFIELD_CODE_W;
+
+	private static final String SUBFIELD_CODE_Y = "y";
+	public static final String SUBFIELD_HOLDINGS_ITEM_YEARS_CODE = SUBFIELD_CODE_Y; // Periodics only
+
+	private static final String SUBFIELD_CODE_Z = "z";
+	public static final String SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_BUILDING_LEVEL_CODE = SUBFIELD_CODE_Z;
+
+	private static final String SUBFIELD_CODE_1 = "1";
+	public static final String SUBFIELD_HOLDINGS_ITEM_BARCODE_SECOND_CODE = SUBFIELD_CODE_1;
+
+	private static final String SUBFIELD_CODE_4 = "4";
+	public static final String SUBFIELD_HOLDINGS_ITEM_PHYSICAL_CONDITION_CODE = SUBFIELD_CODE_4;
+
+	// Delimiters
+	public static final String DELIMITER_HOLDINGS_ITEM_EDITION_NUMBERS = COMMA_DELIMITER;
+	public static final String DELIMITER_HOLDINGS_ITEM_YEARS = COMMA_DELIMITER;
 
 }
