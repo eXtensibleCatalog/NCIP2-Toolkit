@@ -18,6 +18,7 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
+import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
@@ -39,6 +40,7 @@ import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1Language;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
@@ -267,9 +269,10 @@ public class KohaUtil {
 
 	public static ItemOptionalFields parseItemOptionalFields(LookupItemSetInitiationData initData, MarcItem marcItem) {
 		ItemOptionalFields iof = new ItemOptionalFields();
-		/*
-				if (kohaItem.getCirculationStatus() != null)
-					iof.setCirculationStatus(kohaItem.getCirculationStatus());
+
+		if (initData.getCirculationStatusDesired()) {
+			iof.setCirculationStatus(parseCirculationStatus(marcItem));
+		}
 		/*
 				if (kohaItem.getHoldQueueLength() >= 0)
 					iof.setHoldQueueLength(new BigDecimal(kohaItem.getHoldQueueLength()));
@@ -439,5 +442,22 @@ public class KohaUtil {
 	public static RequestDetails parseRequestDetails(MarcItem requestItem) {
 		// FIXME
 		return null;
+	}
+
+	private static CirculationStatus parseCirculationStatus(MarcItem marcItem) {
+		Map<String, String> holdingsItemDataField = marcItem.getDataField(LocalConfig.getMarcHoldingsItemTag());
+		if (holdingsItemDataField != null) {
+			String statusVal = holdingsItemDataField.get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_STATUS_CODE);
+			if (statusVal != null) {
+				if (statusVal.matches(KohaConstants.CIRC_STATUS_NOT_AVAILABLE + "|" + KohaConstants.CIRC_STATUS_LOST + "|" + KohaConstants.CIRC_STATUS_DAMAGED)) {
+					return Version1CirculationStatus.NOT_AVAILABLE;
+				} else if (statusVal.matches(KohaConstants.CIRC_STATUS_ON_SHELF + "|" + KohaConstants.CIRC_STATUS_PRESENT_ONLY)) {
+					return Version1CirculationStatus.AVAILABLE_ON_SHELF;
+				} else if (statusVal.matches(KohaConstants.CIRC_STATUS_PROCESSING)) {
+					return Version1CirculationStatus.IN_PROCESS;
+				}
+			}
+		}
+		return Version1CirculationStatus.CIRCULATION_STATUS_UNDEFINED;
 	}
 }

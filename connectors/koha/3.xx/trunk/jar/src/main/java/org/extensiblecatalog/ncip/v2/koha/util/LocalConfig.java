@@ -36,7 +36,7 @@ public class LocalConfig {
 
 	private static String ilsDiSuffix;
 
-	private static String marcItemDescField;
+	private static String marcHoldingsItemTag;
 
 	/**
 	 * @return the echoParticularProblemsToLUIS
@@ -369,12 +369,12 @@ public class LocalConfig {
 		LocalConfig.adminPass = adminPass;
 	}
 
-	public static String getMarcItemDescriptionField() {
-		return marcItemDescField;
+	public static String getMarcHoldingsItemTag() {
+		return marcHoldingsItemTag;
 	}
 
-	public static void setMarcItemDescriptionField(String marcItemDescField) {
-		LocalConfig.marcItemDescField = marcItemDescField;
+	public static void setMarcHoldingsItemTag(String marcItemDescField) {
+		LocalConfig.marcHoldingsItemTag = marcItemDescField;
 	}
 
 }

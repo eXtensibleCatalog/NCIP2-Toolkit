@@ -92,7 +92,11 @@ public class KohaConnector {
 
 			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
 
-			LocalConfig.setMarcItemDescriptionField(kohaConfig.getProperty(KohaConstants.CONF_MARC_ITEM_DESC_FIELD));
+			try {
+				LocalConfig.setMarcHoldingsItemTag(kohaConfig.getProperty(KohaConstants.CONF_HOLDINGS_ITEM_TAG));
+			} catch (Exception e) {
+				LocalConfig.setMarcHoldingsItemTag(KohaConstants.DATAFIELD_HOLDINGS_ITEM_DEFAULT_TAG);
+			}
 
 			try {
 				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_MAX_ITEM_PREPARATION_TIME_DELAY)));

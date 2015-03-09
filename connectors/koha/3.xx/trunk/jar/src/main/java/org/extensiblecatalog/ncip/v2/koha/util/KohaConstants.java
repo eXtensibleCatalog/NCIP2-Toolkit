@@ -41,7 +41,7 @@ public class KohaConstants {
 	public static final String CONF_NEXT_ITEM_TOKEN_EXPIRATION_TIME = "NextItemTokenExpirationTime";
 	public static final String CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS = "IncludeParticularProblemsInLookupItemSet";
 	public static final String CONF_KOHA_CURRENCY_CODE = "KohaCurrencyCode";
-	public static final String CONF_MARC_ITEM_DESC_FIELD = "MarcItemDescriptionField";
+	public static final String CONF_HOLDINGS_ITEM_TAG = "MarcItemDescriptionField";
 	public static final String CONF_ADMIN_NAME = "AdminName";
 	public static final String CONF_ADMIN_PASS = "AdminPass";
 
@@ -110,6 +110,7 @@ public class KohaConstants {
 	public static final String DATAFIELD_PHYSICAL_DESCRIPTION_TAG = "300";
 	public static final String DATAFIELD_AUTHOR_OF_COMPONENT_RELATED_TAG = "700";
 	public static final String DATAFIELD_SIGLA_PARENT_TAG = "910";
+	public static final String DATAFIELD_HOLDINGS_ITEM_DEFAULT_TAG = "996";
 
 	// subfield codes
 	private static final String SUBFIELD_CODE_A = "a";
@@ -178,5 +179,12 @@ public class KohaConstants {
 	// Delimiters
 	public static final String DELIMITER_HOLDINGS_ITEM_EDITION_NUMBERS = COMMA_DELIMITER;
 	public static final String DELIMITER_HOLDINGS_ITEM_YEARS = COMMA_DELIMITER;
+
+	public static final String CIRC_STATUS_PRESENT_ONLY = "P";
+	public static final String CIRC_STATUS_ON_SHELF = "A";
+	public static final String CIRC_STATUS_LOST = "Z";
+	public static final String CIRC_STATUS_PROCESSING = "ZP";
+	public static final String CIRC_STATUS_NOT_AVAILABLE = "V";
+	public static final String CIRC_STATUS_DAMAGED = "PK";
 
 }
