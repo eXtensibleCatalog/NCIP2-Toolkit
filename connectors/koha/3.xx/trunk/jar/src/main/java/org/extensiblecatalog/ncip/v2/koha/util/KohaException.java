@@ -1,20 +1,22 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
-import java.io.Serializable;
+public class KohaException extends Exception {
 
-/**
- * 
- * @author General exception for interacting with koha
- *
- */
-public class KohaException extends Exception implements Serializable {
+	private static final String DEFAULT_SHORT_MESSAGE = "Internal Error";
+	public static final String INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT = "Invalid ItemidIdentifierValue format";
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5881855954246581333L;
+	private String shortMessage;
 
 	public KohaException(String message) {
+		this(DEFAULT_SHORT_MESSAGE, message);
+	}
+
+	public KohaException(String shortMessage, String message) {
 		super(message);
+		this.shortMessage = shortMessage;
+	}
+
+	public String getShortMessage() {
+		return shortMessage;
 	}
 }

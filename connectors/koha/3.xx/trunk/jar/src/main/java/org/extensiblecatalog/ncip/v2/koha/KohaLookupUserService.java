@@ -146,8 +146,8 @@ public class KohaLookupUserService implements LookupUserService {
 				} catch (SAXException se) {
 					Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
 					responseData.setProblems(Arrays.asList(p));
-				} catch (KohaException ae) {
-					Problem p = new Problem(new ProblemType("Processing KohaException error."), null, ae.getMessage());
+				} catch (KohaException ke) {
+					Problem p = new Problem(new ProblemType(ke.getShortMessage()), null, ke.getMessage());
 					responseData.setProblems(Arrays.asList(p));
 				} catch (Exception e) {
 					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());

@@ -70,8 +70,8 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 			} catch (SAXException se) {
 				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
 				responseData.setProblems(Arrays.asList(p));
-			} catch (KohaException ae) {
-				Problem p = new Problem(new ProblemType("Processing KohaException error."), null, ae.getMessage());
+			} catch (KohaException ke) {
+				Problem p = new Problem(new ProblemType(ke.getShortMessage()), null, ke.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (ParserConfigurationException pce) {
 				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
