@@ -23,6 +23,7 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
 public class KohaRequestItemService implements RequestItemService {
@@ -57,12 +58,15 @@ public class KohaRequestItemService implements RequestItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
+				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
 				MarcItem requestItem = kohaRemoteServiceManager.requestItem(initData);
 
-				if (KohaUtil.parseProblems(requestItem) == null) {
+				if (requestItem != null) {
 					updateResponseData(responseData, initData, requestItem);
 				} else {
-					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(requestItem)));
+
+					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "One of items was not found.");
+					responseData.setProblems(Arrays.asList(p));
 					/*
 					responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
 					responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());

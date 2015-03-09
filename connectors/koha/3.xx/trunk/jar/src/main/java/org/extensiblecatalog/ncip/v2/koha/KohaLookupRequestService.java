@@ -22,6 +22,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.xml.sax.SAXException;
@@ -60,13 +61,15 @@ public class KohaLookupRequestService implements LookupRequestService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
+				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
 				MarcItem requestItem = kohaRemoteServiceManager.lookupRequest(initData);
 
-				if (KohaUtil.parseProblems(requestItem) == null) {
+				if (requestItem != null) {
 					updateResponseData(responseData, initData, requestItem);
-				} else
-					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(requestItem)));
-
+				} else {
+					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
+					responseData.setProblems(Arrays.asList(p));
+				}
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));

@@ -142,7 +142,7 @@ public class KohaConstants {
 	public static final String SUBFIELD_HOLDINGS_ITEM_RECORD_SIGNATURE_CODE = SUBFIELD_CODE_G;
 
 	private static final String SUBFIELD_CODE_H = "h";
-	public static final String SUBFIELD_HOLDINGS_ITEM_SIGNATURE_CODE = SUBFIELD_CODE_H;
+	public static final String SUBFIELD_HOLDINGS_ITEM_CALL_NUMBER_CODE = SUBFIELD_CODE_H;
 
 	private static final String SUBFIELD_CODE_I = "i";
 	public static final String SUBFIELD_HOLDINGS_ITEM_NUMBER_CODE = SUBFIELD_CODE_I; // Periodics only
@@ -175,6 +175,9 @@ public class KohaConstants {
 
 	private static final String SUBFIELD_CODE_4 = "4";
 	public static final String SUBFIELD_HOLDINGS_ITEM_PHYSICAL_CONDITION_CODE = SUBFIELD_CODE_4;
+
+	private static final String SUBFIELD_CODE_5 = "5";
+	public static final String SUBFIELD_HOLDINGS_ITEM_RESTRICTION_CODE = SUBFIELD_CODE_5;
 
 	// Delimiters
 	public static final String DELIMITER_HOLDINGS_ITEM_EDITION_NUMBERS = COMMA_DELIMITER;

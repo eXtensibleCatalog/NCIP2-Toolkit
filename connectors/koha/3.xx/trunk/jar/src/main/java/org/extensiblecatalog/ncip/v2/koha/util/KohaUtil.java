@@ -24,14 +24,17 @@ import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Language;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
@@ -42,6 +45,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifier
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1Language;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
@@ -273,59 +277,33 @@ public class KohaUtil {
 		if (initData.getCirculationStatusDesired()) {
 			iof.setCirculationStatus(parseCirculationStatus(marcItem));
 		}
-		/*
-				if (kohaItem.getHoldQueueLength() >= 0)
-					iof.setHoldQueueLength(new BigDecimal(kohaItem.getHoldQueueLength()));
 
-				if (kohaItem.getElectronicResource() != null)
-					iof.setElectronicResource(kohaItem.getElectronicResource());
+		if (initData.getHoldQueueLengthDesired()) {
+			iof.setHoldQueueLength(parseHoldQueueLength(marcItem));
+		}
 
-				if (kohaItem.getCallNumber() != null || kohaItem.getCopyNumber() != null || kohaItem.getDescription() != null) {
-					ItemDescription description = new ItemDescription();
+		if (initData.getItemDescriptionDesired()) {
+			ItemDescription description = new ItemDescription();
 
-					if (kohaItem.getCallNumber() != null)
-						description.setCallNumber(kohaItem.getCallNumber());
+			String callNumber = parseCallNumber(marcItem);
+			BigDecimal noOfPieces = parseNoOfPieces(marcItem);
+			if (callNumber != null || noOfPieces != null) {
 
-					if (kohaItem.getCopyNumber() != null)
-						description.setCopyNumber(kohaItem.getCopyNumber());
+				description.setCallNumber(callNumber);
+				description.setNumberOfPieces(noOfPieces);
 
-					if (kohaItem.getDescription() != null)
-						description.setHoldingsInformation(kohaItem.getDescription());
+				iof.setItemDescription(description);
+			}
+		}
 
-					if (kohaItem.getNumberOfPieces() != null)
-						description.setNumberOfPieces(kohaItem.getNumberOfPieces());
+		if (initData.getItemUseRestrictionTypeDesired()) {
+			iof.setItemUseRestrictionTypes(parseItemUseRestrictionTypes(marcItem));
+		}
 
-					iof.setItemDescription(description);
-				}
+		if (initData.getLocationDesired()) {
+			iof.setLocations(parseLocations(marcItem));
 
-				if (kohaItem.getItemUseRestrictionTypes().size() > 0)
-					iof.setItemUseRestrictionTypes(kohaItem.getItemUseRestrictionTypes());
-
-				if (kohaItem.getLocation() != null || kohaItem.getCollection() != null) {
-					Location location = new Location();
-
-					LocationName locationName = new LocationName();
-
-					List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
-
-					if (kohaItem.getLocation() != null)
-						locationNameInstances.add(createLocationNameInstance(kohaItem.getLocation(), new BigDecimal(1)));
-
-					if (kohaItem.getCollection() != null)
-						locationNameInstances.add(createLocationNameInstance(kohaItem.getCollection(), new BigDecimal(2)));
-
-					locationName.setLocationNameInstances(locationNameInstances);
-
-					location.setLocationName(locationName);
-					location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
-
-					iof.setLocations(Arrays.asList(location));
-				}
-
-				if (kohaItem.getBarcode() != null)
-					iof.setBibliographicDescription(kohaItem.getBarcode());
-		*/
-
+		}
 		if (initData.getBibliographicDescriptionDesired()) {
 			BibliographicDescription bibDesc = parseBibliographicDescription(marcItem);
 
@@ -349,8 +327,7 @@ public class KohaUtil {
 			bibliographicDescription.setAuthorOfComponent(authorOfComponent);
 		}
 
-		// FIXME: datafield 996 -> code "y" -> val KN = Book .. mapping?
-		bibliographicDescription.setMediumType(null);
+		bibliographicDescription.setMediumType(parseMediumType(marcItem));
 
 		String flde = marcItem.getControlField(KohaConstants.CONTROLFIELD_FLDE_TAG);
 		if (flde != null && flde.length() > 37) {
@@ -358,14 +335,6 @@ public class KohaUtil {
 			String langVal = (String) flde.subSequence(35, 38);
 			Language lang = new Language(Version1Language.VERSION_1_LANGUAGE, langVal);
 			bibliographicDescription.setLanguage(lang);
-		}
-
-		Map<String, String> isbnDataField = marcItem.getDataField(KohaConstants.DATAFIELD_ISBN_RELATED_TAG);
-		if (isbnDataField != null) {
-			String isbnVal = isbnDataField.get(KohaConstants.SUBFIELD_ISBN_CODE);
-			if (isbnVal != null) {
-				bibliographicDescription.setBibliographicItemIds(Arrays.asList(createBibliographicItemIdAsISBN(isbnVal)));
-			}
 		}
 
 		Map<String, String> titleDataField = marcItem.getDataField(KohaConstants.DATAFIELD_TITLE_RELATED_TAG);
@@ -405,6 +374,32 @@ public class KohaUtil {
 			bibliographicDescription.setPagination(pagination);
 		}
 
+		List<BibliographicItemId> bibIds = new ArrayList<BibliographicItemId>();
+
+		Map<String, String> isbnDataField = marcItem.getDataField(KohaConstants.DATAFIELD_ISBN_RELATED_TAG);
+		if (isbnDataField != null) {
+
+			String isbnVal = isbnDataField.get(KohaConstants.SUBFIELD_ISBN_CODE);
+
+			if (isbnVal != null) {
+				bibIds.add(createBibliographicItemIdAsISBN(isbnVal));
+			}
+		}
+
+		if (marcItem.getHoldingsItemSubfields() != null) {
+			String barcode = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_BARCODE_CODE);
+
+			if (barcode == null)
+				barcode = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_BARCODE_SECOND_CODE);
+
+			if (barcode != null) {
+				bibIds.add(createBibliographicItemIdAsLegalDepositNumber(barcode));
+			}
+		}
+
+		if (bibIds.size() > 0)
+			bibliographicDescription.setBibliographicItemIds(bibIds);
+
 		return bibliographicDescription;
 	}
 
@@ -434,20 +429,9 @@ public class KohaUtil {
 		return createAgencyId(LocalConfig.getDefaultAgency());
 	}
 
-	public static Problem parseProblems(MarcItem renewItem) {
-		// FIXME
-		return null;
-	}
-
-	public static RequestDetails parseRequestDetails(MarcItem requestItem) {
-		// FIXME
-		return null;
-	}
-
 	private static CirculationStatus parseCirculationStatus(MarcItem marcItem) {
-		Map<String, String> holdingsItemDataField = marcItem.getDataField(LocalConfig.getMarcHoldingsItemTag());
-		if (holdingsItemDataField != null) {
-			String statusVal = holdingsItemDataField.get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_STATUS_CODE);
+		if (marcItem.getHoldingsItemSubfields() != null) {
+			String statusVal = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_STATUS_CODE);
 			if (statusVal != null) {
 				if (statusVal.matches(KohaConstants.CIRC_STATUS_NOT_AVAILABLE + "|" + KohaConstants.CIRC_STATUS_LOST + "|" + KohaConstants.CIRC_STATUS_DAMAGED)) {
 					return Version1CirculationStatus.NOT_AVAILABLE;
@@ -459,5 +443,76 @@ public class KohaUtil {
 			}
 		}
 		return Version1CirculationStatus.CIRCULATION_STATUS_UNDEFINED;
+	}
+
+	public static RequestDetails parseRequestDetails(MarcItem requestItem) {
+		// FIXME
+		return null;
+	}
+
+	private static BigDecimal parseHoldQueueLength(MarcItem marcItem) {
+		// FIXME
+		return null;
+	}
+
+	private static BigDecimal parseNoOfPieces(MarcItem marcItem) {
+		// FIXME
+		return null;
+	}
+
+	private static MediumType parseMediumType(MarcItem marcItem) {
+		// FIXME: datafield 996 -> code "??" -> val KN = Book & mapping?
+		return null;
+	}
+
+	private static String parseCallNumber(MarcItem marcItem) {
+		if (marcItem.getHoldingsItemSubfields() != null) {
+			return marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_CALL_NUMBER_CODE);
+		}
+		return null;
+	}
+
+	private static List<ItemUseRestrictionType> parseItemUseRestrictionTypes(MarcItem marcItem) {
+		List<ItemUseRestrictionType> iurts = new ArrayList<ItemUseRestrictionType>();
+
+		if (marcItem.getHoldingsItemSubfields() != null) {
+			String statusVal = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_STATUS_CODE);
+
+			if (statusVal.equals(KohaConstants.CIRC_STATUS_PRESENT_ONLY)) {
+				iurts.add(Version1ItemUseRestrictionType.IN_LIBRARY_USE_ONLY);
+			}
+		}
+
+		// TODO: datafield 996 -> code "5" -> mapping? ..
+
+		if (iurts.size() > 0)
+			return iurts;
+
+		return null;
+	}
+
+	private static List<Location> parseLocations(MarcItem marcItem) {
+
+		String locationOnAgencyLevel = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_AGENCY_LEVEL_CODE);
+		String locationOnBuildingLevel = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_BUILDING_LEVEL_CODE);
+
+		if (locationOnAgencyLevel != null || locationOnBuildingLevel != null) {
+			Location location = new Location();
+			LocationName locationName = new LocationName();
+			List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+
+			if (locationOnAgencyLevel != null)
+				locationNameInstances.add(createLocationNameInstance(locationOnAgencyLevel, new BigDecimal(1)));
+
+			if (locationOnBuildingLevel != null)
+				locationNameInstances.add(createLocationNameInstance(locationOnBuildingLevel, new BigDecimal(2)));
+
+			locationName.setLocationNameInstances(locationNameInstances);
+			location.setLocationName(locationName);
+			location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+
+			return Arrays.asList(location);
+		}
+		return null;
 	}
 }

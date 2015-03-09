@@ -28,6 +28,7 @@ import org.extensiblecatalog.ncip.v2.service.RenewItemService;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
 import org.xml.sax.SAXException;
 
 public class KohaRenewItemService implements RenewItemService {
@@ -65,10 +66,12 @@ public class KohaRenewItemService implements RenewItemService {
 			try {
 				MarcItem renewItem = kohaRemoteServiceManager.renewItem(initData);
 
-				if (KohaUtil.parseProblems(renewItem) != null) {
+				if (renewItem != null) {
 					updateResponseData(responseData, initData, renewItem);
-				} else
-					responseData.setProblems(Arrays.asList(KohaUtil.parseProblems(renewItem)));
+				} else {
+					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
+					responseData.setProblems(Arrays.asList(p));
+				}
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
