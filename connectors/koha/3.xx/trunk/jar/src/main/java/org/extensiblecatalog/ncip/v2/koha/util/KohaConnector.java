@@ -1,5 +1,6 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -186,7 +187,7 @@ public class KohaConnector {
 
 		String itemId = initData.getItemId().getItemIdentifierValue();
 
-		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_BIB, itemId).addRequest(KohaConstants.ATTR_ITEMS, "1").toURL();
+		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_BIB, itemId).addRequest(KohaConstants.ATTR_ITEMS, "Y").toURL();
 
 		try {
 			streamSource = createInputSourceWithCookie(url);
@@ -195,6 +196,8 @@ public class KohaConnector {
 			if (responseCode.equals("403")) {
 				renewSessionCookie();
 				streamSource = createInputSourceWithCookie(url);
+			} else if (e instanceof FileNotFoundException) {
+				throw new KohaException(KohaException.ITEM_NOT_FOUND, "The item you are looking for (" + itemId + ") was not found.");
 			} else
 				throw e;
 		}

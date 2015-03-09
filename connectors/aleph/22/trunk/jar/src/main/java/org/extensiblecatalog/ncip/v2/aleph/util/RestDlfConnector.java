@@ -153,7 +153,7 @@ public class RestDlfConnector extends AlephMediator {
 		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId || !isCorrectItemId) {
-			throw new AlephException(AlephException.INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT,
+			throw new AlephException(AlephException.INVALID_ITEM_IDENTIFIER_VALUE_FORMAT,
 					"Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
@@ -194,7 +194,7 @@ public class RestDlfConnector extends AlephMediator {
 		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId) {
-			throw new AlephException(AlephException.INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT, "Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
+			throw new AlephException(AlephException.INVALID_ITEM_IDENTIFIER_VALUE_FORMAT, "Record Id is accepted only in strict format with strict length. e.g. MZK01000000421");
 		}
 
 		// AppProfileType is currently used for language specification
@@ -465,7 +465,7 @@ public class RestDlfConnector extends AlephMediator {
 		boolean isCorrectRecordId = AlephUtil.isCorrectRecordId(recordId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId) {
-			throw new AlephException(AlephException.INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT,
+			throw new AlephException(AlephException.INVALID_ITEM_IDENTIFIER_VALUE_FORMAT,
 					"Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
@@ -553,7 +553,7 @@ public class RestDlfConnector extends AlephMediator {
 				boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemIdVal, LocalConfig.getBibLibraryLength());
 
 				if (!isCorrectRecordId || !isCorrectItemId) {
-					throw new AlephException(AlephException.INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT,
+					throw new AlephException(AlephException.INVALID_ITEM_IDENTIFIER_VALUE_FORMAT,
 							"Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 				}
 
@@ -667,7 +667,7 @@ public class RestDlfConnector extends AlephMediator {
 		boolean isCorrectItemId = AlephUtil.isCorrectItemId(itemId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectRecordId || !isCorrectItemId) {
-			throw new AlephException(AlephException.INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT,
+			throw new AlephException(AlephException.INVALID_ITEM_IDENTIFIER_VALUE_FORMAT,
 					"Item Id is accepted only in strict format with strict length. e.g. MZK01001276830-MZK50001311815000020");
 		}
 
@@ -727,7 +727,7 @@ public class RestDlfConnector extends AlephMediator {
 		boolean isCorrectLoanId = AlephUtil.isCorrectLoanId(alephLoanId, LocalConfig.getBibLibraryLength());
 
 		if (!isCorrectLoanId) {
-			throw new AlephException(AlephException.INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT, "Loan Id is accepted only in strict format with strict length. e.g. MZK50004929137");
+			throw new AlephException(AlephException.INVALID_ITEM_IDENTIFIER_VALUE_FORMAT, "Loan Id is accepted only in strict format with strict length. e.g. MZK50004929137");
 		}
 
 		AlephRenewItem renewItem = new AlephRenewItem();

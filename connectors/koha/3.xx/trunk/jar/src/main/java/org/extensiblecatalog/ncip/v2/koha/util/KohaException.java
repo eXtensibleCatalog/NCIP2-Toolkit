@@ -2,8 +2,9 @@ package org.extensiblecatalog.ncip.v2.koha.util;
 
 public class KohaException extends Exception {
 
-	private static final String DEFAULT_SHORT_MESSAGE = "Internal Error";
-	public static final String INVALID_ITEMID_IDENTIFIER_VALUE_FORMAT = "Invalid ItemidIdentifierValue format";
+	private static final String DEFAULT_SHORT_MESSAGE = "Internal connector error";
+	public static final String INVALID_ITEM_IDENTIFIER_VALUE_FORMAT = "Invalid ItemIdentifierValue format";
+	public static final String ITEM_NOT_FOUND = "Item not found";
 
 	private String shortMessage;
 
