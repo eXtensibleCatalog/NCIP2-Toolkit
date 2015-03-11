@@ -22,6 +22,8 @@ public class KohaConstants {
 
 	public static final String DEFAULT_SCHEME = "http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd";
 
+	public static final String KOHA_TEMPLATE_LOOKUP_USER = "members/tables/ncip_lookup_user.tt";
+
 	private static final String COMMA_DELIMITER = ",";
 	private static final String SEMICOLON_DELIMITER = ";";
 
@@ -49,9 +51,6 @@ public class KohaConstants {
 
 	public static final SimpleDateFormat KOHA_DATE_FORMATTER = new SimpleDateFormat("yyy-MM-dd");
 
-	public static final String PARAM_SERVICE = "service";
-	public static final String PARAM_ID = "id";
-
 	public static final String ILS_DI_LOOKUP_USER = "GetPatronInfo";
 	public static final String ILS_DI_LOOKUP_ITEM = "GetRecords";
 
@@ -71,6 +70,12 @@ public class KohaConstants {
 	// HTML ATTRS
 
 	public static final String ATTR_ITEMS = "items";
+	public static final String ATTR_TEMPLATE_PATH = "template_path";
+	public static final String ATTR_SEARCH_FIELD_TYPES = "searchfieldstype";
+	public static final String ATTR_SEARCH_MEMBER = "searchmember";
+
+	// HTML ATTRS' VALS
+	public static final String ATTR_VAL_BORROWER_NUMBER = "borrowernumber";
 
 	//
 	// XML PARSING SECTION

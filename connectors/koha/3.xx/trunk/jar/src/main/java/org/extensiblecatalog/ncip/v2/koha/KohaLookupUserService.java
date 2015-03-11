@@ -9,27 +9,17 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
-import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
 import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
-import org.extensiblecatalog.ncip.v2.service.AccountBalance;
-import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.Amount;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
-import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
-import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserService;
@@ -41,9 +31,10 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 public class KohaLookupUserService implements LookupUserService {
@@ -102,37 +93,13 @@ public class KohaLookupUserService implements LookupUserService {
 		} else {
 
 			if (authenticationIncluded) {
-				// Just authenticate patronId with password input through X-Services ..
-
-				AgencyId suppliedAgencyId;
-
-				KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
-
-				if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null)
-					suppliedAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId();
-				else
-					suppliedAgencyId = new AgencyId(LocalConfig.getDefaultAgency());
-
-				try {
-
-					String username = "";
-
-					UserId userId = new UserId();
-					userId.setAgencyId(suppliedAgencyId);
-					userId.setUserIdentifierValue(username);
-					userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
-
-					responseData.setUserId(userId);
-				} catch (Exception e) {
-					Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
-					responseData.setProblems(Arrays.asList(p));
-				}
+				// FIXME
 			} else {
 				// Regular lookup User ..
 
 				KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
-				KohaUser kohaUser = null;
+				JSONObject kohaUser = null;
 				try {
 					kohaUser = kohaRemoteServiceManager.lookupUser(patronId, initData);
 
@@ -158,7 +125,7 @@ public class KohaLookupUserService implements LookupUserService {
 		return responseData;
 	}
 
-	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, KohaUser kohaUser, KohaRemoteServiceManager svcMgr) {
+	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr) {
 
 		if (kohaUser != null) {
 
@@ -174,81 +141,21 @@ public class KohaLookupUserService implements LookupUserService {
 			boolean loanedItemsDesired = initData.getLoanedItemsDesired();
 
 			if (userFiscalAccountDesired) {
-				List<UserFiscalAccount> userFiscalAccounts = kohaUser.getUserFiscalAccounts();
-
-				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), kohaUser.getBalanceMinorUnit());
-
-				// Update Currency Code
-				for (UserFiscalAccount userFiscalAccount : userFiscalAccounts) {
-					AccountBalance accountBalance = userFiscalAccount.getAccountBalance();
-
-					if (accountBalance == null) {
-						accountBalance = new AccountBalance();
-						accountBalance.setMonetaryValue(new BigDecimal("0"));
-					}
-					accountBalance.setCurrencyCode(currencyCode);
-					userFiscalAccount.setAccountBalance(accountBalance);
-
-					List<AccountDetails> accountDetails = userFiscalAccount.getAccountDetails();
-
-					for (AccountDetails details : accountDetails) {
-						FiscalTransactionInformation fiscalTransactionInformation = details.getFiscalTransactionInformation();
-
-						Amount amount = fiscalTransactionInformation.getAmount();
-						amount.setCurrencyCode(currencyCode);
-
-						fiscalTransactionInformation.setAmount(amount);
-
-						details.setFiscalTransactionInformation(fiscalTransactionInformation);
-					}
-				}
+				List<UserFiscalAccount> userFiscalAccounts = KohaUtil.parseUserFiscalAccounts(kohaUser);
 
 				responseData.setUserFiscalAccounts(userFiscalAccounts);
 			}
 
-			if (requestedItemsDesired)
-				responseData.setRequestedItems(kohaUser.getRequestedItems());
+			/*
+						if (requestedItemsDesired)
+							responseData.setRequestedItems(KohaUtil.parseRequestedItems(kohaUser));
 
-			if (loanedItemsDesired)
-				responseData.setLoanedItems(kohaUser.getLoanedItems());
+						if (loanedItemsDesired)
+							responseData.setLoanedItems(KohaUtil.parseLoanedItems(kohaUser));
 
-			// User optional fields:
-			boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
-			boolean nameInformationDesired = initData.getNameInformationDesired();
-			boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
-			boolean userIdDesired = initData.getUserIdDesired();
-			boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+			*/
 
-			UserOptionalFields uof = new UserOptionalFields();
-			boolean includeUserOptionalFields = false;
-
-			if (blockOrTrapDesired) {
-				uof.setBlockOrTraps(kohaUser.getBlockOrTraps());
-				includeUserOptionalFields = true;
-			}
-
-			if (nameInformationDesired) {
-				uof.setNameInformation(kohaUser.getNameInformation());
-				includeUserOptionalFields = true;
-			}
-
-			if (userAddressInformationDesired) {
-				uof.setUserAddressInformations(kohaUser.getUserAddressInformations());
-				includeUserOptionalFields = true;
-			}
-
-			if (userIdDesired) {
-				uof.setUserIds(kohaUser.getUserIds());
-				includeUserOptionalFields = true;
-			}
-
-			if (userPrivilegeDesired) {
-				uof.setUserPrivileges(kohaUser.getUserPrivileges());
-				includeUserOptionalFields = true;
-			}
-
-			if (includeUserOptionalFields)
-				responseData.setUserOptionalFields(uof);
+			responseData.setUserOptionalFields(KohaUtil.parseUserOptionalFields(initData, kohaUser));
 		}
 	}
 }

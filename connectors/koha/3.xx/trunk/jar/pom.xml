@@ -7,7 +7,6 @@
 
 	<!-- The project details. -->
 	<artifactId>koha-jar</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>NCIP V2 Koha</name>
 	<description>NCIP V2 Koha for new ILS connectors</description>
@@ -41,6 +40,17 @@
 			<version>1.2-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>2.16</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>

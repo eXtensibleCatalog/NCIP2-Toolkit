@@ -9,7 +9,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class KohaLookupItemHandler extends DefaultHandler {
+public class KohaMarcItemHandler extends DefaultHandler {
 
 	private MarcItem marcItem;
 
@@ -22,7 +22,7 @@ public class KohaLookupItemHandler extends DefaultHandler {
 	private boolean marcControlFieldReached;
 	private boolean marcLeaderReached;
 
-	public KohaLookupItemHandler() {
+	public KohaMarcItemHandler() {
 		marcItem = new MarcItem();
 
 		marcSubFieldReached = false;

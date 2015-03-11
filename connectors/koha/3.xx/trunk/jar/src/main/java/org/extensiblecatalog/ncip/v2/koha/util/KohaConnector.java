@@ -1,10 +1,13 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -12,6 +15,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -22,7 +30,7 @@ import org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
-import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLookupItemHandler;
+import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaMarcItemHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
@@ -44,12 +52,19 @@ import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class KohaConnector {
 
-	private static SAXParser parser;
+	private static SAXParser saxParser;
+
+	private static JSONParser jsonParser;
 
 	private static InputSource streamSource;
 
@@ -62,7 +77,8 @@ public class KohaConnector {
 	public KohaConnector() throws ServiceException {
 
 		try {
-			parser = SAXParserFactory.newInstance().newSAXParser();
+			saxParser = SAXParserFactory.newInstance().newSAXParser();
+			jsonParser = new JSONParser();
 		} catch (Exception e1) {
 			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory.");
 		}
@@ -140,7 +156,7 @@ public class KohaConnector {
 
 		KohaLoginHandler loginHandler = new KohaLoginHandler();
 
-		parser.parse(streamSource, loginHandler);
+		saxParser.parse(streamSource, loginHandler);
 
 		if (!loginHandler.isLogged()) {
 			throw new KohaException("Invalid credentials were provided in toolkit.properties - cannot log in.");
@@ -163,21 +179,35 @@ public class KohaConnector {
 	 * @throws KohaException
 	 * @throws IOException
 	 * @throws SAXException
+	 * @throws ParseException
+	 * @throws URISyntaxException
 	 */
-	public KohaUser lookupUser(String patronId, LookupUserInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		/*
-				boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
-				boolean loanedItemsDesired = initData.getLoanedItemsDesired();
-				boolean requestedItemsDesired = initData.getRequestedItemsDesired();
-				boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
-				boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+	public JSONObject lookupUser(String patronId, LookupUserInitiationData initData) throws KohaException, SAXException, ParserConfigurationException, ParseException,
+			URISyntaxException, IOException {
 
-				boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired();
+		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_MEMBERS_SEARCH).addRequest(KohaConstants.ATTR_TEMPLATE_PATH, KohaConstants.KOHA_TEMPLATE_LOOKUP_USER)
+				.addRequest(KohaConstants.ATTR_SEARCH_FIELD_TYPES, KohaConstants.ATTR_VAL_BORROWER_NUMBER).addRequest(KohaConstants.ATTR_SEARCH_MEMBER, patronId).toURL();
 
-				String appProfileType = null;
-				if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null)
-					appProfileType = initData.getInitiationHeader().getApplicationProfileType().getValue();
-		*/
+		String response = getPlainTextResponse(url);
+
+		JSONObject obj = (JSONObject) jsonParser.parse(response);
+		return obj;
+	}
+
+	private String getPlainTextResponse(URL url) throws IOException, SAXException, KohaException {
+
+		Client client = ClientBuilder.newClient();
+
+		try {
+			WebTarget target = client.target(url.toURI());
+
+			renewSessionCookie();
+			Builder builder = target.request(MediaType.TEXT_PLAIN_TYPE).header("Cookie", currentSessionIdCookie);
+			return builder.get(String.class);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
@@ -187,7 +217,7 @@ public class KohaConnector {
 	}
 
 	public MarcItem lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		KohaLookupItemHandler itemHandler = new KohaLookupItemHandler();
+		KohaMarcItemHandler itemHandler = new KohaMarcItemHandler();
 
 		String itemId = initData.getItemId().getItemIdentifierValue();
 
@@ -195,18 +225,11 @@ public class KohaConnector {
 
 		try {
 			streamSource = createInputSourceWithCookie(url);
-		} catch (IOException e) {
-			String responseCode = (String) e.getMessage().subSequence(36, 39);
-			if (responseCode.equals("403")) {
-				renewSessionCookie();
-				streamSource = createInputSourceWithCookie(url);
-			} else if (e instanceof FileNotFoundException) {
-				throw new KohaException(KohaException.ITEM_NOT_FOUND, "The item you are looking for (" + itemId + ") was not found.");
-			} else
-				throw e;
+		} catch (FileNotFoundException e) {
+			throw new KohaException(KohaException.ITEM_NOT_FOUND, "The item you are looking for (" + itemId + ") was not found.");
 		}
 
-		parser.parse(streamSource, itemHandler);
+		saxParser.parse(streamSource, itemHandler);
 
 		return itemHandler.getMarcItem();
 	}
@@ -286,11 +309,19 @@ public class KohaConnector {
 		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getSvcServerPort()).setPath(LocalConfig.getSvcSuffix());
 	}
 
-	private static InputSource createInputSourceWithCookie(URL url) throws IOException {
+	private static InputSource createInputSourceWithCookie(URL url) throws IOException, SAXException, KohaException {
 		URLConnection urlConn = url.openConnection();
 		urlConn.setRequestProperty("Cookie", currentSessionIdCookie);
 
-		return new InputSource(urlConn.getInputStream());
-
+		try {
+			return new InputSource(urlConn.getInputStream());
+		} catch (IOException e) {
+			String responseCode = (String) e.getMessage().subSequence(36, 39);
+			if (responseCode.equals("403")) {
+				renewSessionCookie();
+				return createInputSourceWithCookie(url);
+			} else
+				throw e;
+		}
 	}
 }

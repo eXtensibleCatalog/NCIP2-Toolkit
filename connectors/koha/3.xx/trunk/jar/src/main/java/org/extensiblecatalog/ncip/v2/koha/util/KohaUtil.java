@@ -34,12 +34,14 @@ import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
-import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
@@ -49,6 +51,8 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1Language;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 public class KohaUtil {
@@ -514,5 +518,82 @@ public class KohaUtil {
 			return Arrays.asList(location);
 		}
 		return null;
+	}
+
+	public static List<UserFiscalAccount> parseUserFiscalAccounts(JSONObject kohaUser) {
+		// TODO
+
+		/*
+				CurrencyCode currencyCode = new CurrencyCode(svcMgr.getCurrencyCode(), kohaUser.getBalanceMinorUnit());
+
+				// Update Currency Code
+				for (UserFiscalAccount userFiscalAccount : userFiscalAccounts) {
+					AccountBalance accountBalance = userFiscalAccount.getAccountBalance();
+
+					if (accountBalance == null) {
+						accountBalance = new AccountBalance();
+						accountBalance.setMonetaryValue(new BigDecimal("0"));
+					}
+					accountBalance.setCurrencyCode(currencyCode);
+					userFiscalAccount.setAccountBalance(accountBalance);
+
+					List<AccountDetails> accountDetails = userFiscalAccount.getAccountDetails();
+
+					for (AccountDetails details : accountDetails) {
+						FiscalTransactionInformation fiscalTransactionInformation = details.getFiscalTransactionInformation();
+
+						Amount amount = fiscalTransactionInformation.getAmount();
+						amount.setCurrencyCode(currencyCode);
+
+						fiscalTransactionInformation.setAmount(amount);
+
+						details.setFiscalTransactionInformation(fiscalTransactionInformation);
+					}
+				}
+				*/
+		return null;
+	}
+
+	public static UserOptionalFields parseUserOptionalFields(LookupUserInitiationData initData, JSONObject kohaUser) {
+		UserOptionalFields uof = new UserOptionalFields();
+
+		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
+		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
+		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+		boolean userPrivilegeDesired = initData.getUserPrivilegeDesired();
+		/*
+		 * 
+						if (blockOrTrapDesired) {
+							uof.setBlockOrTraps(kohaUser.getBlockOrTraps());
+							includeUserOptionalFields = true;
+						}
+
+						if (nameInformationDesired) {
+							uof.setNameInformation(kohaUser.getNameInformation());
+							includeUserOptionalFields = true;
+						}
+
+						if (userAddressInformationDesired) {
+							uof.setUserAddressInformations(kohaUser.getUserAddressInformations());
+							includeUserOptionalFields = true;
+						}
+
+						if (userIdDesired) {
+							uof.setUserIds(kohaUser.getUserIds());
+							includeUserOptionalFields = true;
+						}
+
+						if (userPrivilegeDesired) {
+							uof.setUserPrivileges(kohaUser.getUserPrivileges());
+							includeUserOptionalFields = true;
+						}
+		 */
+
+		boolean nameInformationDesired = initData.getNameInformationDesired();
+		boolean userIdDesired = initData.getUserIdDesired();
+		boolean userAddressInformationDesired = initData.getUserAddressInformationDesired();
+
+		return null; // TODO: Return null if none optional field desired ..
 	}
 }
