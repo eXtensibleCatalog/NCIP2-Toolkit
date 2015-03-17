@@ -185,8 +185,7 @@ public class KohaConnector {
 	public JSONObject lookupUser(String patronId, LookupUserInitiationData initData) throws KohaException, SAXException, ParserConfigurationException, ParseException,
 			URISyntaxException, IOException {
 
-		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_MEMBERS_SEARCH).addRequest(KohaConstants.ATTR_TEMPLATE_PATH, KohaConstants.KOHA_TEMPLATE_LOOKUP_USER)
-				.addRequest(KohaConstants.ATTR_SEARCH_FIELD_TYPES, KohaConstants.ATTR_VAL_BORROWER_NUMBER).addRequest(KohaConstants.ATTR_SEARCH_MEMBER, patronId).toURL();
+		URL url = getCommonSvcNcipURLBuilder(KohaConstants.ATTR_VAL_LOOKUP_USER).addRequest(KohaConstants.ATTR_VAL_USERID, patronId).toURL();
 
 		String response = getPlainTextResponse(url);
 
@@ -221,7 +220,7 @@ public class KohaConnector {
 
 		String itemId = initData.getItemId().getItemIdentifierValue();
 
-		URL url = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_BIB, itemId).addRequest(KohaConstants.ATTR_ITEMS, "Y").toURL();
+		URL url = getCommonSvcNcipURLBuilder(KohaConstants.ATTR_VAL_LOOKUP_ITEM).addRequest(KohaConstants.ATTR_SEARCH_FIELD_TYPES, itemId).toURL();
 
 		try {
 			streamSource = createInputSourceWithCookie(url);
@@ -309,6 +308,10 @@ public class KohaConnector {
 		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getSvcServerPort()).setPath(LocalConfig.getSvcSuffix());
 	}
 
+	private static URLBuilder getCommonSvcNcipURLBuilder(String service) {
+		return getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_NCIP).addRequest(KohaConstants.ATTR_SERVICE, service);
+	}
+
 	private static InputSource createInputSourceWithCookie(URL url) throws IOException, SAXException, KohaException {
 		URLConnection urlConn = url.openConnection();
 		urlConn.setRequestProperty("Cookie", currentSessionIdCookie);
@@ -320,6 +323,8 @@ public class KohaConnector {
 			if (responseCode.equals("403")) {
 				renewSessionCookie();
 				return createInputSourceWithCookie(url);
+			} else if (responseCode.equals("400")) {
+				throw KohaException.create400BadRequestException();
 			} else
 				throw e;
 		}

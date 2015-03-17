@@ -497,25 +497,27 @@ public class KohaUtil {
 
 	private static List<Location> parseLocations(MarcItem marcItem) {
 
-		String locationOnAgencyLevel = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_AGENCY_LEVEL_CODE);
-		String locationOnBuildingLevel = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_BUILDING_LEVEL_CODE);
+		if (marcItem.getHoldingsItemSubfields() != null) {
+			String locationOnAgencyLevel = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_AGENCY_LEVEL_CODE);
+			String locationOnBuildingLevel = marcItem.getHoldingsItemSubfields().get(KohaConstants.SUBFIELD_HOLDINGS_ITEM_LOCATION_ON_BUILDING_LEVEL_CODE);
 
-		if (locationOnAgencyLevel != null || locationOnBuildingLevel != null) {
-			Location location = new Location();
-			LocationName locationName = new LocationName();
-			List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+			if (locationOnAgencyLevel != null || locationOnBuildingLevel != null) {
+				Location location = new Location();
+				LocationName locationName = new LocationName();
+				List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
 
-			if (locationOnAgencyLevel != null)
-				locationNameInstances.add(createLocationNameInstance(locationOnAgencyLevel, new BigDecimal(1)));
+				if (locationOnAgencyLevel != null)
+					locationNameInstances.add(createLocationNameInstance(locationOnAgencyLevel, new BigDecimal(1)));
 
-			if (locationOnBuildingLevel != null)
-				locationNameInstances.add(createLocationNameInstance(locationOnBuildingLevel, new BigDecimal(2)));
+				if (locationOnBuildingLevel != null)
+					locationNameInstances.add(createLocationNameInstance(locationOnBuildingLevel, new BigDecimal(2)));
 
-			locationName.setLocationNameInstances(locationNameInstances);
-			location.setLocationName(locationName);
-			location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+				locationName.setLocationNameInstances(locationNameInstances);
+				location.setLocationName(locationName);
+				location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
 
-			return Arrays.asList(location);
+				return Arrays.asList(location);
+			}
 		}
 		return null;
 	}

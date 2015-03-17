@@ -63,13 +63,12 @@ public class KohaConstants {
 	public static final String SVC_HOLDS = "holds";
 	public static final String SVC_RENEW = "renew";
 	public static final String SVC_REPORT = "report";
+	public static final String SVC_NCIP = "ncip";
 	public static final String SVC_MEMBERS_SEARCH = "members/search";
 
 	public static final String STATUS_OK = "ok";
 
 	// HTML ATTRS
-
-	public static final String ATTR_ITEMS = "items";
 	public static final String ATTR_TEMPLATE_PATH = "template_path";
 	public static final String ATTR_SEARCH_FIELD_TYPES = "searchfieldstype";
 	public static final String ATTR_SEARCH_MEMBER = "searchmember";
@@ -194,5 +193,16 @@ public class KohaConstants {
 	public static final String CIRC_STATUS_PROCESSING = "ZP";
 	public static final String CIRC_STATUS_NOT_AVAILABLE = "V";
 	public static final String CIRC_STATUS_DAMAGED = "PK";
+
+	public static final String ATTR_SERVICE = "service";
+
+
+	public static final String ATTR_VAL_ITEMID = "itemid";
+
+	public static final String ATTR_VAL_LOOKUP_USER = "lookup_user";
+	
+	public static final String ATTR_VAL_LOOKUP_ITEM = "lookup_item";
+
+	public static final String ATTR_VAL_USERID = "userId";
 
 }
