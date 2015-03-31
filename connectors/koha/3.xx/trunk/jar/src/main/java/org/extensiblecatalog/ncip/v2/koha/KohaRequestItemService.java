@@ -36,20 +36,22 @@ public class KohaRequestItemService implements RequestItemService {
 		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 		boolean itemIdsisEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
 
-		if (userIdIsEmpty || itemIdsisEmpty) {
+		boolean bibIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
+				&& initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier().isEmpty();
+
+		if (userIdIsEmpty || (itemIdsisEmpty && bibIdIsEmpty)) {
 			List<Problem> problems = new ArrayList<Problem>();
 
 			if (userIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Cannot request item with unknown user.");
+				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Cannot request item with unknown user. Please specify UserId");
 				problems.add(p);
 			}
 
-			if (itemIdsisEmpty) {
-
-				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null, "Cannot request unknown item");
+			if (itemIdsisEmpty && bibIdIsEmpty) {
+				Problem p = new Problem(new ProblemType("ItemId & BilbiographicRecord are both undefined."), null, null,
+						"Cannot request unknown item or record. Please specify BibliographicRecord or ItemId.");
 				problems.add(p);
-
 			}
 
 			responseData.setProblems(problems);

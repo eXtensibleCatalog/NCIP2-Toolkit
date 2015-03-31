@@ -86,7 +86,7 @@ public class KohaUtil {
 	public static String convertToKohaDate(GregorianCalendar gregorianCalendar) {
 		if (gregorianCalendar == null)
 			return null;
-		// We need: 20141231
+		// We need: 31/12/2015
 
 		String month = Integer.toString(gregorianCalendar.get(Calendar.MONTH) + 1);
 		if (month.length() < 2)
@@ -94,7 +94,7 @@ public class KohaUtil {
 		String day = Integer.toString(gregorianCalendar.get(Calendar.DAY_OF_MONTH));
 		if (day.length() < 2)
 			day = "0" + day;
-		return Integer.toString(gregorianCalendar.get(Calendar.YEAR)) + month + day;
+		return day + "/" + month + "/" + Integer.toString(gregorianCalendar.get(Calendar.YEAR));
 	}
 
 	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {

@@ -35,34 +35,38 @@ public class KohaLookupRequestService implements LookupRequestService {
 
 		final LookupRequestResponseData responseData = new LookupRequestResponseData();
 
+		boolean requestIdIsEmpty = initData.getRequestId() == null || initData.getRequestId().getRequestIdentifierValue().isEmpty();
 		boolean itemIdIsEmpty = initData.getItemId() == null || initData.getItemId().getItemIdentifierValue().isEmpty();
 		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 
-		if (itemIdIsEmpty || userIdIsEmpty) {
+		if (requestIdIsEmpty && (itemIdIsEmpty || userIdIsEmpty)) {
+			String description = "Cannot lookup unknown request. Please specify RequestId or both ItemId & UserId";
 
-			List<Problem> problems = new ArrayList<Problem>();
+			if (requestIdIsEmpty) {
+				responseData.setProblems(Arrays.asList(new Problem(new ProblemType("Request Id is undefined."), null, null, description)));
+			} else {
+				List<Problem> problems = new ArrayList<Problem>();
 
-			if (itemIdIsEmpty) {
+				if (itemIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null, "Cannot lookup request of unknown item. ");
-				problems.add(p);
+					Problem p = new Problem(new ProblemType("Item id is undefined."), null, null, description);
+					problems.add(p);
 
+				}
+				if (userIdIsEmpty) {
+
+					Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, description);
+					problems.add(p);
+				}
+				responseData.setProblems(problems);
 			}
-			if (userIdIsEmpty) {
-
-				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Cannot lookup request with unknown user.");
-				problems.add(p);
-
-			}
-			responseData.setProblems(problems);
-
 		} else {
 
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
 				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
-				JSONObject requestItem = kohaRemoteServiceManager.lookupRequest(initData);
+				JSONObject requestItem = kohaRemoteServiceManager.lookupRequest(initData, !requestIdIsEmpty);
 
 				if (requestItem != null) {
 					updateResponseData(responseData, initData, requestItem);

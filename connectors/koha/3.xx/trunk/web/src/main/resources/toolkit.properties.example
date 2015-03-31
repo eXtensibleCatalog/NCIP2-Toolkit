@@ -39,12 +39,12 @@ NCIPServiceValidatorConfiguration.ValidateMessagesAgainstSchema=true
 CoreConfiguration.IncludeStackTracesInProblemResponses=true
 
 # Koha Configuration
-AgencyUnstructuredAddress=Kounicova 65a, 601 87 Brno
-AgencyTranslatedName=Moravian Library
+AgencyUnstructuredAddress=Smetanova 173, \u010C. T\u0159ebová, 560 02
+AgencyTranslatedName=M\u011Bstská knihovna \u010Ceská T\u0159ebová
 AgencyId=KOHALIB1
 
 # Set this link to your client's registration site
-UserRegistrationLink=https://www.mzk.cz/predregistrace
+UserRegistrationLink=http://vufind.katalogknih.cz/MyResearch/Home
 
 AuthDataFormatType=text/plain
 
@@ -52,10 +52,7 @@ OPACServer=188.166.14.82
 OPACPort=80
 SVCPort=8080
 
-MarcItemDescriptionField=993
-
 SVCSuffix=cgi-bin/koha/svc
-ILSDISuffix=cgi-bin/koha/ilsdi.pl
 
 AdminName=userName
 AdminPass=userPassword

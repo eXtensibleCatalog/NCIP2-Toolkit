@@ -1,17 +1,15 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -38,16 +36,18 @@ import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.OrganizationNameInformation;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
-import org.extensiblecatalog.ncip.v2.service.UpdateUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -67,8 +67,6 @@ public class KohaConnector {
 
 	private static String currentSessionIdCookie = "";
 
-	private Random random = new Random();
-
 	private static int loginAttempts;
 
 	public KohaConnector() throws ServiceException {
@@ -78,17 +76,15 @@ public class KohaConnector {
 		try {
 			saxParser = SAXParserFactory.newInstance().newSAXParser();
 			jsonParser = new JSONParser();
-		} catch (Exception e1) {
-			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory.");
-		}
-		try {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
 
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));
 
 			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.CONF_OPAC_SERVER));
+
 			LocalConfig.setOpacServerPort(kohaConfig.getProperty(KohaConstants.CONF_OPAC_PORT));
+
 			LocalConfig.setSvcServerPort(kohaConfig.getProperty(KohaConstants.CONF_SVC_PORT));
 
 			LocalConfig.setAdminName(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_NAME));
@@ -108,12 +104,6 @@ public class KohaConnector {
 			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
 
 			try {
-				LocalConfig.setMarcHoldingsItemTag(kohaConfig.getProperty(KohaConstants.CONF_HOLDINGS_ITEM_TAG));
-			} catch (Exception e) {
-				LocalConfig.setMarcHoldingsItemTag(KohaConstants.DATAFIELD_HOLDINGS_ITEM_DEFAULT_TAG);
-			}
-
-			try {
 				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_MAX_ITEM_PREPARATION_TIME_DELAY)));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -127,6 +117,11 @@ public class KohaConnector {
 
 		} catch (ToolkitException e) {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
+
+		} catch (SAXException e1) {
+			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
+		} catch (ParserConfigurationException e1) {
+			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
 		}
 
 	}
@@ -135,46 +130,86 @@ public class KohaConnector {
 	 * @param patronId
 	 * @param {@link LookupUserInitiationData} initData
 	 * @return {@link KohaUser}
+	 * @throws MalformedURLException
 	 * @throws KohaException
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParseException
 	 * @throws URISyntaxException
 	 */
-	public JSONObject lookupUser(String patronId, LookupUserInitiationData initData) throws KohaException, SAXException, ParserConfigurationException, ParseException,
-			URISyntaxException, IOException {
+	public JSONObject lookupUser(LookupUserInitiationData initData) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
 
-		URL url = getCommonSvcNcipURLBuilder(KohaConstants.ATTR_VAL_LOOKUP_USER).addRequest(KohaConstants.ATTR_VAL_USERID, patronId).toURL();
+		String patronId = initData.getUserId().getUserIdentifierValue();
 
-		String response = getPlainTextResponse(url);
+		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
+		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
+		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
 
-		JSONObject obj = (JSONObject) jsonParser.parse(response);
-		return obj;
+		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired()
+				|| initData.getUserPrivilegeDesired();
+
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER).addRequest(KohaConstants.PARAM_USER_ID, patronId);
+
+		if (loanedItemsDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED);
+
+		if (requestedItemsDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_REQUESTED_ITEMS_DESIRED);
+
+		if (userFiscalAccountDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_USER_FISCAL_ACCOUNT_DESIRED);
+
+		if (!personalInfoDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_NOT_USER_INFO);
+
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject cancelRequestItem(CancelRequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject cancelRequestItem(CancelRequestItemInitiationData initData, boolean itemIdIsNotEmpty) throws KohaException, IOException, SAXException,
+			ParserConfigurationException, URISyntaxException, ParseException {
+
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CANCEL_REQUEST_ITEM).addRequest(KohaConstants.PARAM_USER_ID,
+				initData.getUserId().getUserIdentifierValue());
+
+		if (itemIdIsNotEmpty)
+			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue());
+		else
+			urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_ID, initData.getRequestId().getRequestIdentifierValue());
+
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
 	public JSONObject lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ParseException,
 			URISyntaxException {
 
-		String itemId = initData.getItemId().getItemIdentifierValue();
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM)
+				.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue());
 
-		URL url = getCommonSvcNcipURLBuilder(KohaConstants.ATTR_VAL_LOOKUP_ITEM).addRequest(KohaConstants.ATTR_ITEM_ID, itemId).toURL();
+		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
+		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
+		boolean circulationStatusDesired = initData.getCirculationStatusDesired();
 
-		String response = getPlainTextResponse(url);
+		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired() || initData.getLocationDesired();
 
-		JSONObject obj = (JSONObject) jsonParser.parse(response);
+		if (itemRestrictionDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
 
-		return obj;
-	}
+		if (holdQueueLengthDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_HOLD_QUEUE_LENGTH_DESIRED);
 
-	public List<JSONObject> lookupItems(String id, LookupItemSetInitiationData initData, KohaLookupItemSetService kohaLookupItemSetService) throws KohaException, IOException,
-			SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+		if (circulationStatusDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_CIRCULATION_STATUS_DESIRED);
+
+		if (!itemInfoDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_NOT_ITEM_INFO);
+
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
 	public JSONObject lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException, ParseException,
@@ -192,22 +227,78 @@ public class KohaConnector {
 		return lookupItem(LIinitData);
 	}
 
-	public JSONObject lookupRequest(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject lookupRequest(LookupRequestInitiationData initData, boolean requestIdIsNotEmpty) throws KohaException, IOException, SAXException,
+			ParserConfigurationException, ServiceException, URISyntaxException, ParseException {
+
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_REQUEST);
+
+		if (requestIdIsNotEmpty)
+			urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_ID, initData.getRequestId().getRequestIdentifierValue());
+		else
+			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue()).addRequest(KohaConstants.PARAM_USER_ID,
+					initData.getUserId().getUserIdentifierValue());
+
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject renewItem(RenewItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject renewItem(RenewItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
+
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_RENEW_ITEM).addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue())
+				.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
+
+		GregorianCalendar desiredDateDue = initData.getDesiredDateDue();
+
+		// TODO: test .toString value ..
+		if (desiredDateDue != null)
+			urlBuilder.addRequest(KohaConstants.PARAM_DESIRED_DATE_DUE, KohaUtil.convertToKohaDate(desiredDateDue));
+
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
+			ParseException {
+
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_REQUEST_ITEM).addRequest(KohaConstants.PARAM_USER_ID,
+				initData.getUserId().getUserIdentifierValue());
+
+		if (initData.getItemIds() != null && initData.getItemId(0) != null)
+			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId(0).getItemIdentifierValue());
+		else
+			urlBuilder.addRequest(KohaConstants.PARAM_BIB_ID, initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier());
+
+		RequestType requestType = initData.getRequestType();
+		if (requestType != null && requestType.getValue().matches(Version1RequestType.HOLD.getValue() + "|" + Version1RequestType.LOAN.getValue()))
+			urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_TYPE, requestType.getValue());
+
+		GregorianCalendar pickupExpiryDate = initData.getPickupExpiryDate();
+		if (pickupExpiryDate != null)
+			urlBuilder.addRequest(KohaConstants.PARAM_PICKUP_EXPIRY_DATE, KohaUtil.convertToKohaDate(pickupExpiryDate));
+
+		GregorianCalendar earliestDateNeeded = initData.getEarliestDateNeeded();
+		if (earliestDateNeeded != null)
+			urlBuilder.addRequest(KohaConstants.PARAM_EARLIEST_DATE_NEEDED, KohaUtil.convertToKohaDate(earliestDateNeeded));
+
+		PickupLocation pickupLocation = initData.getPickupLocation();
+		if (pickupLocation != null)
+			urlBuilder.addRequest(KohaConstants.PARAM_PICKUP_LOCATION, pickupLocation.getValue());
+
+		String userNote = initData.getUserNote();
+		if (userNote != null)
+			urlBuilder.addRequest(KohaConstants.PARAM_NOTES, userNote);
+
+		URL url = urlBuilder.toURL();
+
+		String response = getPlainTextResponse(url);
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public String updateUser(UpdateUserInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException {
+	public List<JSONObject> lookupItemSet(String id, LookupItemSetInitiationData initData, KohaLookupItemSetService kohaLookupItemSetService) throws KohaException, IOException,
+			SAXException, ParserConfigurationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -248,7 +339,7 @@ public class KohaConnector {
 	}
 
 	private static URLBuilder getCommonSvcNcipURLBuilder(String service) {
-		return getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_NCIP).addRequest(KohaConstants.ATTR_SERVICE, service);
+		return getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_NCIP).addRequest(KohaConstants.PARAM_SERVICE, service);
 	}
 
 	private String getPlainTextResponse(URL url) throws KohaException, IOException, SAXException, URISyntaxException {
@@ -279,7 +370,8 @@ public class KohaConnector {
 	}
 
 	/**
-	 * Logins definer admin user (from settings in toolkit.properties) & saves cookies to be able to continue parsing requests as logged user.<br>
+	 * Logins definer admin user (from settings in toolkit.properties) & saves
+	 * cookies to be able to continue parsing requests as logged user.<br>
 	 * 
 	 * @param streamSource
 	 * @param url

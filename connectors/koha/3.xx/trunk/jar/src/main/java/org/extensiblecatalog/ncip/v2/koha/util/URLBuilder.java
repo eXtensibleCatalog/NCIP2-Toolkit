@@ -11,17 +11,17 @@ import org.apache.commons.lang.ArrayUtils;
 
 public class URLBuilder {
 
-	Map<String, String> params = new HashMap<String, String>();
-	boolean secured;
-	String[] path;
-	String base;
-	String port;
+	private Map<String, String> params = new HashMap<String, String>();
+	private boolean secured;
+	private String[] path;
+	private String base;
+	private String port;
 
 	public URLBuilder setPath(String... path) {
 		this.path = path;
 		return this;
 	}
-	
+
 	public URLBuilder appendPath(String... path) {
 		this.path = (String[]) ArrayUtils.addAll(this.path, path);
 		return this;
@@ -35,7 +35,8 @@ public class URLBuilder {
 	}
 
 	/**
-	 * By default is built not secure connection You should call this function only if you want to establish secured connection (https URL prefix)
+	 * By default is built not secure connection You should call this function
+	 * only if you want to establish secured connection (https URL prefix)
 	 * 
 	 * @param server
 	 */
@@ -47,7 +48,8 @@ public class URLBuilder {
 	}
 
 	/**
-	 * By default is built not secure connection You should call this function only if you want to establish secured connection (https URL prefix)
+	 * By default is built not secure connection You should call this function
+	 * only if you want to establish secured connection (https URL prefix)
 	 * 
 	 * @param server
 	 */
@@ -60,6 +62,11 @@ public class URLBuilder {
 
 	public URLBuilder addRequest(String key, String value) {
 		params.put(key, value);
+		return this;
+	}
+
+	public URLBuilder addRequest(String key) {
+		params.put(key, null);
 		return this;
 	}
 
@@ -101,9 +108,10 @@ public class URLBuilder {
 			for (Entry<String, String> entry : params.entrySet()) {
 
 				sb.append(entry.getKey());
-				sb.append("=");
-				sb.append(entry.getValue());
-
+				if (entry.getValue() != null) {
+					sb.append("=");
+					sb.append(entry.getValue());
+				}
 				if (--remaining >= 1) {
 					sb.append("&");
 				}

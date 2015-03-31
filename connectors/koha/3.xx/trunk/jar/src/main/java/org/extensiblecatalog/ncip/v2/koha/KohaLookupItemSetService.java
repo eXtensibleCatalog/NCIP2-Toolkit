@@ -178,7 +178,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 					bibInformation = new BibInformation();
 
-					marcItems = kohaSvcMgr.lookupItems(id, initData, this);
+					marcItems = kohaSvcMgr.lookupItemSet(id, initData, this);
 
 					bibInformation.setBibliographicId(bibId);
 

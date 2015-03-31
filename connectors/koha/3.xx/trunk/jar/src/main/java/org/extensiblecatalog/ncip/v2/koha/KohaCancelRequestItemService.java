@@ -31,17 +31,18 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 
 		final CancelRequestItemResponseData responseData = new CancelRequestItemResponseData();
 
+		boolean requestIdIsEmpty = initData.getRequestId() == null || initData.getRequestId().getRequestIdentifierValue().isEmpty();
 		boolean itemIdIsEmpty = initData.getItemId() == null || initData.getItemId().getItemIdentifierValue().isEmpty();
 		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 
-		if (itemIdIsEmpty || userIdIsEmpty) {
+		if ((itemIdIsEmpty && requestIdIsEmpty) || userIdIsEmpty) {
 
 			List<Problem> problems = new ArrayList<Problem>();
 
-			if (itemIdIsEmpty) {
+			if (itemIdIsEmpty && requestIdIsEmpty) {
 
 				Problem p = new Problem(new ProblemType("Item id is undefined."), null, null,
-						"Cannot cancel request for unknown item. Also note that Request Id is not supported by this service.");
+						"Cannot cancel request for unknown item or request. Please specify at least RequestId or ItemId.");
 				problems.add(p);
 
 			}
@@ -59,7 +60,7 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 
 			try {
 				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
-				JSONObject requestItem = kohaRemoteServiceManager.cancelRequestItem(initData);
+				JSONObject requestItem = kohaRemoteServiceManager.cancelRequestItem(initData, !itemIdIsEmpty);
 
 				if (requestItem != null) {
 					updateResponseData(responseData, initData, requestItem);
