@@ -14,7 +14,6 @@ import java.util.Arrays;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0.jaxb.elements.ItemTransaction;
-import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -29,6 +28,7 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,7 +66,7 @@ public class KohaLookupItemService implements LookupItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				MarcItem kohaItem = kohaRemoteServiceManager.lookupItem(initData);
+				JSONObject kohaItem = kohaRemoteServiceManager.lookupItem(initData);
 
 				if (kohaItem != null) {
 					updateResponseData(initData, responseData, kohaItem);
@@ -95,16 +95,20 @@ public class KohaLookupItemService implements LookupItemService {
 		return responseData;
 	}
 
-	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, MarcItem marcItem) throws ServiceException, KohaException {
+	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, JSONObject JsonItem) throws ServiceException, KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
+		
+		JSONObject itemInfo = (JSONObject) JsonItem.get("itemInfo");
+		
+		String itemId = (String) itemInfo.get("itemId");
 
-		responseData.setItemId(KohaUtil.parseItemId(marcItem));
+		responseData.setItemId(initData.getItemId());
 
-		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(initData, marcItem);
+		ItemOptionalFields iof = null;
 
 		responseData.setItemOptionalFields(iof);
 	}

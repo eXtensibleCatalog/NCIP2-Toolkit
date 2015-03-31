@@ -7,7 +7,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.extensiblecatalog.ncip.v2.koha.agency.KohaAgency;
-import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
 import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
@@ -51,7 +50,6 @@ public class KohaUser implements Serializable {
 
 	private List<RequestedItem> requestedItems;
 	private List<LoanedItem> loanedItems;
-	private List<MarcItem> fineItems;
 	private List<String> blocks;
 	private List<String> notes;
 
@@ -170,20 +168,6 @@ public class KohaUser implements Serializable {
 	 */
 	public void setLoanedItems(List<LoanedItem> loanedItems) {
 		this.loanedItems = loanedItems;
-	}
-
-	/**
-	 * Add a requested item to this user It will not add it to the internal list if it already exists
-	 * 
-	 * @param user
-	 */
-	public void addRequestedItem(MarcItem item) {
-		// FIXME ??
-		RequestedItem reqItem = new RequestedItem();
-
-		if (!requestedItems.contains(reqItem)) {
-			requestedItems.add(reqItem);
-		}
 	}
 
 	/**
@@ -352,36 +336,6 @@ public class KohaUser implements Serializable {
 
 	public int getBalanceMinorUnit() {
 		return balanceMinorUnit;
-	}
-
-	/**
-	 * @param fineItems
-	 *            the fineItems to set
-	 */
-	public void setFineItems(List<MarcItem> fineItems) {
-		this.fineItems = fineItems;
-	}
-
-	/**
-	 * @return the fineItems
-	 */
-	public List<MarcItem> getFineItems() {
-		if (fineItems == null)
-			fineItems = new ArrayList<MarcItem>();
-		return fineItems;
-	}
-
-	/**
-	 * Add a fine item to this user It will not add it to the internal list if it already exists
-	 * 
-	 * @param user
-	 */
-	public void addFineItem(MarcItem item) {
-		if (fineItems == null)
-			fineItems = new ArrayList<MarcItem>();
-		if (!fineItems.contains(item)) {
-			fineItems.add(item);
-		}
 	}
 
 	/**

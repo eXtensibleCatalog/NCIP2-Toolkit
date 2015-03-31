@@ -15,7 +15,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
+
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -29,6 +29,7 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 public class KohaRenewItemService implements RenewItemService {
@@ -64,7 +65,7 @@ public class KohaRenewItemService implements RenewItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				MarcItem renewItem = kohaRemoteServiceManager.renewItem(initData);
+				JSONObject renewItem = kohaRemoteServiceManager.renewItem(initData);
 
 				if (renewItem != null) {
 					updateResponseData(responseData, initData, renewItem);
@@ -93,7 +94,7 @@ public class KohaRenewItemService implements RenewItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, MarcItem renewItem) {
+	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, JSONObject renewItem) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 

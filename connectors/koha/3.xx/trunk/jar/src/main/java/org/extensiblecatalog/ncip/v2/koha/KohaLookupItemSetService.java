@@ -9,7 +9,6 @@ import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.ItemToken;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -35,6 +34,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 public class KohaLookupItemSetService implements LookupItemSetService {
@@ -149,8 +149,8 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 		BibInformation bibInformation;
 
-		List<MarcItem> marcItems;
-		MarcItem marcItem;
+		List<JSONObject> marcItems;
+		JSONObject marcItem;
 
 		List<HoldingsSet> holdingSets;
 
@@ -259,8 +259,6 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 							ItemToken itemToken = new ItemToken();
 							itemToken.setBibliographicId(id);
 
-							itemToken.setItemId(KohaUtil.parseItemId(marcItem).getItemIdentifierValue());
-
 							int newToken = random.nextInt();
 
 							itemToken.setNextToken(Integer.toString(newToken));
@@ -346,7 +344,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 		BibInformation bibInformation;
 
-		MarcItem marcItem;
+		JSONObject marcItem;
 
 		List<HoldingsSet> holdingsSets;
 
@@ -467,19 +465,16 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	 * @return {@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}
 	 * @throws KohaException
 	 */
-	private HoldingsSet parseHoldingsSet(MarcItem marcItem, LookupItemSetInitiationData initData) throws KohaException {
+	private HoldingsSet parseHoldingsSet(JSONObject marcItem, LookupItemSetInitiationData initData) throws KohaException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
 		if (initData.getBibliographicDescriptionDesired()) {
-			BibliographicDescription bDesc = KohaUtil.parseBibliographicDescription(marcItem);
+			BibliographicDescription bDesc = null;
+
 			holdingsSet.setBibliographicDescription(bDesc);
 		}
 
 		ItemInformation info = new ItemInformation();
-
-		info.setItemId(KohaUtil.parseItemId(marcItem));
-
-		info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(initData, marcItem));
 
 		holdingsSet.setItemInformations(Arrays.asList(info));
 
@@ -498,23 +493,20 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	 * @return List<{@link org.extensiblecatalog.ncip.v2.service.HoldingsSet}>
 	 * @throws KohaException
 	 */
-	private List<HoldingsSet> parseHoldingsSets(List<MarcItem> marcItems, LookupItemSetInitiationData initData) throws KohaException {
+	private List<HoldingsSet> parseHoldingsSets(List<JSONObject> marcItems, LookupItemSetInitiationData initData) throws KohaException {
 
 		HoldingsSet holdingsSet = new HoldingsSet();
 		List<ItemInformation> itemInfoList = new ArrayList<ItemInformation>();
 
-		for (MarcItem item : marcItems) {
+		for (JSONObject item : marcItems) {
 
 			if (initData.getBibliographicDescriptionDesired()) {
-				BibliographicDescription bDesc = KohaUtil.parseBibliographicDescription(item);
+				BibliographicDescription bDesc = null;
+
 				holdingsSet.setBibliographicDescription(bDesc);
 			}
 
 			ItemInformation info = new ItemInformation();
-
-			info.setItemId(KohaUtil.parseItemId(item));
-
-			info.setItemOptionalFields(KohaUtil.parseItemOptionalFields(initData, item));
 
 			itemInfoList.add(info);
 		}

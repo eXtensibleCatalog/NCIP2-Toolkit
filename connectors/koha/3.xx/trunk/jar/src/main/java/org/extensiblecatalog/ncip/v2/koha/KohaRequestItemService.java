@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.extensiblecatalog.ncip.v2.koha.item.MarcItem;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -24,6 +23,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 public class KohaRequestItemService implements RequestItemService {
@@ -59,7 +59,7 @@ public class KohaRequestItemService implements RequestItemService {
 
 			try {
 				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
-				MarcItem requestItem = kohaRemoteServiceManager.requestItem(initData);
+				JSONObject requestItem = kohaRemoteServiceManager.requestItem(initData);
 
 				if (requestItem != null) {
 					updateResponseData(responseData, initData, requestItem);
@@ -92,7 +92,7 @@ public class KohaRequestItemService implements RequestItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, MarcItem requestItem) {
+	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, JSONObject requestItem) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 

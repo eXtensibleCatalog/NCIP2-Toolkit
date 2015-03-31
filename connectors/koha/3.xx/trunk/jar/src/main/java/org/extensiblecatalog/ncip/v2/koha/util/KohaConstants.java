@@ -69,12 +69,14 @@ public class KohaConstants {
 	public static final String STATUS_OK = "ok";
 
 	// HTML ATTRS
-	public static final String ATTR_TEMPLATE_PATH = "template_path";
-	public static final String ATTR_SEARCH_FIELD_TYPES = "searchfieldstype";
-	public static final String ATTR_SEARCH_MEMBER = "searchmember";
-
-	// HTML ATTRS' VALS
-	public static final String ATTR_VAL_BORROWER_NUMBER = "borrowernumber";
+	public static final String ATTR_USER_ID = "userId";
+	public static final String ATTR_ITEM_ID = "itemId";
+	public static final String ATTR_BIB_ID = "bibId";
+	public static final String ATTR_REQUEST_ID = "requestId";
+	public static final String ATTR_BARCODE = "barcode";
+	public static final String ATTR_LOANED_ITEMS_DESIRED = "loanedItemsDesired";
+	public static final String ATTR_REQUESTED_ITEMS_DESIRED = "requestedItemsDesired";
+	public static final String ATTR_ITEM_USE_RESTRICTION_TYPE_DESIRED = "itemUseRestrictionTypeDesired";
 
 	//
 	// XML PARSING SECTION
@@ -196,11 +198,10 @@ public class KohaConstants {
 
 	public static final String ATTR_SERVICE = "service";
 
-
 	public static final String ATTR_VAL_ITEMID = "itemid";
 
 	public static final String ATTR_VAL_LOOKUP_USER = "lookup_user";
-	
+
 	public static final String ATTR_VAL_LOOKUP_ITEM = "lookup_item";
 
 	public static final String ATTR_VAL_USERID = "userId";

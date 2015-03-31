@@ -141,7 +141,7 @@ public class KohaLookupUserService implements LookupUserService {
 			boolean loanedItemsDesired = initData.getLoanedItemsDesired();
 
 			if (userFiscalAccountDesired) {
-				List<UserFiscalAccount> userFiscalAccounts = KohaUtil.parseUserFiscalAccounts(kohaUser);
+				List<UserFiscalAccount> userFiscalAccounts = null;
 
 				responseData.setUserFiscalAccounts(userFiscalAccounts);
 			}
@@ -155,7 +155,7 @@ public class KohaLookupUserService implements LookupUserService {
 
 			*/
 
-			responseData.setUserOptionalFields(KohaUtil.parseUserOptionalFields(initData, kohaUser));
+			responseData.setUserOptionalFields(null);
 		}
 	}
 }
