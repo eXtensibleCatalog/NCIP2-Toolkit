@@ -1,6 +1,8 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,20 +12,26 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
-import org.extensiblecatalog.ncip.v2.koha.util.RequestDetails;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestService;
+import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.RequestElementType;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
@@ -65,15 +73,10 @@ public class KohaLookupRequestService implements LookupRequestService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
-				JSONObject requestItem = kohaRemoteServiceManager.lookupRequest(initData, !requestIdIsEmpty);
 
-				if (requestItem != null) {
-					updateResponseData(responseData, initData, requestItem);
-				} else {
-					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
-					responseData.setProblems(Arrays.asList(p));
-				}
+				JSONObject requestItem = kohaRemoteServiceManager.lookupRequest(initData, !requestIdIsEmpty);
+				updateResponseData(responseData, initData, requestItem);
+
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
@@ -97,57 +100,73 @@ public class KohaLookupRequestService implements LookupRequestService {
 		return responseData;
 	}
 
-	private void updateResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, JSONObject requestItem) {
+	private void updateResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, JSONObject requestItem) throws ParseException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		RequestDetails requestDetails = null;
+		String branchCode = (String) requestItem.get("branchcode");
 
 		for (RequestElementType desiredService : initData.getRequestElementTypes()) {
 
-			if (desiredService.equals(Version1RequestElementType.ACKNOWLEDGED_FEE_AMOUNT)) {
-				responseData.setAcknowledgedFeeAmount(requestDetails.getAcknowledgedFeeAmout());
-			} else if (desiredService.equals(Version1RequestElementType.DATE_AVAILABLE)) {
-				// responseData.setDateAvailable(requestItem.getDateAvailable());
-			} else if (desiredService.equals(Version1RequestElementType.DATE_OF_USER_REQUEST)) {
-				responseData.setDateOfUserRequest(requestDetails.getDatePlaced());
-			} else if (desiredService.equals(Version1RequestElementType.EARLIEST_DATE_NEEDED)) {
-				responseData.setEarliestDateNeeded(requestDetails.getEarliestDateNeeded());
+			if (desiredService.equals(Version1RequestElementType.DATE_OF_USER_REQUEST)) {
+				responseData.setDateOfUserRequest(KohaUtil.parseGregorianCalendarFromKohaLongDate((String) requestItem.get("timestamp")));
 			} else if (desiredService.equals(Version1RequestElementType.HOLD_QUEUE_POSITION)) {
-				// responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-			} else if (desiredService.equals(Version1RequestElementType.NEED_BEFORE_DATE)) {
-				responseData.setNeedBeforeDate(requestDetails.getNeedBeforeDate());
-			} else if (desiredService.equals(Version1RequestElementType.PAID_FEE_AMOUNT)) {
-				responseData.setPaidFeeAmount(requestDetails.getPaidFeeAmount());
-			} else if (desiredService.equals(Version1RequestElementType.PICKUP_DATE)) {
-				responseData.setPickupDate(requestDetails.getPickupDate());
-			} else if (desiredService.equals(Version1RequestElementType.PICKUP_EXPIRY_DATE)) {
-				responseData.setPickupExpiryDate(requestDetails.getPickupExpiryDate());
-			} else if (desiredService.equals(Version1RequestElementType.PICKUP_LOCATION)) {
-				responseData.setPickupLocation(requestDetails.getPickupLocation());
+				BigDecimal ahoj = new BigDecimal((String) requestItem.get("priority"));
+				responseData.setHoldQueuePosition(ahoj);
+			} else if (desiredService.equals(Version1RequestElementType.PICKUP_LOCATION) && branchCode != null) {
+				responseData.setPickupLocation(new PickupLocation(branchCode));
 			} else if (desiredService.equals(Version1RequestElementType.REQUEST_SCOPE_TYPE)) {
-				responseData.setRequestScopeType(Version1RequestScopeType.ITEM);
-			} else if (desiredService.equals(Version1RequestElementType.REQUEST_STATUS_TYPE)) {
-				responseData.setRequestStatusType(requestDetails.getRequestStatusType());
+				if (requestItem.get("itemnumber") != null)
+					responseData.setRequestScopeType(Version1RequestScopeType.ITEM);
+				else
+					responseData.setRequestScopeType(Version1RequestScopeType.BIBLIOGRAPHIC_ITEM);
 			} else if (desiredService.equals(Version1RequestElementType.REQUEST_TYPE)) {
 				responseData.setRequestType(initData.getRequestType());
-			} else if (desiredService.equals(Version1RequestElementType.SHIPPING_INFORMATION)) {
-				// responseData.setShippingInformation(requestItem.getShippingInformation());
 			} else if (desiredService.equals(Version1RequestElementType.USER_ID)) {
-				responseData.setUserId(initData.getUserId());
+				UserId userId = new UserId();
+				userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+				userId.setUserIdentifierValue((String) requestItem.get("borrowernumber"));
+				if (branchCode != null)
+					userId.setAgencyId(new AgencyId(branchCode));
+				responseData.setUserId(userId);
+			} else if (desiredService.equals(Version1RequestElementType.PICKUP_EXPIRY_DATE)) {
+				responseData.setPickupExpiryDate(KohaUtil.parseGregorianCalendarFromKohaDate((String) requestItem.get("expirationdate")));
+			} else if (desiredService.equals(Version1RequestElementType.EARLIEST_DATE_NEEDED)) {
+				responseData.setEarliestDateNeeded(KohaUtil.parseGregorianCalendarFromKohaDate((String) requestItem.get("reservedate")));
+			} else if (desiredService.equals(Version1RequestElementType.REQUEST_STATUS_TYPE)) {
+				if (requestItem.get("waitingdate") != null)
+					responseData.setRequestStatusType(Version1RequestStatusType.AVAILABLE_FOR_PICKUP);
+				else
+					responseData.setRequestStatusType(Version1RequestStatusType.IN_PROCESS);
+			} else if (desiredService.equals(Version1RequestElementType.DATE_AVAILABLE)) {
+				if (requestItem.get("waitingdate") != null)
+					responseData.setDateAvailable(KohaUtil.parseGregorianCalendarFromKohaDate((String) requestItem.get("waitingdate")));
+				else if (requestItem.get("onloanuntil") != null)
+					responseData.setDateAvailable(KohaUtil.parseGregorianCalendarFromKohaLongDate((String) requestItem.get("onloanuntil")));
+				else
+					responseData.setDateAvailable(KohaUtil.parseDateAvailableFromHoldingBranch(branchCode));
 			}
 		}
 
-		responseData.setItemId(initData.getItemId());
-		/*
-		responseData.setRequestId(requestItem.getRequestId());
+		responseData.setRequestId(initData.getRequestId());
 
-		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue((String) requestItem.get("itemnumber"));
+		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
 
-		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-		*/
+		RequestId requestId = new RequestId();
+		requestId.setRequestIdentifierValue((String) requestItem.get("reserve_id"));
+
+		if (branchCode != null) {
+			itemId.setAgencyId(new AgencyId(branchCode));
+			requestId.setAgencyId(new AgencyId(branchCode));
+		}
+
+		responseData.setRequestId(requestId);
+		responseData.setItemId(itemId);
+
 	}
 }

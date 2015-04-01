@@ -24,9 +24,6 @@ public class KohaConstants {
 
 	public static final String KOHA_TEMPLATE_LOOKUP_USER = "members/tables/ncip_lookup_user.tt";
 
-	private static final String COMMA_DELIMITER = ",";
-	private static final String SEMICOLON_DELIMITER = ";";
-
 	// Constants for parsing from toolkit.properties
 	public static final String CONF_OPAC_PORT = "OPACPort";
 	public static final String CONF_OPAC_SERVER = "OPACServer";
@@ -46,25 +43,18 @@ public class KohaConstants {
 	public static final String CONF_HOLDINGS_ITEM_TAG = "MarcItemDescriptionField";
 	public static final String CONF_ADMIN_NAME = "AdminName";
 	public static final String CONF_ADMIN_PASS = "AdminPass";
+	public static final String CONF_TRANSFER_BRANCH_TIME = "TransferBranchTime";
 
 	public static final String REQUEST_ID_DELIMITER = ";";
 
 	public static final SimpleDateFormat KOHA_DATE_FORMATTER = new SimpleDateFormat("yyy-MM-dd");
+	public static final SimpleDateFormat KOHA_DATE_LONG_FORMATTER = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
 
 	public static final String ILS_DI_LOOKUP_USER = "GetPatronInfo";
 	public static final String ILS_DI_LOOKUP_ITEM = "GetRecords";
 
 	public static final String SVC_AUTHENTICATION = "authentication";
-	public static final String SVC_BARCODE = "barcode";
-	public static final String SVC_BIB = "bib";
-	public static final String SVC_BIB_PROFILE = "bib_profile";
-	public static final String SVC_CHECKING = "checkin";
-	public static final String SVC_CHECKOUTS = "checkouts";
-	public static final String SVC_HOLDS = "holds";
-	public static final String SVC_RENEW = "renew";
-	public static final String SVC_REPORT = "report";
 	public static final String SVC_NCIP = "ncip";
-	public static final String SVC_MEMBERS_SEARCH = "members/search";
 
 	public static final String STATUS_OK = "ok";
 

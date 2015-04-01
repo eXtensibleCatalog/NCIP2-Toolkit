@@ -1,5 +1,11 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.extensiblecatalog.ncip.v2.service.ServiceError;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+
 public class LocalConfig {
 
 	private static boolean echoParticularProblemsToLUIS;
@@ -36,7 +42,7 @@ public class LocalConfig {
 
 	private static String ilsDiSuffix;
 
-	private static String marcHoldingsItemTag;
+	private static Map<String, Integer> transferBranchTime;
 
 	/**
 	 * @return the echoParticularProblemsToLUIS
@@ -369,12 +375,24 @@ public class LocalConfig {
 		LocalConfig.adminPass = adminPass;
 	}
 
-	public static String getMarcHoldingsItemTag() {
-		return marcHoldingsItemTag;
+	public static Map<String, Integer> getTransferBranchTime() {
+		return transferBranchTime;
 	}
 
-	public static void setMarcHoldingsItemTag(String marcItemDescField) {
-		LocalConfig.marcHoldingsItemTag = marcItemDescField;
-	}
+	public static void setTransferBranchesTime(String transferBranchTime) throws ServiceException {
+		Map<String, Integer> keyValuePairs = new HashMap<String, Integer>();
+		try {
+			for (String keyValuePair : transferBranchTime.split(",")) {
+				String[] splitted = keyValuePair.split(":");
 
+				String key = splitted[0].trim();
+				Integer value = Integer.parseInt(splitted[1]);
+
+				keyValuePairs.put(key, value);
+			}
+		} catch (Exception e) {
+			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Please check transferBranchTime syntax (should be KeyValuePairs like this: \"DOSP:1, SPBE:48, P:24\")");
+		}
+		LocalConfig.transferBranchTime = keyValuePairs;
+	}
 }

@@ -23,14 +23,19 @@ import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserService;
+import org.extensiblecatalog.ncip.v2.service.NameInformation;
+import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
+import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
 import org.json.simple.JSONArray;
@@ -77,35 +82,59 @@ public class KohaLookupUserService implements LookupUserService {
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr) {
 
-		if (kohaUser != null) {
+		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
-			ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
+		if (responseHeader != null)
+			responseData.setResponseHeader(responseHeader);
 
-			if (responseHeader != null)
-				responseData.setResponseHeader(responseHeader);
+		UserOptionalFields userOptionalFields = new UserOptionalFields();
 
-			responseData.setUserId(initData.getUserId());
+		JSONObject userInfo = (JSONObject) kohaUser.get("userInfo");
+		if (userInfo != null) {
+			if (initData.getNameInformationDesired()) {
+				String firstname = (String) userInfo.get("firstname");
+				String surname = (String) userInfo.get("surname");
+				String title = (String) userInfo.get("title");
+				String othernames = (String) userInfo.get("othernames");
 
-			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
-			boolean requestedItemsDesired = initData.getRequestedItemsDesired();
-			boolean loanedItemsDesired = initData.getLoanedItemsDesired();
+				StructuredPersonalUserName structuredPersonalUserName = new StructuredPersonalUserName();
+				structuredPersonalUserName.setGivenName(firstname);
+				structuredPersonalUserName.setPrefix(title);
+				structuredPersonalUserName.setSurname(surname);
+				structuredPersonalUserName.setSuffix(othernames);
 
-			if (userFiscalAccountDesired) {
-				List<UserFiscalAccount> userFiscalAccounts = null;
+				PersonalNameInformation personalNameInformation = new PersonalNameInformation();
+				personalNameInformation.setStructuredPersonalUserName(structuredPersonalUserName);
 
-				responseData.setUserFiscalAccounts(userFiscalAccounts);
+				NameInformation nameInformation = new NameInformation();
+				nameInformation.setPersonalNameInformation(personalNameInformation);
+				userOptionalFields.setNameInformation(nameInformation);
 			}
 
-			/*
-						if (requestedItemsDesired)
-							responseData.setRequestedItems(KohaUtil.parseRequestedItems(kohaUser));
+			if (initData.getUserAddressInformationDesired())
+				userOptionalFields.setUserAddressInformations(KohaUtil.parseUserAddressInformations(userInfo));
 
-						if (loanedItemsDesired)
-							responseData.setLoanedItems(KohaUtil.parseLoanedItems(kohaUser));
+			if (initData.getUserPrivilegeDesired()) {
 
-			*/
-
-			responseData.setUserOptionalFields(null);
+			}
 		}
+		responseData.setUserId(initData.getUserId());
+
+		JSONArray requestedItems = (JSONArray) kohaUser.get("requestedItems");
+		if (requestedItems != null) {
+
+		}
+
+		JSONArray loanedItems = (JSONArray) kohaUser.get("loanedItems");
+		if (loanedItems != null) {
+
+		}
+
+		JSONArray fiscalAccounts = (JSONArray) kohaUser.get("userFiscalAccount");
+		if (fiscalAccounts != null) {
+
+		}
+		responseData.setUserOptionalFields(userOptionalFields);
+
 	}
 }

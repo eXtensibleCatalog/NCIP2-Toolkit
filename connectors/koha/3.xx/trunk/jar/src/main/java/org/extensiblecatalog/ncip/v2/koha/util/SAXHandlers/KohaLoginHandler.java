@@ -1,14 +1,6 @@
 package org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
-import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
-import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

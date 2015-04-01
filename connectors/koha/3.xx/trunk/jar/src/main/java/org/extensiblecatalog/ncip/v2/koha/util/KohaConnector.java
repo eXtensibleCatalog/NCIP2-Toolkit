@@ -24,7 +24,6 @@ import javax.xml.parsers.SAXParserFactory;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService;
-import org.extensiblecatalog.ncip.v2.koha.user.KohaUser;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
@@ -78,6 +77,8 @@ public class KohaConnector {
 			jsonParser = new JSONParser();
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
+
+			LocalConfig.setTransferBranchesTime(kohaConfig.getProperty(KohaConstants.CONF_TRANSFER_BRANCH_TIME));
 
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));
 
@@ -250,7 +251,6 @@ public class KohaConnector {
 
 		GregorianCalendar desiredDateDue = initData.getDesiredDateDue();
 
-		// TODO: test .toString value ..
 		if (desiredDateDue != null)
 			urlBuilder.addRequest(KohaConstants.PARAM_DESIRED_DATE_DUE, KohaUtil.convertToKohaDate(desiredDateDue));
 

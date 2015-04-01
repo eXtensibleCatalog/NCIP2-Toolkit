@@ -17,6 +17,8 @@ import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
@@ -26,14 +28,20 @@ import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
+import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
+import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserAddressRoleType;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
@@ -114,19 +122,26 @@ public class KohaUtil {
 	 * @return gregorianCalendarDate
 	 * @throws SAXException
 	 */
-	public static GregorianCalendar parseGregorianCalendarFromKohaDate(String kohaDateParsed) throws SAXException {
-		if (!kohaDateParsed.equalsIgnoreCase("0000-00-00")) {
+	public static GregorianCalendar parseGregorianCalendarFromKohaDate(String kohaDateParsed) throws ParseException {
+		if (kohaDateParsed != null && !kohaDateParsed.equalsIgnoreCase("0000-00-00")) {
 			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
 
-			try {
-				gregorianCalendarDate.setTime(KohaConstants.KOHA_DATE_FORMATTER.parse(kohaDateParsed));
-				if (inDaylightTime())
-					gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 3);
-				else
-					gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 1);
-			} catch (ParseException e) {
-				throw new SAXException(e);
-			}
+			gregorianCalendarDate.setTime(KohaConstants.KOHA_DATE_FORMATTER.parse(kohaDateParsed));
+			if (inDaylightTime())
+				gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 2);
+
+			return gregorianCalendarDate;
+		} else
+			return null;
+	}
+
+	public static GregorianCalendar parseGregorianCalendarFromKohaLongDate(String kohaLongDateParsed) throws ParseException {
+		if (kohaLongDateParsed != null && !kohaLongDateParsed.equalsIgnoreCase("0000-00-00 00:00:00")) {
+			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
+
+			gregorianCalendarDate.setTime(KohaConstants.KOHA_DATE_LONG_FORMATTER.parse(kohaLongDateParsed));
+			if (inDaylightTime())
+				gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 2);
 
 			return gregorianCalendarDate;
 		} else
@@ -253,4 +268,143 @@ public class KohaUtil {
 		return luisInitData;
 	}
 
+	public static GregorianCalendar parseDateAvailableFromHoldingBranch(String branchCode) {
+		Integer hoursToDeliver = LocalConfig.getTransferBranchTime().get(branchCode);
+
+		if (hoursToDeliver != null) {
+			GregorianCalendar dateAvailable = new GregorianCalendar();
+			if (inDaylightTime())
+				dateAvailable.add(Calendar.HOUR_OF_DAY, 2);
+
+			dateAvailable.add(Calendar.HOUR_OF_DAY, hoursToDeliver);
+			return dateAvailable;
+		} else
+			return null;
+	}
+
+	public static List<UserAddressInformation> parseUserAddressInformations(JSONObject userInfo) {
+
+		List<UserAddressInformation> userAddressInformations = new ArrayList<UserAddressInformation>();
+
+		String streetnumber = (String) userInfo.get("streetnumber");
+		String addressFirstLine = (String) userInfo.get("address");
+		String addressSecondLine = (String) userInfo.get("address2");
+		String city = (String) userInfo.get("city");
+		String state = (String) userInfo.get("state");
+		String zipcode = (String) userInfo.get("zipcode");
+		String country = (String) userInfo.get("country");
+
+		if (!allOfTheseAreNull(streetnumber, addressFirstLine, addressSecondLine, city)) {
+
+			StructuredAddress structuredAddress = new StructuredAddress();
+			structuredAddress.setCountry(country);
+			structuredAddress.setLine1(addressFirstLine);
+			structuredAddress.setLine2(addressSecondLine);
+			structuredAddress.setStreet(streetnumber);
+			structuredAddress.setPostOfficeBox(zipcode);
+			structuredAddress.setDistrict(city);
+			structuredAddress.setRegion(state);
+
+			userAddressInformations.add(createPhysicalAddress(structuredAddress));
+		}
+
+		String streetnumber2 = (String) userInfo.get("B_streetnumber");
+		String address2FirstLine = (String) userInfo.get("B_address");
+		String address2SecondLine = (String) userInfo.get("B_address2");
+		String city2 = (String) userInfo.get("B_city");
+		String state2 = (String) userInfo.get("B_state");
+		String zipcode2 = (String) userInfo.get("B_zipcode");
+		String country2 = (String) userInfo.get("B_country");
+
+		if (!allOfTheseAreNull(streetnumber2, address2FirstLine, address2SecondLine, city2)) {
+
+			StructuredAddress structuredAddress = new StructuredAddress();
+			structuredAddress.setCountry(country2);
+			structuredAddress.setLine1(address2FirstLine);
+			structuredAddress.setLine2(address2SecondLine);
+			structuredAddress.setStreet(streetnumber2);
+			structuredAddress.setPostOfficeBox(zipcode2);
+			structuredAddress.setDistrict(city2);
+			structuredAddress.setRegion(state2);
+
+			userAddressInformations.add(createPhysicalAddress(structuredAddress));
+		}
+
+		String email = (String) userInfo.get("email");
+		if (email != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.MAILTO, email));
+		}
+
+		String email2 = (String) userInfo.get("emailpro");
+		if (email2 != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.MAILTO, email2));
+		}
+
+		String email3 = (String) userInfo.get("B_email");
+		if (email3 != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.MAILTO, email3));
+		}
+
+		String phone = (String) userInfo.get("phone");
+		if (phone != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, phone));
+		}
+
+		String phone2 = (String) userInfo.get("phonepro");
+		if (phone2 != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, phone2));
+		}
+
+		String phone3 = (String) userInfo.get("B_phone");
+		if (phone3 != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, phone3));
+		}
+
+		String mobile = (String) userInfo.get("mobile");
+		if (mobile != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, mobile));
+		}
+
+		String fax = (String) userInfo.get("fax");
+		if (fax != null) {
+			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.FAX, fax));
+		}
+
+		if (userAddressInformations.size() != 0)
+			return userAddressInformations;
+		else
+			return null;
+	}
+
+	private static UserAddressInformation createPhysicalAddress(StructuredAddress structuredAddress) {
+		UserAddressInformation userAddressInformation = new UserAddressInformation();
+		userAddressInformation.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+
+		PhysicalAddress physicalAddress = new PhysicalAddress();
+		physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
+		physicalAddress.setStructuredAddress(structuredAddress);
+
+		userAddressInformation.setPhysicalAddress(physicalAddress);
+		return userAddressInformation;
+	}
+
+	private static UserAddressInformation createElectronicAddress(ElectronicAddressType electronicAddressType, String electronicAddressData) {
+		UserAddressInformation userAddressInformation = new UserAddressInformation();
+		userAddressInformation.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
+
+		ElectronicAddress electronicAddress = new ElectronicAddress();
+		electronicAddress.setElectronicAddressType(electronicAddressType);
+		electronicAddress.setElectronicAddressData(electronicAddressData);
+
+		userAddressInformation.setElectronicAddress(electronicAddress);
+		return userAddressInformation;
+	}
+
+	private static boolean allOfTheseAreNull(String... values) {
+		for (String value : values) {
+			if (value != null)
+				return false;
+		}
+		return true;
+	}
 }
