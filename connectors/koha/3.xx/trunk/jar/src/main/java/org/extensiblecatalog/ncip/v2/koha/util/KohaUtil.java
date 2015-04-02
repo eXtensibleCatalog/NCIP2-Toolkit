@@ -15,8 +15,10 @@ import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.Amount;
+import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
@@ -36,6 +38,7 @@ import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
@@ -53,6 +56,7 @@ import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1FiscalActionType;
 import org.extensiblecatalog.ncip.v2.service.Version1FiscalTransactionType;
@@ -556,5 +560,75 @@ public class KohaUtil {
 		accountBalance.setCurrencyCode(new CurrencyCode(LocalConfig.getCurrencyCode(), amount.scale()));
 		accountBalance.setMonetaryValue(amount);
 		return accountBalance;
+	}
+
+	public static List<Location> createLocations(String homeBranch, String locationVal) {
+		List<Location> locations = new ArrayList<Location>();
+		Location location = new Location();
+		LocationName locationName = new LocationName();
+		List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
+
+		if (locationVal != null) {
+			LocationNameInstance locationNameInstance = new LocationNameInstance();
+			locationNameInstance.setLocationNameLevel(new BigDecimal(1));
+			locationNameInstance.setLocationNameValue(locationVal);
+			locationNameInstances.add(locationNameInstance);
+		}
+		if (homeBranch != null) {
+
+			LocationNameInstance locationNameInstance = new LocationNameInstance();
+			locationNameInstance.setLocationNameLevel(new BigDecimal(2));
+			locationNameInstance.setLocationNameValue(homeBranch);
+			locationNameInstances.add(locationNameInstance);
+		}
+		locationName.setLocationNameInstances(locationNameInstances);
+		location.setLocationName(locationName);
+		location.setLocationType(Version1LocationType.PERMANENT_LOCATION);
+		locations.add(location);
+		return locations;
+	}
+
+	public static BibliographicDescription parseBibliographicDescription(JSONObject itemInfo) {
+		BibliographicDescription bibliographicDescription = new BibliographicDescription();
+
+		String bibId = (String) itemInfo.get("biblionumber");
+		String author = (String) itemInfo.get("author");
+		String mediumTypeVal = (String) itemInfo.get("mediumtype");
+		String placeOfPublication = (String) itemInfo.get("place");
+		String publisher = (String) itemInfo.get("publishercode");
+		String volume = (String) itemInfo.get("volume");
+		String title = (String) itemInfo.get("title");
+		String isbn = (String) itemInfo.get("isbn");
+
+		if (isbn != null) {
+			List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
+			BibliographicItemId bibliographicItemId = new BibliographicItemId();
+			bibliographicItemId.setBibliographicItemIdentifier(isbn);
+			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.ISBN);
+			bibliographicItemIds.add(bibliographicItemId);
+			bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
+		}
+
+		if (bibId != null) {
+			ComponentId componentId = new ComponentId();
+			componentId.setComponentIdentifier(bibId);
+			componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getScheme(),
+					Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
+			bibliographicDescription.setComponentId(componentId);
+		}
+
+		bibliographicDescription.setAuthor(author);
+
+		if (mediumTypeVal != null)
+			bibliographicDescription.setMediumType(new MediumType("http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
+
+		bibliographicDescription.setEdition(volume);
+
+		bibliographicDescription.setPlaceOfPublication(placeOfPublication);
+		bibliographicDescription.setPublisher(publisher);
+
+		bibliographicDescription.setTitle(title);
+
+		return bibliographicDescription;
 	}
 }
