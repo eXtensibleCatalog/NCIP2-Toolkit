@@ -114,8 +114,8 @@ public class KohaLookupRequestService implements LookupRequestService {
 			if (desiredService.equals(Version1RequestElementType.DATE_OF_USER_REQUEST)) {
 				responseData.setDateOfUserRequest(KohaUtil.parseGregorianCalendarFromKohaLongDate((String) requestItem.get("timestamp")));
 			} else if (desiredService.equals(Version1RequestElementType.HOLD_QUEUE_POSITION)) {
-				BigDecimal ahoj = new BigDecimal((String) requestItem.get("priority"));
-				responseData.setHoldQueuePosition(ahoj);
+				BigDecimal holdQueuePosition = new BigDecimal((String) requestItem.get("priority"));
+				responseData.setHoldQueuePosition(holdQueuePosition);
 			} else if (desiredService.equals(Version1RequestElementType.PICKUP_LOCATION) && branchCode != null) {
 				responseData.setPickupLocation(new PickupLocation(branchCode));
 			} else if (desiredService.equals(Version1RequestElementType.REQUEST_SCOPE_TYPE)) {

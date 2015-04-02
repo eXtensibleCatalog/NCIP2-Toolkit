@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.koha.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 
@@ -24,23 +25,16 @@ public class LocalConfig {
 	private static String bibLibrary;
 	private static String admLibrary;
 
+	private static String currencyCode;
+
 	private static String adminName;
 	private static String adminPass;
-
-	// Koha API's patron -> address mapping
-	private static String userStreetStoredIn;
-	private static String userPostalAndCityStoredIn;
-
-	private static String userPhoneStoredIn;
-	private static String userIdCardStoredIn;
 
 	private static int maxItemPreparationTimeDelay = 0;
 
 	private static int tokenExpirationTime;
 
 	private static int bibLibraryLength;
-
-	private static String ilsDiSuffix;
 
 	private static Map<String, Integer> transferBranchTime;
 
@@ -211,66 +205,6 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @return the userStreetStoredIn
-	 */
-	public static String getNodeUserStreetStoredIn() {
-		return userStreetStoredIn;
-	}
-
-	/**
-	 * @param userStreetStoredIn
-	 *            the userStreetStoredIn to set
-	 */
-	public static void setUserStreetStoredIn(String userStreetStoredIn) {
-		LocalConfig.userStreetStoredIn = userStreetStoredIn;
-	}
-
-	/**
-	 * @return the userPostalStoredIn
-	 */
-	public static String getNodeUserPostalAndCityStoredIn() {
-		return userPostalAndCityStoredIn;
-	}
-
-	/**
-	 * @param userPostalStoredIn
-	 *            the userPostalStoredIn to set
-	 */
-	public static void setUserPostalAndCityStoredIn(String userPostalStoredIn) {
-		LocalConfig.userPostalAndCityStoredIn = userPostalStoredIn;
-	}
-
-	/**
-	 * @return the userPhoneStoredIn
-	 */
-	public static String getNodeUserPhoneStoredIn() {
-		return userPhoneStoredIn;
-	}
-
-	/**
-	 * @param userPhoneStoredIn
-	 *            the userPhoneStoredIn to set
-	 */
-	public static void setUserPhoneStoredIn(String userPhoneStoredIn) {
-		LocalConfig.userPhoneStoredIn = userPhoneStoredIn;
-	}
-
-	/**
-	 * @return the userIdCardStoredIn
-	 */
-	public static String getUserIdCardStoredIn() {
-		return userIdCardStoredIn;
-	}
-
-	/**
-	 * @param userIdCardStoredIn
-	 *            the userIdCardStoredIn to set
-	 */
-	public static void setUserIdCardStoredIn(String userIdCardStoredIn) {
-		LocalConfig.userIdCardStoredIn = userIdCardStoredIn;
-	}
-
-	/**
 	 * @return the maxItemPreparationTimeDelay
 	 */
 	public static int getMaxItemPreparationTimeDelay() {
@@ -305,14 +239,6 @@ public class LocalConfig {
 	 */
 	public static int getBibLibraryLength() {
 		return bibLibraryLength;
-	}
-
-	public static void setIlsDiSuffix(String ilsDiSuffix) {
-		LocalConfig.ilsDiSuffix = ilsDiSuffix;
-	}
-
-	public static String getIlsDiSuffix() {
-		return ilsDiSuffix;
 	}
 
 	/**
@@ -394,5 +320,13 @@ public class LocalConfig {
 			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Please check transferBranchTime syntax (should be KeyValuePairs like this: \"DOSP:1, SPBE:48, P:24\")");
 		}
 		LocalConfig.transferBranchTime = keyValuePairs;
+	}
+
+	public static String getCurrencyCode() {
+		return currencyCode;
+	}
+
+	public static void setCurrencyCode(String currencyCode) {
+		LocalConfig.currencyCode = currencyCode;
 	}
 }

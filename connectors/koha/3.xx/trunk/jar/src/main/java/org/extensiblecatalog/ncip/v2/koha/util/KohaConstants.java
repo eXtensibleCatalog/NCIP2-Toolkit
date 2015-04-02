@@ -44,6 +44,7 @@ public class KohaConstants {
 	public static final String CONF_ADMIN_NAME = "AdminName";
 	public static final String CONF_ADMIN_PASS = "AdminPass";
 	public static final String CONF_TRANSFER_BRANCH_TIME = "TransferBranchTime";
+	public static final String CONF_CURRENCY_CODE = "CurrencyCode";
 
 	public static final String REQUEST_ID_DELIMITER = ";";
 

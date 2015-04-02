@@ -81,6 +81,8 @@ public class KohaConnector {
 			LocalConfig.setTransferBranchesTime(kohaConfig.getProperty(KohaConstants.CONF_TRANSFER_BRANCH_TIME));
 
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));
+			
+			LocalConfig.setCurrencyCode(kohaConfig.getProperty(KohaConstants.CONF_CURRENCY_CODE));
 
 			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.CONF_OPAC_SERVER));
 
@@ -91,7 +93,6 @@ public class KohaConnector {
 			LocalConfig.setAdminName(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_NAME));
 			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_PASS));
 
-			LocalConfig.setIlsDiSuffix(kohaConfig.getProperty(KohaConstants.CONF_ILS_DI_SUFFIX));
 			LocalConfig.setSvcSuffix(kohaConfig.getProperty(KohaConstants.CONF_SVC_SUFFIX));
 
 			LocalConfig.setAgencyAddress(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_UNSTRUCTURED_ADDRESS));

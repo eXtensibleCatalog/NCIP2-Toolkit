@@ -11,17 +11,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.extensiblecatalog.ncip.v2.service.AccountBalance;
+import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.Amount;
+import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
 import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
 import org.extensiblecatalog.ncip.v2.service.ElectronicAddressType;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionReferenceId;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
@@ -29,19 +38,33 @@ import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
+import org.extensiblecatalog.ncip.v2.service.PickupLocation;
+import org.extensiblecatalog.ncip.v2.service.RequestElementType;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
+import org.extensiblecatalog.ncip.v2.service.RequestIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
+import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
+import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1FiscalActionType;
+import org.extensiblecatalog.ncip.v2.service.Version1FiscalTransactionType;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UserAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
@@ -298,8 +321,8 @@ public class KohaUtil {
 
 			StructuredAddress structuredAddress = new StructuredAddress();
 			structuredAddress.setCountry(country);
-			structuredAddress.setLine1(addressFirstLine);
-			structuredAddress.setLine2(addressSecondLine);
+			structuredAddress.setLocality(addressFirstLine);
+			structuredAddress.setLocationWithinBuilding(addressSecondLine);
 			structuredAddress.setStreet(streetnumber);
 			structuredAddress.setPostOfficeBox(zipcode);
 			structuredAddress.setDistrict(city);
@@ -320,8 +343,8 @@ public class KohaUtil {
 
 			StructuredAddress structuredAddress = new StructuredAddress();
 			structuredAddress.setCountry(country2);
-			structuredAddress.setLine1(address2FirstLine);
-			structuredAddress.setLine2(address2SecondLine);
+			structuredAddress.setLocality(address2FirstLine);
+			structuredAddress.setLocationWithinBuilding(address2SecondLine);
 			structuredAddress.setStreet(streetnumber2);
 			structuredAddress.setPostOfficeBox(zipcode2);
 			structuredAddress.setDistrict(city2);
@@ -406,5 +429,132 @@ public class KohaUtil {
 				return false;
 		}
 		return true;
+	}
+
+	public static RequestedItem parseRequestedItem(JSONObject requestedItemParsed) throws ParseException {
+
+		RequestedItem requestedItem = new RequestedItem();
+
+		String branchCode = (String) requestedItemParsed.get("branchcode");
+		String itemId = (String) requestedItemParsed.get("itemnumber");
+		String requestId = (String) requestedItemParsed.get("reserve_id");
+
+		String waitingDate = (String) requestedItemParsed.get("waitingdate");
+		String datePlaced = (String) requestedItemParsed.get("timestamp");
+		String pickupExpiryDate = (String) requestedItemParsed.get("expirationdate");
+		String earliestDateNeeded = (String) requestedItemParsed.get("reservedate");
+
+		if (branchCode != null)
+			requestedItem.setPickupLocation(new PickupLocation(branchCode));
+
+		if (itemId != null)
+			requestedItem.setItemId(createItemId(itemId, branchCode));
+
+		requestedItem.setRequestId(createRequestId(requestId, branchCode));
+
+		if (waitingDate != null)
+			requestedItem.setRequestStatusType(Version1RequestStatusType.AVAILABLE_FOR_PICKUP);
+		else
+			requestedItem.setRequestStatusType(Version1RequestStatusType.IN_PROCESS);
+
+		requestedItem.setDatePlaced(parseGregorianCalendarFromKohaLongDate(datePlaced));
+
+		requestedItem.setPickupExpiryDate(parseGregorianCalendarFromKohaDate(pickupExpiryDate));
+
+		requestedItem.setEarliestDateNeeded(parseGregorianCalendarFromKohaDate(earliestDateNeeded));
+
+		requestedItem.setRequestType(Version1RequestType.HOLD);
+
+		BigDecimal holdQueuePosition = new BigDecimal((String) requestedItemParsed.get("priority"));
+		requestedItem.setHoldQueuePosition(holdQueuePosition);
+
+		return requestedItem;
+	}
+
+	public static ItemId createItemId(String itemIdVal) {
+		return createItemId(itemIdVal, null);
+	}
+
+	public static ItemId createItemId(String itemIdVal, String agencyIdVal) {
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue(itemIdVal);
+		if (agencyIdVal != null)
+			itemId.setAgencyId(new AgencyId(agencyIdVal));
+		itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
+		return itemId;
+
+	}
+
+	public static RequestId createRequestId(String requestIdVal) {
+		return createRequestId(requestIdVal, null);
+	}
+
+	public static RequestId createRequestId(String requestIdVal, String agencyIdVal) {
+		RequestId requestId = new RequestId();
+		requestId.setRequestIdentifierValue(requestIdVal);
+		if (agencyIdVal != null)
+			requestId.setAgencyId(new AgencyId(agencyIdVal));
+		return requestId;
+	}
+
+	public static LoanedItem parseLoanedItem(JSONObject loanedItemparsed) throws ParseException {
+		LoanedItem loanedItem = new LoanedItem();
+
+		String itemId = (String) loanedItemparsed.get("itemnumber");
+
+		String dateDue = (String) loanedItemparsed.get("date_due");
+
+		loanedItem.setItemId(createItemId(itemId));
+		loanedItem.setDateDue(parseGregorianCalendarFromKohaDate(dateDue));
+		return loanedItem;
+	}
+
+	public static AccountDetails parseAccountDetails(JSONObject userFiscalAccountParsed) throws ParseException {
+		AccountDetails accountDetail = new AccountDetails();
+
+		String amount = (String) userFiscalAccountParsed.get("amount");
+
+		String accrualDate = (String) userFiscalAccountParsed.get("date");
+
+		String transactionId = (String) userFiscalAccountParsed.get("accountno");
+
+		String description = (String) userFiscalAccountParsed.get("description");
+
+		accountDetail.setAccrualDate(parseGregorianCalendarFromKohaDate(accrualDate));
+
+		FiscalTransactionReferenceId fiscalTransactionReferenceId = new FiscalTransactionReferenceId();
+		fiscalTransactionReferenceId.setFiscalTransactionIdentifierValue(transactionId);
+		fiscalTransactionReferenceId.setAgencyId(new AgencyId(LocalConfig.getDefaultAgency()));
+
+		FiscalTransactionInformation fiscalTransactionInformation = new FiscalTransactionInformation();
+		fiscalTransactionInformation.setFiscalActionType(Version1FiscalActionType.PAYMENT);
+		fiscalTransactionInformation.setFiscalTransactionType(Version1FiscalTransactionType.SERVICE_CHARGE);
+		fiscalTransactionInformation.setFiscalTransactionReferenceId(fiscalTransactionReferenceId);
+
+		fiscalTransactionInformation.setAmount(createAmount(amount));
+
+		fiscalTransactionInformation.setFiscalTransactionDescription(description);
+
+		accountDetail.setFiscalTransactionInformation(fiscalTransactionInformation);
+
+		return accountDetail;
+	}
+
+	private static Amount createAmount(String amountParsed) {
+		Amount amount = new Amount();
+		String[] splitted = amountParsed.split("\\.");
+		String hundredths = splitted.length == 2 ? splitted[0] + splitted[1].substring(0, 2) : splitted[0] + "00";
+		BigDecimal amountVal = new BigDecimal(hundredths);
+
+		amount.setCurrencyCode(new CurrencyCode(LocalConfig.getCurrencyCode(), 2));
+		amount.setMonetaryValue(amountVal);
+		return amount;
+	}
+
+	public static AccountBalance createAccountBalance(BigDecimal amount) {
+		AccountBalance accountBalance = new AccountBalance();
+		accountBalance.setCurrencyCode(new CurrencyCode(LocalConfig.getCurrencyCode(), amount.scale()));
+		accountBalance.setMonetaryValue(amount);
+		return accountBalance;
 	}
 }
