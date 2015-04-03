@@ -59,15 +59,10 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
 				JSONObject requestItem = kohaRemoteServiceManager.cancelRequestItem(initData, !itemIdIsEmpty);
 
-				if (requestItem != null) {
-					updateResponseData(responseData, initData, requestItem);
-				} else {
-					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
-					responseData.setProblems(Arrays.asList(p));
-				}
+				updateResponseData(responseData, initData, requestItem);
+
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
@@ -95,13 +90,12 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId());
-		/*
-		responseData.setRequestId(requestItem.getRequestId());
-		responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-		responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-		responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
-		*/
+		String userId = (String) requestItem.get("userId");
+		String itemId = (String) requestItem.get("itemId");
+		String requestId = (String) requestItem.get("requestId");
+		
+		responseData.setUserId(KohaUtil.createUserId(userId));
+		responseData.setItemId(KohaUtil.createItemId(itemId));
+		responseData.setRequestId(KohaUtil.createRequestId(requestId));
 	}
 }

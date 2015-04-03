@@ -48,8 +48,9 @@ public class KohaConstants {
 
 	public static final String REQUEST_ID_DELIMITER = ";";
 
-	public static final SimpleDateFormat KOHA_DATE_FORMATTER = new SimpleDateFormat("yyy-MM-dd");
-	public static final SimpleDateFormat KOHA_DATE_LONG_FORMATTER = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
+	public static final SimpleDateFormat KOHA_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat KOHA_DATE_LONG_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final SimpleDateFormat KOHA_DATE_FORMATTER_BACKSLASHES = new SimpleDateFormat("dd/MM/yyyy");
 
 	public static final String ILS_DI_LOOKUP_USER = "GetPatronInfo";
 	public static final String ILS_DI_LOOKUP_ITEM = "GetRecords";

@@ -82,13 +82,7 @@ public class KohaLookupItemService implements LookupItemService {
 
 			try {
 				JSONObject kohaItem = kohaRemoteServiceManager.lookupItem(initData);
-
-				if (kohaItem != null) {
-					updateResponseData(initData, responseData, kohaItem);
-				} else {
-					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
-					responseData.setProblems(Arrays.asList(p));
-				}
+				updateResponseData(initData, responseData, kohaItem);
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");

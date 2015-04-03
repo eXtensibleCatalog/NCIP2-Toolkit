@@ -9,12 +9,12 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-
 
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -67,12 +67,7 @@ public class KohaRenewItemService implements RenewItemService {
 			try {
 				JSONObject renewItem = kohaRemoteServiceManager.renewItem(initData);
 
-				if (renewItem != null) {
-					updateResponseData(responseData, initData, renewItem);
-				} else {
-					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "Item " + initData.getItemId().getItemIdentifierValue() + " was not found.");
-					responseData.setProblems(Arrays.asList(p));
-				}
+				updateResponseData(responseData, initData, renewItem);
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -94,20 +89,25 @@ public class KohaRenewItemService implements RenewItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, JSONObject renewItem) {
+	private void updateResponseData(RenewItemResponseData responseData, RenewItemInitiationData initData, JSONObject renewItem) throws ParseException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		responseData.setUserId(initData.getUserId());
-		responseData.setItemId(initData.getItemId());
+		String userId = (String) renewItem.get("userId");
+		String itemId = (String) renewItem.get("itemId");
+		String branch = (String) renewItem.get("branchcode");
+		String dateDue = (String) renewItem.get("dateDue");
+
+		responseData.setDateDue(KohaUtil.parseGregorianCalendarFromKohaDateWithBackslashes(dateDue));
+		responseData.setUserId(KohaUtil.createUserId(userId, branch));
+		responseData.setItemId(KohaUtil.createItemId(itemId, branch));
 		/*
 		responseData.setItemOptionalFields(renewItem.getItemOptionalFields());
 		responseData.setUserOptionalFields(renewItem.getUserOptionalFields());
 		responseData.setFiscalTransactionInformation(renewItem.getFiscalTransactionInfo());
-		responseData.setDateDue(renewItem.getDateDue());
 		responseData.setDateForReturn(renewItem.getDateForReturn());
 		responseData.setPending(renewItem.getPending());
 		responseData.setRenewalCount(renewItem.getRenewalCount());

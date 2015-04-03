@@ -175,6 +175,19 @@ public class KohaUtil {
 			return null;
 	}
 
+	public static GregorianCalendar parseGregorianCalendarFromKohaDateWithBackslashes(String dateVal) throws ParseException {
+		if (dateVal != null && !dateVal.equalsIgnoreCase("00/00/0000")) {
+			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
+
+			gregorianCalendarDate.setTime(KohaConstants.KOHA_DATE_FORMATTER_BACKSLASHES.parse(dateVal));
+			if (inDaylightTime())
+				gregorianCalendarDate.add(Calendar.HOUR_OF_DAY, 2);
+
+			return gregorianCalendarDate;
+		} else
+			return null;
+	}
+
 	public static ResponseHeader reverseInitiationHeader(NCIPInitiationData initData) {
 
 		InitiationHeader initiationHeader = initData.getInitiationHeader();
@@ -473,6 +486,20 @@ public class KohaUtil {
 		requestedItem.setHoldQueuePosition(holdQueuePosition);
 
 		return requestedItem;
+	}
+
+	public static UserId createUserId(String userId) {
+		return createUserId(userId, null);
+	}
+
+	public static UserId createUserId(String userIdVal, String agencyIdVal) {
+		UserId userId = new UserId();
+		userId.setUserIdentifierValue(userIdVal);
+		if (agencyIdVal != null)
+			userId.setAgencyId(new AgencyId(agencyIdVal));
+		userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
+		return userId;
+
 	}
 
 	public static ItemId createItemId(String itemIdVal) {

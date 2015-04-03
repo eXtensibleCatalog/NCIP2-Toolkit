@@ -60,20 +60,9 @@ public class KohaRequestItemService implements RequestItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				// TODO: Implement handling exception because of many possible issues such as insufficient funds in the budget
 				JSONObject requestItem = kohaRemoteServiceManager.requestItem(initData);
+				updateResponseData(responseData, initData, requestItem);
 
-				if (requestItem != null) {
-					updateResponseData(responseData, initData, requestItem);
-				} else {
-
-					Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, "", "One of items was not found.");
-					responseData.setProblems(Arrays.asList(p));
-					/*
-					responseData.setRequiredFeeAmount(requestItem.getRequiredFeeAmount());
-					responseData.setRequiredItemUseRestrictionTypes(requestItem.getItemUseRestrictionTypes());
-					*/
-				}
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
@@ -101,45 +90,17 @@ public class KohaRequestItemService implements RequestItemService {
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		if (initData.getItemIds().size() > 1) {
-			// If there was more than one requested item, then merge all item identifier's values into one because responseData does not support
-			// multiple ItemIds
-			StringBuilder joinedItemIds = new StringBuilder();
-			int itemIdsSize = initData.getItemIds().size();
-			for (int i = 0; i < itemIdsSize; i++) {
+		String userId = (String) requestItem.get("userId");
+		String itemId = (String) requestItem.get("itemId");
+		String requestId = (String) requestItem.get("requestId");
 
-				String itemIdValue = initData.getItemId(i).getItemIdentifierValue();
+		responseData.setUserId(KohaUtil.createUserId(userId));
+		if (itemId != null)
+			responseData.setItemId(KohaUtil.createItemId(itemId));
+		responseData.setRequestId(KohaUtil.createRequestId(requestId));
 
-				if (itemIdValue.isEmpty())
-					itemIdValue = "null";
+		responseData.setRequestScopeType(initData.getRequestScopeType());
+		responseData.setRequestType(initData.getRequestType());
 
-				joinedItemIds.append(itemIdValue);
-
-				if (i != itemIdsSize - 1) {
-					joinedItemIds.append(KohaConstants.REQUEST_ID_DELIMITER);
-				}
-			}
-			ItemId itemId = new ItemId();
-			itemId.setItemIdentifierType(Version1ItemIdentifierType.ACCESSION_NUMBER);
-			itemId.setItemIdentifierValue(joinedItemIds.toString());
-			responseData.setItemId(itemId);
-		} else
-			responseData.setItemId(initData.getItemId(0));
-		/*
-				responseData.setRequestScopeType(requestItem.getRequestScopeType());
-				responseData.setRequestType(requestItem.getRequestType());
-				responseData.setRequestId(requestItem.getRequestId());
-				responseData.setItemOptionalFields(requestItem.getItemOptionalFields());
-				responseData.setUserOptionalFields(requestItem.getUserOptionalFields());
-				responseData.setFiscalTransactionInformation(requestItem.getFiscalTransactionInfo());
-
-				// Not implemented services, most of them probably even not implementable in Koha logic
-				responseData.setDateAvailable(requestItem.getDateAvailable());
-				responseData.setHoldPickupDate(requestItem.getHoldPickupDate());
-				responseData.setHoldQueueLength(requestItem.getHoldQueueLength());
-				responseData.setHoldQueuePosition(requestItem.getHoldQueuePosition());
-				responseData.setShippingInformation(requestItem.getShippingInformation());
-			*/
-		responseData.setUserId(initData.getUserId());
 	}
 }
