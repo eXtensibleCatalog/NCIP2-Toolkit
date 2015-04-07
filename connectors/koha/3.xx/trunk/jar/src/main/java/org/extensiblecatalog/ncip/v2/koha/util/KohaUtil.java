@@ -31,7 +31,10 @@ import org.extensiblecatalog.ncip.v2.service.FiscalTransactionReferenceId;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
@@ -48,6 +51,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
@@ -56,11 +60,13 @@ import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1FiscalActionType;
 import org.extensiblecatalog.ncip.v2.service.Version1FiscalTransactionType;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
@@ -69,6 +75,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UserAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
@@ -620,7 +627,7 @@ public class KohaUtil {
 
 		String bibId = (String) itemInfo.get("biblionumber");
 		String author = (String) itemInfo.get("author");
-		String mediumTypeVal = (String) itemInfo.get("mediumtype");
+		String mediumTypeVal = (String) itemInfo.get("itype");
 		String placeOfPublication = (String) itemInfo.get("place");
 		String publisher = (String) itemInfo.get("publishercode");
 		String volume = (String) itemInfo.get("volume");
@@ -657,5 +664,82 @@ public class KohaUtil {
 		bibliographicDescription.setTitle(title);
 
 		return bibliographicDescription;
+	}
+
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
+		return parseItemOptionalFields(kohaItem, KohaUtil.luisInitDataToLookupItemInitData(initData, itemIdVal));
+	}
+
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemInitiationData initData) throws ServiceException {
+
+		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired() || initData.getLocationDesired();
+		ItemOptionalFields iof = new ItemOptionalFields();
+		if (itemInfoDesired) {
+			JSONObject itemInfo = (JSONObject) kohaItem.get("itemInfo");
+
+			if (initData.getLocationDesired()) {
+				String homeBranch = (String) itemInfo.get("homebranch");
+				String locationVal = (String) itemInfo.get("location");
+				if (homeBranch != null || locationVal != null) {
+					iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
+				}
+			}
+
+			if (initData.getItemDescriptionDesired()) {
+				ItemDescription itemDescription = new ItemDescription();
+
+				String callNumber = (String) itemInfo.get("itemcallnumber");
+				String copyNumber = (String) itemInfo.get("copynumber");
+
+				itemDescription.setCallNumber(callNumber);
+				itemDescription.setCopyNumber(copyNumber);
+
+				iof.setItemDescription(itemDescription);
+			}
+
+			if (initData.getBibliographicDescriptionDesired())
+				iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(itemInfo));
+
+		}
+
+		if (initData.getCirculationStatusDesired()) {
+			String circulationStatus = (String) kohaItem.get("circulationStatus");
+			iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+		}
+
+		if (initData.getHoldQueueLengthDesired()) {
+			String holdQueueLength = (String) kohaItem.get("holdQueueLength");
+
+			if (holdQueueLength != null)
+				iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
+		}
+
+		if (initData.getItemUseRestrictionTypeDesired()) {
+			JSONArray itemUseRestrictions = (JSONArray) kohaItem.get("itemUseRestrictions");
+			if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
+				List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+				for (Object itemUseRestriction : itemUseRestrictions) {
+					String itemUseRestrictionValue = (String) itemUseRestriction;
+					itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE, itemUseRestrictionValue));
+				}
+				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+			}
+		}
+
+		return iof;
+	}
+
+	public static LookupItemInitiationData luisInitDataToLookupItemInitData(LookupItemSetInitiationData initData, String itemIdVal) {
+		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
+		ItemId itemId = new ItemId();
+		itemId.setItemIdentifierValue(itemIdVal);
+		LIinitData.setItemId(itemId);
+		LIinitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
+		LIinitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
+		LIinitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
+		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
+		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
+		LIinitData.setLocationDesired(initData.getLocationDesired());
+		return LIinitData;
 	}
 }

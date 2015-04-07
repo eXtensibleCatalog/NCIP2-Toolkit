@@ -13,16 +13,23 @@ public class KohaException extends Exception {
 	public static final String INVALID_ITEM_IDENTIFIER_VALUE_FORMAT = "Invalid ItemIdentifierValue format";
 	public static final String ITEM_NOT_FOUND = "Item not found";
 	public static final String BAD_REQUEST_400 = "400 Bad Request";
+	public static final String NOT_FOUND_404 = "404 Not Found";
 
 	private String shortMessage;
+	private String notFoundIdentifierValue;
 
 	public KohaException(String message) {
 		this(DEFAULT_SHORT_MESSAGE, message);
 	}
 
 	public KohaException(String shortMessage, String message) {
+		this(shortMessage, message, null);
+	}
+
+	public KohaException(String shortMessage, String message, String notFoundIdentifierValue) {
 		super(message);
 		this.shortMessage = shortMessage;
+		this.notFoundIdentifierValue = notFoundIdentifierValue;
 	}
 
 	public String getShortMessage() {
@@ -36,6 +43,10 @@ public class KohaException extends Exception {
 						+ message);
 	}
 
+	public static KohaException create404NotFoundException(String message, String notFoundIdentifierValue) {
+		return new KohaException(KohaException.NOT_FOUND_404, message, notFoundIdentifierValue);
+	}
+
 	public static KohaException createCommonException(int status, String message) {
 		return new KohaException(String.valueOf(status), message);
 	}
@@ -43,5 +54,9 @@ public class KohaException extends Exception {
 	public static KohaException createTooManyLoginAttempts() {
 		return new KohaException(KohaException.TOO_MANY_LOGIN_ATTEMPTS,
 				"There has been too many login attempts. Please verify your admin credentials specified in toolkit.properties.");
+	}
+
+	public String getNotFoundIdentifierValue() {
+		return notFoundIdentifierValue;
 	}
 }

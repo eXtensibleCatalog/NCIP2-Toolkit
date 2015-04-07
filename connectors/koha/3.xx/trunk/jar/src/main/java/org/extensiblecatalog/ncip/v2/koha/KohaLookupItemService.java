@@ -111,66 +111,10 @@ public class KohaLookupItemService implements LookupItemService {
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		ItemOptionalFields iof = new ItemOptionalFields();
+		responseData.setItemId(initData.getItemId());
 
-		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired() || initData.getLocationDesired();
-		if (itemInfoDesired) {
-			JSONObject itemInfo = (JSONObject) kohaItem.get("itemInfo");
+		ItemOptionalFields iof = KohaUtil.parseItemOptionalFields(kohaItem, initData);
 
-			String itemId = (String) itemInfo.get("itemnumber");
-			String agencyId = (String) itemInfo.get("holdingbranch");
-
-			responseData.setItemId(KohaUtil.createItemId(itemId, agencyId));
-
-			if (initData.getLocationDesired()) {
-				String homeBranch = (String) itemInfo.get("homebranch");
-				String locationVal = (String) itemInfo.get("location");
-				if (homeBranch != null || locationVal != null) {
-					iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
-				}
-			}
-
-			if (initData.getItemDescriptionDesired()) {
-				ItemDescription itemDescription = new ItemDescription();
-
-				String callNumber = (String) itemInfo.get("callnumber");
-				String copyNumber = (String) itemInfo.get("copynumber");
-
-				itemDescription.setCallNumber(callNumber);
-				itemDescription.setCopyNumber(copyNumber);
-
-				iof.setItemDescription(itemDescription);
-			}
-
-			if (initData.getBibliographicDescriptionDesired())
-				iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(itemInfo));
-
-		} else
-			responseData.setItemId(initData.getItemId());
-
-		if (initData.getCirculationStatusDesired()) {
-			String circulationStatus = (String) kohaItem.get("circulationStatus");
-			iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
-		}
-
-		if (initData.getHoldQueueLengthDesired()) {
-			String holdQueueLength = (String) kohaItem.get("holdQueueLength");
-
-			if (holdQueueLength != null)
-				iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
-		}
-
-		if (initData.getItemUseRestrictionTypeDesired()) {
-			JSONArray itemUseRestrictions = (JSONArray) kohaItem.get("itemUseRestrictions");
-			if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
-				List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-				for (Object itemUseRestriction : itemUseRestrictions) {
-					String itemUseRestrictionValue = (String) itemUseRestriction;
-					itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE, itemUseRestrictionValue));
-				}
-				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-			}
-		}
 		responseData.setItemOptionalFields(iof);
 	}
 }

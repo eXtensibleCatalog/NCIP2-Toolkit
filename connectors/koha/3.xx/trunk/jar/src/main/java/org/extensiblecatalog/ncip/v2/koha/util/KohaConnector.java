@@ -81,7 +81,7 @@ public class KohaConnector {
 			LocalConfig.setTransferBranchesTime(kohaConfig.getProperty(KohaConstants.CONF_TRANSFER_BRANCH_TIME));
 
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));
-			
+
 			LocalConfig.setCurrencyCode(kohaConfig.getProperty(KohaConstants.CONF_CURRENCY_CODE));
 
 			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.CONF_OPAC_SERVER));
@@ -188,8 +188,8 @@ public class KohaConnector {
 	public JSONObject lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ParseException,
 			URISyntaxException {
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM)
-				.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue());
+		String itemIdVal = initData.getItemId().getItemIdentifierValue();
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM).addRequest(KohaConstants.PARAM_ITEM_ID, itemIdVal);
 
 		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
 		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
@@ -209,24 +209,42 @@ public class KohaConnector {
 		if (!itemInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_ITEM_INFO);
 
-		String response = getPlainTextResponse(urlBuilder.toURL());
+		String response = getPlainTextResponse(urlBuilder.toURL(), itemIdVal);
 
 		return (JSONObject) jsonParser.parse(response);
 	}
 
 	public JSONObject lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException, ParseException,
 			URISyntaxException {
-		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
-		ItemId itemId = new ItemId();
-		itemId.setItemIdentifierValue(id);
-		LIinitData.setItemId(itemId);
-		LIinitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
-		LIinitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
-		LIinitData.setHoldQueueLengthDesired(initData.getHoldQueueLengthDesired());
-		LIinitData.setItemDescriptionDesired(initData.getItemDescriptionDesired());
-		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
-		LIinitData.setLocationDesired(initData.getLocationDesired());
-		return lookupItem(LIinitData);
+		return lookupItem(KohaUtil.luisInitDataToLookupItemInitData(initData, id));
+	}
+
+	public JSONObject lookupItemSet(String bibId, LookupItemSetInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException,
+			URISyntaxException, ParseException {
+
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET).addRequest(KohaConstants.PARAM_BIB_ID, bibId);
+
+		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
+		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
+		boolean circulationStatusDesired = initData.getCirculationStatusDesired();
+
+		boolean bibInfoDesired = initData.getBibliographicDescriptionDesired();
+
+		if (itemRestrictionDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
+
+		if (holdQueueLengthDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_HOLD_QUEUE_LENGTH_DESIRED);
+
+		if (circulationStatusDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_CIRCULATION_STATUS_DESIRED);
+
+		if (!bibInfoDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_NOT_BIB_INFO);
+
+		String response = getPlainTextResponse(urlBuilder.toURL(), bibId);
+
+		return (JSONObject) jsonParser.parse(response);
 	}
 
 	public JSONObject lookupRequest(LookupRequestInitiationData initData, boolean requestIdIsNotEmpty) throws KohaException, IOException, SAXException,
@@ -298,12 +316,6 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public List<JSONObject> lookupItemSet(String id, LookupItemSetInitiationData initData, KohaLookupItemSetService kohaLookupItemSetService) throws KohaException, IOException,
-			SAXException, ParserConfigurationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {
 		AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
 
@@ -344,6 +356,10 @@ public class KohaConnector {
 	}
 
 	private String getPlainTextResponse(URL url) throws KohaException, IOException, SAXException, URISyntaxException {
+		return getPlainTextResponse(url, null);
+	}
+
+	private String getPlainTextResponse(URL url, String identifier) throws KohaException, IOException, SAXException, URISyntaxException {
 
 		Client client = ClientBuilder.newClient();
 
@@ -361,12 +377,14 @@ public class KohaConnector {
 				return responseEntity;
 			} else if (statusCode == 400) {
 				throw KohaException.create400BadRequestException(responseEntity);
+			} else if (statusCode == 404) {
+				throw KohaException.create404NotFoundException(responseEntity, identifier);
 			} else {
 				throw KohaException.createCommonException(statusCode, responseEntity);
 			}
 		} else {
 			renewSessionCookie();
-			return getPlainTextResponse(url);
+			return getPlainTextResponse(url, identifier);
 		}
 	}
 
