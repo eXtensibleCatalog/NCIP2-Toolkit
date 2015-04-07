@@ -33,41 +33,25 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 		KohaRemoteServiceManager serviceManager = new KohaRemoteServiceManager();
 
 		// Inputs:
-		String agency = "KOH";
-		String bibRecIds[] = { "KOH01000000421", "KOH01000062021", "KOH01000000425", "KOH01000385610" };
+		String bibRecIds[] = { "96", "110", "115", "1200" };
 		int bibIdsCount = bibRecIds.length;
 
 		int maximumItemsCount = 0;
 
 		// Outputs:
-		String[] isbns = { "80-900870-1-9", "0-13-914622-9", "80-85605-77-5", "261H001467" };
+		String[] isbns = { "80-85941-28-7 :", "80-87197-000-X :", "80-7176-163-X :", "80-7186-097-2 :" };
 
-		String[] authors = { "Malinová, Libuše", "Brammer, Lawrence M.", "Elman, Jiří", "Náhoda (hudební skupina)" };
+		String[] authors = { "Grey, Zane,", "L'Amour, Louis,", "Pearson, Ridley,", "Blyton, Enid," };
 
-		String[] publishers = { "EPA,", "Prentice-Hall,", "Victoria Publishing,", "Studio ASD," };
+		String[] publishers = { "Oddych,", "Tallpress,", "Knižní klub,", "Egmont ČR," };
 
-		String[] titles = { "Anglicko-český a česko-anglický elektrotechnický a elektronický slovník / Sest. aut. kol. pod",
-				"Therapeutic psychology : fundamentals of counseling and psychotherapy / Lawrence M. Brammer, Everett",
-				"Anglicko-český ekonomický slovník : Ekonomie, právo, výpočetní technika. [2.] M-Z / ..., Kam", "Náhoda [zvukový záznam] / Náhoda " };
+		String[] titles = { "Ztracené Pueblo /", "Hora pokladů /", "Dobrodinec /", "Správná pětka." };
 
-		String[] mediumTypes = { Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(),
-				Version1MediumType.AUDIO_TAPE.getValue() };
+		String[][] callN0s = { { null, "PP" }, { null, "PP" }, { null, "PP" }, { "M/II", "PP M/II" } };
 
-		String[][] callN0s = { { "621.3 ANG" }, { "PK-0083.568" }, { "2-0997.767,2", "2-0997.767,2" }, { "KZ-0001.436" } };
+		String[][] itemIds = { { "118", "119" }, { "142", "143" }, { "150", "151" }, { "1426", "1427" } };
 
-		String[][] itemIds = { { "KOH01000000421-KOH50000000421000010" }, { "KOH01000062021-KOH50000062021000010" },
-				{ "KOH01000000425-KOH50000000425000020", "KOH01000000425-KOH50000000425000030" }, { "KOH01000385610-KOH50000385610000010" } };
-
-		String[][] barcodes = { { "2610002885" }, { "3119972468" }, { "2610007443", "2610008987" }, { "261H001467" } };
-
-		String[][] itemRestrictions = { { "In Library Use Only" }, { "Limited Circulation, Normal Loan Period" },
-				{ "In Library Use Only", "Limited Circulation, Normal Loan Period" }, { "Supervision Required" } };
-
-		String[][] numberOfPieces = { { "1" }, { "1" }, { "2", "2" }, { "1" } };
-
-		String[][] circStatuses = { { Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() }, { Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() },
-				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(), Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() },
-				{ Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() } };
+		String[][] numberOfPieces = { { "2", "2" }, { "2", "2" }, { "2", "2" }, { "2", "2" } };
 
 		LookupItemSetResponseData responseData;
 		LookupItemSetInitiationData initData;
@@ -102,7 +86,7 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 
 			initData = new LookupItemSetInitiationData();
 
-			bibliographicIds = createBibRecordIdList(agency, bibRecIds);
+			bibliographicIds = createBibRecordIdList(bibRecIds);
 
 			initData.setBibliographicIds(bibliographicIds);
 
@@ -157,20 +141,13 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 								.getBibliographicItemIdentifier());
 					assertEquals("Unexpected Publisher returned.", publishers[processedBibInfos], holdSet.getBibliographicDescription().getPublisher());
 					assertEquals("Unexpected Title returned.", titles[processedBibInfos], holdSet.getBibliographicDescription().getTitle());
-					assertEquals("Unexpected MediumType returned.", mediumTypes[processedBibInfos], holdSet.getBibliographicDescription().getMediumType().getValue());
 
 					for (int j = 0; j < holdSet.getItemInformations().size(); j++) {
 
 						itemInfo = holdSet.getItemInformation(j);
 
-						assertEquals("Unexpected Circulation Status returned", circStatuses[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
-								.getCirculationStatus().getValue());
 						assertEquals("Unexpected Accession Number returned. (Koha Item Id)", itemIds[processedBibInfos][processedItemInfos], itemInfo.getItemId()
 								.getItemIdentifierValue());
-						assertEquals("Unexpected Barcode returned. (Legal Deposit Number)", barcodes[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
-								.getBibliographicDescription().getBibliographicItemId(0).getBibliographicItemIdentifier());
-						assertEquals("Unexpected Item Use Restriction Type returned.", itemRestrictions[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
-								.getItemUseRestrictionType(0).getValue());
 						assertEquals("Unexpected Call number returned.", callN0s[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields().getItemDescription()
 								.getCallNumber());
 						assertEquals("Unexpected Number of pieces returned.", numberOfPieces[processedBibInfos][processedItemInfos], itemInfo.getItemOptionalFields()
@@ -209,9 +186,8 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 		}
 	}
 
-	private List<BibliographicId> createBibRecordIdList(String agency, String... bibIdValue) {
+	private List<BibliographicId> createBibRecordIdList(String... bibIdValue) {
 		List<BibliographicId> bibliographicIds = new ArrayList<BibliographicId>();
-		AgencyId agencyId = new AgencyId(agency);
 
 		BibliographicId bibliographicId;
 		BibliographicRecordId bibliographicRecordId;
@@ -219,7 +195,6 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 		for (String bibId : bibIdValue) {
 			bibliographicId = new BibliographicId();
 			bibliographicRecordId = new BibliographicRecordId();
-			bibliographicRecordId.setAgencyId(agencyId);
 			bibliographicRecordId.setBibliographicRecordIdentifier(bibId);
 			bibliographicRecordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
 			bibliographicId.setBibliographicRecordId(bibliographicRecordId);

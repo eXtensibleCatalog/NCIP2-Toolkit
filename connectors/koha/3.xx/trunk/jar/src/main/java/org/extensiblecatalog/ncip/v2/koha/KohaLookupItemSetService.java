@@ -436,73 +436,78 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 			holdingsSet.setBibliographicDescription(bibliographicDescription);
 		}
 
+		Long numberOfPieces = (Long) response.get("itemsCount");
+
 		List<ItemInformation> itemInformations = new ArrayList<ItemInformation>();
 
 		JSONArray items = (JSONArray) response.get("items");
+
 		int i;
 		for (i = startFrom; i < items.size(); ++i) {
 			boolean canContinue = maxItemsToParse == 0 || maxItemsToParse > i - startFrom;
 			if (canContinue) {
 				JSONObject itemInfo = (JSONObject) items.get(i);
-				if (itemInfo != null) {
-					ItemInformation itemInformation = new ItemInformation();
+				ItemInformation itemInformation = new ItemInformation();
 
-					ItemOptionalFields iof = new ItemOptionalFields();
+				ItemOptionalFields iof = new ItemOptionalFields();
 
-					String itemId = (String) itemInfo.get("itemnumber");
-					String agencyId = (String) itemInfo.get("holdingbranch");
+				String itemId = (String) itemInfo.get("itemnumber");
+				String agencyId = (String) itemInfo.get("holdingbranch");
 
-					itemInformation.setItemId(KohaUtil.createItemId(itemId, agencyId));
+				itemInformation.setItemId(KohaUtil.createItemId(itemId, agencyId));
 
-					if (initData.getLocationDesired()) {
-						String homeBranch = (String) itemInfo.get("homebranch");
-						String locationVal = (String) itemInfo.get("location");
-						if (homeBranch != null || locationVal != null) {
-							iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
-						}
+				if (initData.getLocationDesired()) {
+					String homeBranch = (String) itemInfo.get("homebranch");
+					String locationVal = (String) itemInfo.get("location");
+					if (homeBranch != null || locationVal != null) {
+						iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
 					}
-
-					if (initData.getItemDescriptionDesired()) {
-						ItemDescription itemDescription = new ItemDescription();
-
-						String callNumber = (String) itemInfo.get("itemcallnumber");
-						String copyNumber = (String) itemInfo.get("copynumber");
-
-						itemDescription.setCallNumber(callNumber);
-						itemDescription.setCopyNumber(copyNumber);
-
-						iof.setItemDescription(itemDescription);
-					}
-
-					if (initData.getCirculationStatusDesired()) {
-						String circulationStatus = (String) itemInfo.get("circulationStatus");
-						iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
-					}
-
-					if (initData.getHoldQueueLengthDesired()) {
-						String holdQueueLength = (String) itemInfo.get("holdQueueLength");
-
-						if (holdQueueLength != null)
-							iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
-					}
-
-					if (initData.getItemUseRestrictionTypeDesired()) {
-						JSONArray itemUseRestrictions = (JSONArray) itemInfo.get("itemUseRestrictions");
-						if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
-							List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-							for (Object itemUseRestriction : itemUseRestrictions) {
-								String itemUseRestrictionValue = (String) itemUseRestriction;
-								itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
-										itemUseRestrictionValue));
-							}
-							iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-						}
-					}
-
-					itemInformation.setItemOptionalFields(iof);
-					itemInformations.add(itemInformation);
-					++itemsForwarded;
 				}
+
+				if (initData.getItemDescriptionDesired()) {
+					ItemDescription itemDescription = new ItemDescription();
+
+					if (numberOfPieces != null)
+						itemDescription.setNumberOfPieces(new BigDecimal(numberOfPieces));
+
+					String callNumber = (String) itemInfo.get("itemcallnumber");
+					String copyNumber = (String) itemInfo.get("copynumber");
+
+					itemDescription.setCallNumber(callNumber);
+					itemDescription.setCopyNumber(copyNumber);
+
+					iof.setItemDescription(itemDescription);
+				}
+
+				if (initData.getCirculationStatusDesired()) {
+					String circulationStatus = (String) itemInfo.get("circulationStatus");
+					iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+				}
+
+				if (initData.getHoldQueueLengthDesired()) {
+					String holdQueueLength = (String) itemInfo.get("holdQueueLength");
+
+					if (holdQueueLength != null)
+						iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
+				}
+
+				if (initData.getItemUseRestrictionTypeDesired()) {
+					JSONArray itemUseRestrictions = (JSONArray) itemInfo.get("itemUseRestrictions");
+					if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
+						List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+						for (Object itemUseRestriction : itemUseRestrictions) {
+							String itemUseRestrictionValue = (String) itemUseRestriction;
+							itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
+									itemUseRestrictionValue));
+						}
+						iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+					}
+				}
+
+				itemInformation.setItemOptionalFields(iof);
+				itemInformations.add(itemInformation);
+				++itemsForwarded;
+
 			} else {
 
 				ItemToken itemToken = new ItemToken();
@@ -525,7 +530,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 			}
 		}
 
-		if (maxItemsToParse != 0 && maxItemsToParse == i - startFrom && !isLast) {
+		if (maxItemsToParse != 0 && maxItemsToParse == i - startFrom && !isLast && newTokenKey == null) {
 			ItemToken itemToken = new ItemToken();
 
 			itemToken.setBibliographicId(bibIdVal);
