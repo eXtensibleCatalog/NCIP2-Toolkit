@@ -4,7 +4,7 @@
 	<ns1:LookupRequest>
 
 		<ns1:RequestId>
-        		<ns1:RequestIdentifierValue>005056681</ns1:RequestIdentifierValue>
+        		<ns1:RequestIdentifierValue>125</ns1:RequestIdentifierValue>
 		</ns1:RequestId>
         
 	        <ns1:RequestElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/requestelementtype/requestelementtype.scm">User Id</ns1:RequestElementType>

@@ -1,5 +1,7 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
+import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -17,12 +19,10 @@ public class KohaLookupUserTest extends TestCase {
 		LookupUserResponseData responseData = new LookupUserResponseData();
 
 		// Input:
-		AgencyId agencyId = new AgencyId("KOH");
 
-		String user = "700";
+		String user = "3";
 
 		UserId userId = new UserId();
-		userId.setAgencyId(agencyId);
 		userId.setUserIdentifierValue(user);
 		userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
 		initData.setUserId(userId);
@@ -40,43 +40,38 @@ public class KohaLookupUserTest extends TestCase {
 		initData.setUserPrivilegeDesired(true);
 
 		// Output:
-		String surName = "Pokus1 Přijmení";
-		String street = "Trvalá ulice 123";
-		String locality = "Trvalé";
-		String postal = "12345 ";
+		String surname = "Kozlovský";
+		String givenName = "Jiří";
+		String prefix = "Mr";
 
-		String electronicAddress = "test@mzk.cz";
-		String privilegeDesc = "04 - S";
+		String categoryCode = "KN";
 
 		InitiationHeader initiationHeader = new InitiationHeader();
-		
+
 		ToAgencyId toAgencyId = new ToAgencyId();
 		toAgencyId.setAgencyId(new AgencyId("KOH-Koha"));
-				
+
 		FromAgencyId fromAgencyId = new FromAgencyId();
 		fromAgencyId.setAgencyId(new AgencyId("KOH-VuFind"));
-		
+
 		initiationHeader.setFromAgencyId(fromAgencyId);
 		initiationHeader.setToAgencyId(toAgencyId);
 		initData.setInitiationHeader(initiationHeader);
-		
+
 		responseData = service.performService(initData, null, serviceManager);
 
-		//FIXME: Add tests for LookupUser with all features desired
-		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
+		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null);
 
-		assertEquals("Unexpected Surname returned.", surName, responseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation()
+		assertEquals("Unexpected Surname returned.", surname, responseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation()
 				.getStructuredPersonalUserName().getSurname());
 
-		StructuredAddress structuredPhysicalAddress = responseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress();
-		assertEquals("Unexpected Street returned.", street, structuredPhysicalAddress.getStreet());
-		assertEquals("Unexpected Locality retuned.", locality, structuredPhysicalAddress.getLocality());
-		assertEquals("Unexpected Postal returned.", postal, structuredPhysicalAddress.getPostalCode());
+		assertEquals("Unexpected GivenName returned.", givenName, responseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation()
+				.getStructuredPersonalUserName().getGivenName());
 
-		assertEquals("Unexpected Electronic address returned (expecting " + electronicAddress + ")", electronicAddress, responseData.getUserOptionalFields()
-				.getUserAddressInformation(1).getElectronicAddress().getElectronicAddressData());
+		List<UserAddressInformation> userAddressInformations = responseData.getUserOptionalFields().getUserAddressInformations();
+		assertTrue("No UserAddressInformation returned ..", userAddressInformations != null && userAddressInformations.size() > 0);
 
-		assertEquals("Unexpected privilege description returned", privilegeDesc, responseData.getUserOptionalFields().getUserPrivilege(0).getUserPrivilegeDescription());
+		assertEquals("Unexpected privilege description returned", categoryCode, responseData.getUserOptionalFields().getUserPrivilege(0).getAgencyUserPrivilegeType().getValue());
 		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());
 		assertEquals("Unexpected FromAgencyId returned.", toAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getFromAgencyId().getAgencyId().getValue());
 	}
