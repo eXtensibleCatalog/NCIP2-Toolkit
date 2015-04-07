@@ -9,7 +9,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import junit.framework.TestCase;
 
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.ItemInformation;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
+import org.extensiblecatalog.ncip.v2.service.ServiceException;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.xml.sax.SAXException;
 
 public class KohaLookupItemSet_ItemIdsTest extends TestCase {
@@ -21,37 +31,24 @@ public class KohaLookupItemSet_ItemIdsTest extends TestCase {
 
 		// Inputs:
 		String agency = "KOH";
-		String itemIdValues[] = { "KOH01000000421-KOH50000000421000010", "KOH01000062021-KOH50000062021000010", "KOH01000000425-KOH50000000425000020",
-				"KOH01000000425-KOH50000000425000030", "KOH01000385610-KOH50000385610000010" };
+
+		String[] itemIdValues = { "118", "142", "150", "1426", };
 
 		int itemIdsCount = itemIdValues.length;
 		int maximumItemsCount = 0;
 
 		// Outputs:
-		String[] isbns = { "80-900870-1-9", "0-13-914622-9", "80-85605-77-5", "80-85605-77-5", "261H001467" };
+		String[] isbns = { "80-85941-28-7 :", "80-87197-000-X :", "80-7176-163-X :", "80-7186-097-2 :" };
 
-		String[] authors = { "Malinová, Libuše", "Brammer, Lawrence M.", "Elman, Jiří", "Elman, Jiří", "Náhoda (hudební skupina)" };
+		String[] authors = { "Grey, Zane,", "L'Amour, Louis,", "Pearson, Ridley,", "Blyton, Enid," };
 
-		String[] publishers = { "EPA,", "Prentice-Hall,", "Victoria Publishing,", "Victoria Publishing,", "Studio ASD," };
+		String[] publishers = { "Oddych,", "Tallpress,", "Knižní klub,", "Egmont ČR," };
 
-		String[] titles = { "Anglicko-český a česko-anglický elektrotechnický a elektronický slovník / Sest. aut. kol. pod",
-				"Therapeutic psychology : fundamentals of counseling and psychotherapy / Lawrence M. Brammer, Everett",
-				"Anglicko-český ekonomický slovník : Ekonomie, právo, výpočetní technika. [2.] M-Z / ..., Kam",
-				"Anglicko-český ekonomický slovník : Ekonomie, právo, výpočetní technika. [2.] M-Z / ..., Kam", "Náhoda [zvukový záznam] / Náhoda " };
+		String[] titles = { "Ztracené Pueblo /", "Hora pokladů /", "Dobrodinec /", "Správná pětka." };
 
-		String[] mediumTypes = { Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(), Version1MediumType.BOOK.getValue(),
-				Version1MediumType.AUDIO_TAPE.getValue() };
+		String[] mediumTypes = { "KN", "KN", "KN", "KN" };
 
-		String[] callN0s = { "621.3 ANG", "PK-0083.568", "2-0997.767,2", "2-0997.767,2", "KZ-0001.436" };
-
-		String[] barcodes = { "2610002885", "3119972468", "2610007443", "2610008987", "261H001467" };
-
-		String[] itemRestrictions = { "In Library Use Only", "Limited Circulation, Normal Loan Period", "In Library Use Only", "Limited Circulation, Normal Loan Period",
-				"Supervision Required" };
-
-		String[] circStatuses = { Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(), Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(),
-				Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(), Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue(),
-				Version1CirculationStatus.AVAILABLE_ON_SHELF.getValue() };
+		String[] callN0s = { null, null, null, "M/II" };
 
 		LookupItemSetInitiationData initData;
 		List<ItemId> itemIds;
@@ -68,7 +65,7 @@ public class KohaLookupItemSet_ItemIdsTest extends TestCase {
 		initiationHeader.setFromAgencyId(fromAgencyId);
 		initiationHeader.setToAgencyId(toAgencyId);
 
-		int processedItems, itemsParsedInInnerWhileCycle;
+		int processedItems;
 		boolean nextItemTokenIsNull;
 
 		HoldingsSet holdSet;
@@ -127,24 +124,25 @@ public class KohaLookupItemSet_ItemIdsTest extends TestCase {
 				for (int processedItemIds = 0; processedItemIds < itemIds.size();) {
 					holdSet = responseData.getBibInformation(processedItemIds).getHoldingsSet(0);
 
+					assertEquals("Unexpected BibliographicItemId returned. (Koha Item Id)", itemIdValues[processedItems], responseData.getBibInformation(processedItemIds)
+							.getBibliographicId().getBibliographicItemId().getBibliographicItemIdentifier());
+
 					assertEquals("Returned bibliographicRecordIdentifies doesn't equal to input.", itemIdValues[processedItems], responseData.getBibInformation(processedItemIds)
 							.getBibliographicId().getBibliographicItemId().getBibliographicItemIdentifier());
-					assertEquals("Unexpected Author returned.", authors[processedItems], holdSet.getBibliographicDescription().getAuthor());
+					assertEquals("Unexpected Author returned.", authors[processedItems], holdSet.getItemInformation(0).getItemOptionalFields().getBibliographicDescription()
+							.getAuthor());
 					if (processedItems < 4)
-						assertEquals("Unexpected ISBN returned.", isbns[processedItems], holdSet.getBibliographicDescription().getBibliographicItemId(0)
-								.getBibliographicItemIdentifier());
-					assertEquals("Unexpected Publisher returned.", publishers[processedItems], holdSet.getBibliographicDescription().getPublisher());
-					assertEquals("Unexpected Title returned.", titles[processedItems], holdSet.getBibliographicDescription().getTitle());
-					assertEquals("Unexpected MediumType returned.", mediumTypes[processedItems], holdSet.getBibliographicDescription().getMediumType().getValue());
+						assertEquals("Unexpected ISBN returned.", isbns[processedItems], holdSet.getItemInformation(0).getItemOptionalFields().getBibliographicDescription()
+								.getBibliographicItemId(0).getBibliographicItemIdentifier());
+					assertEquals("Unexpected Publisher returned.", publishers[processedItems], holdSet.getItemInformation(0).getItemOptionalFields().getBibliographicDescription()
+							.getPublisher());
+					assertEquals("Unexpected Title returned.", titles[processedItems], holdSet.getItemInformation(0).getItemOptionalFields().getBibliographicDescription()
+							.getTitle());
+					assertEquals("Unexpected MediumType returned.", mediumTypes[processedItems], holdSet.getItemInformation(0).getItemOptionalFields()
+							.getBibliographicDescription().getMediumType().getValue());
 
 					itemInfo = holdSet.getItemInformation(0);
 
-					assertEquals("Unexpected Circulation Status returned", circStatuses[processedItems], itemInfo.getItemOptionalFields().getCirculationStatus().getValue());
-					assertEquals("Unexpected Accession Number returned. (Koha Item Id)", itemIdValues[processedItems], itemInfo.getItemId().getItemIdentifierValue());
-					assertEquals("Unexpected Barcode returned. (Legal Deposit Number)", barcodes[processedItems], itemInfo.getItemOptionalFields().getBibliographicDescription()
-							.getBibliographicItemId(0).getBibliographicItemIdentifier());
-					assertEquals("Unexpected Item Use Restriction Type returned.", itemRestrictions[processedItems], itemInfo.getItemOptionalFields().getItemUseRestrictionType(0)
-							.getValue());
 					assertEquals("Unexpected Call number returned.", callN0s[processedItems], itemInfo.getItemOptionalFields().getItemDescription().getCallNumber());
 
 					++processedItems;

@@ -18,14 +18,11 @@ public class KohaCreateUserFiscalTransactionTest extends TestCase {
 		CreateUserFiscalTransactionResponseData responseData = new CreateUserFiscalTransactionResponseData();
 
 		// Input:
-
-		AgencyId agencyId = new AgencyId("KOH");
 		String requestIdVal = "005033321";
 
 		String userIdVal = "701";
 
 		UserId userId = new UserId();
-		userId.setAgencyId(agencyId);
 		userId.setUserIdentifierType(Version1UserIdentifierType.INSTITUTION_ID_NUMBER);
 		userId.setUserIdentifierValue(userIdVal);
 		initData.setUserId(userId);
@@ -38,7 +35,6 @@ public class KohaCreateUserFiscalTransactionTest extends TestCase {
 		fiscalTransactionInformation.setAmount(amount);
 
 		RequestId requestId = new RequestId();
-		requestId.setAgencyId(agencyId);
 		requestId.setRequestIdentifierValue(requestIdVal);
 
 		fiscalTransactionInformation.setRequestId(requestId);
@@ -47,18 +43,19 @@ public class KohaCreateUserFiscalTransactionTest extends TestCase {
 		fiscalTransactionInformation.setPaymentMethodType(Version1PaymentMethodType.BANK_DRAFT);
 
 		initData.setFiscalTransactionInformation(fiscalTransactionInformation);
-		
+
 		InitiationHeader initiationHeader = new InitiationHeader();
-		
+
 		ToAgencyId toAgencyId = new ToAgencyId();
 		toAgencyId.setAgencyId(new AgencyId("KOH-Koha"));
-				
+
 		FromAgencyId fromAgencyId = new FromAgencyId();
 		fromAgencyId.setAgencyId(new AgencyId("KOH-VuFind"));
-		
+
 		initiationHeader.setFromAgencyId(fromAgencyId);
 		initiationHeader.setToAgencyId(toAgencyId);
 		initData.setInitiationHeader(initiationHeader);
+
 		// Output:
 
 		int fiscalTranIdValLength = 27;
@@ -67,8 +64,9 @@ public class KohaCreateUserFiscalTransactionTest extends TestCase {
 
 		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
 
+		assertTrue("Unexpected AgencyId returned.", responseData.getFiscalTransactionReferenceId().getAgencyId() != null);
+		
 		assertEquals("Unexpected UserId returned.", userIdVal, responseData.getUserId().getUserIdentifierValue());
-		assertEquals("Unexpected AgencyId returned.", agencyId.getValue(), responseData.getFiscalTransactionReferenceId().getAgencyId().getValue());
 		assertEquals("Unexpected length of FiscalTransactionIdentifierValue returned.", fiscalTranIdValLength, responseData.getFiscalTransactionReferenceId()
 				.getFiscalTransactionIdentifierValue().length());
 		assertEquals("Unexpected ToAgencyId returned.", fromAgencyId.getAgencyId().getValue(), responseData.getResponseHeader().getToAgencyId().getAgencyId().getValue());

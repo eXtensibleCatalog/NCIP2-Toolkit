@@ -26,10 +26,9 @@ public class KohaLookupAgencyTest extends TestCase {
 
 		KohaRemoteServiceManager serviceManager = new KohaRemoteServiceManager();
 		LookupAgencyInitiationData initData = new LookupAgencyInitiationData();
-		
+
 		// Input:
-		AgencyId agencyId = new AgencyId("KOH");
-		
+
 		List<AgencyElementType> agencyElementTypes = new ArrayList<AgencyElementType>();
 
 		agencyElementTypes.add(Version1AgencyElementType.AGENCY_ADDRESS_INFORMATION);
@@ -40,19 +39,19 @@ public class KohaLookupAgencyTest extends TestCase {
 		agencyElementTypes.add(Version1AgencyElementType.ORGANIZATION_NAME_INFORMATION);
 
 		initData.setAgencyElementTypes(agencyElementTypes);
-		initData.setAgencyId(agencyId);
 
 		InitiationHeader initiationHeader = new InitiationHeader();
-		
+
 		ToAgencyId toAgencyId = new ToAgencyId();
 		toAgencyId.setAgencyId(new AgencyId("KOH-Koha"));
-				
+
 		FromAgencyId fromAgencyId = new FromAgencyId();
 		fromAgencyId.setAgencyId(new AgencyId("KOH-VuFind"));
-		
+
 		initiationHeader.setFromAgencyId(fromAgencyId);
 		initiationHeader.setToAgencyId(toAgencyId);
 		initData.setInitiationHeader(initiationHeader);
+		initData.setAgencyId(fromAgencyId.getAgencyId());
 
 		// Output:
 
@@ -64,7 +63,7 @@ public class KohaLookupAgencyTest extends TestCase {
 
 		assertEquals("Unexpected presence of ns1:Problem element.", true, responseData.getProblems() == null || responseData.getProblems().get(0) == null);
 
-		assertEquals("Unexpected Agency Id returned.", agencyId.getValue(), responseData.getAgencyId().getValue());
+		assertTrue("Agency Id not returned.", responseData.getAgencyId() != null);
 		assertEquals("Unexpected Organization Name returned.", organizationName, responseData.getOrganizationNameInformations().get(0).getOrganizationName());
 		assertEquals("Unexpected Organization Address returned.", organizationAddress, responseData.getAgencyAddressInformations().get(0).getPhysicalAddress()
 				.getUnstructuredAddress().getUnstructuredAddressData());
