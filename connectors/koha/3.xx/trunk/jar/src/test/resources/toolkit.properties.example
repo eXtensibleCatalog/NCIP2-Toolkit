@@ -1,5 +1,4 @@
-# Note that after each little change here you should copy this file to /connectors/koha/20/trunk/jar/src/test/resources in orded to pass tests
-# But keep in mind this is configuration file which are all mandatory informations parsed for connector
+# This is configuration for tests only .. to edit configuration of real responder, edit web/src/main/resources/toolkit.properties ..
 
 ToolkitConfiguration.PropertiesFileTitle=KohaWeb
 Connector.ConfigClass=org.extensiblecatalog.ncip.v2.koha.util.KohaConfiguration
