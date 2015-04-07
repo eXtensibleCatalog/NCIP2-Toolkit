@@ -26,14 +26,6 @@
 
 	<dependencies>
 
-		<!-- Log4j -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-			<scope>compile</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>common</artifactId>
@@ -108,21 +100,6 @@
 						<target>${javaVersion}</target>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.tomcat.maven</groupId>
-					<artifactId>tomcat7-maven-plugin</artifactId>
-					<version>2.2</version>
-					<configuration>
-						<url>http://cpk-devel.mzk.cz:7080/manager/text</url>
-						<server>TomcatDevel</server>
-						<path>/koha</path>
-					</configuration>
-				</plugin>
-				<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <version>2.2</version> 
-					<configuration> <descriptors> <descriptor>assembly.xml</descriptor> </descriptors> 
-					</configuration> <executions> <execution> <id>make-assembly</id> <phase>package</phase> 
-					<goals> <goal>single</goal> </goals> </execution> </executions> </plugin> -->
-
 			</plugins>
 		</pluginManagement>
 	</build>
