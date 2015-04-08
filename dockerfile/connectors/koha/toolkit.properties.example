@@ -1,0 +1,71 @@
+# Note that after each little change here you should copy this file to /connectors/koha/20/trunk/jar/src/test/resources in orded to pass tests
+# But keep in mind this is configuration file which are all mandatory informations parsed for connector
+
+ToolkitConfiguration.PropertiesFileTitle=KohaWeb
+Connector.ConfigClass=org.extensiblecatalog.ncip.v2.koha.util.KohaConfiguration
+RemoteServiceManager.class=org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager
+
+CancelRequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaCancelRequestItemService
+CreateUserFiscalTransactionService.class=org.extensiblecatalog.ncip.v2.koha.KohaCreateUserFiscalTransactionService
+LookupAgencyService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupAgencyService
+LookupItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemService
+LookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
+LookupRequestService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupRequestService
+LookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
+RequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRequestItemService
+RenewItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRenewItemService
+
+# NCIP 2_02
+DozerTranslatorConfiguration.MappingFiles=ncipv2_02_mappings.xml
+TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator
+NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements
+NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd
+
+# ILS
+#DozerTranslatorConfiguration.MappingFiles=ilsdiv1_0_bc_mappings.xml
+#TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.dozer.ILSDIv1_0_bc_JAXBDozerTranslator
+#NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_01.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.elements,ncip_v2_01_ils-di_bc_extensions.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.elements
+#NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_01_ils-di_bc_extensions.xsd
+
+# To write copies of the NCIP messages (initiation & response) to the log:
+TranslatorConfiguration.LogMessages=true
+
+# To turn off schema validation (e.g. for ILS-DI 1.0) add this:
+NCIPServiceValidatorConfiguration.ValidateMessagesAgainstSchema=true
+
+# To have the NCIP Toolkit's responder include Java stack traces in the Problem elements it returns
+# when an exception occurs.
+CoreConfiguration.IncludeStackTracesInProblemResponses=true
+
+# Koha Configuration
+AgencyUnstructuredAddress=LibraryAddressHere
+AgencyTranslatedName=LibraryNameHere
+AgencyId=LibrarySIGLAHere
+
+# Set this link to your client's registration site
+UserRegistrationLink=LibraryRegistrationLinkHere
+
+AuthDataFormatType=text/plain
+
+OPACServer=KohaIPHere
+OPACPort=80
+SVCPort=8080
+
+SVCSuffix=cgi-bin/koha/svc
+
+AdminName=IntranetAdministratorNameHere
+AdminPass=IntranetAdministratorPassHere
+
+CurrencyCode=CZK
+
+# Time in hours needed to transfer item after being requested from specific branch (format is: "BranchCode:Hours, BranchCode:Hours")
+TransferBranchTime=DOSP:1, SPBE:48, P:24
+
+# If there is a problem looking up an item from lookup item set, this defines whether to ouput those problems.
+IncludeParticularProblemsInLookupItemSet=true
+
+# Default delay in days, which is required to prepare requested item (set to 0 to disable):
+MaxItemPreparationTimeDelay=1
+
+# NextItemToken expiration time in seconds
+NextItemTokenExpirationTime=900

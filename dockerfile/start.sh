@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Run tomcat with random PW (to show generated password, use "docker logs CONTAINER_ID")
 # All running containers can be listed with "docker ps -a"
 i=$(docker run -d -p 8080:8080 xcncip2toolkit/xcncip2toolkit)
@@ -16,6 +15,7 @@ i=$(docker run -d -p 8080:8080 xcncip2toolkit/xcncip2toolkit)
 if [ $i ]; then
 echo ""
 echo "XCNCIP2Toolkit deployment is done."
-echo "You can test it here: http://localhost:8080/aleph-web/ (Ctrl + click)"
+echo "You can test it here: http://localhost:8080/aleph-web/"
+echo "And here: http://localhost:8080/koha-web/ (Ctrl + click)"
 echo ""
 fi

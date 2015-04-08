@@ -12,8 +12,9 @@ USER xcncip2toolkit
 RUN git clone https://github.com/moravianlibrary/xcncip2toolkit.git /home/xcncip2toolkit/xcncip2toolkit
 
 # Build with bash script because of multiple build errors
-ADD maven_build_ncip2.sh /home/xcncip2toolkit/xcncip2toolkit.sh
-RUN . /home/xcncip2toolkit/xcncip2toolkit.sh
+ADD maven_build_ncip2.sh /home/xcncip2toolkit/initialization.sh
+ADD toolkit.properties /home/xcncip2toolkit/xcncip2toolkit/connectors/koha/3.xx/trunk/web/src/main/resources/toolkit.properties
+RUN /home/xcncip2toolkit/initialization.sh
 
 # Link built .war to tomcat so that it is all set
 USER root
