@@ -17,7 +17,8 @@ RUN . /home/xcncip2toolkit/xcncip2toolkit.sh
 
 # Link built .war to tomcat so that it is all set
 USER root
-RUN ln -s /home/xcncip2toolkit/xcncip2toolkit/connectors/aleph/20/trunk/web/target/aleph-web-0.0.1-SNAPSHOT.war /tomcat/webapps/aleph-web.war
+RUN ln -s /home/xcncip2toolkit/xcncip2toolkit/connectors/aleph/22/trunk/web/target/aleph-web-0.0.1-SNAPSHOT.war /tomcat/webapps/aleph-web.war
+RUN ln -s /home/xcncip2toolkit/xcncip2toolkit/connectors/koha/3.xx/trunk/web/target/koha-web-0.0.1-SNAPSHOT.war /tomcat/webapps/koha-web.war
 
 EXPOSE 8080
 CMD ["/run.sh"]

@@ -38,23 +38,23 @@ NCIPServiceValidatorConfiguration.ValidateMessagesAgainstSchema=true
 CoreConfiguration.IncludeStackTracesInProblemResponses=true
 
 # Koha Configuration
-AgencyUnstructuredAddress=Smetanova 173, \u010C. T\u0159ebová, 560 02
-AgencyTranslatedName=M\u011Bstská knihovna \u010Ceská T\u0159ebová
-AgencyId=KOHALIB1
+AgencyUnstructuredAddress=LibraryAddressHere
+AgencyTranslatedName=LibraryNameHere
+AgencyId=LibrarySIGLAHere
 
 # Set this link to your client's registration site
-UserRegistrationLink=http://vufind.katalogknih.cz/MyResearch/Home
+UserRegistrationLink=LibraryRegistrationLinkHere
 
 AuthDataFormatType=text/plain
 
-OPACServer=188.166.14.82
+OPACServer=KohaIPHere
 OPACPort=80
 SVCPort=8080
 
 SVCSuffix=cgi-bin/koha/svc
 
-AdminName=userName
-AdminPass=userPassword
+AdminName=IntranetAdministratorNameHere
+AdminPass=IntranetAdministratorPassHere
 
 CurrencyCode=CZK
 
