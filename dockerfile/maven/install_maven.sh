@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -t xcncip2toolkit/maven .
+sudo docker build -t xcncip2toolkit/maven .
