@@ -3,6 +3,7 @@ FROM xcncip2toolkit/maven
 MAINTAINER Jiří Kozlovský <mail@jkozlovsky.cz>
 
 ENV REFRESHED_AT 2014-09-26
+ENV LANG C.UTF-8
 
 # Add user to manage home dir
 RUN adduser --disabled-password --gecos "" xcncip2toolkit
