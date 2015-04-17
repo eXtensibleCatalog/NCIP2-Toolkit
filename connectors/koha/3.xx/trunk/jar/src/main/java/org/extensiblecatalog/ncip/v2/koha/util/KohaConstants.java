@@ -81,6 +81,7 @@ public class KohaConstants {
 	public static final String PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED = "itemUseRestrictionTypeDesired";
 	public static final String PARAM_HOLD_QUEUE_LENGTH_DESIRED = "holdQueueLengthDesired";
 	public static final String PARAM_USER_FISCAL_ACCOUNT_DESIRED = "userFiscalAccountDesired";
+	public static final String PARAM_MAX_DATE_DUE_DESIRED = "maxDateDueDesired";
 
 	public static final String PARAM_NOT_USER_INFO = "notUserInfo";
 	public static final String PARAM_NOT_ITEM_INFO = "notItemInfo";
@@ -104,5 +105,10 @@ public class KohaConstants {
 	public static final String SERVICE_REQUEST_ITEM = "request_item";
 	public static final String SERVICE_RENEW_ITEM = "renew_item";
 	public static final String SERVICE_CANCEL_REQUEST_ITEM = "cancel_request_item";
+	public static final String SERVICE_CAN_BE_REQUESTED = "can_be_requested";
+	public static final String SERVICE_CAN_BE_RENEWED = "can_be_renewed";
+
+	public static final String APP_PROFILE_TYPE_CAN_BE_REQUESTED = "Can Be Requested";
+	public static final String APP_PROFILE_TYPE_CAN_BE_RENEWED = "Can Be Renewed";
 
 }

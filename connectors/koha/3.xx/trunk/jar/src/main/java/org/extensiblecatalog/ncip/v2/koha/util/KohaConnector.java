@@ -37,6 +37,7 @@ import org.extensiblecatalog.ncip.v2.service.OrganizationNameInformation;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
@@ -46,6 +47,7 @@ import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
+import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.json.simple.JSONObject;
@@ -163,6 +165,37 @@ public class KohaConnector {
 
 		if (!personalInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_USER_INFO);
+
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
+	}
+
+	public JSONObject canBeRenewed(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
+			ParseException {
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CAN_BE_RENEWED);
+
+		urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue()).addRequest(KohaConstants.PARAM_USER_ID,
+				initData.getUserId().getUserIdentifierValue());
+
+		// If there is NeedBeforeDate RequestElementType then include param maxDateDueDesired to url ..
+		for (RequestElementType desiredService : initData.getRequestElementTypes()) {
+			if (desiredService.equals(Version1RequestElementType.NEED_BEFORE_DATE)) {
+				urlBuilder.addRequest(KohaConstants.PARAM_MAX_DATE_DUE_DESIRED);
+				break;
+			}
+		}
+		String response = getPlainTextResponse(urlBuilder.toURL());
+
+		return (JSONObject) jsonParser.parse(response);
+	}
+
+	public JSONObject canBeRequested(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
+			ParseException {
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CAN_BE_REQUESTED);
+
+		urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue()).addRequest(KohaConstants.PARAM_USER_ID,
+				initData.getUserId().getUserIdentifierValue());
 
 		String response = getPlainTextResponse(urlBuilder.toURL());
 

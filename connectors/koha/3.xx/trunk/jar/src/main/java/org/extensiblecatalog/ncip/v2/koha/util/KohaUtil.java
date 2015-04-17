@@ -183,7 +183,7 @@ public class KohaUtil {
 	}
 
 	public static GregorianCalendar parseGregorianCalendarFromKohaDateWithBackslashes(String dateVal) throws ParseException {
-		if (dateVal != null && !dateVal.equalsIgnoreCase("00/00/0000")) {
+		if (dateVal != null && !dateVal.matches("00/00/0000")) {
 			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
 
 			gregorianCalendarDate.setTime(KohaConstants.KOHA_DATE_FORMATTER_BACKSLASHES.parse(dateVal));
