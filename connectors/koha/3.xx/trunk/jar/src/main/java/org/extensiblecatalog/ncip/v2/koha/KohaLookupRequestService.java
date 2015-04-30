@@ -219,7 +219,7 @@ public class KohaLookupRequestService implements LookupRequestService {
 		if (allowed.equals("y")) {
 			responseData.setItemId(initData.getItemId());
 		} else {
-			Problem p = new Problem(new ProblemType("Not allowed"), null, "Desired item/bib id cannot be renewed.");
+			Problem p = new Problem(new ProblemType("Not allowed"), null, "Desired item/bib id cannot be requested.");
 			responseData.setProblems(Arrays.asList(p));
 		}
 	}
