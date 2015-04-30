@@ -11,6 +11,9 @@ public class KohaException extends Exception {
 	private static final String TOO_MANY_LOGIN_ATTEMPTS = "Too many login attempts";
 
 	public static final String INVALID_ITEM_IDENTIFIER_VALUE_FORMAT = "Invalid ItemIdentifierValue format";
+	public static final String INVALID_AUTHENTICATIONINPUT_FORMAT = "Invalid AuthenticationInput format";
+	public static final String INVALID_CREDENTIALS_PROVIDED = "Invalid credentials provided";
+	
 	public static final String ITEM_NOT_FOUND = "Item not found";
 	public static final String BAD_REQUEST_400 = "400 Bad Request";
 	public static final String NOT_FOUND_404 = "404 Not Found";

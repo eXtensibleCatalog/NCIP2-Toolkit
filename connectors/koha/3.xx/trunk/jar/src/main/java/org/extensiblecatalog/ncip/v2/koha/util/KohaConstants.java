@@ -64,6 +64,7 @@ public class KohaConstants {
 	public static final String PARAM_USER_ID = "userId";
 	public static final String PARAM_ITEM_ID = "itemId";
 	public static final String PARAM_BIB_ID = "bibId";
+	public static final String PARAM_PW = "pw";
 	public static final String PARAM_REQUEST_ID = "requestId";
 	public static final String PARAM_REQUEST_TYPE = "requestType";
 	public static final String PARAM_PICKUP_EXPIRY_DATE = "pickupExpiryDate";

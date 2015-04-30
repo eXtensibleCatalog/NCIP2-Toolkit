@@ -11,10 +11,13 @@ package org.extensiblecatalog.ncip.v2.koha;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Resource.AuthenticationType;
 
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -24,6 +27,7 @@ import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
@@ -49,6 +53,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
+import com.sun.xml.xsom.impl.scd.Iterators.Map;
+
 public class KohaLookupUserService implements LookupUserService {
 
 	@Override
@@ -56,35 +62,59 @@ public class KohaLookupUserService implements LookupUserService {
 
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 
-		if (initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().trim().isEmpty()) {
-			responseData.setProblems(Arrays.asList(new Problem(new ProblemType("UserId is undefined."), null, null, "Cannot lookup unkown user ..")));
-		} else {
+		KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
-			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
+		try {
 
-			try {
-				JSONObject kohaUser = kohaRemoteServiceManager.lookupUser(initData);
+			if (initData.getAuthenticationInputs() != null) {
+				processAuthInput(initData, kohaRemoteServiceManager,responseData);
+			} else { // Regular lookup ..
 
-				updateResponseData(initData, responseData, kohaUser, kohaRemoteServiceManager);
-			} catch (MalformedURLException mue) {
-				Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
-				responseData.setProblems(Arrays.asList(p));
-			} catch (SAXException se) {
-				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (KohaException ke) {
-				Problem p = new Problem(new ProblemType(ke.getShortMessage()), null, ke.getMessage());
-				responseData.setProblems(Arrays.asList(p));
-			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
-				responseData.setProblems(Arrays.asList(p));
+				if (initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().trim().isEmpty()) {
+					responseData.setProblems(Arrays.asList(new Problem(new ProblemType("UserId is undefined."), null, null, "Cannot lookup unkown user ..")));
+				} else {
+					JSONObject kohaUser = kohaRemoteServiceManager.lookupUser(initData);
+
+					updateResponseData(initData, responseData, kohaUser, kohaRemoteServiceManager);
+				}
 			}
+		} catch (MalformedURLException mue) {
+			Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
+			responseData.setProblems(Arrays.asList(p));
+		} catch (IOException ie) {
+			Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+			responseData.setProblems(Arrays.asList(p));
+		} catch (SAXException se) {
+			Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
+			responseData.setProblems(Arrays.asList(p));
+		} catch (KohaException ke) {
+			Problem p = new Problem(new ProblemType(ke.getShortMessage()), null, ke.getMessage());
+			responseData.setProblems(Arrays.asList(p));
+		} catch (Exception e) {
+			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+			responseData.setProblems(Arrays.asList(p));
 
 		}
 		return responseData;
+	}
+
+	private void processAuthInput(LookupUserInitiationData initData, KohaRemoteServiceManager kohaRemoteServiceManager, LookupUserResponseData responseData) throws KohaException, MalformedURLException, IOException, SAXException, URISyntaxException, org.json.simple.parser.ParseException {
+		String userId = null, pass = null;
+		for (AuthenticationInput input : initData.getAuthenticationInputs()) {
+			if (input.getAuthenticationInputType().getValue().equalsIgnoreCase(Version1AuthenticationInputType.USER_ID.getValue())) {
+				userId = input.getAuthenticationInputData().trim();
+			} else if (input.getAuthenticationInputType().getValue().equalsIgnoreCase(Version1AuthenticationInputType.PASSWORD.getValue())) {
+				pass = input.getAuthenticationInputData().trim();
+			}
+		}
+
+		if (userId == null || pass == null || userId.isEmpty() || pass.isEmpty())
+			throw new KohaException(KohaException.INVALID_AUTHENTICATIONINPUT_FORMAT, "User Id or Password are empty or not specified.");
+
+		kohaRemoteServiceManager.authenticateUser(userId, pass); // Will throw Exception if something is wrong
+		
+		// Setting user id means authentication was successful - otherwise there should be thrown an Problem element instead
+		responseData.setUserId(KohaUtil.createUserId(userId));
 	}
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
