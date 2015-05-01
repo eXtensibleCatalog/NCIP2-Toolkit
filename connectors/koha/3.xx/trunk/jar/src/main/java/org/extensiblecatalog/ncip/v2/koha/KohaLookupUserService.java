@@ -66,7 +66,7 @@ public class KohaLookupUserService implements LookupUserService {
 
 		try {
 
-			if (initData.getAuthenticationInputs() != null) {
+			if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 1) {
 				processAuthInput(initData, kohaRemoteServiceManager,responseData);
 			} else { // Regular lookup ..
 
