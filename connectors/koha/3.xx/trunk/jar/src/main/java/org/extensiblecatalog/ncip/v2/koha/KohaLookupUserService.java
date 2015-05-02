@@ -136,7 +136,7 @@ public class KohaLookupUserService implements LookupUserService {
 			throw KohaException.create400BadRequestException("Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
 
 		// Setting user id means authentication was successful - otherwise there should be thrown an Problem element instead
-		initData.setUserId(KohaUtil.createUserId(userIdVal));
+		initData.setUserId(KohaUtil.createUserId(userIdVal, LocalConfig.getDefaultAgency()));
 	}
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
@@ -202,7 +202,9 @@ public class KohaLookupUserService implements LookupUserService {
 				userOptionalFields.setDateOfBirth(KohaUtil.parseGregorianCalendarFromKohaDate(dateOfBirth));
 			}
 		}
-		responseData.setUserId(initData.getUserId());
+		
+		UserId userId = KohaUtil.createUserId(initData.getUserId().getUserIdentifierValue(), LocalConfig.getDefaultAgency());
+		responseData.setUserId(userId);
 
 		JSONArray requestedItemsParsed = (JSONArray) kohaUser.get("requestedItems");
 		if (requestedItemsParsed != null && requestedItemsParsed.size() != 0) {
