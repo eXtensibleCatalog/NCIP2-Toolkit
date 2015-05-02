@@ -66,18 +66,24 @@ public class KohaLookupUserService implements LookupUserService {
 
 		try {
 
+			boolean authenticated = false;
 			if (initData.getAuthenticationInputs() != null && initData.getAuthenticationInputs().size() > 1) {
-				processAuthInput(initData, kohaRemoteServiceManager,responseData);
-			} else { // Regular lookup ..
+				processAuthInput(initData, kohaRemoteServiceManager, responseData);
+				authenticated = true;
+			}
 
+			if (desiredAnything(initData)) {
 				if (initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().trim().isEmpty()) {
 					responseData.setProblems(Arrays.asList(new Problem(new ProblemType("UserId is undefined."), null, null, "Cannot lookup unkown user ..")));
 				} else {
 					JSONObject kohaUser = kohaRemoteServiceManager.lookupUser(initData);
-
 					updateResponseData(initData, responseData, kohaUser, kohaRemoteServiceManager);
 				}
-			}
+			} else if (authenticated)
+				responseData.setUserId(initData.getUserId());
+			else
+				throw KohaException.create400BadRequestException("You have not desired anything processable");
+
 		} catch (MalformedURLException mue) {
 			Problem p = new Problem(new ProblemType("Processing MalformedURLException error."), null, mue.getMessage());
 			responseData.setProblems(Arrays.asList(p));
@@ -98,7 +104,14 @@ public class KohaLookupUserService implements LookupUserService {
 		return responseData;
 	}
 
-	private void processAuthInput(LookupUserInitiationData initData, KohaRemoteServiceManager kohaRemoteServiceManager, LookupUserResponseData responseData) throws KohaException, MalformedURLException, IOException, SAXException, URISyntaxException, org.json.simple.parser.ParseException {
+	private boolean desiredAnything(LookupUserInitiationData initData) {
+		return initData.getBlockOrTrapDesired() || initData.getDateOfBirthDesired() || initData.getLoanedItemsDesired() || initData.getNameInformationDesired()
+				|| initData.getRequestedItemsDesired() || initData.getUserAddressInformationDesired() || initData.getUserFiscalAccountDesired()
+				|| initData.getUserPrivilegeDesired();
+	}
+
+	private void processAuthInput(LookupUserInitiationData initData, KohaRemoteServiceManager kohaRemoteServiceManager, LookupUserResponseData responseData) throws KohaException,
+			MalformedURLException, IOException, SAXException, URISyntaxException, org.json.simple.parser.ParseException {
 		String userId = null, pass = null;
 		for (AuthenticationInput input : initData.getAuthenticationInputs()) {
 			if (input.getAuthenticationInputType().getValue().equalsIgnoreCase(Version1AuthenticationInputType.USER_ID.getValue())) {
@@ -111,10 +124,19 @@ public class KohaLookupUserService implements LookupUserService {
 		if (userId == null || pass == null || userId.isEmpty() || pass.isEmpty())
 			throw new KohaException(KohaException.INVALID_AUTHENTICATIONINPUT_FORMAT, "User Id or Password are empty or not specified.");
 
-		kohaRemoteServiceManager.authenticateUser(userId, pass); // Will throw Exception if something is wrong
-		
+		JSONObject response = kohaRemoteServiceManager.authenticateUser(userId, pass); // Will throw Exception if something is wrong
+
+		String authorized = (String) response.get("authorized");
+
+		if (authorized == null || !authorized.equals("y"))
+			throw new KohaException(KohaException.INVALID_CREDENTIALS_PROVIDED, "ILS could not authorize provided credentials - either User Id or Password is wrong");
+
+		String userIdVal = (String) response.get("borNo");
+		if (userIdVal == null || userIdVal.trim().isEmpty())
+			throw KohaException.create400BadRequestException("Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
+
 		// Setting user id means authentication was successful - otherwise there should be thrown an Problem element instead
-		responseData.setUserId(KohaUtil.createUserId(userId));
+		initData.setUserId(KohaUtil.createUserId(userIdVal));
 	}
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)

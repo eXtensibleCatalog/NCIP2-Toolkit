@@ -76,6 +76,7 @@ public class KohaConstants {
 
 	public static final String PARAM_SERVICE = "service";
 
+	public static final String PARAM_BOR_NO_DESIRED = "borNoDesired";
 	public static final String PARAM_LOANED_ITEMS_DESIRED = "loanedItemsDesired";
 	public static final String PARAM_REQUESTED_ITEMS_DESIRED = "requestedItemsDesired";
 	public static final String PARAM_CIRCULATION_STATUS_DESIRED = "circulationStatusDesired";

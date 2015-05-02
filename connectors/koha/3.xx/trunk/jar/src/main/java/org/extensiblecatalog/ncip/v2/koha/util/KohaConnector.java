@@ -130,21 +130,17 @@ public class KohaConnector {
 
 	}
 
-	public void authenticateUser(String userId, String pw) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
+	public JSONObject authenticateUser(String userId, String pw) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER);
 
 		urlBuilder.addRequest(KohaConstants.PARAM_USER_ID, userId);
 		urlBuilder.addRequest(KohaConstants.PARAM_PW, pw);
 
+		urlBuilder.addRequest(KohaConstants.PARAM_BOR_NO_DESIRED);
+
 		String rawResponse = getPlainTextResponse(urlBuilder.toURL());
 
-		JSONObject response = (JSONObject) jsonParser.parse(rawResponse);
-
-		String authorized = (String) response.get("authorized");
-
-		if (authorized == null || !authorized.equals("y"))
-			throw new KohaException(KohaException.INVALID_CREDENTIALS_PROVIDED, "ILS could not authorize provided credentials - either User Id or Password is wrong");
-
+		return (JSONObject) jsonParser.parse(rawResponse);
 	}
 
 	/**
