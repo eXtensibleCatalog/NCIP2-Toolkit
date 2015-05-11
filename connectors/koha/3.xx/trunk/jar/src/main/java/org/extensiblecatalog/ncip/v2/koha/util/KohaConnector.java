@@ -1,34 +1,38 @@
 package org.extensiblecatalog.ncip.v2.koha.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
-import org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
@@ -119,15 +123,41 @@ public class KohaConnector {
 				throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to create svc authentication url from toolkit.properties");
 			}
 
+			//FIXME: Set this SSL trustworthy from configuration
+			SSLContext ctx = SSLContext.getInstance("TLS");
+			ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
+			SSLContext.setDefault(ctx);
+
+			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+				@Override
+				public boolean verify(String arg0, SSLSession arg1) {
+					return true;
+				}
+			});
+
 		} catch (ToolkitException e) {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
 
-		} catch (SAXException e1) {
-			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
-		} catch (ParserConfigurationException e1) {
+		} catch (Exception e1) {
 			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
 		}
 
+	}
+
+	private static class DefaultTrustManager implements X509TrustManager {
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return null;
+		}
 	}
 
 	public JSONObject authenticateUser(String userId, String pw) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
@@ -407,28 +437,36 @@ public class KohaConnector {
 
 	private String getPlainTextResponse(URL url, String identifier) throws KohaException, IOException, SAXException, URISyntaxException {
 
-		Client client = ClientBuilder.newClient();
-
-		WebTarget target = client.target(url.toURI());
-
-		Builder builder = target.request(MediaType.TEXT_PLAIN_TYPE).header("Cookie", currentSessionIdCookie);
-		Response response = builder.get();
-
-		int statusCode = response.getStatus();
+		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		conn.addRequestProperty("Cookie", currentSessionIdCookie);
+		int statusCode = conn.getResponseCode();
 		if (statusCode != 403) {
 			loginAttempts = 0;
-			String responseEntity = response.readEntity(String.class);
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			StringBuilder stringBuilder = new StringBuilder();
+
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				stringBuilder.append(line + "\n");
+			}
+			String responseEntity = stringBuilder.toString();
 
 			if (statusCode == 200) {
+				conn.disconnect();
 				return responseEntity;
 			} else if (statusCode == 400) {
+				conn.disconnect();
 				throw KohaException.create400BadRequestException(responseEntity);
 			} else if (statusCode == 404) {
+				conn.disconnect();
 				throw KohaException.create404NotFoundException(responseEntity, identifier);
 			} else {
+				conn.disconnect();
 				throw KohaException.createCommonException(statusCode, responseEntity);
 			}
 		} else {
+			conn.disconnect();
 			renewSessionCookie();
 			return getPlainTextResponse(url, identifier);
 		}
