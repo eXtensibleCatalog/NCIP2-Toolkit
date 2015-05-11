@@ -1,5 +1,4 @@
-# Note that after each little change here you should copy this file to /connectors/koha/20/trunk/jar/src/test/resources in orded to pass tests
-# But keep in mind this is configuration file which are all mandatory informations parsed for connector
+# This is configuration for tests only .. to edit configuration of real responder, edit web/src/main/resources/toolkit.properties ..
 
 ToolkitConfiguration.PropertiesFileTitle=KohaWeb
 Connector.ConfigClass=org.extensiblecatalog.ncip.v2.koha.util.KohaConfiguration
@@ -38,23 +37,24 @@ NCIPServiceValidatorConfiguration.ValidateMessagesAgainstSchema=true
 CoreConfiguration.IncludeStackTracesInProblemResponses=true
 
 # Koha Configuration
-AgencyUnstructuredAddress=LibraryAddressHere
-AgencyTranslatedName=LibraryNameHere
-AgencyId=LibrarySIGLAHere
+AgencyUnstructuredAddress=Smetanova 173, \u010C. T\u0159ebová, 560 02
+AgencyTranslatedName=M\u011Bstská knihovna \u010Ceská T\u0159ebová
+AgencyId=KOHALIB1
 
 # Set this link to your client's registration site
-UserRegistrationLink=LibraryRegistrationLinkHere
+UserRegistrationLink=http://vufind.katalogknih.cz/MyResearch/Home
 
 AuthDataFormatType=text/plain
 
-OPACServer=KohaIPHere
+# OPACServer must be in format without backslash at the end & does have to include either https:// or http://
+OPACServer=https://serverHostName
 OPACPort=80
 SVCPort=8080
 
 SVCSuffix=cgi-bin/koha/svc
 
-AdminName=IntranetAdministratorNameHere
-AdminPass=IntranetAdministratorPassHere
+AdminName=userName
+AdminPass=userPassword
 
 CurrencyCode=CZK
 

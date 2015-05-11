@@ -12,7 +12,6 @@ import org.apache.commons.lang.ArrayUtils;
 public class URLBuilder {
 
 	private Map<String, String> params = new HashMap<String, String>();
-	private boolean secured;
 	private String[] path;
 	private String base;
 	private String port;
@@ -27,13 +26,6 @@ public class URLBuilder {
 		return this;
 	}
 
-	public URLBuilder setBase(String server, String port, boolean isSecured) {
-		base = server;
-		this.port = port;
-		secured = isSecured;
-		return this;
-	}
-
 	/**
 	 * By default is built not secure connection You should call this function
 	 * only if you want to establish secured connection (https URL prefix)
@@ -43,7 +35,6 @@ public class URLBuilder {
 	public URLBuilder setBase(String server, String port) {
 		base = server;
 		this.port = port;
-		secured = false;
 		return this;
 	}
 
@@ -56,7 +47,6 @@ public class URLBuilder {
 	public URLBuilder setBase(String server) {
 		base = server;
 		port = "80";
-		secured = false;
 		return this;
 	}
 
@@ -78,7 +68,7 @@ public class URLBuilder {
 		if (serverAndPort.length == 2)
 			port = serverAndPort[1];
 
-		this.setBase(serverAndPort[0], port == null || port.isEmpty() ? "80" : port, linkParts[0].contains("https"));
+		this.setBase(serverAndPort[0], port == null || port.isEmpty() ? "80" : port);
 
 		this.setPath(Arrays.copyOfRange(linkParts, 3, linkParts.length));
 		return this;
@@ -87,11 +77,6 @@ public class URLBuilder {
 	public URL toURL() throws MalformedURLException {
 		StringBuilder sb = new StringBuilder();
 
-		if (secured == false) {
-			sb.append("http://");
-		} else {
-			sb.append("https://");
-		}
 
 		sb.append(base);
 		sb.append(":");

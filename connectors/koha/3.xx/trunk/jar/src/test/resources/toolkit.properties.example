@@ -46,7 +46,8 @@ UserRegistrationLink=http://vufind.katalogknih.cz/MyResearch/Home
 
 AuthDataFormatType=text/plain
 
-OPACServer=188.166.14.82
+# OPACServer must be in format without backslash at the end & does have to include either https:// or http://
+OPACServer=https://serverHostName
 OPACPort=80
 SVCPort=8080
 
