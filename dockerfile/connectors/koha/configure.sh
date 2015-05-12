@@ -13,7 +13,9 @@ read -e -p "Enter your SIGLA: " sigla
 echo ""
 read -e -p "Enter URL of your online registration form (optional): " registrationLink
 echo ""
-read -e -p "Enter IP address of your OPAC: " opac
+echo "Enter the hostname of your OPAC (e.g. http://ceska-trebova.cz or https://188.166.14.82)"
+echo "PLEASE INCLUDE http:// OR https:// ! It is also important not to add the backslash at the end"
+read -e -p "Hostname of your OPAC:" opac
 echo ""
 echo "Please note that toolkit's koha connector cannot work without access to intranet, thus it is needed to provide."
 echo ""
