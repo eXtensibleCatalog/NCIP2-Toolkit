@@ -51,6 +51,9 @@ OPACServer=https://serverHostName
 OPACPort=80
 SVCPort=8080
 
+# Set this to true only for testing purposes & only when you know your OPAC is having unsigned certificate 
+TrustAllCertificates=false
+
 SVCSuffix=cgi-bin/koha/svc
 
 AdminName=userName

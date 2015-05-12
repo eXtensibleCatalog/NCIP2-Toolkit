@@ -123,17 +123,24 @@ public class KohaConnector {
 				throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to create svc authentication url from toolkit.properties");
 			}
 
-			//FIXME: Set this SSL trustworthy from configuration
-			SSLContext ctx = SSLContext.getInstance("TLS");
-			ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
-			SSLContext.setDefault(ctx);
+			try {
+				// This try block checks for "TrustAllCertificates" in configuration & if it is set to "true"
 
-			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-				@Override
-				public boolean verify(String arg0, SSLSession arg1) {
-					return true;
+				if (Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_TRUST_ALL_CERTIFICATES))) {
+					SSLContext ctx = SSLContext.getInstance("TLS");
+					ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
+					SSLContext.setDefault(ctx);
+
+					HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+						@Override
+						public boolean verify(String arg0, SSLSession arg1) {
+							return true;
+						}
+					});
 				}
-			});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		} catch (ToolkitException e) {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
@@ -443,7 +450,12 @@ public class KohaConnector {
 		if (statusCode != 403) {
 			loginAttempts = 0;
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			BufferedReader reader;
+			if (statusCode == 200)
+				reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			else
+				reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+
 			StringBuilder stringBuilder = new StringBuilder();
 
 			String line = null;
