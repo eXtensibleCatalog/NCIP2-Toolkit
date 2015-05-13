@@ -132,9 +132,15 @@ public class KohaLookupUserService implements LookupUserService {
 			throw new KohaException(KohaException.INVALID_CREDENTIALS_PROVIDED, "ILS could not authorize provided credentials - either User Id or Password is wrong");
 
 		String userIdVal = (String) response.get("borNo");
-		if (userIdVal == null || userIdVal.trim().isEmpty())
-			throw KohaException.create400BadRequestException("Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
-
+		if (userIdVal == null || userIdVal.trim().isEmpty()) {
+			try {
+				// We need to verify userId is an integer all the time - if it is, then we don't need userIdVal from Koha ILS - we actually supplied it
+				userIdVal = String.valueOf((Integer.parseInt(userId)));
+			} catch (NumberFormatException e) {
+				// If it's thrown, that mean userId is an string & Koha ILS unexpectedly returned successful authentication
+				throw KohaException.create400BadRequestException("Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
+			}
+		}
 		// Setting user id means authentication was successful - otherwise there should be thrown an Problem element instead
 		initData.setUserId(KohaUtil.createUserId(userIdVal, LocalConfig.getDefaultAgency()));
 	}
@@ -202,7 +208,7 @@ public class KohaLookupUserService implements LookupUserService {
 				userOptionalFields.setDateOfBirth(KohaUtil.parseGregorianCalendarFromKohaDate(dateOfBirth));
 			}
 		}
-		
+
 		UserId userId = KohaUtil.createUserId(initData.getUserId().getUserIdentifierValue(), LocalConfig.getDefaultAgency());
 		responseData.setUserId(userId);
 
