@@ -21,6 +21,7 @@ import org.extensiblecatalog.ncip.v2.aleph.user.AlephRestDlfUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephUtil;
+import org.extensiblecatalog.ncip.v2.aleph.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
@@ -178,7 +179,10 @@ public class AlephLookupUserService implements LookupUserService {
 			if (responseHeader != null)
 				responseData.setResponseHeader(responseHeader);
 
-			responseData.setUserId(initData.getUserId());
+			UserId userId = new UserId();			
+			userId.setUserIdentifierValue(initData.getUserId().getUserIdentifierValue());
+			userId.setAgencyId(AlephUtil.createAgencyId(LocalConfig.getDefaultAgency())); // Default agency from config is important here ..
+			responseData.setUserId(userId);
 
 			boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
 			boolean requestedItemsDesired = initData.getRequestedItemsDesired();
