@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.koha;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
 import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
@@ -10,6 +11,7 @@ import org.extensiblecatalog.ncip.v2.service.AuthenticationDataFormatType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationPrompt;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationPromptType;
+import org.extensiblecatalog.ncip.v2.service.ConsortiumAgreement;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupAgencyService;
@@ -81,40 +83,17 @@ public class KohaLookupAgencyService implements LookupAgencyService {
 
 				if (getAgencyAddressInformation)
 					responseData.setAgencyAddressInformations(Arrays.asList(kohaSvcMgr.getAgencyPhysicalAddressInformation()));
+				
+				// TODO: How about returning optional phone numbers in AgencyAddressInfromations ? 
 
 				if (getOrganizationNameInformation)
 					responseData.setOrganizationNameInformations(kohaSvcMgr.getOrganizationNameInformations());
 
-				if (getAuthenticationPrompt) {
-					AuthenticationPrompt authenticationPrompt = new AuthenticationPrompt();
-
-					PromptOutput promptOutput = new PromptOutput();
-
-					AuthenticationPromptType authenticationPromptType = new AuthenticationPromptType("", "User Registration Link");
-					promptOutput.setAuthenticationPromptType(authenticationPromptType);
-
-					promptOutput.setAuthenticationPromptData(registrationLink);
-
-					authenticationPrompt.setPromptOutput(promptOutput);
-
-					PromptInput promptInput = new PromptInput();
-
-					AuthenticationDataFormatType authenticationDataFormatType;
-
-					String authenticationDataFormatTypeScheme = Version1AuthenticationDataFormatType.VERSION_1_AUTHENTICATION_DATA_FORMAT_TYPE;
-					String authenticationDataFormatTypeValue = LocalConfig.getAuthDataFormatType();
-
-					authenticationDataFormatType = new Version1AuthenticationDataFormatType(authenticationDataFormatTypeScheme, authenticationDataFormatTypeValue);
-					promptInput.setAuthenticationDataFormatType(authenticationDataFormatType);
-
-					String authenticationInputTypeScheme = Version1AuthenticationInputType.VERSION_1_AUTHENTICATION_INPUT_TYPE;
-					String authenticationInputTypeValue = ""; // This AuthenticationInput is used to forward user registration link.
-
-					promptInput.setAuthenticationInputType(new AuthenticationInputType(authenticationInputTypeScheme, authenticationInputTypeValue));
-
-					authenticationPrompt.setPromptInput(promptInput);
-					responseData.setAuthenticationPrompts(Arrays.asList(authenticationPrompt));
+				if (getConsortiumAgreement) {
+					ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("RegistrationLink", registrationLink);
+					responseData.setConsortiumAgreements(Arrays.asList(consortiumAgreement));
 				}
+				
 				responseData.setAgencyId(KohaUtil.createAgencyId(localAgencyId));
 			}
 		}
