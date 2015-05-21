@@ -1,101 +1,27 @@
+<?xml version="1.0" encoding="windows-1252"?>
 <ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
    <ns1:LookupRequestResponse>
       <ns1:RequestId>
-         <ns1:RequestIdentifierValue>005056681</ns1:RequestIdentifierValue>
+         <ns1:AgencyId>DOSP</ns1:AgencyId>
+         <ns1:RequestIdentifierValue>133</ns1:RequestIdentifierValue>
       </ns1:RequestId>
       <ns1:ItemId>
-         <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH</ns1:AgencyId>
+         <ns1:AgencyId>DOSP</ns1:AgencyId>
          <ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Accession Number</ns1:ItemIdentifierType>
-         <ns1:ItemIdentifierValue>KOH01000065021-KOH50000065021000010</ns1:ItemIdentifierValue>
+         <ns1:ItemIdentifierValue>1</ns1:ItemIdentifierValue>
       </ns1:ItemId>
       <ns1:UserId>
-         <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH</ns1:AgencyId>
+         <ns1:AgencyId>DOSP</ns1:AgencyId>
          <ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Institution Id Number</ns1:UserIdentifierType>
-         <ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
+         <ns1:UserIdentifierValue>3</ns1:UserIdentifierValue>
       </ns1:UserId>
       <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Hold</ns1:RequestType>
       <ns1:RequestScopeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requestscopetype/requestscopetype.scm">Item</ns1:RequestScopeType>
       <ns1:RequestStatusType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requeststatustype/requeststatustype.scm">In Process</ns1:RequestStatusType>
-      <ns1:EarliestDateNeeded>2014-10-22T22:00:00Z</ns1:EarliestDateNeeded>
-      <ns1:NeedBeforeDate>2015-10-22T22:00:00Z</ns1:NeedBeforeDate>
-      <ns1:PickupDate>2014-10-24T15:44:00Z</ns1:PickupDate>
-      <ns1:PickupLocation>Loan Department - Ground floor</ns1:PickupLocation>
-      <ns1:DateOfUserRequest>2014-10-23T15:44:00Z</ns1:DateOfUserRequest>
-      <ns1:ItemOptionalFields>
-         <ns1:BibliographicDescription>
-            <ns1:ComponentId>
-               <ns1:ComponentIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/bibliographicrecordidentifiercode/bibliographicrecordidentifiercode.scm">Accession Number</ns1:ComponentIdentifierType>
-               <ns1:ComponentIdentifier>2610034811</ns1:ComponentIdentifier>
-            </ns1:ComponentId>
-            <ns1:Publisher>Dům techniky ČSVTS,</ns1:Publisher>
-            <ns1:Title>Aktiv revizních techniků elektrických zařízení</ns1:Title>
-            <ns1:SponsoringBody>In process</ns1:SponsoringBody>
-            <ns1:MediumType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm">Book</ns1:MediumType>
-         </ns1:BibliographicDescription>
-         <ns1:ItemUseRestrictionType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/itemuserestrictiontype/itemuserestrictiontype.scm">In Library Use Only</ns1:ItemUseRestrictionType>
-         <ns1:CirculationStatus ns1:Scheme="localized">In process</ns1:CirculationStatus>
-         <ns1:HoldQueueLength>0</ns1:HoldQueueLength>
-         <ns1:ItemDescription>
-            <ns1:CallNumber>2-0805.673</ns1:CallNumber>
-            <ns1:HoldingsInformation>
-               <ns1:UnstructuredHoldingsData>1996</ns1:UnstructuredHoldingsData>
-            </ns1:HoldingsInformation>
-         </ns1:ItemDescription>
-         <ns1:Location>
-            <ns1:LocationType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/locationtype/locationtype.scm">Permanent Location</ns1:LocationType>
-            <ns1:LocationName>
-               <ns1:LocationNameInstance>
-                  <ns1:LocationNameLevel>1</ns1:LocationNameLevel>
-                  <ns1:LocationNameValue>KOH?</ns1:LocationNameValue>
-               </ns1:LocationNameInstance>
-               <ns1:LocationNameInstance>
-                  <ns1:LocationNameLevel>2</ns1:LocationNameLevel>
-                  <ns1:LocationNameValue>Stock / within 1 hour</ns1:LocationNameValue>
-               </ns1:LocationNameInstance>
-            </ns1:LocationName>
-         </ns1:Location>
-      </ns1:ItemOptionalFields>
-      <ns1:UserOptionalFields>
-         <ns1:NameInformation>
-            <ns1:PersonalNameInformation>
-               <ns1:StructuredPersonalUserName>
-                  <ns1:Surname>Pokus1 Přijmení</ns1:Surname>
-               </ns1:StructuredPersonalUserName>
-            </ns1:PersonalNameInformation>
-         </ns1:NameInformation>
-         <ns1:UserAddressInformation>
-            <ns1:UserAddressRoleType ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Ship To</ns1:UserAddressRoleType>
-            <ns1:PhysicalAddress>
-               <ns1:StructuredAddress>
-                  <ns1:Street>Trvalá ulice 123</ns1:Street>
-                  <ns1:Locality>Trvalé</ns1:Locality>
-                  <ns1:PostalCode>12345 </ns1:PostalCode>
-               </ns1:StructuredAddress>
-               <ns1:PhysicalAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Postal Address</ns1:PhysicalAddressType>
-            </ns1:PhysicalAddress>
-         </ns1:UserAddressInformation>
-         <ns1:UserAddressInformation>
-            <ns1:UserAddressRoleType ns1:Scheme="http://www.niso.org/ncip/v2_0/imp1/schemes/useraddressroletype/useraddressroletype.scm">Notice</ns1:UserAddressRoleType>
-            <ns1:ElectronicAddress>
-               <ns1:ElectronicAddressType ns1:Scheme="http://www.iana.org/assignments/uri-schemes">mailserver</ns1:ElectronicAddressType>
-               <ns1:ElectronicAddressData>test@mzk.cz</ns1:ElectronicAddressData>
-            </ns1:ElectronicAddress>
-         </ns1:UserAddressInformation>
-         <ns1:UserPrivilege>
-            <ns1:AgencyId>KOH</ns1:AgencyId>
-            <ns1:AgencyUserPrivilegeType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/agencyuserprivilegetype/agencyuserprivilegetype.scm">KOH type</ns1:AgencyUserPrivilegeType>
-            <ns1:ValidFromDate>2010-08-29T22:00:00Z</ns1:ValidFromDate>
-            <ns1:ValidToDate>2099-12-30T23:00:00Z</ns1:ValidToDate>
-            <ns1:UserPrivilegeDescription>04 - S</ns1:UserPrivilegeDescription>
-         </ns1:UserPrivilege>
-         <ns1:BlockOrTrap>
-            <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">KOH50</ns1:AgencyId>
-            <ns1:BlockOrTrapType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm">Protokol</ns1:BlockOrTrapType>
-         </ns1:BlockOrTrap>
-         <ns1:UserId>
-            <ns1:UserIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleuseridentifiertype/visibleuseridentifiertype.scm">Barcode</ns1:UserIdentifierType>
-            <ns1:UserIdentifierValue>700</ns1:UserIdentifierValue>
-         </ns1:UserId>
-      </ns1:UserOptionalFields>
+      <ns1:HoldQueuePosition>1</ns1:HoldQueuePosition>
+      <ns1:EarliestDateNeeded>2015-05-02T00:00:00Z</ns1:EarliestDateNeeded>
+      <ns1:PickupLocation>DOSP</ns1:PickupLocation>
+      <ns1:DateOfUserRequest>2015-05-02T17:32:37Z</ns1:DateOfUserRequest>
+      <ns1:DateAvailable>2015-05-21T19:15:12.275Z</ns1:DateAvailable>
    </ns1:LookupRequestResponse>
 </ns1:NCIPMessage>
