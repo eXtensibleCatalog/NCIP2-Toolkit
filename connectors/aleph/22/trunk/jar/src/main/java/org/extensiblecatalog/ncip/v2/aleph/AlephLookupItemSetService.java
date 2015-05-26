@@ -304,7 +304,6 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					bibInformations.add(bibInformation);
 					++itemsForwarded;
 				}
-				throw new Exception();
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
