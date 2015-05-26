@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaConstants;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
@@ -119,7 +120,7 @@ public class KohaLookupRequestService implements LookupRequestService {
 			} catch (ServiceException e) {
 				throw e;
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 			}
 		}

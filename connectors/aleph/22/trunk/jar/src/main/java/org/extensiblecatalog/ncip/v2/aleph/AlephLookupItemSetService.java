@@ -9,6 +9,7 @@ import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
@@ -303,6 +304,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 					bibInformations.add(bibInformation);
 					++itemsForwarded;
 				}
+				throw new Exception();
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
@@ -320,7 +322,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			}
@@ -446,7 +448,7 @@ public class AlephLookupItemSetService implements LookupItemSetService {
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			}

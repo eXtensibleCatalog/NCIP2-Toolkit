@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.annotation.Resource.AuthenticationType;
 
+import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -97,7 +98,7 @@ public class KohaLookupUserService implements LookupUserService {
 			Problem p = new Problem(new ProblemType(ke.getShortMessage()), null, ke.getMessage());
 			responseData.setProblems(Arrays.asList(p));
 		} catch (Exception e) {
-			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+			Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 			responseData.setProblems(Arrays.asList(p));
 
 		}

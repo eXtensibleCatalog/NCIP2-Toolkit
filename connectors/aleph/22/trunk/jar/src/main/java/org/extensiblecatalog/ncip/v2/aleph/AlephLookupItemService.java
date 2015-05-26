@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.item.AlephItem;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephRemoteServiceManager;
@@ -89,7 +90,7 @@ public class AlephLookupItemService implements LookupItemService {
 				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 			}
 		}

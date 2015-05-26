@@ -9,6 +9,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.aleph.user.AlephXServicesUser;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephConstants;
 import org.extensiblecatalog.ncip.v2.aleph.util.AlephException;
@@ -126,7 +127,7 @@ public class AlephUpdateUserService implements NCIPService<UpdateUserInitiationD
 						"Couldn't convert XMLBuilder to String using asString() method.");
 				responseData.setProblems(Arrays.asList(p));
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 			}
 

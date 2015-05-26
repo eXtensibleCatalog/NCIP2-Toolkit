@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.aspectj.weaver.ArrayAnnotationValue;
 import org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0.jaxb.elements.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
@@ -90,7 +91,7 @@ public class KohaLookupItemService implements LookupItemService {
 				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, e.getMessage());
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 			}
 		}
