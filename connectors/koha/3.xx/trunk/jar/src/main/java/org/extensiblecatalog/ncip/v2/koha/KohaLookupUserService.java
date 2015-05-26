@@ -146,7 +146,7 @@ public class KohaLookupUserService implements LookupUserService {
 	}
 
 	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
-			throws ParseException {
+			throws ParseException, KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 

@@ -455,7 +455,7 @@ public class KohaUtil {
 		return true;
 	}
 
-	public static RequestedItem parseRequestedItem(JSONObject requestedItemParsed) throws ParseException {
+	public static RequestedItem parseRequestedItem(JSONObject requestedItemParsed) throws ParseException, KohaException {
 
 		RequestedItem requestedItem = new RequestedItem();
 
@@ -471,8 +471,10 @@ public class KohaUtil {
 		if (branchCode != null)
 			requestedItem.setPickupLocation(new PickupLocation(branchCode));
 
-		if (itemId != null)
+		if (itemId != null) {
 			requestedItem.setItemId(createItemId(itemId, branchCode));
+		} else
+			throw KohaException.create500InternalServerError("Cannot process RequestItem without it's ItemIdentifierValue");
 
 		requestedItem.setRequestId(createRequestId(requestId, branchCode));
 

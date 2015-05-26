@@ -17,6 +17,7 @@ public class KohaException extends Exception {
 	public static final String ITEM_NOT_FOUND = "Item not found";
 	public static final String BAD_REQUEST_400 = "400 Bad Request";
 	public static final String NOT_FOUND_404 = "404 Not Found";
+	public static final String INTERNAL_SERVER_ERROR_500 = "500 Internal Server Error";
 
 	private String shortMessage;
 	private String notFoundIdentifierValue;
@@ -48,6 +49,10 @@ public class KohaException extends Exception {
 
 	public static KohaException create404NotFoundException(String message, String notFoundIdentifierValue) {
 		return new KohaException(KohaException.NOT_FOUND_404, message, notFoundIdentifierValue);
+	}
+	
+	public static KohaException create500InternalServerError(String message) {
+		return new KohaException(KohaException.INTERNAL_SERVER_ERROR_500, message);
 	}
 
 	public static KohaException createCommonException(int status, String message) {
