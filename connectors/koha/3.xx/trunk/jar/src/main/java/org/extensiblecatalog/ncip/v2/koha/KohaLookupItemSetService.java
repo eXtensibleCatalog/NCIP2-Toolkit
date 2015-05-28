@@ -20,6 +20,7 @@ import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
+import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -163,9 +164,9 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 			try {
 				if (bibId.getBibliographicRecordId() != null) {
-					String bibIdVal = bibId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+					String bibRecordIdVal = bibId.getBibliographicRecordId().getBibliographicRecordIdentifier();
 
-					if (bibIdVal.isEmpty()) {
+					if (bibRecordIdVal.isEmpty()) {
 						if (wantSeeAllProblems) {
 							Problem problem = new Problem(new ProblemType("Empty BibliographicRecordIdentifierValue."), null,
 									"Here you have specified empty BibliographicRecordIdentifierValue.");
@@ -176,40 +177,11 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 						continue;
 					}
 
-					JSONObject response = kohaSvcMgr.lookupItemSet(bibIdVal, initData);
-
 					bibInformation.setBibliographicId(bibId);
 
-					holdingSets = Arrays.asList(parseHoldingsSetFromLookupItemSet(response, initData, bibIdVal));
+					JSONObject kohaItem = kohaSvcMgr.lookupItem(bibRecordIdVal, initData);
 
-					bibInformation.setHoldingsSets(holdingSets);
-
-					bibInformations.add(bibInformation);
-
-					if (newTokenKey != null) {
-						responseData.setNextItemToken(newTokenKey);
-						newTokenKey = null;
-						break;
-					}
-
-				} else if (bibId.getBibliographicItemId() != null) {
-					String itemIdVal = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
-
-					if (itemIdVal.isEmpty()) {
-						if (wantSeeAllProblems) {
-							Problem problem = new Problem(new ProblemType("Empty BibliographicItemIdentifierValue."), null,
-									"Here you have specified empty BibliographicItemIdentifierValue.");
-							bibInformation.setProblems(Arrays.asList(problem));
-							bibInformations.add(bibInformation);
-						}
-						continue;
-					}
-
-					bibInformation.setBibliographicId(bibId);
-
-					JSONObject kohaItem = kohaSvcMgr.lookupItem(itemIdVal, initData);
-
-					holdingSets = Arrays.asList(parseHoldingsSetFromLookupItem(kohaItem, initData, itemIdVal));
+					holdingSets = Arrays.asList(parseHoldingsSetFromLookupItem(kohaItem, initData, bibRecordIdVal));
 
 					bibInformation.setHoldingsSets(holdingSets);
 
@@ -222,7 +194,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 					if (createNextItemToken) {
 
 						ItemToken itemToken = new ItemToken();
-						itemToken.setBibliographicId(itemIdVal);
+						itemToken.setBibliographicId(bibRecordIdVal);
 
 						int newToken = random.nextInt();
 
@@ -232,6 +204,36 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 						responseData.setNextItemToken(Integer.toString(newToken));
 						break;
 					}
+					
+				} else if (bibId.getBibliographicItemId() != null) {
+					String bibItemIdVal = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
+
+					if (bibItemIdVal.isEmpty()) {
+						if (wantSeeAllProblems) {
+							Problem problem = new Problem(new ProblemType("Empty BibliographicItemIdentifierValue."), null,
+									"Here you have specified empty BibliographicItemIdentifierValue.");
+							bibInformation.setProblems(Arrays.asList(problem));
+							bibInformations.add(bibInformation);
+						}
+						continue;
+					}
+
+					JSONObject response = kohaSvcMgr.lookupItemSet(bibItemIdVal, initData);
+
+					bibInformation.setBibliographicId(bibId);
+
+					holdingSets = Arrays.asList(parseHoldingsSetFromLookupItemSet(response, initData, bibItemIdVal));
+
+					bibInformation.setHoldingsSets(holdingSets);
+
+					bibInformations.add(bibInformation);
+
+					if (newTokenKey != null) {
+						responseData.setNextItemToken(newTokenKey);
+						newTokenKey = null;
+						break;
+					}
+
 
 				} else {
 
@@ -338,8 +340,8 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 				JSONObject kohaItem = kohaSvcMgr.lookupItem(itemIdVal, initData);
 
 				BibliographicId bibliographicId = new BibliographicId();
-				BibliographicItemId bibliographicItemId = KohaUtil.createBibliographicItemIdAsLegalDepositNumber(itemIdVal);
-				bibliographicId.setBibliographicItemId(bibliographicItemId);
+				BibliographicRecordId bibliographicItemId = KohaUtil.createBibliographicRecordIdAsAccessionNumber(itemIdVal);
+				bibliographicId.setBibliographicRecordId(bibliographicItemId);
 
 				bibInformation.setBibliographicId(bibliographicId);
 

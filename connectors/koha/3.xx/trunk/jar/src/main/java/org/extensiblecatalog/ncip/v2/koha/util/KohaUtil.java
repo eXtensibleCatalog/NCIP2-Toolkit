@@ -3,6 +3,7 @@ package org.extensiblecatalog.ncip.v2.koha.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -613,7 +614,7 @@ public class KohaUtil {
 		if (homeBranch != null) {
 
 			LocationNameInstance locationNameInstance = new LocationNameInstance();
-			locationNameInstance.setLocationNameLevel(new BigDecimal(2));
+			locationNameInstance.setLocationNameLevel(new BigDecimal(4));
 			locationNameInstance.setLocationNameValue(homeBranch);
 			locationNameInstances.add(locationNameInstance);
 		}
@@ -636,21 +637,16 @@ public class KohaUtil {
 		String title = (String) itemInfo.get("title");
 		String isbn = (String) itemInfo.get("isbn");
 
-		if (isbn != null) {
-			List<BibliographicItemId> bibliographicItemIds = new ArrayList<BibliographicItemId>();
+		if (bibId != null) {
+			BibliographicItemId bibliographicItemId = new BibliographicItemId();
+			bibliographicItemId.setBibliographicItemIdentifier(bibId);
+			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+		} else if (isbn != null) {
 			BibliographicItemId bibliographicItemId = new BibliographicItemId();
 			bibliographicItemId.setBibliographicItemIdentifier(isbn);
 			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.ISBN);
-			bibliographicItemIds.add(bibliographicItemId);
-			bibliographicDescription.setBibliographicItemIds(bibliographicItemIds);
-		}
-
-		if (bibId != null) {
-			ComponentId componentId = new ComponentId();
-			componentId.setComponentIdentifier(bibId);
-			componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getScheme(),
-					Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
-			bibliographicDescription.setComponentId(componentId);
+			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
 		}
 
 		bibliographicDescription.setAuthor(author);
@@ -743,5 +739,12 @@ public class KohaUtil {
 		LIinitData.setItemUseRestrictionTypeDesired(initData.getItemUseRestrictionTypeDesired());
 		LIinitData.setLocationDesired(initData.getLocationDesired());
 		return LIinitData;
+	}
+
+	public static BibliographicRecordId createBibliographicRecordIdAsAccessionNumber(String itemIdVal) {
+		BibliographicRecordId recordId = new BibliographicRecordId();
+		recordId.setBibliographicRecordIdentifier(itemIdVal);
+		recordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
+		return recordId;
 	}
 }
