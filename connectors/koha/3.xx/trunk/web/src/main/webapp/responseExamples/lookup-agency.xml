@@ -15,6 +15,6 @@
             <ns1:PhysicalAddressType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Street Address</ns1:PhysicalAddressType>
          </ns1:PhysicalAddress>
       </ns1:AgencyAddressInformation>
-      <ns1:ConsortiumAgreement ns1:Scheme="RegistrationLink">http://vufind.katalogknih.cz/MyResearch/Home</ns1:ConsortiumAgreement>
+      <ns1:ConsortiumAgreement ns1:Scheme="http://www.knihovny.cz/registration_link">http://vufind.katalogknih.cz/MyResearch/Home</ns1:ConsortiumAgreement>
    </ns1:LookupAgencyResponse>
 </ns1:NCIPMessage>
