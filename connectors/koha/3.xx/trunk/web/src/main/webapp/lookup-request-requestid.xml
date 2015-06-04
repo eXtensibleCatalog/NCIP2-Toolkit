@@ -3,7 +3,7 @@
 	ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
 	<ns1:LookupRequest>
 		<ns1:RequestId>
-			<ns1:RequestIdentifierValue>75</ns1:RequestIdentifierValue>
+			<ns1:RequestIdentifierValue>75</ns1:RequestIdentifierValue>
 		</ns1:RequestId>
 
 		<ns1:RequestElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/requestelementtype/requestelementtype.scm">User Id</ns1:RequestElementType>

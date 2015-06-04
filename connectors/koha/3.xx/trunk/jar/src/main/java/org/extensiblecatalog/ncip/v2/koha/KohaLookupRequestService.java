@@ -74,37 +74,11 @@ public class KohaLookupRequestService implements LookupRequestService {
 
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
-			boolean somethingSpecialDesired = initData.getInitiationHeader() != null && initData.getInitiationHeader().getApplicationProfileType() != null;
-
 			try {
-				if (!somethingSpecialDesired) {
 
 					JSONObject requestItem = kohaRemoteServiceManager.lookupRequest(initData, !requestIdIsEmpty);
 					updateRegularResponseData(responseData, initData, requestItem);
 
-				} else {
-					String desiredSpeciality = initData.getInitiationHeader().getApplicationProfileType().getValue();
-
-					if (desiredSpeciality != null && !desiredSpeciality.trim().isEmpty()) {
-						if (desiredSpeciality.equals(KohaConstants.APP_PROFILE_TYPE_CAN_BE_RENEWED)) {
-
-							JSONObject canBeRenewed = kohaRemoteServiceManager.canBeRenewed(initData);
-							updateCanBeRenewedResponseData(responseData, initData, canBeRenewed);
-
-						} else if (desiredSpeciality.equals(KohaConstants.APP_PROFILE_TYPE_CAN_BE_REQUESTED)) {
-
-							JSONObject canBeRequested = kohaRemoteServiceManager.canBeRequested(initData);
-							updateCanBeRequestedResponseData(responseData, initData, canBeRequested);
-
-						} else {
-							Problem p = new Problem(new ProblemType("Unrecognized value"), null, "InitiationHeader's ApplicationProfileType has an unknown value.");
-							responseData.setProblems(Arrays.asList(p));
-						}
-					} else {
-						Problem p = new Problem(new ProblemType("Empty value"), null, "InitiationHeader's ApplicationProfileType has an empty value.");
-						responseData.setProblems(Arrays.asList(p));
-					}
-				}
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
@@ -198,30 +172,4 @@ public class KohaLookupRequestService implements LookupRequestService {
 
 	}
 
-	private void updateCanBeRenewedResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, JSONObject canBeRenewedResponse)
-			throws ParseException {
-		String allowed = (String) canBeRenewedResponse.get("allowed");
-
-		if (allowed.equals("y")) {
-			String maxDateDue = (String) canBeRenewedResponse.get("maxDateDue");
-			if (maxDateDue != null) {
-				responseData.setNeedBeforeDate(KohaUtil.parseGregorianCalendarFromKohaDateWithBackslashes(maxDateDue));
-			}
-			responseData.setItemId(initData.getItemId());
-		} else {
-			Problem p = new Problem(new ProblemType("Not allowed"), null, "Desired item/bib id cannot be renewed.");
-			responseData.setProblems(Arrays.asList(p));
-		}
-	}
-
-	private void updateCanBeRequestedResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, JSONObject canBeRequestedResponse) {
-		String allowed = (String) canBeRequestedResponse.get("allowed");
-
-		if (allowed.equals("y")) {
-			responseData.setItemId(initData.getItemId());
-		} else {
-			Problem p = new Problem(new ProblemType("Not allowed"), null, "Desired item/bib id cannot be requested.");
-			responseData.setProblems(Arrays.asList(p));
-		}
-	}
 }

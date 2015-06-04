@@ -90,7 +90,7 @@ public class KohaLookupAgencyService implements LookupAgencyService {
 					responseData.setOrganizationNameInformations(kohaSvcMgr.getOrganizationNameInformations());
 
 				if (getConsortiumAgreement) {
-					ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("RegistrationLink", registrationLink);
+					ConsortiumAgreement consortiumAgreement = new ConsortiumAgreement("http://www.knihovny.cz/registration_link", registrationLink);
 					responseData.setConsortiumAgreements(Arrays.asList(consortiumAgreement));
 				}
 				
