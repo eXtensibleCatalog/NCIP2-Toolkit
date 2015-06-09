@@ -27,6 +27,7 @@
       <module>ncipv2_02</module>
       <module>ilsdiv1_0</module>
       <module>ilsdiv1_0_bc</module>
+      <module>ilsdiv1_1</module>
       <module>wclv1_0</module>
     </modules>
 

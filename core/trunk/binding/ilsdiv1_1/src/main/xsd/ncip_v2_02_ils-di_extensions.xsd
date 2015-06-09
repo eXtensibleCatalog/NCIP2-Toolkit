@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ........................................... -->
+<!-- NISO Circulation Interchange Protocol ..... -->
+<!--           ILS-DI Extensions                 -->
+<!-- ........................................... -->
+<!--
+Purpose:
+  This file defines the XML Schema for extensions to the NISO Circulation Interchange Protocol adopted by the
+  ILS Discover Interfaces group
+
+Dependencies:
+  ncip_v2_02.xsd.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://knihovny.cz/ILSDI/ncip/2015/extensions"
+           xmlns:ncip="http://www.niso.org/2008/ncip"
+           targetNamespace="http://knihovny.cz/ILSDI/ncip/2015/extensions"
+           elementFormDefault="qualified" attributeFormDefault="qualified">
+
+    <xs:import namespace="http://www.niso.org/2008/ncip" schemaLocation="ncip_v2_02.xsd"/>
+    
+</xs:schema>
