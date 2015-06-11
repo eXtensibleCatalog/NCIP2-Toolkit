@@ -24,20 +24,6 @@
 
 	<dependencies>
 
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-ilsdiv1_0_bc</artifactId>
-			<!-- <version>${project.version}</version> -->
-			<version>1.2-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-ncipv2_01</artifactId>
-			<version>${toolkitVersion}</version>
-			<scope>compile</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -45,11 +31,11 @@
 			<version>${toolkitVersion}</version>
 			<scope>compile</scope>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-ilsdiv1_0</artifactId>
-			<version>${toolkitVersion}</version>
+			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<artifactId>binding-ilsdiv1_1</artifactId>
+			<version>1.2-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 

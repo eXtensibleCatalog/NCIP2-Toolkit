@@ -68,25 +68,13 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-ncipv2_01</artifactId>
-			<version>${toolkitVersion}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>binding-ncipv2_02</artifactId>
 			<version>${toolkitVersion}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-ilsdiv1_0</artifactId>
-			<version>${toolkitVersion}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-wclv1_0</artifactId>
+			<artifactId>binding-ilsdiv1_1</artifactId>
 			<version>${toolkitVersion}</version>
 			<scope>compile</scope>
 		</dependency>

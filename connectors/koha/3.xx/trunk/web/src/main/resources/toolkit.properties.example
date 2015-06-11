@@ -15,16 +15,17 @@ RequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRequestItemServi
 RenewItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRenewItemService
 
 # NCIP 2_02
-DozerTranslatorConfiguration.MappingFiles=ncipv2_02_mappings.xml
-TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator
-NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements
-NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd
+#DozerTranslatorConfiguration.MappingFiles=ncipv2_02_mappings.xml
+#TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator
+#NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements
+#NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd
 
 # ILS
-#DozerTranslatorConfiguration.MappingFiles=ilsdiv1_0_bc_mappings.xml
-#TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.dozer.ILSDIv1_0_bc_JAXBDozerTranslator
-#NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_01.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.elements,ncip_v2_01_ils-di_bc_extensions.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.elements
-#NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_01_ils-di_bc_extensions.xsd
+ILSDIvOneOneLookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
+DozerTranslatorConfiguration.MappingFiles=ilsdiv1_1_mappings.xml
+TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_JAXBDozerTranslator
+NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements,ncip_v2_02_ils-di_extensions.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements
+NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd,ncip_v2_02_ils-di_extensions.xsd
 
 # To write copies of the NCIP messages (initiation & response) to the log:
 TranslatorConfiguration.LogMessages=true
