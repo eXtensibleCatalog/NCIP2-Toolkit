@@ -81,7 +81,7 @@ public class ILSDIv1_1_ContentMappingFactory extends BaseContentConverter<
         elementNamesToServiceClassMap.put("ItemUpdatedResponse", ItemUpdatedResponseData.class);
         elementNamesToServiceClassMap.put("LookupAgency", LookupAgencyInitiationData.class);
         elementNamesToServiceClassMap.put("LookupAgencyResponse", LookupAgencyResponseData.class);
-        elementNamesToServiceClassMap.put("LookupItemSet", LookupItemSetInitiationData.class);
+        elementNamesToServiceClassMap.put("LookupItemSet", ILSDIvOneOneLookupItemSetInitiationData.class);
         elementNamesToServiceClassMap.put("LookupItemSetResponse", LookupItemSetResponseData.class);
         elementNamesToServiceClassMap.put("LookupItem", LookupItemInitiationData.class);
         elementNamesToServiceClassMap.put("LookupItemResponse", LookupItemResponseData.class);

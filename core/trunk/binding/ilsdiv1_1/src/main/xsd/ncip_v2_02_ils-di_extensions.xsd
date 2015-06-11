@@ -20,4 +20,6 @@ Dependencies:
 
     <xs:import namespace="http://www.niso.org/2008/ncip" schemaLocation="ncip_v2_02.xsd"/>
     
+    <!-- No actual extensions done yet - this serves just do be capable of adding any new -->
+    
 </xs:schema>
