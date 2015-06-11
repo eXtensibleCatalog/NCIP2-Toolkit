@@ -1677,8 +1677,8 @@
             <a>bibliographicDescription</a>
             <b>ext</b>
         </field>
-        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_ExtensionConverter"
-                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.RenewalNotPermitted,org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.RenewalNotPermitted">
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_EmptyFieldExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.RenewalNotPermitted">
             <a>renewalNotPermitted</a>
             <b>ext</b>
         </field>
