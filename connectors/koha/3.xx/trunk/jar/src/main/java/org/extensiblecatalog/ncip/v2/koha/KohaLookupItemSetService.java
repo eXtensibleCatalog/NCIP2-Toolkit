@@ -19,17 +19,15 @@ import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.BibInformation;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
-import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetService;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
@@ -38,6 +36,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
+import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
@@ -46,7 +45,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
-public class KohaLookupItemSetService implements LookupItemSetService {
+public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LookupItemSetService {
 
 	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
@@ -65,7 +64,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	private ItemToken nextItemToken;
 
 	@Override
-	public LookupItemSetResponseData performService(LookupItemSetInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
+	public LookupItemSetResponseData performService(ILSDIvOneOneLookupItemSetInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
 			throws ServiceException {
 
 		maximumItemsCount = parseMaximumItemsCount(initData);
@@ -148,7 +147,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	 * @param kohaSvcMgr
 	 * @param nextItemToken
 	 */
-	private void parseBibIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, KohaRemoteServiceManager kohaSvcMgr) {
+	private void parseBibIds(ILSDIvOneOneLookupItemSetInitiationData initData, LookupItemSetResponseData responseData, KohaRemoteServiceManager kohaSvcMgr) {
 
 		boolean wantSeeAllProblems = LocalConfig.isEchoParticularProblemsToLUIS();
 
@@ -204,7 +203,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 						responseData.setNextItemToken(Integer.toString(newToken));
 						break;
 					}
-					
+
 				} else if (bibId.getBibliographicItemId() != null) {
 					String bibItemIdVal = bibId.getBibliographicItemId().getBibliographicItemIdentifier();
 
@@ -233,7 +232,6 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 						newTokenKey = null;
 						break;
 					}
-
 
 				} else {
 
@@ -308,7 +306,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	 * @param kohaSvcMgr
 	 * @param nextItemToken
 	 */
-	private void parseItemIds(LookupItemSetInitiationData initData, LookupItemSetResponseData responseData, KohaRemoteServiceManager kohaSvcMgr) {
+	private void parseItemIds(ILSDIvOneOneLookupItemSetInitiationData initData, LookupItemSetResponseData responseData, KohaRemoteServiceManager kohaSvcMgr) {
 
 		boolean wantSeeAllProblems = LocalConfig.isEchoParticularProblemsToLUIS();
 
@@ -422,7 +420,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 
 	}
 
-	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response, LookupItemSetInitiationData initData, String bibIdVal) throws ServiceException {
+	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response, ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal) throws ServiceException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
 		int startFrom = 0, maxItemsToParse = 0;
@@ -507,6 +505,31 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 					}
 				}
 
+				if (initData.getUserId() != null) {
+
+					// Process "Not For Loan" as the output of inability of requesting an item with provided UserId
+					List<ItemUseRestrictionType> itemUseRestrictionTypes;
+
+					boolean createdRestrictionsAlready = iof.getItemUseRestrictionTypes() != null && iof.getItemUseRestrictionTypes().size() > 0;
+
+					if (createdRestrictionsAlready) {
+						itemUseRestrictionTypes = iof.getItemUseRestrictionTypes();
+					} else
+						itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+
+					String canBeRequestedVal = (String) itemInfo.get("canBeRequested");
+
+					// Do not create "Not For Loan" if it's null - maybe Koha ILS not updated?
+					boolean cannotBeRequested = canBeRequestedVal != null && !canBeRequestedVal.equals("y");
+
+					if (cannotBeRequested)
+						itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.NOT_FOR_LOAN);
+
+					// Do not set empty list ..
+					if (createdRestrictionsAlready || cannotBeRequested)
+						iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+				}
+
 				itemInformation.setItemOptionalFields(iof);
 				itemInformations.add(itemInformation);
 				++itemsForwarded;
@@ -556,7 +579,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 		return holdingsSet;
 	}
 
-	private HoldingsSet parseHoldingsSetFromLookupItem(JSONObject kohaItem, LookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
+	private HoldingsSet parseHoldingsSetFromLookupItem(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 		ItemInformation itemInfo = new ItemInformation();
 
@@ -576,7 +599,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	 * @return {@link org.extensiblecatalog.ncip.v2.koha.util.ItemToken}
 	 * @throws ServiceException
 	 */
-	private ItemToken parseItemToken(LookupItemSetInitiationData initData, KohaRemoteServiceManager kohaSvcMgr) throws ServiceException {
+	private ItemToken parseItemToken(ILSDIvOneOneLookupItemSetInitiationData initData, KohaRemoteServiceManager kohaSvcMgr) throws ServiceException {
 
 		String tokenKey = initData.getNextItemToken();
 		List<BibliographicId> bibIds;
@@ -629,7 +652,7 @@ public class KohaLookupItemSetService implements LookupItemSetService {
 	 * @return {@link Integer}
 	 * @throws ServiceException
 	 */
-	private int parseMaximumItemsCount(LookupItemSetInitiationData initData) throws ServiceException {
+	private int parseMaximumItemsCount(ILSDIvOneOneLookupItemSetInitiationData initData) throws ServiceException {
 		if (initData.getMaximumItemsCount() != null)
 			try {
 				return initData.getMaximumItemsCount().intValueExact();

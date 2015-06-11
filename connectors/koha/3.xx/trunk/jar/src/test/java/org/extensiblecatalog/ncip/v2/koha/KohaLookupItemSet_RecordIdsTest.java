@@ -14,15 +14,13 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
-import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
-import org.extensiblecatalog.ncip.v2.service.Version1MediumType;
 import org.xml.sax.SAXException;
 
 public class KohaLookupItemSet_RecordIdsTest extends TestCase {
@@ -54,7 +52,7 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 		String[][] numberOfPieces = { { "2", "2" }, { "2", "2" }, { "2", "2" }, { "2", "2" } };
 
 		LookupItemSetResponseData responseData;
-		LookupItemSetInitiationData initData;
+		ILSDIvOneOneLookupItemSetInitiationData initData;
 
 		List<BibliographicId> bibliographicIds;
 
@@ -84,7 +82,7 @@ public class KohaLookupItemSet_RecordIdsTest extends TestCase {
 			nextItemTokenIsNull = true;
 			parsedNextItemToken = null;
 
-			initData = new LookupItemSetInitiationData();
+			initData = new ILSDIvOneOneLookupItemSetInitiationData();
 
 			bibliographicIds = createBibRecordIdList(bibRecIds);
 

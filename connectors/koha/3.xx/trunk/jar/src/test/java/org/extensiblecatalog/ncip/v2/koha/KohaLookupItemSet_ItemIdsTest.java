@@ -12,10 +12,10 @@ import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsSet;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
@@ -50,7 +50,7 @@ public class KohaLookupItemSet_ItemIdsTest extends TestCase {
 
 		String[] callN0s = { null, null, null, "M/II" };
 
-		LookupItemSetInitiationData initData;
+		ILSDIvOneOneLookupItemSetInitiationData initData;
 		List<ItemId> itemIds;
 		String parsedNextItemToken;
 
@@ -80,7 +80,7 @@ public class KohaLookupItemSet_ItemIdsTest extends TestCase {
 			nextItemTokenIsNull = true;
 			parsedNextItemToken = null;
 
-			initData = new LookupItemSetInitiationData();
+			initData = new ILSDIvOneOneLookupItemSetInitiationData();
 
 			itemIds = createItemIdList(agency, itemIdValues);
 			initData.setItemIds(itemIds);

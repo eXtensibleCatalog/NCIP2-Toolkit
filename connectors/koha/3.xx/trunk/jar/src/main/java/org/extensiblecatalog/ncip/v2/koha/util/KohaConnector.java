@@ -33,15 +33,14 @@ import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.OrganizationNameInformation;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RenewItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
@@ -51,7 +50,6 @@ import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.json.simple.JSONObject;
@@ -204,9 +202,9 @@ public class KohaConnector {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER).addRequest(KohaConstants.PARAM_USER_ID, patronId);
 
-		if (loanedItemsDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED);
-
+		if (loanedItemsDesired) 
+			urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED).addRequest(KohaConstants.PARAM_RENEWABILITY_DESIRED);
+		
 		if (requestedItemsDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_REQUESTED_ITEMS_DESIRED);
 
@@ -215,37 +213,6 @@ public class KohaConnector {
 
 		if (!personalInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_USER_INFO);
-
-		String response = getPlainTextResponse(urlBuilder.toURL());
-
-		return (JSONObject) jsonParser.parse(response);
-	}
-
-	public JSONObject canBeRenewed(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
-			ParseException {
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CAN_BE_RENEWED);
-
-		urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue()).addRequest(KohaConstants.PARAM_USER_ID,
-				initData.getUserId().getUserIdentifierValue());
-
-		// If there is NeedBeforeDate RequestElementType then include param maxDateDueDesired to url ..
-		for (RequestElementType desiredService : initData.getRequestElementTypes()) {
-			if (desiredService.equals(Version1RequestElementType.NEED_BEFORE_DATE)) {
-				urlBuilder.addRequest(KohaConstants.PARAM_MAX_DATE_DUE_DESIRED);
-				break;
-			}
-		}
-		String response = getPlainTextResponse(urlBuilder.toURL());
-
-		return (JSONObject) jsonParser.parse(response);
-	}
-
-	public JSONObject canBeRequested(LookupRequestInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
-			ParseException {
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CAN_BE_REQUESTED);
-
-		urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue()).addRequest(KohaConstants.PARAM_USER_ID,
-				initData.getUserId().getUserIdentifierValue());
 
 		String response = getPlainTextResponse(urlBuilder.toURL());
 
@@ -297,12 +264,12 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject lookupItem(String id, LookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException, ParseException,
-			URISyntaxException {
+	public JSONObject lookupItem(String id, ILSDIvOneOneLookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException,
+			ParseException, URISyntaxException {
 		return lookupItem(KohaUtil.luisInitDataToLookupItemInitData(initData, id));
 	}
 
-	public JSONObject lookupItemSet(String bibId, LookupItemSetInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException,
+	public JSONObject lookupItemSet(String bibId, ILSDIvOneOneLookupItemSetInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException,
 			URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET).addRequest(KohaConstants.PARAM_BIB_ID, bibId);
@@ -324,6 +291,11 @@ public class KohaConnector {
 
 		if (!bibInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_BIB_INFO);
+		
+		boolean userIdProvided = initData.getUserId() != null && ! initData.getUserId().getUserIdentifierValue().trim().isEmpty();
+		
+		if (userIdProvided)
+			urlBuilder.addRequest(KohaConstants.PARAM_CAN_BE_REQUESTED_BY_USERID, initData.getUserId().getUserIdentifierValue());
 
 		String response = getPlainTextResponse(urlBuilder.toURL(), bibId);
 
@@ -462,19 +434,18 @@ public class KohaConnector {
 			while ((line = reader.readLine()) != null) {
 				stringBuilder.append(line + "\n");
 			}
+			
+			conn.disconnect();
+			
 			String responseEntity = stringBuilder.toString();
-
+			
 			if (statusCode == 200) {
-				conn.disconnect();
 				return responseEntity;
 			} else if (statusCode == 400) {
-				conn.disconnect();
 				throw KohaException.create400BadRequestException(responseEntity);
 			} else if (statusCode == 404) {
-				conn.disconnect();
 				throw KohaException.create404NotFoundException(responseEntity, identifier);
 			} else {
-				conn.disconnect();
 				throw KohaException.createCommonException(statusCode, responseEntity);
 			}
 		} else {
@@ -486,7 +457,7 @@ public class KohaConnector {
 
 	/**
 	 * Logins definer admin user (from settings in toolkit.properties) & saves
-	 * cookies to be able to continue parsing requests as logged user.<br>
+	 * cookies to be able to continue parsing requests as logged user.
 	 * 
 	 * @param streamSource
 	 * @param url

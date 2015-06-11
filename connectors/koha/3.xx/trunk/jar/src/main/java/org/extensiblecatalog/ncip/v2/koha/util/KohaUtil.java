@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.Amount;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
@@ -31,24 +31,21 @@ import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionReferenceId;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
-import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.MediumType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
-import org.extensiblecatalog.ncip.v2.service.RequestElementType;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.RequestIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.RequestedItem;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
@@ -56,13 +53,11 @@ import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
-import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyElementType;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicItemIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
-import org.extensiblecatalog.ncip.v2.service.Version1ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1FiscalActionType;
 import org.extensiblecatalog.ncip.v2.service.Version1FiscalTransactionType;
@@ -70,8 +65,6 @@ import org.extensiblecatalog.ncip.v2.service.Version1ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LocationType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestElementType;
-import org.extensiblecatalog.ncip.v2.service.Version1RequestScopeType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestStatusType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UserAddressRoleType;
@@ -292,13 +285,13 @@ public class KohaUtil {
 	}
 
 	/**
-	 * Converts LookupItemInitiationData to LookupItemSetInitiationData with respect only to desired services.
+	 * Converts LookupItemInitiationData to ILSDIvOneOneLookupItemSetInitiationData with respect only to desired services.
 	 * 
 	 * @param initData
 	 * @return luisInitData
 	 */
-	public static LookupItemSetInitiationData lookupItemInitDataToLUISInitData(LookupItemInitiationData initData) {
-		LookupItemSetInitiationData luisInitData = new LookupItemSetInitiationData();
+	public static ILSDIvOneOneLookupItemSetInitiationData lookupItemInitDataToLUISInitData(LookupItemInitiationData initData) {
+		ILSDIvOneOneLookupItemSetInitiationData luisInitData = new ILSDIvOneOneLookupItemSetInitiationData();
 
 		luisInitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
 		luisInitData.setCirculationStatusDesired(initData.getCirculationStatusDesired());
@@ -538,12 +531,17 @@ public class KohaUtil {
 		return requestId;
 	}
 
-	public static LoanedItem parseLoanedItem(JSONObject loanedItemparsed) throws ParseException {
-		LoanedItem loanedItem = new LoanedItem();
+	public static ILSDIv1_1_LoanedItem parseLoanedItem(JSONObject loanedItemparsed) throws ParseException {
+		ILSDIv1_1_LoanedItem loanedItem = new ILSDIv1_1_LoanedItem();
 
 		String itemId = (String) loanedItemparsed.get("itemnumber");
 
 		String dateDue = (String) loanedItemparsed.get("date_due");
+
+		String renewable = (String) loanedItemparsed.get("renewable");
+
+		if (renewable != null)
+			loanedItem.setRenewalNotPermitted(!renewable.equals("y"));
 
 		loanedItem.setItemId(createItemId(itemId));
 		loanedItem.setDateDue(parseGregorianCalendarFromKohaDate(dateDue));
@@ -664,7 +662,7 @@ public class KohaUtil {
 		return bibliographicDescription;
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
 		return parseItemOptionalFields(kohaItem, KohaUtil.luisInitDataToLookupItemInitData(initData, itemIdVal));
 	}
 
@@ -727,7 +725,7 @@ public class KohaUtil {
 		return iof;
 	}
 
-	public static LookupItemInitiationData luisInitDataToLookupItemInitData(LookupItemSetInitiationData initData, String itemIdVal) {
+	public static LookupItemInitiationData luisInitDataToLookupItemInitData(ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) {
 		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
 		ItemId itemId = new ItemId();
 		itemId.setItemIdentifierValue(itemIdVal);

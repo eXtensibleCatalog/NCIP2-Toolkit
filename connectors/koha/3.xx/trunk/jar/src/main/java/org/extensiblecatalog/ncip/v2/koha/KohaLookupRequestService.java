@@ -77,7 +77,7 @@ public class KohaLookupRequestService implements LookupRequestService {
 			try {
 
 					JSONObject requestItem = kohaRemoteServiceManager.lookupRequest(initData, !requestIdIsEmpty);
-					updateRegularResponseData(responseData, initData, requestItem);
+					updateResponseData(responseData, initData, requestItem);
 
 			} catch (IOException ie) {
 				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
@@ -102,7 +102,7 @@ public class KohaLookupRequestService implements LookupRequestService {
 		return responseData;
 	}
 
-	private void updateRegularResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, JSONObject requestItem) throws ParseException {
+	private void updateResponseData(LookupRequestResponseData responseData, LookupRequestInitiationData initData, JSONObject requestItem) throws ParseException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 

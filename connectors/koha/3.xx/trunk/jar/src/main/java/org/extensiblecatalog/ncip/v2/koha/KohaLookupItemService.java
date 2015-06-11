@@ -9,28 +9,15 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.aspectj.weaver.ArrayAnnotationValue;
-import org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0.jaxb.elements.ItemTransaction;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
-import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
-import org.extensiblecatalog.ncip.v2.service.Location;
-import org.extensiblecatalog.ncip.v2.service.LocationName;
-import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemService;
@@ -40,10 +27,6 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
-import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
-import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
-import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
