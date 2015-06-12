@@ -197,19 +197,24 @@ public class KohaConnector {
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
 		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
 
+		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
+
 		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired()
 				|| initData.getUserPrivilegeDesired();
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER).addRequest(KohaConstants.PARAM_USER_ID, patronId);
 
-		if (loanedItemsDesired) 
+		if (loanedItemsDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED).addRequest(KohaConstants.PARAM_RENEWABILITY_DESIRED);
-		
+
 		if (requestedItemsDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_REQUESTED_ITEMS_DESIRED);
 
 		if (userFiscalAccountDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_USER_FISCAL_ACCOUNT_DESIRED);
+
+		if (blockOrTrapDesired)
+			urlBuilder.addRequest(KohaConstants.PARAM_BLOCK_OR_TRAP_DESIRED);
 
 		if (!personalInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_USER_INFO);
@@ -291,9 +296,9 @@ public class KohaConnector {
 
 		if (!bibInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_BIB_INFO);
-		
-		boolean userIdProvided = initData.getUserId() != null && ! initData.getUserId().getUserIdentifierValue().trim().isEmpty();
-		
+
+		boolean userIdProvided = initData.getUserId() != null && !initData.getUserId().getUserIdentifierValue().trim().isEmpty();
+
 		if (userIdProvided)
 			urlBuilder.addRequest(KohaConstants.PARAM_CAN_BE_REQUESTED_BY_USERID, initData.getUserId().getUserIdentifierValue());
 
@@ -434,11 +439,11 @@ public class KohaConnector {
 			while ((line = reader.readLine()) != null) {
 				stringBuilder.append(line + "\n");
 			}
-			
+
 			conn.disconnect();
-			
+
 			String responseEntity = stringBuilder.toString();
-			
+
 			if (statusCode == 200) {
 				return responseEntity;
 			} else if (statusCode == 400) {

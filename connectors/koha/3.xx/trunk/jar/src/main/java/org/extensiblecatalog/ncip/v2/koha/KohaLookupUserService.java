@@ -29,6 +29,7 @@ import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
+import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
@@ -44,6 +45,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
+import org.extensiblecatalog.ncip.v2.service.UserElementType;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
@@ -202,6 +204,11 @@ public class KohaLookupUserService implements LookupUserService {
 					userPrivileges.add(userPrivilege);
 					userOptionalFields.setUserPrivileges(userPrivileges);
 				}
+			}
+
+			if (initData.getBlockOrTrapDesired()) {
+				List<BlockOrTrap> blockOrTraps = KohaUtil.parseBlockOrTraps((JSONArray) userInfo.get("blocks"));
+				userOptionalFields.setBlockOrTraps(blockOrTraps);
 			}
 
 			if (initData.getDateOfBirthDesired()) {

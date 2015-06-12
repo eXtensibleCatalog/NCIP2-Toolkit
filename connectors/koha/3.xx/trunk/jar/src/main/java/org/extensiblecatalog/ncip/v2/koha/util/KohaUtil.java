@@ -75,6 +75,8 @@ import org.xml.sax.SAXException;
 
 public class KohaUtil {
 
+	private static final AgencyId defaultAgencyId = createAgencyId(LocalConfig.getDefaultAgency());
+
 	public static AgencyId createAgencyId(String agencyId) {
 		return new AgencyId(Version1AgencyElementType.VERSION_1_AGENCY_ELEMENT_TYPE, agencyId);
 	}
@@ -133,12 +135,25 @@ public class KohaUtil {
 		return day + "/" + month + "/" + Integer.toString(gregorianCalendar.get(Calendar.YEAR));
 	}
 
-	public static BlockOrTrap parseBlockOrTrap(String parsedBlock) {
+	public static List<BlockOrTrap> parseBlockOrTraps(JSONArray blocksParsed) {
+		if (blocksParsed != null && blocksParsed.size() > 0) {
+			List<BlockOrTrap> blocks = new ArrayList<BlockOrTrap>();
+
+			for (Object blockParsed : blocksParsed) {
+				String block = blockParsed.toString();
+
+				if (block != null && !block.isEmpty())
+					blocks.add(createBlockOrTrap(block));
+			}
+			return blocks;
+		}
+		return null;
+	}
+
+	private static BlockOrTrap createBlockOrTrap(String block) {
 		BlockOrTrap blockOrTrap = new BlockOrTrap();
-
-		// TODO: Revise this
-		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", parsedBlock));
-
+		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", block));
+		blockOrTrap.setAgencyId(defaultAgencyId);
 		return blockOrTrap;
 	}
 

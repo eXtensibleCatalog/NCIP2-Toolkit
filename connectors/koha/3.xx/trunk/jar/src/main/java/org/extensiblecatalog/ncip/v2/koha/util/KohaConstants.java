@@ -78,12 +78,15 @@ public class KohaConstants {
 	public static final String PARAM_SERVICE = "service";
 
 	public static final String PARAM_BOR_NO_DESIRED = "borNoDesired";
+	
 	public static final String PARAM_LOANED_ITEMS_DESIRED = "loanedItemsDesired";
 	public static final String PARAM_REQUESTED_ITEMS_DESIRED = "requestedItemsDesired";
+	public static final String PARAM_USER_FISCAL_ACCOUNT_DESIRED = "userFiscalAccountDesired";
+	public static final String PARAM_BLOCK_OR_TRAP_DESIRED = "blockOrTrapDesired";
+	
 	public static final String PARAM_CIRCULATION_STATUS_DESIRED = "circulationStatusDesired";
 	public static final String PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED = "itemUseRestrictionTypeDesired";
 	public static final String PARAM_HOLD_QUEUE_LENGTH_DESIRED = "holdQueueLengthDesired";
-	public static final String PARAM_USER_FISCAL_ACCOUNT_DESIRED = "userFiscalAccountDesired";
 	public static final String PARAM_MAX_DATE_DUE_DESIRED = "maxDateDueDesired";
 	
 	public static final String PARAM_RENEWABILITY_DESIRED = "renewabilityDesired";
