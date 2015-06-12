@@ -140,32 +140,36 @@ public class KohaUtil {
 			List<BlockOrTrap> blocks = new ArrayList<BlockOrTrap>();
 
 			for (Object blockParsed : blocksParsed) {
-				String block = blockParsed.toString();
+				String rawBlock = blockParsed.toString();
 
-				String key = block.split(":")[0];
-				String value = block.substring(key.length() + 1);
+				String key = rawBlock.split(":")[0];
+				String value = rawBlock.substring(key.length() + 1);
 
 				boolean valueIsNotEmpty = value != null && !value.isEmpty();
 
+				String block = null;
 				if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED) && valueIsNotEmpty) {
-					
+
 					block = LocalConfig.getBlockOrTrapStringFormattedOfExpired(value);
-					if (block != null)
-						blocks.add(createBlockOrTrap(block));
-					
+					if (block == null)
+						block = rawBlock;
+
 				} else if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED) && valueIsNotEmpty) {
-					
+
 					block = LocalConfig.getBlockOrTrapStringFormattedOfDebarred(value);
-					if (block != null)
-						blocks.add(createBlockOrTrap(block));
-					
+					if (block == null)
+						block = rawBlock;
+
 				} else if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES) && valueIsNotEmpty) {
-					
+
 					block = LocalConfig.getBlockOrTrapStringFormattedOfTotalfines(value);
-					if (block != null)
-						blocks.add(createBlockOrTrap(block));
-					
-				} else if (block != null && !block.isEmpty())
+					if (block == null)
+						block = rawBlock;
+
+				} else if (rawBlock != null && !rawBlock.isEmpty())
+					block = rawBlock;
+
+				if (block != null) // Do not set empty block ..
 					blocks.add(createBlockOrTrap(block));
 			}
 			return blocks;
