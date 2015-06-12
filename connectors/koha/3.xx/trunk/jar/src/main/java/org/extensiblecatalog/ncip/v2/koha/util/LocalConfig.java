@@ -11,6 +11,10 @@ public class LocalConfig {
 
 	private static boolean echoParticularProblemsToLUIS;
 
+	private static String stringFormatForExpired;
+	private static String stringFormatForTotalfines;
+	private static String stringFormatForDebarred;
+
 	private static String defaultAgency;
 	private static String agencyAddress;
 	private static String agencyName;
@@ -328,5 +332,29 @@ public class LocalConfig {
 
 	public static void setCurrencyCode(String currencyCode) {
 		LocalConfig.currencyCode = currencyCode;
+	}
+
+	public static String getBlockOrTrapStringFormattedOfTotalfines(String valueToFormat) {
+		return String.format(stringFormatForTotalfines, valueToFormat);
+	}
+
+	public static void setBlockOrTrapStringFormatForTotalfines(String stringFormat) {
+		stringFormatForTotalfines = stringFormat;
+	}
+
+	public static String getBlockOrTrapStringFormattedOfExpired(String valueToFormat) {
+		return String.format(stringFormatForExpired, valueToFormat);
+	}
+
+	public static void setBlockOrTrapStringFormatForExpired(String stringFormat) {
+		stringFormatForExpired = stringFormat;
+	}
+
+	public static String getBlockOrTrapStringFormattedOfDebarred(String valueToFormat) {
+		return String.format(stringFormatForDebarred, valueToFormat);
+	}
+
+	public static void setBlockOrTrapStringFormatForDebarred(String stringFormat) {
+		stringFormatForDebarred = stringFormat;
 	}
 }

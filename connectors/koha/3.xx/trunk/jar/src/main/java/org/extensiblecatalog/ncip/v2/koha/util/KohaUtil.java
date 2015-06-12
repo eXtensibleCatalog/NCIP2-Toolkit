@@ -142,7 +142,27 @@ public class KohaUtil {
 			for (Object blockParsed : blocksParsed) {
 				String block = blockParsed.toString();
 
-				if (block != null && !block.isEmpty())
+				String key = block.split(":")[0];
+				String value = block.substring(key.length() + 1);
+
+				boolean valueIsNotEmpty = value != null && !value.isEmpty();
+
+				if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED) && valueIsNotEmpty) {
+					
+					block = LocalConfig.getBlockOrTrapStringFormattedOfExpired(value);
+					blocks.add(createBlockOrTrap(block));
+					
+				} else if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED) && valueIsNotEmpty) {
+					
+					block = LocalConfig.getBlockOrTrapStringFormattedOfDebarred(value);
+					blocks.add(createBlockOrTrap(block));
+					
+				} else if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES) && valueIsNotEmpty) {
+					
+					block = LocalConfig.getBlockOrTrapStringFormattedOfTotalfines(value);
+					blocks.add(createBlockOrTrap(block));
+					
+				} else if (block != null && !block.isEmpty())
 					blocks.add(createBlockOrTrap(block));
 			}
 			return blocks;

@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
 import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
@@ -82,6 +83,10 @@ public class KohaConnector {
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
 
+			LocalConfig.setBlockOrTrapStringFormatForExpired(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED));
+			LocalConfig.setBlockOrTrapStringFormatForTotalfines(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES));
+			LocalConfig.setBlockOrTrapStringFormatForDebarred(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED));
+			
 			LocalConfig.setTransferBranchesTime(kohaConfig.getProperty(KohaConstants.CONF_TRANSFER_BRANCH_TIME));
 
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));

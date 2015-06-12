@@ -73,3 +73,10 @@ MaxItemPreparationTimeDelay=1
 
 # NextItemToken expiration time in seconds
 NextItemTokenExpirationTime=900
+
+# Mapping of custom BlockOrTrapTypes depending on input from ILS's svc/ncip CGI
+# If you want to include the VALUE to the customized message, put on its place this identifier: %s
+# If you want to include a percent character, than you have to escape it with backslash like that: 10\% will result in 10%
+expired=Vá\u0161 ú\u010Det vypr\u0161el, prosíme prodlu\u017Ete si registraci na http://vufind.katalogknih.cz/
+totalfines=Máte vzniklý nedoplatek v hodnot\u011B %s. Va\u0161e mo\u017Enosti portálu jsou omezeny
+debarred=Vá\u0161 ú\u010Det byl postihnut. %s

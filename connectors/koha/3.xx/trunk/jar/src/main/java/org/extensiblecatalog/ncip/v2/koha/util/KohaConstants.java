@@ -47,6 +47,10 @@ public class KohaConstants {
 	public static final String CONF_CURRENCY_CODE = "CurrencyCode";
 	public static final String CONF_TRUST_ALL_CERTIFICATES = "TrustAllCertificates";
 
+	public static final String CONF_STRING_FORMAT_FOR_EXPIRED = "expired";
+	public static final String CONF_STRING_FORMAT_FOR_TOTALFINES = "totalfines";
+	public static final String CONF_STRING_FORMAT_FOR_DEBARRED = "debarred";
+
 	public static final String REQUEST_ID_DELIMITER = ";";
 
 	public static final SimpleDateFormat KOHA_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
@@ -117,5 +121,4 @@ public class KohaConstants {
 
 	public static final String APP_PROFILE_TYPE_CAN_BE_REQUESTED = "Can Be Requested";
 	public static final String APP_PROFILE_TYPE_CAN_BE_RENEWED = "Can Be Renewed";
-
 }
