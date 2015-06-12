@@ -150,17 +150,20 @@ public class KohaUtil {
 				if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED) && valueIsNotEmpty) {
 					
 					block = LocalConfig.getBlockOrTrapStringFormattedOfExpired(value);
-					blocks.add(createBlockOrTrap(block));
+					if (block != null)
+						blocks.add(createBlockOrTrap(block));
 					
 				} else if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED) && valueIsNotEmpty) {
 					
 					block = LocalConfig.getBlockOrTrapStringFormattedOfDebarred(value);
-					blocks.add(createBlockOrTrap(block));
+					if (block != null)
+						blocks.add(createBlockOrTrap(block));
 					
 				} else if (key.equals(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES) && valueIsNotEmpty) {
 					
 					block = LocalConfig.getBlockOrTrapStringFormattedOfTotalfines(value);
-					blocks.add(createBlockOrTrap(block));
+					if (block != null)
+						blocks.add(createBlockOrTrap(block));
 					
 				} else if (block != null && !block.isEmpty())
 					blocks.add(createBlockOrTrap(block));

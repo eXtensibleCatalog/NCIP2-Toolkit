@@ -335,7 +335,7 @@ public class LocalConfig {
 	}
 
 	public static String getBlockOrTrapStringFormattedOfTotalfines(String valueToFormat) {
-		return String.format(stringFormatForTotalfines, valueToFormat);
+		return stringFormatForTotalfines == null ? null : String.format(stringFormatForTotalfines, valueToFormat);
 	}
 
 	public static void setBlockOrTrapStringFormatForTotalfines(String stringFormat) {
@@ -343,7 +343,7 @@ public class LocalConfig {
 	}
 
 	public static String getBlockOrTrapStringFormattedOfExpired(String valueToFormat) {
-		return String.format(stringFormatForExpired, valueToFormat);
+		return stringFormatForExpired == null ? null : String.format(stringFormatForExpired, valueToFormat);
 	}
 
 	public static void setBlockOrTrapStringFormatForExpired(String stringFormat) {
@@ -351,7 +351,7 @@ public class LocalConfig {
 	}
 
 	public static String getBlockOrTrapStringFormattedOfDebarred(String valueToFormat) {
-		return String.format(stringFormatForDebarred, valueToFormat);
+		return stringFormatForDebarred == null ? null : String.format(stringFormatForDebarred, valueToFormat);
 	}
 
 	public static void setBlockOrTrapStringFormatForDebarred(String stringFormat) {
