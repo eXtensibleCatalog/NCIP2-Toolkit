@@ -225,7 +225,9 @@ public class KohaLookupUserService implements LookupUserService {
 			List<RequestedItem> requestedItems = new ArrayList<RequestedItem>();
 			for (int i = 0; i < requestedItemsParsed.size(); ++i) {
 				JSONObject requestedItemParsed = (JSONObject) requestedItemsParsed.get(i);
-				requestedItems.add(KohaUtil.parseRequestedItem(requestedItemParsed));
+				RequestedItem requestedItem = KohaUtil.parseRequestedItem(requestedItemParsed);
+				if (requestedItem != null)
+					requestedItems.add(requestedItem);
 			}
 			responseData.setRequestedItems(requestedItems);
 		}

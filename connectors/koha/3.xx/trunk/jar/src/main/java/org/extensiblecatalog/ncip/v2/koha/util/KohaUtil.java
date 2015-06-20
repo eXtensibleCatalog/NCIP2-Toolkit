@@ -497,6 +497,11 @@ public class KohaUtil {
 
 		String branchCode = (String) requestedItemParsed.get("branchcode");
 		String itemId = (String) requestedItemParsed.get("itemnumber");
+		
+		if (itemId == null) {
+			// Cannot actually process biblio-leveled request ..
+			return null;
+		}
 		String requestId = (String) requestedItemParsed.get("reserve_id");
 
 		String waitingDate = (String) requestedItemParsed.get("waitingdate");
@@ -507,10 +512,7 @@ public class KohaUtil {
 		if (branchCode != null)
 			requestedItem.setPickupLocation(new PickupLocation(branchCode));
 
-		if (itemId != null) {
-			requestedItem.setItemId(createItemId(itemId, branchCode));
-		} else
-			throw KohaException.create500InternalServerError("Cannot process RequestItem without it's ItemIdentifierValue");
+		requestedItem.setItemId(createItemId(itemId, branchCode));
 
 		requestedItem.setRequestId(createRequestId(requestId, branchCode));
 
