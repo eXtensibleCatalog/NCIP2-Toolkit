@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.net.ssl.HostnameVerifier;
@@ -86,7 +87,16 @@ public class KohaConnector {
 			LocalConfig.setBlockOrTrapStringFormatForExpired(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED));
 			LocalConfig.setBlockOrTrapStringFormatForTotalfines(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES));
 			LocalConfig.setBlockOrTrapStringFormatForDebarred(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED));
-			
+
+			String localeToSet = kohaConfig.getProperty("locale");
+			if (localeToSet != null)
+				for (Locale locale : Locale.getAvailableLocales()) {
+					if (locale.toString().equals(localeToSet)) {
+						Locale.setDefault(locale);
+						break;
+					}
+				}
+
 			LocalConfig.setTransferBranchesTime(kohaConfig.getProperty(KohaConstants.CONF_TRANSFER_BRANCH_TIME));
 
 			LocalConfig.setDefaultAgency(kohaConfig.getProperty(KohaConstants.CONF_DEFAULT_AGENCY));
