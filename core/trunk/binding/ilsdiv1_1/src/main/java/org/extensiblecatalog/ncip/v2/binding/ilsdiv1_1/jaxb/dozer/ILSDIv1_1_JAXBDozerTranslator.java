@@ -9,14 +9,16 @@
 package org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer;
 
 import org.dozer.DozerBeanMapper;
-import java.io.ByteArrayInputStream;
 import org.extensiblecatalog.ncip.v2.binding.jaxb.JAXBHelper;
 import org.extensiblecatalog.ncip.v2.binding.jaxb.dozer.BaseJAXBDozerTranslator;
+
+import java.io.ByteArrayInputStream;
 import org.extensiblecatalog.ncip.v2.common.LoggingHelper;
 import org.extensiblecatalog.ncip.v2.common.StatisticsBean;
 import org.extensiblecatalog.ncip.v2.common.TranslatorConfiguration;
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_NCIPMessage;
+import javax.xml.bind.PropertyException;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -118,7 +120,11 @@ public class ILSDIv1_1_JAXBDozerTranslator extends BaseJAXBDozerTranslator<org.e
             statisticsBean.record(respTranslateStartTime, respTranslateEndTime,
                 StatisticsBean.RESPONDER_CREATE_MESSAGE_LABELS, msgName);
 
-            ncipMsg.setVersion(NCIP_VERSION_V2_02);
+            String messageVersion = responseData.getVersion();
+            if (messageVersion == null)
+            	messageVersion = NCIP_VERSION_V2_02;
+            
+            ncipMsg.setVersion(messageVersion);
 
             long respMarshalStartTime = System.currentTimeMillis();
 
@@ -147,6 +153,5 @@ public class ILSDIv1_1_JAXBDozerTranslator extends BaseJAXBDozerTranslator<org.e
 
         }
 
-    }
-    
+    }    
 }
