@@ -503,6 +503,7 @@ public class KohaUtil {
 			return null;
 		}
 		String requestId = (String) requestedItemParsed.get("reserve_id");
+		String title = (String) requestedItemParsed.get("title");
 
 		String waitingDate = (String) requestedItemParsed.get("waitingdate");
 		String datePlaced = (String) requestedItemParsed.get("timestamp");
@@ -515,6 +516,8 @@ public class KohaUtil {
 		requestedItem.setItemId(createItemId(itemId, branchCode));
 
 		requestedItem.setRequestId(createRequestId(requestId, branchCode));
+		
+		requestedItem.setTitle(title);
 
 		if (waitingDate != null)
 			requestedItem.setRequestStatusType(Version1RequestStatusType.AVAILABLE_FOR_PICKUP);
