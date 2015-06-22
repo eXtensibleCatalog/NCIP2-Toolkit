@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# If you plan to deploy docker into other than Czech library, change this
+export LC_ALL=cs_CZ.UTF-8
+export LANGUAGE=cs_CZ.UTF-8
+export LANG=cs_CZ.UTF-8
+
 config='toolkit.properties'
 cp toolkit.properties.example $config
 
@@ -32,3 +38,5 @@ sed -i "s_KohaIPHere_$(echo $opac)_g" $config
 
 sed -i "s_IntranetAdministratorNameHere_$(echo $adminName)_g" $config
 sed -i "s_IntranetAdministratorPassHere_$(echo $adminPass)_g" $config
+
+native2ascii -encoding utf8 toolkit.properties toolkit.properties

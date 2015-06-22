@@ -23,8 +23,7 @@ public class LocalConfig {
 	private static String authDataFormatType;
 
 	private static String serverName;
-	private static String opacPort;
-	private static String svcPort;
+	private static String serverPort;
 	private static String svcSuffix;
 	private static String bibLibrary;
 	private static String admLibrary;
@@ -163,21 +162,6 @@ public class LocalConfig {
 	}
 
 	/**
-	 * @return the serverPort
-	 */
-	public static String getServerPort() {
-		return opacPort;
-	}
-
-	/**
-	 * @param serverPort
-	 *            the serverPort to set
-	 */
-	public static void setOpacServerPort(String serverPort) {
-		LocalConfig.opacPort = serverPort;
-	}
-
-	/**
 	 * @return the bibLibrary
 	 */
 	public static String getBibLibrary() {
@@ -263,16 +247,16 @@ public class LocalConfig {
 	/**
 	 * @return the svcPort
 	 */
-	public static String getSvcServerPort() {
-		return svcPort;
+	public static String getIntranetServerPort() {
+		return serverPort;
 	}
 
 	/**
-	 * @param svcPort
+	 * @param serverPort
 	 *            the svcPort to set
 	 */
-	public static void setSvcServerPort(String svcPort) {
-		LocalConfig.svcPort = svcPort;
+	public static void setIntranetServerPort(String serverPort) {
+		LocalConfig.serverPort = serverPort;
 	}
 
 	/**

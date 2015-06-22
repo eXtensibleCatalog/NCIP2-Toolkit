@@ -47,9 +47,8 @@ UserRegistrationLink=http://vufind.katalogknih.cz/MyResearch/Home
 AuthDataFormatType=text/plain
 
 # OPACServer must be in format without backslash at the end & does have to include either https:// or http://
-OPACServer=https://serverHostName
-OPACPort=80
-SVCPort=8080
+IntranetServer=https://serverHostName
+IntranetPort=8080
 
 # Set this to true only for testing purposes & only when you know your OPAC is having unsigned certificate 
 TrustAllCertificates=false
@@ -72,3 +71,11 @@ MaxItemPreparationTimeDelay=1
 
 # NextItemToken expiration time in seconds
 NextItemTokenExpirationTime=900
+
+# Mapping of custom BlockOrTrapTypes depending on input from ILS's svc/ncip CGI
+# If you want to include the VALUE to the customized message, put on its place this identifier: %s
+# If you want to include a percent character, than you have to escape it with backslash like that: 10\% will result in 10%
+locale=cs_CZ
+expired=V\u00e1\u0161 \u00fa\u010det vypr\u0161el, prodlu\u017ete si jej pros\u00edm ..
+totalfines=M\u00e1te vznikl\u00fd nedoplatek v hodnot\u011B %s. Va\u0161e mo\u017Enosti port\u00e1lu jsou omezeny
+debarred=V\u00e1\u0161 \u00fa\u010Det byl postihnut. %s

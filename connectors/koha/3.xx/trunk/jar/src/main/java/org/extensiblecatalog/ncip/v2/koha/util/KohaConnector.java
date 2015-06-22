@@ -103,11 +103,9 @@ public class KohaConnector {
 
 			LocalConfig.setCurrencyCode(kohaConfig.getProperty(KohaConstants.CONF_CURRENCY_CODE));
 
-			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.CONF_OPAC_SERVER));
+			LocalConfig.setOpacServerName(kohaConfig.getProperty(KohaConstants.CONF_INTRANET_SERVER));
 
-			LocalConfig.setOpacServerPort(kohaConfig.getProperty(KohaConstants.CONF_OPAC_PORT));
-
-			LocalConfig.setSvcServerPort(kohaConfig.getProperty(KohaConstants.CONF_SVC_PORT));
+			LocalConfig.setIntranetServerPort(kohaConfig.getProperty(KohaConstants.CONF_INTRANET_PORT));
 
 			LocalConfig.setAdminName(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_NAME));
 			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_PASS));
@@ -423,7 +421,7 @@ public class KohaConnector {
 	}
 
 	private static URLBuilder getCommonSvcURLBuilder() {
-		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getSvcServerPort()).setPath(LocalConfig.getSvcSuffix());
+		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort()).setPath(LocalConfig.getSvcSuffix());
 	}
 
 	private static URLBuilder getCommonSvcNcipURLBuilder(String service) {

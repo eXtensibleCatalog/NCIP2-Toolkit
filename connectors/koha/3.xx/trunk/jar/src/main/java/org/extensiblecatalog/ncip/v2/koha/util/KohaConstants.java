@@ -25,9 +25,8 @@ public class KohaConstants {
 	public static final String KOHA_TEMPLATE_LOOKUP_USER = "members/tables/ncip_lookup_user.tt";
 
 	// Constants for parsing from toolkit.properties
-	public static final String CONF_OPAC_PORT = "OPACPort";
-	public static final String CONF_OPAC_SERVER = "OPACServer";
-	public static final String CONF_SVC_PORT = "SVCPort";
+	public static final String CONF_INTRANET_SERVER = "IntranetServer";
+	public static final String CONF_INTRANET_PORT = "IntranetPort";
 	public static final String CONF_ILS_DI_SUFFIX = "ILSDISuffix";
 	public static final String CONF_SVC_SUFFIX = "SVCSuffix";
 	public static final String CONF_DEFAULT_AGENCY = "AgencyId";
