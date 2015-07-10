@@ -36,7 +36,6 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceError;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ServiceHelper;
-import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
@@ -92,13 +91,16 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 
 		boolean itemIdsIsEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
 
-		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
-				&& initData.getBibliographicId(0).getBibliographicRecordId() != null
-				&& initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier().isEmpty();
+		// TODO: Make this mind**** human-readable :D ...
+		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null
+				|| initData.getBibliographicIds().size() == 1
+				&& (initData.getBibliographicId(0).getBibliographicRecordId() == null || initData.getBibliographicId(0).getBibliographicRecordId()
+						.getBibliographicRecordIdentifier().isEmpty());
 
-		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
-				&& initData.getBibliographicId(0).getBibliographicItemId() != null
-				&& initData.getBibliographicId(0).getBibliographicItemId().getBibliographicItemIdentifier().isEmpty();
+		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null
+				|| initData.getBibliographicIds().size() == 1
+				&& (initData.getBibliographicId(0).getBibliographicItemId() == null || initData.getBibliographicId(0).getBibliographicItemId().getBibliographicItemIdentifier()
+						.isEmpty());
 
 		if (itemIdsIsEmpty && bibRecIdIsEmpty && bibItemIdIsEmpty) {
 
@@ -259,8 +261,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 					if (wantSeeAllProblems) {
 						Problem p;
 						boolean userNotFound = false;
-						
-						if (ke.getMessage().equals("User not found..\n")) {							
+
+						if (ke.getMessage().equals("User not found..\n")) {
 							p = new Problem(Version1LookupUserProcessingError.UNKNOWN_USER, null, "User you specified in Ext element was not found.");
 
 							responseData.setProblems(Arrays.asList(p));
@@ -270,7 +272,7 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 									+ ", you are searching for, does not exist.");
 						}
 						bibInformation.setProblems(Arrays.asList(p));
-						
+
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
