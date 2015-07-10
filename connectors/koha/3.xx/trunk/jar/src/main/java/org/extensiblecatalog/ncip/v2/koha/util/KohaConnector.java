@@ -425,7 +425,7 @@ public class KohaConnector {
 
 	private String getPlainTextResponse(URL url, String identifier) throws KohaException, IOException, SAXException, URISyntaxException {
 
-		boolean isHttps = url.getProtocol() == "https";
+		boolean isHttps = url.getProtocol().equals("https");
 
 		HttpURLConnection conn = null;
 		if (isHttps)

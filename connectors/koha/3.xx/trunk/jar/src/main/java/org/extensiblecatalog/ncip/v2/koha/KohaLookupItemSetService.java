@@ -41,6 +41,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.Version1GeneralProcessingError;
 import org.extensiblecatalog.ncip.v2.service.Version1ItemUseRestrictionType;
 import org.extensiblecatalog.ncip.v2.service.Version1LookupItemProcessingError;
+import org.extensiblecatalog.ncip.v2.service.Version1LookupUserProcessingError;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
@@ -92,11 +93,11 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 		boolean itemIdsIsEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
 
 		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
-				&& initData.getBibliographicId(0).getBibliographicItemId() == null
+				&& initData.getBibliographicId(0).getBibliographicRecordId() != null
 				&& initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier().isEmpty();
 
 		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
-				&& initData.getBibliographicId(0).getBibliographicRecordId() == null
+				&& initData.getBibliographicId(0).getBibliographicItemId() != null
 				&& initData.getBibliographicId(0).getBibliographicItemId().getBibliographicItemIdentifier().isEmpty();
 
 		if (itemIdsIsEmpty && bibRecIdIsEmpty && bibItemIdIsEmpty) {
@@ -256,11 +257,20 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 				if (ke.getShortMessage().equals(KohaException.NOT_FOUND_404)) {
 
 					if (wantSeeAllProblems) {
-						Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + ke.getNotFoundIdentifierValue()
-								+ ", you are searching for, does not exist.");
+						Problem p;
+						boolean userNotFound = false;
+						
+						if (ke.getMessage().equals("User not found..\n")) {							
+							p = new Problem(Version1LookupUserProcessingError.UNKNOWN_USER, null, "User you specified in Ext element was not found.");
 
+							responseData.setProblems(Arrays.asList(p));
+							break;
+						} else {
+							p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + ke.getNotFoundIdentifierValue()
+									+ ", you are searching for, does not exist.");
+						}
 						bibInformation.setProblems(Arrays.asList(p));
-
+						
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
