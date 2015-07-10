@@ -59,7 +59,6 @@ public class KohaConstants {
 	public static final String ILS_DI_LOOKUP_USER = "GetPatronInfo";
 	public static final String ILS_DI_LOOKUP_ITEM = "GetRecords";
 
-	public static final String SVC_AUTHENTICATION = "authentication";
 	public static final String SVC_NCIP = "ncip";
 
 	public static final String STATUS_OK = "ok";

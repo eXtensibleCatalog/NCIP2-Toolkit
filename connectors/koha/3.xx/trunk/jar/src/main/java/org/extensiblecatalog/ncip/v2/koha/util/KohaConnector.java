@@ -68,10 +68,8 @@ public class KohaConnector {
 
 	private static InputSource streamSource;
 
-	private static URL authenticationUrl;
-
 	private static String currentSessionIdCookie = "";
-
+	
 	private static int loginAttempts;
 
 	public KohaConnector() throws ServiceException {
@@ -129,12 +127,6 @@ public class KohaConnector {
 			}
 
 			try {
-				authenticationUrl = getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_AUTHENTICATION).toURL();
-			} catch (MalformedURLException e) {
-				throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to create svc authentication url from toolkit.properties");
-			}
-
-			try {
 				// This try block checks for "TrustAllCertificates" in configuration & if it is set to "true"
 
 				if (Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_TRUST_ALL_CERTIFICATES))) {
@@ -159,7 +151,6 @@ public class KohaConnector {
 		} catch (Exception e1) {
 			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
 		}
-
 	}
 
 	private static class DefaultTrustManager implements X509TrustManager {
@@ -434,7 +425,14 @@ public class KohaConnector {
 
 	private String getPlainTextResponse(URL url, String identifier) throws KohaException, IOException, SAXException, URISyntaxException {
 
-		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		boolean isHttps = url.getProtocol() == "https";
+
+		HttpURLConnection conn = null;
+		if (isHttps)
+			conn = (HttpsURLConnection) url.openConnection();
+		else
+			conn = (HttpURLConnection) url.openConnection();
+		
 		conn.addRequestProperty("Cookie", currentSessionIdCookie);
 		int statusCode = conn.getResponseCode();
 		if (statusCode != 403) {
@@ -485,7 +483,7 @@ public class KohaConnector {
 	private static void renewSessionCookie() throws IOException, SAXException, KohaException {
 
 		if (++loginAttempts < 5) {
-			HttpURLConnection httpCon = (HttpURLConnection) authenticationUrl.openConnection();
+			HttpURLConnection httpCon = (HttpURLConnection) getCommonSvcNcipURLBuilder(null).toURL().openConnection();
 			httpCon.setDoOutput(true);
 			httpCon.setRequestMethod("POST");
 
