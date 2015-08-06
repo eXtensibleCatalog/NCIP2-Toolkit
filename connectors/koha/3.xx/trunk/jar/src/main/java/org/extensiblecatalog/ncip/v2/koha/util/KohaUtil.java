@@ -18,6 +18,7 @@ import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.Amount;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
+import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
@@ -498,11 +499,13 @@ public class KohaUtil {
 		String branchCode = (String) requestedItemParsed.get("branchcode");
 		String itemId = (String) requestedItemParsed.get("itemnumber");
 		
-		if (itemId == null) {
-			// Cannot actually process biblio-leveled request ..
+		String bibIdVal = (String) requestedItemParsed.get("biblionumber");
+		String requestId = (String) requestedItemParsed.get("reserve_id");
+		
+		if (itemId == null && bibIdVal == null || itemId == null && requestId == null) {
+			// Cannot create RequestItem without both itemId & requestId ..
 			return null;
 		}
-		String requestId = (String) requestedItemParsed.get("reserve_id");
 		String title = (String) requestedItemParsed.get("title");
 
 		String waitingDate = (String) requestedItemParsed.get("waitingdate");
@@ -513,10 +516,15 @@ public class KohaUtil {
 		if (branchCode != null)
 			requestedItem.setPickupLocation(new PickupLocation(branchCode));
 
-		requestedItem.setItemId(createItemId(itemId, branchCode));
+		if (itemId != null)
+			requestedItem.setItemId(createItemId(itemId, branchCode));
+
+		BibliographicId bibId = new BibliographicId();
+		bibId.setBibliographicItemId(KohaUtil.createBibliographicItemIdAsLegalDepositNumber(bibIdVal));
+		requestedItem.setBibliographicIds(Arrays.asList(bibId));
 
 		requestedItem.setRequestId(createRequestId(requestId, branchCode));
-		
+
 		requestedItem.setTitle(title);
 
 		if (waitingDate != null)
