@@ -1,0 +1,12 @@
+# Introduction #
+
+There are at least three approaches you can take when developing an NCIP Initiator for use with any NCIP Responder.
+
+# Write your own #
+The first approach is to write code to compose the NCIP messages as XML documents, substituting data at run time for the dynamic values - user ids, bibliographic ids, etc. Then you send that document as the body of an HTTP POST request to the NCIP responder, and extract its response from the HTTP response it returns. This is particularly well-suited to applications where there are few variations in the structures of the NCIP messages you'll be sending (e.g. with most Lookup services). Extracting the highly-structured data from an NCIP Response message can be more difficult, and you'll need to be careful to ensure that the documents you produce are well-formed and valid XML (e.g, escape characters that have special meaning in XML like the left-angle bracket "<").
+
+# Use XML binding toolkits #
+The second approach is to make use of XML binding toolkits available for most programming languages - e.g. castor or JAXB for Java, XML Serialization in .NET, CodeSynthesis XSD for C++, etc. (More information here: http://www.rpbourret.com/xml/XMLDataBinding.htm.) These provide a way to construct data objects that the tool will, at run-time, turn into an NCIP XML Document, serialized as a string or a stream of bytes that can be put into the body of an HTTP POST as with the first approach. They can also turn the NCIP Response message back into data objects which your code can process in the normal fashion. At the price of some complexity (and learning the toolkit's API), this will provide a more flexible and more object-oriented approach to processing the data in an NCIP message.
+
+# Use the NCIP 2 toolkit #
+The eXtensible Catalog's NCIP 2 toolkit includes an NCIP Initiator capability (the org.extensiblecatalog.ncip.v2.initiator project), and a set of examples illustrating use of it for each supported service (in the org.extensiblecatalog.ncip.v2.examples project). Note that this should work with <i>any</i> NCIP version 2 responder, not just ones based on the NCIP 2 toolkit. This gives you an object-oriented approach to processing the data in an NCIP message, and saves you from most of the complexity associated with using XML data binding tools. It's written in Java, so if you're not developing in the Java language, you'd have to find a way to call Java classes from your environment.
