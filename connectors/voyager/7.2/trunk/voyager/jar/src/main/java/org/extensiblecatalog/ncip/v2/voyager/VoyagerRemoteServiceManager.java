@@ -16,6 +16,11 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 
 import org.apache.commons.httpclient.HttpClient;
+
+import org.apache.commons.httpclient.params.DefaultHttpParams;
+import org.apache.commons.httpclient.params.HttpConnectionParams;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -64,7 +69,65 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     }
 
     public VoyagerRemoteServiceManager(Properties properties) {
-        client = new HttpClient(new MultiThreadedHttpConnectionManager());
+        MultiThreadedHttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
+        client = new HttpClient(manager);
+
+        int maxTotalConnections = 100;;
+        try {
+           maxTotalConnections = Integer.parseInt(voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_MAX_TOTAL_CONNECTIONS, "100"));
+        } catch (NumberFormatException e) {
+           log.warn("Couldn't parse parmater (integer) " + VoyagerConstants.CONFIG_VOYAGER_MAX_TOTAL_CONNECTIONS + ": " + e);
+        }
+
+        int maxHostConnections = 10000;
+        try {
+           maxHostConnections = Integer.parseInt(voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_MAX_TOTAL_CONNECTIONS, "10000"));
+        } catch (NumberFormatException e) {
+           log.warn("Couldn't parse parmater (integer) " + VoyagerConstants.CONFIG_VOYAGER_MAX_HOST_CONNECTIONS + ": " + e);
+        }
+
+        int connectionTimeout = 0;
+        try {
+           connectionTimeout = Integer.parseInt(voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_CONNECTION_TIMEOUT, "0"));
+        } catch (NumberFormatException e) {
+           log.warn("Couldn't parse parmater (integer) " + VoyagerConstants.CONFIG_VOYAGER_CONNECTION_TIMEOUT + ": " + e);
+        }
+
+        int socketTimeout = 0;
+        try {
+           socketTimeout = Integer.parseInt(voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_SOCKET_TIMEOUT, "0"));
+        } catch (NumberFormatException e) {
+           log.warn("Couldn't parse parmater (integer) " + VoyagerConstants.CONFIG_VOYAGER_SOCKET_TIMEOUT + ": " + e);
+        }
+
+        HttpConnectionManagerParams params = manager.getParams();
+
+        log.debug("ConnectionManagerParms: ORIGINAL Max Total Connections = " + params.getMaxTotalConnections());
+        log.debug("ConnectionManagerParms: ORIGINAL Default Max Connections Per Host = " + params.getDefaultMaxConnectionsPerHost());
+        log.debug("ConnectionManagerParms: ORIGINAL Max Connections Per Host = " + params.getMaxConnectionsPerHost(client.getHostConfiguration()));
+        log.debug("ConnectionManagerParms: ORIGINAL TCP getConnectionTimeout = " + params.getConnectionTimeout());
+        log.debug("ConnectionManagerParms: ORIGINAL TCP getSoTimeout = " + params.getSoTimeout());
+        log.debug("ConnectionManagerParms: ORIGINAL TCP getTcpNoDelay = " + params.getTcpNoDelay());
+        log.debug("ConnectionManagerParms: ORIGINAL TCP isStaleCheckingEnabled = " + params.isStaleCheckingEnabled());
+
+        params.setMaxTotalConnections(maxTotalConnections);
+        params.setDefaultMaxConnectionsPerHost(maxHostConnections);
+        params.setMaxConnectionsPerHost(client.getHostConfiguration(), maxHostConnections);
+
+        params.setTcpNoDelay(true);
+        params.setStaleCheckingEnabled(true);
+        params.setConnectionTimeout(connectionTimeout);
+        params.setSoTimeout(socketTimeout);
+
+        HttpConnectionManagerParams params2 = client.getHttpConnectionManager().getParams();
+
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS Max Total Connections = " + params2.getMaxTotalConnections());
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS Default Max Connections Per Host = " + params2.getDefaultMaxConnectionsPerHost());
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS Max Connections Per Host = " + params2.getMaxConnectionsPerHost(client.getHostConfiguration()));
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS TCP getConnectionTimeout = " + params2.getConnectionTimeout());
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS TCP getSoTimeout = " + params2.getSoTimeout());
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS TCP getTcpNoDelay = " + params2.getTcpNoDelay());
+        log.debug("ConnectionManagerParms: AFTER SETTING PARMS TCP isStaleCheckingEnabled = " + params2.isStaleCheckingEnabled());
     }
 
     /**
@@ -426,20 +489,22 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         InputStream response = null;
 
         try {
-            synchronized(client) {
-                putMethod = new PutMethod(url);
-                putMethod.setRequestEntity(new StringRequestEntity(inputXml));
-                statusCode = client.executeMethod(putMethod);
-            }
+            putMethod = new PutMethod(url);
+            putMethod.setRequestEntity(new StringRequestEntity(inputXml));
+            statusCode = client.executeMethod(putMethod);
             if (statusCode == 200) {
                 response = putMethod.getResponseBodyAsStream();
             } else {
                 log.error("Could not contact the vxws service. " + 
                 		"Received HTTP status code: " + statusCode);
+                if (putMethod != null) putMethod.releaseConnection();
+                return null;
             }
         }  catch (IOException e) {
             log.error("IOException caught while contacting the vxws service. " +
             		"An internal error occurred in the NCIP Toolkit.", e);
+            if (putMethod != null) putMethod.releaseConnection();
+            return null;
         }
 
         SAXBuilder builder = new SAXBuilder();
@@ -452,8 +517,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         } catch (IOException e) {
             log.error("IOException parsing xml response");
         } finally {
-            // Release the connection.
-            putMethod.releaseConnection();
+            if (putMethod != null) putMethod.releaseConnection();
         }
         return doc;
     }
@@ -470,26 +534,25 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     public Document getWebServicesDoc(String url) {
 
         int statusCode;
-        GetMethod getMethod;
+        GetMethod getMethod = null;
         log.debug("getWebServicesDoc using URL " + url);
         InputStream response;
 
         try {
-            synchronized(client) {
-                getMethod = new GetMethod(url);
-                statusCode = client.executeMethod(getMethod);
-            }
-
+            getMethod = new GetMethod(url);
+            statusCode = client.executeMethod(getMethod);
             if (statusCode == 200) {
                 response = getMethod.getResponseBodyAsStream();
             } else {
                 log.error("Could not contact the vxws service. " + 
                 		"Received HTTP status code: " + statusCode);
+                if (getMethod != null) getMethod.releaseConnection();
                 return null;
             }
         } catch (IOException e) {
             log.error("IOException caught while contacting the vxws service. " +
             		"An internal error occurred in the NCIP Toolkit.", e);
+            if (getMethod != null) getMethod.releaseConnection();
             return null;
         }
 
@@ -505,8 +568,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
             log.error("IOException parsing xml response");
             return null;
         } finally {
-            // Release the connection.
-            getMethod.releaseConnection();
+            if (getMethod != null) getMethod.releaseConnection();
         }
 
         return doc;
@@ -520,20 +582,22 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     	InputStream response = null;
     	
     	try {
-    		synchronized(client) {
-    			deleteMethod = new DeleteMethod(url);
-    			statusCode = client.executeMethod(deleteMethod);
-    		}
+    		deleteMethod = new DeleteMethod(url);
+    		statusCode = client.executeMethod(deleteMethod);
     		if (statusCode == 200) {
     			response = deleteMethod.getResponseBodyAsStream();
     		} else {
     			log.error("Cound not contact the vxws service with URL: " + url +
     					"  Received HTTP status code: " + statusCode);
+                	if (deleteMethod != null) deleteMethod.releaseConnection();
+                	return null;
     		}
     	} catch (IOException e) {
             log.error("IOException caught while contacting the vxws service. " +
             		"An internal error occurred in the NCIP Toolkit.", e);
-        }
+                if (deleteMethod != null) deleteMethod.releaseConnection();
+                return null;
+        } 
 
     	SAXBuilder builder = new SAXBuilder();
         Document doc = null;
@@ -545,8 +609,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         } catch (IOException e) {
             log.error("IOException parsing xml response");
         } finally {
-            // Release the connection.
-            deleteMethod.releaseConnection();
+            if (deleteMethod != null) deleteMethod.releaseConnection();
         }
 
         return doc;
@@ -567,19 +630,21 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         InputStream response = null;
 
         try {
-            synchronized(client) {
-                postMethod = new PostMethod(url);
-                statusCode = client.executeMethod(postMethod);
-            }
+            postMethod = new PostMethod(url);
+            statusCode = client.executeMethod(postMethod);
             if (statusCode == 200) {
                 response = postMethod.getResponseBodyAsStream();
             } else {
                 log.error("Cound not contact the vxws service with URL: " + url + 
                 		"  Recieved HTTP status code: " + statusCode);
+                if (postMethod != null) postMethod.releaseConnection();
+                return null;
             }
         } catch (IOException e) {
             log.error("IOException caught while contacting the vxws service. " +
             		"An internal error occurred in the NCIP Toolkit.", e);
+            if (postMethod != null) postMethod.releaseConnection();
+            return null;
         }
 
         SAXBuilder builder = new SAXBuilder();
@@ -592,8 +657,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         } catch (IOException e) {
             log.error("IOException parsing xml response");
         } finally {
-            // Release the connection.
-            postMethod.releaseConnection();
+            if (postMethod != null) postMethod.releaseConnection();
         }
 
         return doc;
@@ -615,20 +679,22 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         InputStream response = null;
 
         try {
-            synchronized(client) {
-                postMethod = new PostMethod(url);
-                postMethod.setRequestEntity(new StringRequestEntity(inputXml));
-                statusCode = client.executeMethod(postMethod);
-            }
+            postMethod = new PostMethod(url);
+            postMethod.setRequestEntity(new StringRequestEntity(inputXml));
+            statusCode = client.executeMethod(postMethod);
             if (statusCode == 200) {
                 response = postMethod.getResponseBodyAsStream();
             } else {
                 log.error("Could not contact the vxws service with URL: " + url + "." +
                 		"Received HTTP status code: " + statusCode);
+                if (postMethod != null) postMethod.releaseConnection();
+                return null;
             }
         }  catch (IOException e) {
             log.error("IOException caught while contacting the vxws service. " +
             		"An internal error occurred in the NCIP Toolkit.", e);
+            if (postMethod != null) postMethod.releaseConnection();
+            return null;
         }
 
         SAXBuilder builder = new SAXBuilder();
@@ -641,8 +707,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         } catch (IOException e) {
             log.error("IOException parsing xml response");
         } finally {
-            // Release the connection.
-            postMethod.releaseConnection();
+            if (postMethod != null) postMethod.releaseConnection();
         }
 
         return doc;

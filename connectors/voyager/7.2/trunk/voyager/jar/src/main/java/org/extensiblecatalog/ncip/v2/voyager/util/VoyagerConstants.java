@@ -76,6 +76,31 @@ public class VoyagerConstants {
      */
     public static final String CONFIG_VOYAGER_DEFAULT_CURRENCY = "VoyagerDefaultCurrency";
 
+    /**********************************************************/
+    /********** Voyager Connection Pool Parameters ************/
+    /**********************************************************/
+    /**
+     * Parameter for specifying the maximum number of connections to VXWS
+     */
+    public static final String CONFIG_VOYAGER_MAX_TOTAL_CONNECTIONS = "VoyagerMaxTotalConnections";
+
+    /**
+     * Parameter for specifying the maximum number of connections to VXWS per host
+     */
+    public static final String CONFIG_VOYAGER_MAX_HOST_CONNECTIONS = "VoyagerMaxHostConnections";
+
+    /**
+     * Parameter for specifying the connection timeout (in seconds) to VXWS
+     */
+    public static final String CONFIG_VOYAGER_CONNECTION_TIMEOUT = "VoyagerConnectionTimeout";
+
+    /**
+     * Parameter for specifying the socket timeout (in seconds) to VXWS
+     */
+    public static final String CONFIG_VOYAGER_SOCKET_TIMEOUT = "VoyagerSocketTimeout";
+    /**********************************************************/
+    /**********************************************************/
+
 	/**
      * Location Type Enum, Defined in the Schema
      */
@@ -180,4 +205,5 @@ public class VoyagerConstants {
      * Parameter for specifying if multiple tomcat instances are used for vxws
      */
     public static final String CONFIG_VOYAGER_MULTIPLE_TOMCATS = "MultipleTomcats";
+
 }
