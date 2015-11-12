@@ -80,6 +80,11 @@ public class VoyagerConstants {
     /********** Voyager Connection Pool Parameters ************/
     /**********************************************************/
     /**
+     * Parameter for specifying whether or not to use a connection pool to connect to VXWS
+     */
+    public static final String CONFIG_VOYAGER_USE_CONNECTION_POOL = "VoyagerUseConnectionPool";
+
+    /**
      * Parameter for specifying the maximum number of connections to VXWS
      */
     public static final String CONFIG_VOYAGER_MAX_TOTAL_CONNECTIONS = "VoyagerMaxTotalConnections";

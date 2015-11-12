@@ -57,6 +57,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     /** Logger */
     static Logger log = Logger.getLogger(VoyagerRemoteServiceManager.class);
     HttpClient client;
+    boolean useConnectionPool;
 
     private VoyagerConfiguration voyagerConfig;
     {
@@ -69,6 +70,23 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     }
 
     public VoyagerRemoteServiceManager(Properties properties) {
+        useConnectionPool = false;
+        String useConnectionPoolStr = voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_USE_CONNECTION_POOL, "0");
+        if (useConnectionPoolStr.equalsIgnoreCase("1") || useConnectionPoolStr.equalsIgnoreCase("true")) useConnectionPool = true;
+        if (useConnectionPool) setupConnectionPool();
+    }
+
+    private HttpClient getClient() {
+        if (useConnectionPool) return client;
+        return new HttpClient();
+    }
+
+    /**
+     * Sets up and returns a connection to the voyager database whose location and
+     * driver are defined in the configuration file.
+     */
+    private void setupConnectionPool()
+    {
         MultiThreadedHttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
         client = new HttpClient(manager);
 
@@ -491,7 +509,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         try {
             putMethod = new PutMethod(url);
             putMethod.setRequestEntity(new StringRequestEntity(inputXml));
-            statusCode = client.executeMethod(putMethod);
+            statusCode = getClient().executeMethod(putMethod);
             if (statusCode == 200) {
                 response = putMethod.getResponseBodyAsStream();
             } else {
@@ -540,7 +558,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
 
         try {
             getMethod = new GetMethod(url);
-            statusCode = client.executeMethod(getMethod);
+            statusCode = getClient().executeMethod(getMethod);
             if (statusCode == 200) {
                 response = getMethod.getResponseBodyAsStream();
             } else {
@@ -583,7 +601,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
     	
     	try {
     		deleteMethod = new DeleteMethod(url);
-    		statusCode = client.executeMethod(deleteMethod);
+    		statusCode = getClient().executeMethod(deleteMethod);
     		if (statusCode == 200) {
     			response = deleteMethod.getResponseBodyAsStream();
     		} else {
@@ -631,7 +649,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
 
         try {
             postMethod = new PostMethod(url);
-            statusCode = client.executeMethod(postMethod);
+            statusCode = getClient().executeMethod(postMethod);
             if (statusCode == 200) {
                 response = postMethod.getResponseBodyAsStream();
             } else {
@@ -681,7 +699,7 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         try {
             postMethod = new PostMethod(url);
             postMethod.setRequestEntity(new StringRequestEntity(inputXml));
-            statusCode = client.executeMethod(postMethod);
+            statusCode = getClient().executeMethod(postMethod);
             if (statusCode == 200) {
                 response = postMethod.getResponseBodyAsStream();
             } else {
