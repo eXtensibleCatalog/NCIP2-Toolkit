@@ -717,11 +717,11 @@ public class KohaUtil {
 		return bibliographicDescription;
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException, ParseException {
 		return parseItemOptionalFields(kohaItem, KohaUtil.luisInitDataToLookupItemInitData(initData, itemIdVal));
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemInitiationData initData) throws ServiceException {
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemInitiationData initData) throws ServiceException, ParseException {
 
 		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired() || initData.getLocationDesired();
 		ItemOptionalFields iof = new ItemOptionalFields();
@@ -756,6 +756,15 @@ public class KohaUtil {
 		if (initData.getCirculationStatusDesired()) {
 			String circulationStatus = (String) kohaItem.get("circulationStatus");
 			iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+			
+			if (circulationStatus.equalsIgnoreCase("On Loan")) {
+				String dueDateParsed = (String) kohaItem.get("dueDate");
+				
+				if (dueDateParsed != null) {
+					GregorianCalendar dueDate = parseGregorianCalendarFromKohaDate(dueDateParsed);
+					iof.setDateDue(dueDate);
+				}
+			}
 		}
 
 		if (initData.getHoldQueueLengthDesired()) {

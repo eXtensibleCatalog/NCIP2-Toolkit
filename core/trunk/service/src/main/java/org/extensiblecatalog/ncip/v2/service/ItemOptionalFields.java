@@ -11,6 +11,7 @@ package org.extensiblecatalog.ncip.v2.service;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import java.math.BigDecimal;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -28,6 +29,7 @@ public class ItemOptionalFields {
     protected SecurityMarker securityMarker;
     protected String holdQueue;
     protected Boolean sensitizationFlag = false;
+    protected GregorianCalendar dateDue;
 
     public ItemDescription getItemDescription() {
         return itemDescription;
@@ -123,6 +125,14 @@ public class ItemOptionalFields {
 
     public void setSensitizationFlag(boolean sensitizationFlag) {
         this.sensitizationFlag = sensitizationFlag;
+    }
+    
+    public GregorianCalendar getDateDue() {
+    	return dateDue;
+    }
+    
+    public void setDateDue(GregorianCalendar dateDue) {
+    	this.dateDue = dateDue;
     }
 
     /**
