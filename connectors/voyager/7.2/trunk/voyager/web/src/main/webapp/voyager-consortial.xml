@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- EXAMPLE voyager.xml config file -->
+<Context>
+<Parameter name="ILSDefaultAgency" value="DEFAULTdb" override="true"/>
+<Parameter name="ConsortialUse" value="true" override="true"/>
+<Parameter name="VoyagerVxwsUrl" value="http://some-vxws-server.org:8080" override="true"/>
+<Parameter name="VoyagerDatabaseUrl" value="jdbc:oracle:thin:@some-oracle-server:1521:DEFAULT" override="true"/>
+<Parameter name="VoyagerOracleUser" value="DefaultUser" override="true"/>
+<Parameter name="VoyagerDatabaseReadOnlyUsername" value="readonlyuser" override="true"/>
+<Parameter name="VoyagerDatabaseReadOnlyPassword" value="readonlypwd" override="true"/>
+
+<!-- Connection Pool Parameters -->
+<Parameter name="VoyagerUseConnectionPool" value="true" override="true"/>
+<Parameter name="VoyagerMaxTotalConnections" value="10000" override="true"/>
+<Parameter name="VoyagerMaxHostConnections" value="99999" override="true"/>
+<Parameter name="VoyagerConnectionTimeout" value="0" override="true"/>
+<Parameter name="VoyagerSocketTimeout" value="0" override="true"/>
+
+<Parameter name="AFF1" value="AFF1db" override="true"/>
+<Parameter name="AFF2" value="AFF2db" override="true"/>
+
+<Parameter name="AFF1db" value="1@AFF1DB20012345678901" override="true"/>
+<Parameter name="AFF2db" value="1@AFF2DB20022345678901" override="true"/>
+
+<Parameter name="AFF1dbdatabase" value="jdbc:oracle:thin:@some-oracle-server:1521:AFF1" override="true"/>
+<Parameter name="AFF1dbusername" value="someusername" override="true"/>
+<Parameter name="AFF1dbpassword" value="somepwd" override="true"/>
+<Parameter name="AFF1dbdbuser" value="AFF1DB" override="true"/>
+<Parameter name="AFF1dbvxwsUrl" value="http://some-vxws-server.org:8080/aff1" override="true"/>
+
+<Parameter name="AFF2dbdatabase" value="jdbc:oracle:thin:@some-oracle-server:1521:AFF2" override="true"/>
+<Parameter name="AFF2dbusername" value="someusername" override="true"/>
+<Parameter name="AFF2dbpassword" value="somepwd" override="true"/>
+<Parameter name="AFF2dbdbuser" value="AFF2DB" override="true"/>
+<Parameter name="AFF2dbvxwsUrl" value="http://some-vxws-server.org:8080/aff2" override="true"/>
+
+<Parameter name="MaxLuisItems" value="100" override="true"/>
+
+<Parameter name="ExternalLDAPLocation" value="ldap://some-ldap-server.edu override="true"/>
+<Parameter name="ExternalLDAPPort" value="389" override="true"/>
+<Parameter name="ExternalLDAPStart" value="ou=people, dc=someuniv, dc=edu" override="true"/>
+<Parameter name="ExternalLDAPUsernameAttribute" value="uid" override="true"/>
+<Parameter name="ExternalLDAPUrId" value="urid" override="true"/>
+<Parameter name="ExternalLDAPLastname" value="sn" override="true"/>
+
+<Parameter name="CoreConfiguration.AddedSVPClasses" value="org.extensiblecatalog.ncip.v2.service.XcCirculationStatus,org.extensiblecatalog.ncip.v2.service.XcRequestType" override="true"/>
+<Parameter name="ConnectorConfiguration.ConfigClass" value="org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConfiguration" override="true"/>
+<Parameter name="CoreConfiguration.AddedSVPClassesAllowNullScheme" value="org.extensiblecatalog.ncip.v2.service.RequestType" override="true"/>
+</Context>
+
