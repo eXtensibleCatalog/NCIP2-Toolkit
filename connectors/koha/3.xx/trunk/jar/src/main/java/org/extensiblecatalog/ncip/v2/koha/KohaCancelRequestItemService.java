@@ -97,9 +97,10 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 
 		responseData.setUserId(KohaUtil.createUserId(userId));
 		
-		if (!itemId.isEmpty())
+		if (itemId != null && ! itemId.isEmpty())
 			responseData.setItemId(KohaUtil.createItemId(itemId));
 		
-		responseData.setRequestId(KohaUtil.createRequestId(requestId));
+		if (requestId != null && ! requestId.isEmpty())
+			responseData.setRequestId(KohaUtil.createRequestId(requestId));
 	}
 }

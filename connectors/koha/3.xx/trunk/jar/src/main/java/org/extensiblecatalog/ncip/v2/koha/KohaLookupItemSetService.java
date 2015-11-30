@@ -2,8 +2,10 @@ package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -432,7 +434,7 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 
 	}
 
-	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response, ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal) throws ServiceException {
+	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response, ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal) throws ServiceException, ParseException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
 		int startFrom = 0, maxItemsToParse = 0;
@@ -495,6 +497,15 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 				if (initData.getCirculationStatusDesired()) {
 					String circulationStatus = (String) itemInfo.get("circulationStatus");
 					iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+					
+					if (circulationStatus.equalsIgnoreCase("On Loan")) {
+						String dueDateParsed = (String) itemInfo.get("dueDate");
+						
+						if (dueDateParsed != null) {
+							GregorianCalendar dueDate = KohaUtil.parseGregorianCalendarFromKohaDate(dueDateParsed);
+							iof.setDateDue(dueDate);
+						}
+					}
 				}
 
 				if (initData.getHoldQueueLengthDesired()) {
@@ -591,7 +602,7 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 		return holdingsSet;
 	}
 
-	private HoldingsSet parseHoldingsSetFromLookupItem(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException {
+	private HoldingsSet parseHoldingsSetFromLookupItem(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException, ParseException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 		ItemInformation itemInfo = new ItemInformation();
 

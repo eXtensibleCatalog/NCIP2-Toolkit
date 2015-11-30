@@ -80,7 +80,7 @@ public class KohaRequestItemService implements RequestItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, JSONObject requestItem) {
+	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, JSONObject requestItem) throws KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
@@ -91,10 +91,19 @@ public class KohaRequestItemService implements RequestItemService {
 		String itemId = (String) requestItem.get("itemId");
 		String requestId = (String) requestItem.get("requestId");
 
+		boolean itemIdNotSet = false;
+
 		responseData.setUserId(KohaUtil.createUserId(userId));
-		if (itemId != null)
+		if (itemId != null && !itemId.isEmpty())
 			responseData.setItemId(KohaUtil.createItemId(itemId));
-		responseData.setRequestId(KohaUtil.createRequestId(requestId));
+		else
+			itemIdNotSet = true;
+
+		if (requestId != null && !requestId.isEmpty())
+			responseData.setRequestId(KohaUtil.createRequestId(requestId));
+		else if (itemIdNotSet) {
+			throw KohaException.create500InternalServerError("Could not create response message because both requestId & itemId are missing in response from Koha server");
+		}
 
 		responseData.setRequestScopeType(initData.getRequestScopeType());
 		responseData.setRequestType(initData.getRequestType());
