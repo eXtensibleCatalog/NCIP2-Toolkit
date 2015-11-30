@@ -33,6 +33,12 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 
 
 /**
@@ -62,6 +68,29 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
     static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
     VoyagerRemoteServiceManager voyagerSvcMgr;
+
+    // Helper class for spinning off threads
+    class HoldingInfoFromWeb implements Callable {
+        private final int index;
+        private final BibliographicId bibId;
+        private Document restful;
+        private Document xml;
+
+        HoldingInfoFromWeb(int index, BibliographicId bibId){
+            this.index = index;
+            this.bibId = bibId;
+        }
+
+        public HoldingInfoFromWeb call() {
+            restful = getHoldingRecordsFromRestful(bibId);
+            xml = getHoldingRecordsFromXml(bibId);
+            return this;
+        }
+        public int getIndex() { return index; }
+        public Document getRestful() { return restful; }
+        public Document getXml() { return xml; }
+    }
+
 
     /**
      * Construct a VoyagerRemoteServiceManager; 
@@ -129,10 +158,50 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
             log.debug("after removing already processed Bib ids = "+bibIds);
         }
 
+        // Retrieve XML from vxws web services
+        List<Document> holdingsDocsFromRestful = new ArrayList<Document>(bibIds.size());
+        List<Document> holdingsDocsFromXml = new ArrayList<Document>(bibIds.size());
+        int i;
+        int numBibs = bibIds.size();
+
+        // In a non-consortial environment, most LUIS calls will be on a single bib
+        if (numBibs < 2) {
+            for (i=0; i<numBibs; i++) {
+                BibliographicId bibId = bibIds.get(i);
+                holdingsDocsFromRestful.add(i, getHoldingRecordsFromRestful(bibId));
+                holdingsDocsFromXml.add(i, getHoldingRecordsFromXml(bibId));
+            }
+        // But in a consortial environment, there can be many bibs in a LUIS call
+        // For now, let's look up each bib in a separate thread; perhaps later, we may need to get more sophisticated/smart w/r/t resources?
+        } else {
+            ExecutorService exec = Executors.newFixedThreadPool(numBibs);
+            List<Future<HoldingInfoFromWeb>> futureList = new ArrayList<Future<HoldingInfoFromWeb>>(numBibs);
+            List<Callable<HoldingInfoFromWeb>> callList = new ArrayList<Callable<HoldingInfoFromWeb>>(numBibs);
+
+            for (i=0; i<numBibs; i++) {
+                BibliographicId bibId = bibIds.get(i);
+                callList.add(new HoldingInfoFromWeb(i, bibId));
+            }
+            try {
+                futureList = exec.invokeAll(callList);
+                for(Future<HoldingInfoFromWeb> future: futureList) {
+                    HoldingInfoFromWeb result = future.get();
+                    holdingsDocsFromRestful.add(result.getIndex(), result.getRestful());
+                    holdingsDocsFromXml.add(result.getIndex(), result.getXml());
+                }
+            } catch (InterruptedException ex) {
+                log.error("Error calling vxws services via ExecutorService: " + ex);
+            } catch (ExecutionException ex) {
+                log.error("Error calling vxws services via ExecutorService: " + ex);
+            } finally {
+                exec.shutdownNow();
+            }
+        }
+
         List<BibInformation> bibInformations = new ArrayList<BibInformation>();
 
-        // Loop through Bib Ids in request
-        for (BibliographicId bibId : bibIds) {
+        for (i=0; i<numBibs; i++) {
+            BibliographicId bibId = bibIds.get(i);
 
             String id = null;
             String itemAgencyId = null;
@@ -165,9 +234,9 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                     continue;
                 }
 
-                // Retrieve XML from vxws web services
-                holdingsDocFromRestful = getHoldingRecordsFromRestful(bibId);
-                holdingsDocFromXml = getHoldingRecordsFromXml(bibId);
+                // We had already called these services in the beginning
+                holdingsDocFromRestful = holdingsDocsFromRestful.get(i);
+                holdingsDocFromXml = holdingsDocsFromXml.get(i);
 
                 if (holdingsDocFromXml == null) {
                     problems.addAll(ServiceHelper.generateProblems(
