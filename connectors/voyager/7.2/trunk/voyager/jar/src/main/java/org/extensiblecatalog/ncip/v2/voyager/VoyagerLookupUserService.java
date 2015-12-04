@@ -333,11 +333,8 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 ItemId itemId = new ItemId();
 
-                String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL"))
-                    institutionAgencyId = patronAgencyId;
-                else
-                    institutionAgencyId = institutionAgencyId.substring(1);
+                String institutionAgencyId = requestItem.getChildText("dbKey");
+                institutionAgencyId = voyagerConfig.getUbidFromAgency(institutionAgencyId);
 
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(requestItem.getChildText("itemId"));
@@ -578,12 +575,8 @@ public class VoyagerLookupUserService implements LookupUserService {
                 RequestedItem requestedItem = new RequestedItem();
                 ItemId itemId = new ItemId();
 
-                String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL")) {
-                    institutionAgencyId = patronAgencyId;
-                } else {
-                    institutionAgencyId = institutionAgencyId.substring(1);
-                }
+                String institutionAgencyId = requestItem.getChildText("dbKey");
+                institutionAgencyId = voyagerConfig.getUbidFromAgency(institutionAgencyId);
 
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(requestItem.getChildText("itemId"));
@@ -681,12 +674,8 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 ItemId itemId = new ItemId();
 
-                String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL")) {
-                    institutionAgencyId = patronAgencyId;
-                } else {
-                    institutionAgencyId = institutionAgencyId.substring(1);
-                }
+                String institutionAgencyId = requestItem.getChildText("dbKey");
+                institutionAgencyId = voyagerConfig.getUbidFromAgency(institutionAgencyId);
 
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(requestItem.getChildText("itemId"));
@@ -726,11 +715,12 @@ public class VoyagerLookupUserService implements LookupUserService {
                 	requestedItem.setHoldQueuePosition(new BigDecimal("0"));
                 }
                 
-                log.info("Pickup location: " + requestItem.getChildText("pickupLocation"));
+                String pickupLocation = requestItem.getChildText("pickupLocation");
+                log.info("Pickup location: " + pickupLocation);
 
-                if (!requestItem.getChildText("pickupLocation").equalsIgnoreCase("")) {
+                if (pickupLocation != null && !pickupLocation.equalsIgnoreCase("")) {
                     requestedItem.setPickupLocation(
-                    		new PickupLocation(requestItem.getChildText("pickupLocation")));
+                    		new PickupLocation(pickupLocation));
                 }
 
                 GregorianCalendar nullDate = new GregorianCalendar(0, 0, 0);
@@ -778,12 +768,10 @@ public class VoyagerLookupUserService implements LookupUserService {
                 loanedItem.setReminderLevel(new BigDecimal(1));
 
                 ItemId itemId = new ItemId();
-                String institutionAgencyId = institution.getAttributeValue("id");
-                if (institutionAgencyId.equalsIgnoreCase("LOCAL")) {
-                    institutionAgencyId = patronAgencyId;
-                } else {
-                    institutionAgencyId = institutionAgencyId.substring(1);
-                }
+
+                String institutionAgencyId = loan.getChildText("dbKey");
+                institutionAgencyId = voyagerConfig.getUbidFromAgency(institutionAgencyId);
+
                 itemId.setAgencyId(new AgencyId(institutionAgencyId));
                 itemId.setItemIdentifierValue(loan.getChildText("itemId"));
 
