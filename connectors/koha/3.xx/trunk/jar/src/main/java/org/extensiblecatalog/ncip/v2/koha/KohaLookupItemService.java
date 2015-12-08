@@ -9,6 +9,7 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -81,7 +82,7 @@ public class KohaLookupItemService implements LookupItemService {
 		return responseData;
 	}
 
-	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, JSONObject kohaItem) throws ServiceException, KohaException {
+	protected void updateResponseData(LookupItemInitiationData initData, LookupItemResponseData responseData, JSONObject kohaItem) throws ServiceException, KohaException, ParseException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 

@@ -82,6 +82,7 @@ public class KohaConstants {
 	public static final String PARAM_BOR_NO_DESIRED = "borNoDesired";
 	
 	public static final String PARAM_LOANED_ITEMS_DESIRED = "loanedItemsDesired";
+	public static final String PARAM_LOANED_ITEMS_HISTORY_DESIRED = "loanedItemsHistoryDesired";
 	public static final String PARAM_REQUESTED_ITEMS_DESIRED = "requestedItemsDesired";
 	public static final String PARAM_USER_FISCAL_ACCOUNT_DESIRED = "userFiscalAccountDesired";
 	public static final String PARAM_BLOCK_OR_TRAP_DESIRED = "blockOrTrapDesired";

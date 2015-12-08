@@ -8,9 +8,9 @@ CancelRequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaCancelRequ
 CreateUserFiscalTransactionService.class=org.extensiblecatalog.ncip.v2.koha.KohaCreateUserFiscalTransactionService
 LookupAgencyService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupAgencyService
 LookupItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemService
-LookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
+#LookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
 LookupRequestService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupRequestService
-LookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
+#LookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
 RequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRequestItemService
 RenewItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRenewItemService
 
@@ -22,6 +22,7 @@ RenewItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRenewItemService
 
 # ILS
 ILSDIvOneOneLookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
+ILSDIvOneOneLookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
 DozerTranslatorConfiguration.MappingFiles=ilsdiv1_1_mappings.xml
 TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_JAXBDozerTranslator
 NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements,ncip_v2_02_ils-di_extensions.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements

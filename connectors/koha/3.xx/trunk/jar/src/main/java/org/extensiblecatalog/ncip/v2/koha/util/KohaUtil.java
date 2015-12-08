@@ -498,10 +498,10 @@ public class KohaUtil {
 
 		String branchCode = (String) requestedItemParsed.get("branchcode");
 		String itemId = (String) requestedItemParsed.get("itemnumber");
-		
+
 		String bibIdVal = (String) requestedItemParsed.get("biblionumber");
 		String requestId = (String) requestedItemParsed.get("reserve_id");
-		
+
 		if (itemId == null && bibIdVal == null || itemId == null && requestId == null) {
 			// Cannot create RequestItem without both itemId & requestId ..
 			return null;
@@ -717,7 +717,8 @@ public class KohaUtil {
 		return bibliographicDescription;
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException, ParseException {
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal)
+			throws ServiceException, ParseException {
 		return parseItemOptionalFields(kohaItem, KohaUtil.luisInitDataToLookupItemInitData(initData, itemIdVal));
 	}
 
@@ -756,10 +757,10 @@ public class KohaUtil {
 		if (initData.getCirculationStatusDesired()) {
 			String circulationStatus = (String) kohaItem.get("circulationStatus");
 			iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
-			
+
 			if (circulationStatus.equalsIgnoreCase("On Loan")) {
 				String dueDateParsed = (String) kohaItem.get("dueDate");
-				
+
 				if (dueDateParsed != null) {
 					GregorianCalendar dueDate = parseGregorianCalendarFromKohaDate(dueDateParsed);
 					iof.setDateDue(dueDate);
@@ -808,5 +809,12 @@ public class KohaUtil {
 		recordId.setBibliographicRecordIdentifier(itemIdVal);
 		recordId.setBibliographicRecordIdentifierCode(Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER);
 		return recordId;
+	}
+
+	public static String getAppProfileType(NCIPInitiationData initData) {
+		if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getApplicationProfileType() == null) {
+			return "";
+		}
+		return initData.getInitiationHeader().getApplicationProfileType().getValue();
 	}
 }

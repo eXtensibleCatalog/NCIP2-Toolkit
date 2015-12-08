@@ -2005,7 +2005,7 @@
     </mapping>
 
     <mapping map-null="false">
-        <class-a>org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData</class-a>
+        <class-a>org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupUserInitiationData</class-a>
         <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LookupUser</class-b>
         <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_SchemeValuePairToBooleanConverter"
                 custom-converter-param="org.extensiblecatalog.ncip.v2.service.Version1UserElementType.AUTHENTICATION_INPUT">
@@ -2071,6 +2071,16 @@
                 custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.UserFiscalAccountDesired">
             <a>userFiscalAccountDesired</a>
             <b>userFiscalAccountDesired</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_AtomicTypeExtensionConverter"
+                custom-converter-param="java.math.BigDecimal,MaximumItemsCount">
+            <a>maximumItemsCount</a>
+            <b>ext</b>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_AtomicTypeExtensionConverter"
+                custom-converter-param="java.lang.String,NextItemToken">
+            <a>nextItemToken</a>
+            <b>ext</b>
         </field>
     </mapping>
 

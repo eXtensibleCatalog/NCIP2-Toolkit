@@ -15,11 +15,13 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Resource.AuthenticationType;
 
 import org.apache.commons.lang.StringUtils;
+import org.extensiblecatalog.ncip.v2.koha.util.ItemToken;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -30,10 +32,12 @@ import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserService;
+import org.extensiblecatalog.ncip.v2.service.NCIPService;
 import org.extensiblecatalog.ncip.v2.service.NameInformation;
 import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
 import org.extensiblecatalog.ncip.v2.service.Problem;
@@ -58,10 +62,12 @@ import org.xml.sax.SAXException;
 
 import com.sun.xml.xsom.impl.scd.Iterators.Map;
 
-public class KohaLookupUserService implements LookupUserService {
+public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LookupUserService {
+	
+	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
 	@Override
-	public LookupUserResponseData performService(LookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
+	public LookupUserResponseData performService(ILSDIvOneOneLookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
 		final LookupUserResponseData responseData = new LookupUserResponseData();
 
@@ -107,13 +113,13 @@ public class KohaLookupUserService implements LookupUserService {
 		return responseData;
 	}
 
-	private boolean desiredAnything(LookupUserInitiationData initData) {
+	private boolean desiredAnything(ILSDIvOneOneLookupUserInitiationData initData) {
 		return initData.getBlockOrTrapDesired() || initData.getDateOfBirthDesired() || initData.getLoanedItemsDesired() || initData.getNameInformationDesired()
 				|| initData.getRequestedItemsDesired() || initData.getUserAddressInformationDesired() || initData.getUserFiscalAccountDesired()
 				|| initData.getUserPrivilegeDesired();
 	}
 
-	private void processAuthInput(LookupUserInitiationData initData, KohaRemoteServiceManager kohaRemoteServiceManager, LookupUserResponseData responseData) throws KohaException,
+	private void processAuthInput(ILSDIvOneOneLookupUserInitiationData initData, KohaRemoteServiceManager kohaRemoteServiceManager, LookupUserResponseData responseData) throws KohaException,
 			MalformedURLException, IOException, SAXException, URISyntaxException, org.json.simple.parser.ParseException {
 		String userId = null, pass = null;
 		for (AuthenticationInput input : initData.getAuthenticationInputs()) {
@@ -148,7 +154,7 @@ public class KohaLookupUserService implements LookupUserService {
 		initData.setUserId(KohaUtil.createUserId(userIdVal, LocalConfig.getDefaultAgency()));
 	}
 
-	private void updateResponseData(LookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
+	private void updateResponseData(ILSDIvOneOneLookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
 			throws ParseException, KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);

@@ -69,7 +69,7 @@ public class KohaConnector {
 	private static InputSource streamSource;
 
 	private static String currentSessionIdCookie = "";
-	
+
 	private static int loginAttempts;
 
 	public KohaConnector() throws ServiceException {
@@ -184,7 +184,8 @@ public class KohaConnector {
 
 	/**
 	 * @param patronId
-	 * @param {@link LookupUserInitiationData} initData
+	 * @param {@link
+	 * 			LookupUserInitiationData} initData
 	 * @return {@link KohaUser}
 	 * @throws MalformedURLException
 	 * @throws KohaException
@@ -208,8 +209,17 @@ public class KohaConnector {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER).addRequest(KohaConstants.PARAM_USER_ID, patronId);
 
-		if (loanedItemsDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED).addRequest(KohaConstants.PARAM_RENEWABILITY_DESIRED);
+		if (loanedItemsDesired) {
+			String appProfileType = KohaUtil.getAppProfileType(initData);
+			
+			if (appProfileType.contentEquals("LoanedItemsHistory")) {
+				// Loaned items history desired :)
+				urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_HISTORY_DESIRED);
+			} else {
+				// Regular loaned items desired
+				urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED).addRequest(KohaConstants.PARAM_RENEWABILITY_DESIRED);
+			}
+		}
 
 		if (requestedItemsDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_REQUESTED_ITEMS_DESIRED);
@@ -228,8 +238,8 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject cancelRequestItem(CancelRequestItemInitiationData initData, boolean itemIdIsNotEmpty) throws KohaException, IOException, SAXException,
-			ParserConfigurationException, URISyntaxException, ParseException {
+	public JSONObject cancelRequestItem(CancelRequestItemInitiationData initData, boolean itemIdIsNotEmpty)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CANCEL_REQUEST_ITEM).addRequest(KohaConstants.PARAM_USER_ID,
 				initData.getUserId().getUserIdentifierValue());
@@ -244,8 +254,8 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, ParseException,
-			URISyntaxException {
+	public JSONObject lookupItem(LookupItemInitiationData initData)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, ParseException, URISyntaxException {
 
 		String itemIdVal = initData.getItemId().getItemIdentifierValue();
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM).addRequest(KohaConstants.PARAM_ITEM_ID, itemIdVal);
@@ -273,13 +283,13 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject lookupItem(String id, ILSDIvOneOneLookupItemSetInitiationData initData) throws ParserConfigurationException, IOException, SAXException, KohaException,
-			ParseException, URISyntaxException {
+	public JSONObject lookupItem(String id, ILSDIvOneOneLookupItemSetInitiationData initData)
+			throws ParserConfigurationException, IOException, SAXException, KohaException, ParseException, URISyntaxException {
 		return lookupItem(KohaUtil.luisInitDataToLookupItemInitData(initData, id));
 	}
 
-	public JSONObject lookupItemSet(String bibId, ILSDIvOneOneLookupItemSetInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException,
-			URISyntaxException, ParseException {
+	public JSONObject lookupItemSet(String bibId, ILSDIvOneOneLookupItemSetInitiationData initData)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET).addRequest(KohaConstants.PARAM_BIB_ID, bibId);
 
@@ -311,8 +321,8 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject lookupRequest(LookupRequestInitiationData initData, boolean requestIdIsNotEmpty) throws KohaException, IOException, SAXException,
-			ParserConfigurationException, ServiceException, URISyntaxException, ParseException {
+	public JSONObject lookupRequest(LookupRequestInitiationData initData, boolean requestIdIsNotEmpty)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException, URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_REQUEST);
 
@@ -327,7 +337,8 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject renewItem(RenewItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
+	public JSONObject renewItem(RenewItemInitiationData initData)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_RENEW_ITEM).addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue())
 				.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
@@ -342,8 +353,8 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
-			ParseException {
+	public JSONObject requestItem(RequestItemInitiationData initData)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_REQUEST_ITEM).addRequest(KohaConstants.PARAM_USER_ID,
 				initData.getUserId().getUserIdentifierValue());
@@ -432,7 +443,7 @@ public class KohaConnector {
 			conn = (HttpsURLConnection) url.openConnection();
 		else
 			conn = (HttpURLConnection) url.openConnection();
-		
+
 		conn.addRequestProperty("Cookie", currentSessionIdCookie);
 		int statusCode = conn.getResponseCode();
 		if (statusCode != 403) {

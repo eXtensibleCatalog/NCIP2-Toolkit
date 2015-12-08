@@ -20,6 +20,8 @@ import org.extensiblecatalog.ncip.v2.service.*;
 public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
 	protected ILSDIvOneOneLookupItemSetInitiationData ilsdivOneOnelookupItemSet;
+	
+	protected ILSDIvOneOneLookupUserInitiationData ilsdivOneOnelookupUser;
 
 	public void setLookupItemSet(
 			ILSDIvOneOneLookupItemSetInitiationData lookupItemSet) {
@@ -28,6 +30,15 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
 	public ILSDIvOneOneLookupItemSetInitiationData getLookupItemSet() {
 		return ilsdivOneOnelookupItemSet;
+	}
+
+	public void setLookupUser(
+			ILSDIvOneOneLookupItemSetInitiationData lookupUser) {
+		this.ilsdivOneOnelookupUser = ilsdivOneOnelookupUser;
+	}
+
+	public ILSDIvOneOneLookupUserInitiationData getLookupUser() {
+		return ilsdivOneOnelookupUser;
 	}
 
 	@Override
@@ -81,6 +92,12 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
 					if (toSearch.equalsIgnoreCase("getilsdivOneOnelookupItemSet")) {
 						Object obj = super.getLookupItemSet();
+						if (obj != null) {
+							result = (NCIPData) obj;
+							break;
+						}
+					} else if (toSearch.equalsIgnoreCase("getilsdivOneOnelookupUser")) {
+						Object obj = super.getLookupUser();
 						if (obj != null) {
 							result = (NCIPData) obj;
 							break;
