@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+	ns1:version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
+
+	<ns1:LookupUserResponse>
+		<ns1:UserId>
+			<ns1:AgencyId>KOH</ns1:AgencyId>
+			<ns1:UserIdentifierType>Institution Id Number</ns1:UserIdentifierType>
+			<ns1:UserIdentifierValue>3</ns1:UserIdentifierValue>
+		</ns1:UserId>
+		<ns1:Ext>
+			<ns1:LoanedItemsHistory>
+				<ns1:Page>1</ns1:Page>
+				<ns1:LastPage>12</ns1:LastPage>
+				<ns1:LoanedItem>
+					<ns1:ItemId>
+						<ns1:ItemIdentifierValue>382</ns1:ItemIdentifierValue>
+					</ns1:ItemId>
+					<ns1:IndeterminateLoanPeriodFlag />
+				</ns1:LoanedItem>
+				<ns1:LoanedItem>
+					<ns1:ItemId>
+						<ns1:ItemIdentifierValue>5</ns1:ItemIdentifierValue>
+					</ns1:ItemId>
+					<ns1:DateDue>2016-01-01T00:00:00Z</ns1:DateDue>
+					<ns1:Title>PHP 5</ns1:Title>
+				</ns1:LoanedItem>
+				<ns1:LoanedItem>
+					<ns1:ItemId>
+						<ns1:ItemIdentifierValue>11</ns1:ItemIdentifierValue>
+					</ns1:ItemId>
+					<ns1:DateDue>2016-01-01T00:00:00Z</ns1:DateDue>
+				</ns1:LoanedItem>
+			</ns1:LoanedItemsHistory>
+		</ns1:Ext>
+	</ns1:LookupUserResponse>
+</ns1:NCIPMessage>
