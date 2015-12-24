@@ -1,4 +1,3 @@
-# Note that after each little change here you should copy this file to /connectors/koha/20/trunk/jar/src/test/resources in orded to pass tests
 # But keep in mind this is configuration file which are all mandatory informations parsed for connector
 
 ToolkitConfiguration.PropertiesFileTitle=KohaWeb
@@ -9,23 +8,25 @@ CancelRequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaCancelRequ
 CreateUserFiscalTransactionService.class=org.extensiblecatalog.ncip.v2.koha.KohaCreateUserFiscalTransactionService
 LookupAgencyService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupAgencyService
 LookupItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemService
-LookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
+#LookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
 LookupRequestService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupRequestService
-LookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
+#LookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
 RequestItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRequestItemService
 RenewItemService.class=org.extensiblecatalog.ncip.v2.koha.KohaRenewItemService
 
 # NCIP 2_02
-DozerTranslatorConfiguration.MappingFiles=ncipv2_02_mappings.xml
-TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator
-NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements
-NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd
+#DozerTranslatorConfiguration.MappingFiles=ncipv2_02_mappings.xml
+#TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.dozer.NCIPv2_02JAXBDozerTranslator
+#NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ncipv2_02.jaxb.elements
+#NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd
 
 # ILS
-#DozerTranslatorConfiguration.MappingFiles=ilsdiv1_0_bc_mappings.xml
-#TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.dozer.ILSDIv1_0_bc_JAXBDozerTranslator
-#NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_01.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.elements,ncip_v2_01_ils-di_bc_extensions.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_0_bc.jaxb.elements
-#NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_01_ils-di_bc_extensions.xsd
+ILSDIvOneOneLookupItemSetService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupItemSetService
+ILSDIvOneOneLookupUserService.class=org.extensiblecatalog.ncip.v2.koha.KohaLookupUserService
+DozerTranslatorConfiguration.MappingFiles=ilsdiv1_1_mappings.xml
+TranslatorConfiguration.ClassName=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_JAXBDozerTranslator
+NCIP2TranslatorConfiguration.SchemaURLsToPackageMap=ncip_v2_02.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements,ncip_v2_02_ils-di_extensions.xsd=org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements
+NCIPServiceValidatorConfiguration.SupportedSchemaURLs=ncip_v2_02.xsd,ncip_v2_02_ils-di_extensions.xsd
 
 # To write copies of the NCIP messages (initiation & response) to the log:
 TranslatorConfiguration.LogMessages=true
@@ -48,7 +49,7 @@ UserRegistrationLink=LibraryRegistrationLinkHere
 AuthDataFormatType=text/plain
 
 IntranetServer=KohaIPHere
-IntranetPort=8080
+IntranetPort=KohaPortHere
 
 # Set this to true only for testing purposes & only when you know your OPAC is having unsigned certificate
 TrustAllCertificates=false
