@@ -22,6 +22,8 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 	protected ILSDIvOneOneLookupItemSetInitiationData ilsdivOneOnelookupItemSet;
 	
 	protected ILSDIvOneOneLookupUserInitiationData ilsdivOneOnelookupUser;
+	
+	protected ILSDIvOneOneLookupUserResponseData ilsdivOneOnelookupUserResponse;
 
 	public void setLookupItemSet(
 			ILSDIvOneOneLookupItemSetInitiationData lookupItemSet) {
@@ -33,14 +35,22 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 	}
 
 	public void setLookupUser(
-			ILSDIvOneOneLookupItemSetInitiationData lookupUser) {
+			ILSDIvOneOneLookupUserInitiationData lookupUser) {
 		this.ilsdivOneOnelookupUser = ilsdivOneOnelookupUser;
 	}
 
 	public ILSDIvOneOneLookupUserInitiationData getLookupUser() {
 		return ilsdivOneOnelookupUser;
 	}
+	
+	public void setILSDIvOneOneLookupUserResponse(ILSDIvOneOneLookupUserResponseData ilsdivOneOnelookupUserResponse) {
+		this.ilsdivOneOnelookupUserResponse = ilsdivOneOnelookupUserResponse;
+	}
 
+    public ILSDIvOneOneLookupUserResponseData getLookupUserResponse() {
+        return ilsdivOneOnelookupUserResponse;
+    }
+	
 	@Override
 	public NCIPInitiationData getInitiationData()
 			throws InvocationTargetException, IllegalAccessException,
@@ -59,6 +69,22 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 		return initData;
 
 	}
+
+	@Override
+    public NCIPResponseData getResponseData() throws InvocationTargetException, IllegalAccessException, ServiceException {
+
+        NCIPResponseData respData;
+        NCIPData ncipData = unwrap(this);
+        if ( ncipData instanceof NCIPResponseData ) {
+            respData = (NCIPResponseData) ncipData;
+        } else {
+            throw new ServiceException(ServiceError.INVALID_MESSAGE_FORMAT,
+                    "Response message not a recognized type. (Found '" + ncipData.getClass().getSimpleName() + "'.)");
+        }
+
+        return respData;
+
+    }
 
 	/**
 	 * Iterate over the fields, find the first {@Link NCIPData} field

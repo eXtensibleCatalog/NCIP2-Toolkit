@@ -10,9 +10,9 @@
 			<ns1:UserIdentifierValue>3</ns1:UserIdentifierValue>
 		</ns1:UserId>
 		<ns1:Ext>
-			<ns1:LoanedItemsHistory>
-				<ns1:Page>1</ns1:Page>
-				<ns1:LastPage>12</ns1:LastPage>
+			<ns2:LoanedItemsHistory>
+				<ns2:Page>1</ns2:Page>
+				<ns2:LastPage>12</ns2:LastPage>
 				<ns1:LoanedItem>
 					<ns1:ItemId>
 						<ns1:ItemIdentifierValue>382</ns1:ItemIdentifierValue>
@@ -32,7 +32,7 @@
 					</ns1:ItemId>
 					<ns1:DateDue>2016-01-01T00:00:00Z</ns1:DateDue>
 				</ns1:LoanedItem>
-			</ns1:LoanedItemsHistory>
+			</ns2:LoanedItemsHistory>
 		</ns1:Ext>
 	</ns1:LookupUserResponse>
 </ns1:NCIPMessage>

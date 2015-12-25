@@ -13,10 +13,10 @@ import org.extensiblecatalog.ncip.v2.service.*;
 /**
  * Defines the interface for the NCIP Lookup User service.
  */
-public interface ILSDIv1_1_LookupUserService extends NCIPService<ILSDIvOneOneLookupUserInitiationData, LookupUserResponseData> {
+public interface ILSDIv1_1_LookupUserService extends NCIPService<ILSDIvOneOneLookupUserInitiationData, ILSDIvOneOneLookupUserResponseData> {
 
     @Override
-    LookupUserResponseData performService(ILSDIvOneOneLookupUserInitiationData initData,
+    ILSDIvOneOneLookupUserResponseData performService(ILSDIvOneOneLookupUserInitiationData initData,
                                              ServiceContext serviceContext,
                                              RemoteServiceManager serviceManager)
             throws ServiceException;

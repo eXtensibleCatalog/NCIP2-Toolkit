@@ -2072,20 +2072,15 @@
             <a>userFiscalAccountDesired</a>
             <b>userFiscalAccountDesired</b>
         </field>
-        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_AtomicTypeExtensionConverter"
-                custom-converter-param="java.math.BigDecimal,MaximumItemsCount">
-            <a>maximumItemsCount</a>
-            <b>ext</b>
-        </field>
-        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_AtomicTypeExtensionConverter"
-                custom-converter-param="java.lang.String,NextItemToken">
-            <a>nextItemToken</a>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_ExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneHistoryDesired,org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.HistoryDesired">
+            <a>historyDesired</a>
             <b>ext</b>
         </field>
     </mapping>
 
     <mapping map-null="false">
-        <class-a>org.extensiblecatalog.ncip.v2.service.LookupUserResponseData</class-a>
+        <class-a>org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIvOneOneLookupUserResponseData</class-a>
         <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LookupUserResponse</class-b>
         <field>
             <a>requestedItems</a>
@@ -2116,6 +2111,11 @@
             <a>loanedItems</a>
             <b>loanedItem</b>
             <b-hint>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LoanedItem</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_ExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.ilsdiv1_1.LoanedItemsHistory,org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LoanedItemsHistory">
+            <a>loanedItemsHistory</a>
+            <b>ext</b>
         </field>
     </mapping>
 

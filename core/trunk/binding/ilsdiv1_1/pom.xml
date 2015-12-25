@@ -99,7 +99,7 @@
                             <useDependenciesAsEpisodes>true</useDependenciesAsEpisodes>
                             <extension>true</extension>
 							<verbose>true</verbose>
-							<forceRegenerate>true</forceRegenerate>
+							<forceRegenerate>false</forceRegenerate>
 						</configuration>
 					</execution>
 				</executions>

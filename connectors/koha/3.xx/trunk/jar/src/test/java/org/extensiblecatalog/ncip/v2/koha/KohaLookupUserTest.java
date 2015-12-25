@@ -15,7 +15,7 @@ public class KohaLookupUserTest extends TestCase {
 
 		KohaLookupUserService service = new KohaLookupUserService();
 		KohaRemoteServiceManager serviceManager = new KohaRemoteServiceManager();
-		LookupUserInitiationData initData = new LookupUserInitiationData();
+		ILSDIvOneOneLookupUserInitiationData initData = new ILSDIvOneOneLookupUserInitiationData();
 		LookupUserResponseData responseData = new LookupUserResponseData();
 
 		// Input:

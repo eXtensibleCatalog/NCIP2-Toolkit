@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LoanedItem;
+import org.extensiblecatalog.ncip.v2.ilsdiv1_1.LoanedItemsHistory;
 import org.extensiblecatalog.ncip.v2.service.AccountBalance;
 import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
@@ -33,11 +34,13 @@ import org.extensiblecatalog.ncip.v2.service.FiscalTransactionReferenceId;
 import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.HoldingsInformation;
 import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
@@ -816,5 +819,19 @@ public class KohaUtil {
 			return "";
 		}
 		return initData.getInitiationHeader().getApplicationProfileType().getValue();
+	}
+	
+	public static LoanedItemsHistory parseLoanedItemsHistory(JSONObject kohaItem, ILSDIvOneOneLookupUserInitiationData initData) {
+		LoanedItemsHistory loanedItemsHistory = new LoanedItemsHistory();
+		
+		loanedItemsHistory.setPage(initData.getHistoryDesired().getPage());
+		
+		loanedItemsHistory.setLastPage(new BigDecimal(5)); // FIXME
+		
+		List<LoanedItem> loanedItems = new ArrayList<LoanedItem>();
+		// TODO add loanedItems
+		loanedItemsHistory.setLoanedItems(loanedItems);
+		
+		return loanedItemsHistory;		
 	}
 }

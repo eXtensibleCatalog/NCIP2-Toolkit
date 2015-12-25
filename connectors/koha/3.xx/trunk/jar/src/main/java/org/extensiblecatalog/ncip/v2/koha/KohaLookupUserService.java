@@ -15,13 +15,11 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource.AuthenticationType;
-
 import org.apache.commons.lang.StringUtils;
-import org.extensiblecatalog.ncip.v2.koha.util.ItemToken;
+import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIvOneOneLookupUserResponseData;
+import org.extensiblecatalog.ncip.v2.ilsdiv1_1.LoanedItemsHistory;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
@@ -30,14 +28,10 @@ import org.extensiblecatalog.ncip.v2.service.AccountDetails;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
-import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LoanedItem;
-import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
-import org.extensiblecatalog.ncip.v2.service.LookupUserService;
-import org.extensiblecatalog.ncip.v2.service.NCIPService;
 import org.extensiblecatalog.ncip.v2.service.NameInformation;
 import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
 import org.extensiblecatalog.ncip.v2.service.Problem;
@@ -48,28 +42,21 @@ import org.extensiblecatalog.ncip.v2.service.ResponseHeader;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
-import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
-import org.extensiblecatalog.ncip.v2.service.UserElementType;
 import org.extensiblecatalog.ncip.v2.service.UserFiscalAccount;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
-import org.extensiblecatalog.ncip.v2.service.Version1UserIdentifierType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
-import com.sun.xml.xsom.impl.scd.Iterators.Map;
-
 public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LookupUserService {
 	
-	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
-
 	@Override
-	public LookupUserResponseData performService(ILSDIvOneOneLookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
+	public ILSDIvOneOneLookupUserResponseData performService(ILSDIvOneOneLookupUserInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
-		final LookupUserResponseData responseData = new LookupUserResponseData();
+		final ILSDIvOneOneLookupUserResponseData responseData = new ILSDIvOneOneLookupUserResponseData();
 
 		KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
@@ -116,7 +103,7 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 	private boolean desiredAnything(ILSDIvOneOneLookupUserInitiationData initData) {
 		return initData.getBlockOrTrapDesired() || initData.getDateOfBirthDesired() || initData.getLoanedItemsDesired() || initData.getNameInformationDesired()
 				|| initData.getRequestedItemsDesired() || initData.getUserAddressInformationDesired() || initData.getUserFiscalAccountDesired()
-				|| initData.getUserPrivilegeDesired();
+				|| initData.getUserPrivilegeDesired() || initData.getHistoryDesired() != null;
 	}
 
 	private void processAuthInput(ILSDIvOneOneLookupUserInitiationData initData, KohaRemoteServiceManager kohaRemoteServiceManager, LookupUserResponseData responseData) throws KohaException,
@@ -154,7 +141,7 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 		initData.setUserId(KohaUtil.createUserId(userIdVal, LocalConfig.getDefaultAgency()));
 	}
 
-	private void updateResponseData(ILSDIvOneOneLookupUserInitiationData initData, LookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
+	private void updateResponseData(ILSDIvOneOneLookupUserInitiationData initData, ILSDIvOneOneLookupUserResponseData responseData, JSONObject kohaUser, KohaRemoteServiceManager svcMgr)
 			throws ParseException, KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
@@ -220,6 +207,11 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 			if (initData.getDateOfBirthDesired()) {
 				String dateOfBirth = (String) userInfo.get("dateofbirth");
 				userOptionalFields.setDateOfBirth(KohaUtil.parseGregorianCalendarFromKohaDate(dateOfBirth));
+			}
+			
+			if (initData.getHistoryDesired() != null) {
+				LoanedItemsHistory loanedItemsHistory = KohaUtil.parseLoanedItemsHistory(userInfo, initData);
+				responseData.setLoanedItemsHistory(loanedItemsHistory);
 			}
 		}
 

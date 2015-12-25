@@ -8,8 +8,6 @@
 
 package org.extensiblecatalog.ncip.v2.service;
 
-import java.math.BigDecimal;
-
 /**
  * Data to initiate the LookupItemSet service.
  */
@@ -18,26 +16,15 @@ public class ILSDIvOneOneLookupUserInitiationData extends LookupUserInitiationDa
     /**
      * Maximum items count
      */
-    protected BigDecimal maximumItemsCount;
-    /**
-     * Next Item Token
-     */
-    protected String nextItemToken;
+    protected ILSDIvOneOneHistoryDesired historyDesired;
+
+	public ILSDIvOneOneHistoryDesired getHistoryDesired() {
+		return historyDesired;
+	}
+
+	public void setHistoryDesired(ILSDIvOneOneHistoryDesired historyDesired) {
+		this.historyDesired = historyDesired;
+	}
     
-    public BigDecimal getMaximumItemsCount() {
-        return maximumItemsCount;
-    }
-
-    public void setMaximumItemsCount(BigDecimal maximumItemsCount) {
-        this.maximumItemsCount = maximumItemsCount;
-    }
-
-    public String getNextItemToken() {
-        return nextItemToken;
-    }
-
-    public void setNextItemToken(String nextItemToken) {
-        this.nextItemToken = nextItemToken;
-    }
-
+    
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+<ns1:NCIPMessage xmlns:ns2="https://ncip.knihovny.cz/ILSDI/ncip/2015/extensions" xmlns:ns1="http://www.niso.org/2008/ncip"
 	ns1:version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
 
 	<ns1:LookupUser>
@@ -10,9 +10,9 @@
 			<ns1:UserIdentifierValue>3</ns1:UserIdentifierValue>
 		</ns1:UserId>
 		<ns1:Ext>
-			<ns1:HistoryDesired>
-				<ns1:Page>1</ns1:Page>
-			</ns1:HistoryDesired>
+			<ns2:HistoryDesired>
+				<ns2:Page>1</ns2:Page>
+			</ns2:HistoryDesired>
 		</ns1:Ext>
 	</ns1:LookupUser>
 </ns1:NCIPMessage>

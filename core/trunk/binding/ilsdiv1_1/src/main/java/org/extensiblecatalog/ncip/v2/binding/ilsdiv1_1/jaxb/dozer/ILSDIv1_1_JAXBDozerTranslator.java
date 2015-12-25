@@ -22,6 +22,7 @@ import javax.xml.bind.PropertyException;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 public class ILSDIv1_1_JAXBDozerTranslator extends BaseJAXBDozerTranslator<org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.NCIPMessage> {
@@ -106,9 +107,10 @@ public class ILSDIv1_1_JAXBDozerTranslator extends BaseJAXBDozerTranslator<org.e
             String msgName = ServiceHelper.getMessageName(responseData);
 
             // Create a service.NCIPMessage object and put the responseData object in it
-            NCIPMessage svcNCIPMessage = new NCIPMessage();
-            ReflectionHelper.setField(svcNCIPMessage, responseData, msgName);
-
+            ILSDIv1_1_NCIPMessage svcNCIPMessage = new ILSDIv1_1_NCIPMessage();
+            
+            setField(svcNCIPMessage, responseData, msgName);
+            	
             serviceContext.validateBeforeMarshalling(svcNCIPMessage);
 
             // Map from the service.NCIPMessage object to the binding.jaxb.NCIPMessage object
@@ -153,5 +155,37 @@ public class ILSDIv1_1_JAXBDozerTranslator extends BaseJAXBDozerTranslator<org.e
 
         }
 
-    }    
+    }
+    
+    private static void setField(Object obj, Object fieldValue, String fieldName) throws InvocationTargetException, IllegalAccessException, ToolkitException {
+
+        // TODO: Consider whether this really should avoid setting fields to null
+        if (fieldValue != null) {
+
+            Class objClass = obj.getClass();
+            Method setterMethod = ReflectionHelper.findMethod(objClass, "set" + fieldName, fieldValue.getClass());
+            if (setterMethod != null) {
+
+                setterMethod.invoke(obj, fieldValue);
+
+            } else {
+            	
+            	// Check also super class in case of having custom NCIPMessage
+            	objClass = objClass.getSuperclass();
+            	setterMethod = ReflectionHelper.findMethod(objClass, "set" + fieldName, fieldValue.getClass());
+                if (setterMethod != null) {
+
+                    setterMethod.invoke(obj, fieldValue);
+
+                } else {
+                	
+                	objClass = objClass.getSuperclass();
+
+                    throw new ToolkitException("No such field '" + fieldName + "' in " + objClass.getName());
+
+                }
+            }
+        }
+
+    }
 }
