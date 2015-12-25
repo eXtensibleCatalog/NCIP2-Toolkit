@@ -16,8 +16,6 @@ if [ -f $config ]; then
 
 	if [ "$yn" == "n" ]; then
 		exit 0
-	else
-		rm $config
 	fi
 fi
 
