@@ -15,7 +15,8 @@ i=$(docker run -d -p 8080:8080 xcncip2toolkit/xcncip2toolkit)
 if [ $i ]; then
 echo ""
 echo "XCNCIP2Toolkit deployment is done."
-echo "You can test it here: http://localhost:8080/aleph-web/"
-echo "And here: http://localhost:8080/koha-web/ (Ctrl + click)"
+echo "You can test on one of these links depending on your connector installed:"
+echo "http://localhost:8080/aleph-web/"
+echo "http://localhost:8080/koha-web/ (Ctrl + click)"
 echo ""
 fi

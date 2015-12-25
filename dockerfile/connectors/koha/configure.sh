@@ -5,11 +5,27 @@ export LC_ALL=cs_CZ.UTF-8
 export LANGUAGE=cs_CZ.UTF-8
 export LANG=cs_CZ.UTF-8
 
-config='toolkit.properties'
-cp toolkit.properties.example $config
+dir=$(dirname $0)
+configTmp=$dir/toolkit.properties.tmp
+config=$dir/toolkit.properties
+
+# Check if the configuration already exists ..
+if [ -f $config ]; then
+	echo
+	read -e -p "Configuration $config already exists, do you wish to create new one ? [Y/n]" yn
+
+	if [ "$yn" == "n" ]; then
+		exit 0
+	else
+		rm $config
+	fi
+fi
+
+# Create temporary configuration to change the default values at
+cp $dir/toolkit.properties.example $configTmp
 
 echo
-echo "Koha's configuration is on schedule.."
+echo "Koha's configTmpuration is on schedule.."
 echo ""
 echo "Please note that toolkit's koha connector cannot work without access to intranet, thus it is needed to provide."
 echo ""
@@ -17,9 +33,19 @@ read -e -p "Enter username to intranet: " adminName
 echo ""
 read -s -p "Enter password for specified user: " adminPass
 echo ""
-echo "Enter the hostname of your OPAC (e.g. http://ceska-trebova.cz or https://188.166.14.82)"
-echo "PLEASE INCLUDE http:// OR https:// ! It is also important not to add the backslash at the end"
-read -e -p "Hostname of your Koha Intranet:" opac
+read -s -p "Confirm the password: " adminPass2
+echo ""
+while [ "$adminPass2" !=  "$adminPass" ]; do
+	read -s -p "Wrong password, try again: " adminPass2
+	echo ""
+done
+echo ""
+echo "Now enter the hostname of your OPAC ( e.g. https://188.166.14.82)"
+echo "Please include http:// OR https:// protocol specification!"
+echo ""
+read -e -p "Hostname of your Koha Intranet: " opac
+# Purge the char '/' at the end if any ..
+opac=$(echo $opac | sed 's_/$__g')
 echo ""
 read -e -p "Port of your intranet (probably 8080):" port
 echo ""
@@ -32,14 +58,17 @@ echo ""
 read -e -p "Enter URL of your online registration form (optional): " registrationLink
 echo ""
 
-sed -i "s_LibraryAddressHere_$(echo $address)_g" $config
-sed -i "s_LibraryNameHere_$(echo $libraryName)_g" $config
-sed -i "s_LibrarySIGLAHere_$(echo $sigla)_g" $config
-sed -i "s_LibraryRegistrationLinkHere_$(echo $registrationLink)_g" $config
-sed -i "s_KohaIPHere_$(echo $opac)_g" $config
-sed -i "s_KohaPortHere_$(echo $port)_g" $config
+sed -i "s_LibraryAddressHere_$(echo $address)_g" $configTmp
+sed -i "s_LibraryNameHere_$(echo $libraryName)_g" $configTmp
+sed -i "s_LibrarySIGLAHere_$(echo $sigla)_g" $configTmp
+sed -i "s_LibraryRegistrationLinkHere_$(echo $registrationLink)_g" $configTmp
+sed -i "s_KohaIPHere_$(echo $opac)_g" $configTmp
+sed -i "s_KohaPortHere_$(echo $port)_g" $configTmp
 
-sed -i "s_IntranetAdministratorNameHere_$(echo $adminName)_g" $config
-sed -i "s_IntranetAdministratorPassHere_$(echo $adminPass)_g" $config
+sed -i "s_IntranetAdministratorNameHere_$(echo $adminName)_g" $configTmp
+sed -i "s_IntranetAdministratorPassHere_$(echo $adminPass)_g" $configTmp
 
-native2ascii -encoding utf8 toolkit.properties toolkit.properties
+native2ascii -encoding utf8 $configTmp $configTmp
+
+# Move the temp config to the real config
+mv $configTmp $config

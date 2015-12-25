@@ -58,20 +58,6 @@
 			<version>${toolkitVersion}</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.extensiblecatalog.ncip.v2</groupId>
-			<artifactId>initiator</artifactId>
-			<version>${toolkitVersion}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>binding-ncipv2_02</artifactId>
-			<version>${toolkitVersion}</version>
-			<scope>compile</scope>
-		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>binding-ilsdiv1_1</artifactId>
