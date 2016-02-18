@@ -301,9 +301,12 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                          int index = itemIds.indexOf(nextItemToken.getItemId());
                          log.debug("Index of nextitem: " + index);
                          if (index != -1) {
-                             itemIds.subList(0, index).clear();
+                             itemIds.subList(0, index+1).clear();
                          }
                          log.debug("after removing already processed item ids = "+itemIds);
+                         if (itemIds.size() < 1) {
+                             continue;
+                         }
                     }
 
                     HoldingsSet holdingSet = new HoldingsSet();
@@ -455,7 +458,7 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         if (itemCount == MAX_ITEMS_TO_RETURN) {
                             // Set next item token
                             ItemToken itemToken = new ItemToken();
-                            itemToken.setBibliographicId(id);
+                            itemToken.setBibliographicId(itemAgencyId + "_" + id);
                             itemToken.setHoldingsId(holdingId);
                             itemToken.setItemId(itemIds.get(itemIds.size() - 1));
                             int newToken = random.nextInt();
@@ -477,7 +480,7 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         if (itemCount == MAX_ITEMS_TO_RETURN) {
                             // Set next item token
                             ItemToken itemToken = new ItemToken();
-                            itemToken.setBibliographicId(id);
+                            itemToken.setBibliographicId(itemAgencyId + "_" + id);
                             itemToken.setHoldingsId(holdingId);
                             itemToken.setItemId("");
                             int newToken = random.nextInt();
@@ -594,8 +597,9 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
     private int getIndexOfBibId(List<BibliographicId> bibIds, String bibId) {
         for (int i = 0; i < bibIds.size() ; i++) {
-            if (bibIds.get(i).getBibliographicItemId().
-            		getBibliographicItemIdentifier().equalsIgnoreCase(bibId)) {
+        	String id = bibIds.get(i).getBibliographicRecordId().getBibliographicRecordIdentifier();
+            String itemAgencyId = bibIds.get(i).getBibliographicRecordId().getAgencyId().getValue();
+        	if (bibId.equalsIgnoreCase(itemAgencyId + "_" + id)) {
                 return i;
             }
         }
