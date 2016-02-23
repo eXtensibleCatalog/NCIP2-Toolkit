@@ -297,6 +297,18 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                     log.debug("Processing Holding id = " + holdingId);
                     itemIds = getItemIdsFromHoldingDoc(holdingId, holdingsDocFromRestful);
                     log.debug("All itemIds: " + itemIds);
+                    
+                    // We need to distinguish between Holdings with actual Item Records vs. ones without.
+                    // This is so we may parse Item Record-less Holdings records differently, e.g.,
+                    // add item-like info to them later (sans ItemID, of course, since they doen't refer to actual Item Records).
+                    // There are quite a few instances of Holdings without Item Records, but we still want to supply
+                    // useful information about them. The major (only?) difference will be the lack of ItemID.
+                    boolean hasItems = false;
+                    // Get Bib desc, holding set info only if items exist for that holdings
+                    if (itemIds != null && itemIds.size() > 0) {
+                        hasItems = true;
+                    }
+
                     if (nextItemToken != null) {
                          int index = itemIds.indexOf(nextItemToken.getItemId());
                          log.debug("Index of nextitem: " + index);
@@ -321,22 +333,17 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         }
 //                    }
 
-                    // Get Bib desc, holding set info only if items exist for that holdings
-                    if (itemIds != null && itemIds.size() > 0) {
+                    String callNumber = null;
+                    if (hasItems) {
+                        callNumber = getCallNumberForHoldingDoc(holdingId, holdingsDocFromRestful);
+                    } else {
+                        callNumber = getCallNumberForHoldingDocFromXml(holdingId, holdingsDocFromXml);
+                    }
+                    if (callNumber != null) {
+                        holdingSet.setCallNumber(callNumber);
+                    }
 
-                        holdingSet.setCallNumber(
-                        		getCallNumberForHoldingDoc(holdingId, holdingsDocFromRestful));
-
-                        // Set location
-                        // Decision made to omit Location at the Holding Set level this release
-                        /* Location location = null;
-                        if (initData.getLocationDesired()) {
-                            location = getPermanentLocationForHoldingDoc(holdingId, holdingsDocFromRestful);
-                            if (location != null) {
-                                holdingSet.setLocation(location);
-                            }
-                        } */
-
+                    if (hasItems) {
                         int newItemCount = itemCount + itemIds.size();
 
                         if (newItemCount > MAX_ITEMS_TO_RETURN) {
@@ -371,30 +378,24 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         */
 
                         Map<String, ItemDescription> itemDescriptions = null;
-                        if (initData.getItemDescriptionDesired()) {
+                        //if (initData.getItemDescriptionDesired()) {
                             itemDescriptions = getItemDescriptionForItemIds(
                             		itemIds, holdingsDocFromRestful);
-                        }
+                        //}
 
-                        // TODO: Refactor this because we no longer want to return a list of locs.
                         Map<String, Location> locations = null;
                         if (initData.getLocationDesired()) {
                             locations = getLocationForItemIds(itemIds, holdingsDocFromRestful);
                         }
 
                         Map<String, String> copyNumbers = new HashMap<String, String>();
-                        Map<String, GregorianCalendar> dueDates = null;
-                        if (itemDescriptions == null) {
-                            itemDescriptions = getItemDescriptionForItemIds(
-                            		itemIds, holdingsDocFromRestful);
-                        }
-
                         Iterator<String> itrId = itemDescriptions.keySet().iterator();
                         while (itrId.hasNext()) {
                             String key = itrId.next();
                             copyNumbers.put(itemDescriptions.get(key).getCopyNumber(), key);
                         }
 
+                        Map<String, GregorianCalendar> dueDates = null;
                         dueDates = getDueDateForItemIds(itemIds, holdingsDocFromXml,
                         		copyNumbers, holdingId);
 
@@ -404,9 +405,6 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                             String key = itr.next();
                             if (statuses != null) {
                             	String status = statuses.get(key);
-                            	if (status.equalsIgnoreCase("Hold")) {
-                            		status = "On Hold";
-                            	}
                             	log.debug("Status for key " + status);
                             	try {
 	                                if (statuses.get(key) != null) {
@@ -452,7 +450,6 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                         		new ArrayList<ItemInformation>(itemInformations.values()));
 
                         itemCount = itemCount + itemIds.size();
-
                         log.debug("Item count: " + itemCount);
 
                         if (itemCount == MAX_ITEMS_TO_RETURN) {
@@ -469,14 +466,43 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
 
                             reachedMaxItemCount = true;
 
+                            log.info("Adding new holding set");
                             holdingSets.add(holdingSet);
 
                             break;
                         }
-                    } else if (itemIds.size() == 0){
 
+                    // No Item Records, but we still want to return some Holdings info.
+                    } else {
                         itemCount = itemCount + 1;
                         log.debug("Item count: " + itemCount);
+
+                        Map<String, ItemInformation> itemInformations = 
+                                new HashMap<String, ItemInformation>();
+                        ItemInformation itemInformation = new ItemInformation();
+                        ItemId item = new ItemId();
+                        item.setItemIdentifierValue("");
+                        item.setAgencyId(new AgencyId(itemAgencyId));
+
+                        itemInformation.setItemId(item);
+
+                        /*** plug in item-like information for the non-item ***/
+                        ItemOptionalFields iof2 = new ItemOptionalFields();
+                        // Set location
+                        Location location = null;
+                        if (initData.getLocationDesired()) {
+                            location = getLocationForHoldingDocFromXml(holdingId, holdingsDocFromXml);
+                            if (location != null) {
+                                List<Location> tempLocations2 = new ArrayList<Location>();
+                                tempLocations2.add(location);
+                                iof2.setLocations(tempLocations2);
+                            }
+                        }
+                        itemInformation.setItemOptionalFields(iof2);                                                    
+                        itemInformations.put("N/A", itemInformation);
+                        holdingSet.setItemInformations(
+                                new ArrayList<ItemInformation>(itemInformations.values()));
+
                         if (itemCount == MAX_ITEMS_TO_RETURN) {
                             // Set next item token
                             ItemToken itemToken = new ItemToken();
@@ -490,19 +516,12 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
                             luisResponseData.setNextItemToken(Integer.toString(newToken));
 
                             reachedMaxItemCount = true;
+
+                            log.info("Adding new holding set");
+                            holdingSets.add(holdingSet);
+
+                            break;
                         }
-
-                        Map<String, ItemInformation> itemInformations = 
-                        		new HashMap<String, ItemInformation>();
-                        ItemInformation itemInformation = new ItemInformation();
-                        ItemId item = new ItemId();
-                        item.setItemIdentifierValue("");
-                        item.setAgencyId(new AgencyId(itemAgencyId));
-
-                        //itemInformation.setItemId(item);
-                        itemInformations.put("", itemInformation);
-                        holdingSet.setItemInformations(
-                        		new ArrayList<ItemInformation>(itemInformations.values()));
                     }
 
                     log.info("Adding new holding set");
@@ -835,6 +854,69 @@ public class VoyagerLookupItemSetService implements LookupItemSetService {
             throw new ILSException(e);
         }
         return callNumber;
+    }
+
+    static public String getCallNumberForHoldingDocFromXml(String holdingId, Document doc) throws ILSException {
+        Namespace serNs = Namespace.getNamespace(
+                "ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+                "hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace mhNs = Namespace.getNamespace("mfhd", "http://www.endinfosys.com/Voyager/mfhd");
+        String callNumber = null;
+        
+        try {
+            XPath xpath = XPath.newInstance("/ser:voyagerServiceData/ser:serviceData/hol:holdingsRecord/hol:mfhdCollection/mfhd:mfhdRecord[@mfhdId='"
+                    + holdingId + "']/mfhd:mfhdData[@name='callNumber']");
+            xpath.addNamespace(serNs);
+            xpath.addNamespace(holNs);
+            xpath.addNamespace(mhNs);
+            
+            Element thisMFHD = (Element) xpath.selectSingleNode(doc);
+            callNumber = thisMFHD.getTextTrim();
+            
+        } catch (JDOMException e) {
+            log.error("Error processing document in getCallNumberForHoldingDocFromXml()");
+            throw new ILSException(e);
+        }
+        return callNumber;
+    }
+
+    static public Location getLocationForHoldingDocFromXml(String holdingId, Document doc) throws ILSException {
+        Namespace serNs = Namespace.getNamespace(
+                "ser", "http://www.endinfosys.com/Voyager/serviceParameters");
+        Namespace holNs = Namespace.getNamespace(
+                "hol", "http://www.endinfosys.com/Voyager/holdings");
+        Namespace mhNs = Namespace.getNamespace("mfhd", "http://www.endinfosys.com/Voyager/mfhd");
+        Location location = null;
+        
+        try {
+            XPath xpath = XPath.newInstance("/ser:voyagerServiceData/ser:serviceData/hol:holdingsRecord/hol:mfhdCollection/mfhd:mfhdRecord[@mfhdId='"
+                    + holdingId + "']/mfhd:mfhdData[@name='locationDisplayName']");
+            xpath.addNamespace(serNs);
+            xpath.addNamespace(holNs);
+            xpath.addNamespace(mhNs);
+            
+            Element thisMFHD = (Element) xpath.selectSingleNode(doc);
+            String locationNameStr = thisMFHD.getTextTrim();
+            
+            LocationNameInstance locationNameInstance = new LocationNameInstance();
+            locationNameInstance.setLocationNameValue(locationNameStr);
+            //temporarily set to 1.
+            locationNameInstance.setLocationNameLevel(new BigDecimal("1"));
+            List<LocationNameInstance> locationNameInstances = 
+                    new ArrayList<LocationNameInstance>();
+            locationNameInstances.add(locationNameInstance);
+            LocationName locationName = new LocationName();
+            locationName.setLocationNameInstances(locationNameInstances);
+            location = new Location();
+            location.setLocationName(locationName);
+            location.setLocationType(Version1LocationType.TEMPORARY_LOCATION);
+            
+        } catch (JDOMException e) {
+            log.error("Error processing document in getLocationForHoldingDocFromXml()");
+            throw new ILSException(e);
+        }
+        return location;
     }
 
     private Location getPermanentLocationForHoldingDoc(String holdingId, Document doc) {
