@@ -45,7 +45,6 @@ public class VoyagerRenewItemService implements RenewItemService {
     static Logger log = Logger.getLogger(VoyagerRenewItemService.class);
     RenewItemResponseData renewItemResponseData;
     VoyagerRemoteServiceManager voyagerSvcMgr;
-    List<Problem> problems = new ArrayList<Problem>();
     String patronId;
     String patronAgencyId;
     String patronUbId;
@@ -77,6 +76,7 @@ public class VoyagerRenewItemService implements RenewItemService {
                                                  RemoteServiceManager serviceManager)
         throws ServiceException {
 
+        List<Problem> problems = new ArrayList<Problem>();
         renewItemResponseData = new RenewItemResponseData();
         voyagerSvcMgr = (VoyagerRemoteServiceManager) serviceManager;
 

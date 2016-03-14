@@ -48,7 +48,6 @@ public class VoyagerRequestItemService implements RequestItemService {
 
     static Logger log = Logger.getLogger(VoyagerRequestItemService.class);
     VoyagerRemoteServiceManager voyagerSvcMgr;
-    List<Problem> problems = new ArrayList<Problem>();
     
     private String itemId;
     private String bibId;
@@ -82,7 +81,7 @@ public class VoyagerRequestItemService implements RequestItemService {
             ServiceContext serviceContext,
             RemoteServiceManager serviceManager)
                     throws ServiceException {
-
+        List<Problem> problems = new ArrayList<Problem>();
         RequestItemResponseData requestItemResponseData = new RequestItemResponseData();
         voyagerSvcMgr = (VoyagerRemoteServiceManager) serviceManager;
         String host;
@@ -101,7 +100,7 @@ public class VoyagerRequestItemService implements RequestItemService {
         if (initData.getPickupLocation() != null) {
         	pickupCode = initData.getPickupLocation().getValue();
         } else {
-            List<Problem> problems = new ArrayList<Problem>();
+            problems = new ArrayList<Problem>();
             problems.addAll(ServiceHelper.generateProblems(
             		Version1GeneralProcessingError.NEEDED_DATA_MISSING,
                     "PickupLocation", null, "Pickup Location missing in request"));
@@ -244,7 +243,7 @@ public class VoyagerRequestItemService implements RequestItemService {
                 success = processRecall();
             }
         } catch (ILSException e) {
-            List<Problem> problems = new ArrayList<Problem>();
+            problems = new ArrayList<Problem>();
             problems.addAll(ServiceHelper.generateProblems(
             		Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
                     null, null, "Unable to process request"));
@@ -353,6 +352,7 @@ public class VoyagerRequestItemService implements RequestItemService {
 
         XMLOutputter xmlOutputter = new XMLOutputter();
         String xmlOutput = xmlOutputter.outputString(doc);
+        log.debug("The callslip request is:\nurl=" + url + "\nXML=" + xmlOutput);
 
         Document callslipResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
 
@@ -406,6 +406,7 @@ public class VoyagerRequestItemService implements RequestItemService {
 
         XMLOutputter xmlOutputter = new XMLOutputter();
         String xmlOutput = xmlOutputter.outputString(doc);
+        log.debug("The UB request is:\nurl=" + url + "\nXML=" + xmlOutput);
 
         Document ubResponse = voyagerSvcMgr.putWebServicesDoc(url, xmlOutput);
 

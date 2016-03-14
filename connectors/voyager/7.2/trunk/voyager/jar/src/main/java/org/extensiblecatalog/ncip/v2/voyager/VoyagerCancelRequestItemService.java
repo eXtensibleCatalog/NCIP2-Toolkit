@@ -37,7 +37,6 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
 
     static Logger log = Logger.getLogger(VoyagerRequestItemService.class);
     VoyagerRemoteServiceManager voyagerSvcMgr;
-    List<Problem> problems = new ArrayList<Problem>();
 
     private VoyagerConfiguration voyagerConfig;
     {
@@ -57,7 +56,7 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
 		
 		
 		log.debug("Starting CancelRequestItem Service.");
-		
+	    List<Problem> problems = new ArrayList<Problem>();
         CancelRequestItemResponseData cancelRequestItemResponseData = new CancelRequestItemResponseData();
         voyagerSvcMgr = (VoyagerRemoteServiceManager) serviceManager;
         String itemId;
@@ -173,7 +172,7 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
 	            	cancelRequestItemResponseData.setUserId(userId);
 	            }
 	            else {
-	            	List<Problem> problems = new ArrayList<Problem>();
+	            	problems = new ArrayList<Problem>();
 	                problems.addAll(ServiceHelper.generateProblems(
 	                		Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
 	                        null, null, "Unable to process cancel request"));
@@ -199,7 +198,7 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
 	            	cancelRequestItemResponseData.setUserId(userId);
 	            }
 	            else {
-	            	List<Problem> problems = new ArrayList<Problem>();
+	            	problems = new ArrayList<Problem>();
 	                problems.addAll(ServiceHelper.generateProblems(
 	                		Version1RequestItemProcessingError.USER_INELIGIBLE_TO_REQUEST_THIS_ITEM,
 	                        null, null, "Unable to process cancel request"));
