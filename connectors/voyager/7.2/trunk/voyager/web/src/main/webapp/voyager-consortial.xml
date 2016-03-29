@@ -3,6 +3,8 @@
 <Context>
 <Parameter name="ILSDefaultAgency" value="DEFAULTdb" override="true"/>
 <Parameter name="ConsortialUse" value="true" override="true"/>
+<Parameter name="OpacsvrUse" value="true" override="true"/>
+<Parameter name="OpacsvrVersion" value="2005.0@voyager" override="true"/>
 <Parameter name="VoyagerVxwsUrl" value="http://some-vxws-server.org:8080" override="true"/>
 <Parameter name="VoyagerDatabaseUrl" value="jdbc:oracle:thin:@some-oracle-server:1521:DEFAULT" override="true"/>
 <Parameter name="VoyagerOracleUser" value="DefaultUser" override="true"/>
@@ -27,12 +29,16 @@
 <Parameter name="AFF1dbpassword" value="somepwd" override="true"/>
 <Parameter name="AFF1dbdbuser" value="AFF1DB" override="true"/>
 <Parameter name="AFF1dbvxwsUrl" value="http://some-vxws-server.org:8080/aff1" override="true"/>
+<Parameter name="AFF1dbopacsvrHost" value="some-opacsvr-server.org" override="true"/>
+<Parameter name="AFF1dbopacsvrPort" value="9001" override="true"/>
 
 <Parameter name="AFF2dbdatabase" value="jdbc:oracle:thin:@some-oracle-server:1521:AFF2" override="true"/>
 <Parameter name="AFF2dbusername" value="someusername" override="true"/>
 <Parameter name="AFF2dbpassword" value="somepwd" override="true"/>
 <Parameter name="AFF2dbdbuser" value="AFF2DB" override="true"/>
 <Parameter name="AFF2dbvxwsUrl" value="http://some-vxws-server.org:8080/aff2" override="true"/>
+<Parameter name="AFF2dbopacsvrHost" value="some-opacsvr-server.org" override="true"/>
+<Parameter name="AFF2dbopacsvrPort" value="9002" override="true"/>
 
 <Parameter name="MaxLuisItems" value="100" override="true"/>
 

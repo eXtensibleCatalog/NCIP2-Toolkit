@@ -29,6 +29,13 @@ public class VoyagerConstants {
     public static final String CONFIG_CONSORTIUM = "ConsortialUse";
 
     /**
+     * Parameter indicating if site is a consortium and wishes to perform UB requests via opacsvr instead of VXWS
+     * (Currently, the VXWS RESTful Web Services do not seem to work correctly for UB requests.)
+     */
+    public static final String CONFIG_OPACSVR = "OpacsvrUse";
+    public static final String CONFIG_OPACSVR_VERSION = "OpacsvrVersion";
+
+    /**
      * Parameter for looking up the Voyager database's SID
      */
     public static final String CONFIG_VOYAGER_DB_URL = "VoyagerDatabaseUrl";

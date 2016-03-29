@@ -33,6 +33,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1RequestItemProcessingError;
 import org.extensiblecatalog.ncip.v2.voyager.util.ILSException;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConfiguration;
 import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConstants;
+import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerOpacsvr;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -118,6 +119,9 @@ public class VoyagerRequestItemService implements RequestItemService {
             return requestItemResponseData;
         }
         
+        String username = "";
+        String password = "";
+        
         // UserId is present
         if (initData.getUserId() != null){
             log.info("User id is " + initData.getUserId().getUserIdentifierValue());
@@ -182,16 +186,17 @@ public class VoyagerRequestItemService implements RequestItemService {
             String authenticatedUserId = voyagerSvcMgr.authenticateUser(
             		initData.getAuthenticationInputs(), host);
 
-            String username = "";
             for (AuthenticationInput a : initData.getAuthenticationInputs()) {
                 if (a.getAuthenticationInputType().getValue().equalsIgnoreCase("Username")) {
                     username = a.getAuthenticationInputData();
                 }  else if (
                 		a.getAuthenticationInputType().getValue().equalsIgnoreCase("LDAPUsername")) {
                     username = a.getAuthenticationInputData();
+                }  else if (a.getAuthenticationInputType().getValue().equalsIgnoreCase("Password")) {
+                    password = a.getAuthenticationInputData();
                 }
              }
-
+            
             patronId = authenticatedUserId;
 
             if (patronId == null) {
@@ -220,7 +225,8 @@ public class VoyagerRequestItemService implements RequestItemService {
         				initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
         		if (itemAgencyId == null) {
         			ubRequest = false;
-        		} else if (itemAgencyId.equalsIgnoreCase(toAgencyId)) {
+        		// it's a UB request UNLESS patron, item, and pickup agencies are the same
+        		} else if (itemAgencyId.equalsIgnoreCase(toAgencyId) && itemAgencyId.equalsIgnoreCase(patronUbId)) {
         			ubRequest = false;
         		} else {
         			ubRequest = true;
@@ -234,7 +240,7 @@ public class VoyagerRequestItemService implements RequestItemService {
                 success = processStackRetrieval(itemUbId);
             }
             else if (requestType.equalsIgnoreCase("Stack Retrieval") && ubRequest == true) {
-                success = processUBRequest(toAgencyId);
+                success = processUBRequest(toAgencyId, username, password);
             }
             else if (requestType.equalsIgnoreCase("Hold")) {
                 success = processHold();
@@ -370,11 +376,35 @@ public class VoyagerRequestItemService implements RequestItemService {
         }
     }
     
-    private boolean processUBRequest(String toAgencyId) throws ILSException {
+    private boolean processUBRequest(String toAgencyId, String username, String password) throws ILSException {
 
         String host = voyagerSvcMgr.getUrlFromAgencyId(itemAgencyId);
         String itemUbId = (String) voyagerConfig.getProperty(itemAgencyId);
         String pickupUbId = (String) voyagerConfig.getProperty(toAgencyId);
+        
+        boolean opacsvrUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(
+        		VoyagerConstants.CONFIG_OPACSVR));
+
+ 
+        if (opacsvrUse) {
+        	String opacsvrHost = voyagerSvcMgr.getOpacsvrHostFromAgencyId(itemAgencyId);
+        	int opacsvrPort = Integer.parseInt(voyagerSvcMgr.getOpacsvrPortFromAgencyId(itemAgencyId));
+        	String opacsvrVersion = (String)voyagerConfig.getProperty(
+            		VoyagerConstants.CONFIG_OPACSVR_VERSION);
+        	
+	        VoyagerOpacsvr item_opacsvr = new VoyagerOpacsvr(opacsvrHost, opacsvrPort, opacsvrVersion);
+	        item_opacsvr.init();
+	        int rc = item_opacsvr.requestUB(password,
+	                          username,
+	                          patronUbId,
+	                          bibId,
+	                          itemId,
+	                          pickupCode,
+	                          pickupUbId);
+	        log.info("VoyagerOpacsvr:requestUB RC=" + rc);
+	        item_opacsvr.close();
+        	return (rc == 0 ? true : false);
+        }
 
         Document doc = new Document();
         Element root = new Element("ub-request-parameters");

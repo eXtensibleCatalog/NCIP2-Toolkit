@@ -544,6 +544,14 @@ public class VoyagerRemoteServiceManager implements  RemoteServiceManager {
         return voyagerConfig.getProperty(agencyId + "vxwsUrl");
     }
 
+    public String getOpacsvrHostFromAgencyId(String agencyId) {
+        return voyagerConfig.getProperty(agencyId + "opacsvrHost");
+    }
+
+    public String getOpacsvrPortFromAgencyId(String agencyId) {
+        return voyagerConfig.getProperty(agencyId + "opacsvrPort");
+    }
+
     /**
      * Given a URL to a vxws service, issue an HTTP GET request to that URL
      * @param url url to GET
