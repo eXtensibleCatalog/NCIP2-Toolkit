@@ -210,8 +210,7 @@ public class VoyagerOpacsvr {
            }
        }
        if (! foundMFHD) {
-           log.error("Couldn't find MFHD.");
-           return -1;
+           log.warn("Couldn't find MFHD for item ID: " + item_id + ".");
        }
        //log.info("mfhd_id=" + mfhd_id);
 
