@@ -31,6 +31,7 @@ import org.extensiblecatalog.ncip.v2.voyager.util.VoyagerConstants;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
 public class VoyagerCancelRequestItemService implements CancelRequestItemService {
@@ -144,6 +145,8 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
         userId.setAgencyId(new AgencyId(patronAgencyId));
 		
 		String requestId = initData.getRequestId().getRequestIdentifierValue();
+		String requestAgencyId = initData.getRequestId().getAgencyId().getValue();
+		String requestAgencyUbId = (String) voyagerConfig.getProperty(requestAgencyId);
 		String requestType = initData.getRequestType().getValue();
 		
         boolean consortialUse = Boolean.parseBoolean(
@@ -155,12 +158,14 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
             	(String) voyagerConfig.getProperty(VoyagerConstants.CONFIG_VOYAGER_WEB_SERVICE_URL);
         }
 		
-        String truncatedUbId = patronUbId.substring(2);
+        String truncatedAgencyUbId = requestAgencyUbId.substring(2);
         
         if (requestType.equalsIgnoreCase("Hold")) {
 
 			String url = host + "/vxws/patron/" + patronId + "/circulationActions/requests/holds/" +
-					truncatedUbId + "%7C" + requestId + "?patron_homedb=" + patronUbId;
+					truncatedAgencyUbId + "%7C" + requestId + "?patron_homedb=" + patronUbId;
+
+	        log.debug("The cancel hold request is:\nurl=" + url);
 			
 			Document cancelRequestResponse = voyagerSvcMgr.deleteWebServicesDoc(url);
 	
@@ -185,8 +190,10 @@ public class VoyagerCancelRequestItemService implements CancelRequestItemService
         } else if (requestType.equalsIgnoreCase("Stack Retrieval")) {
 	        
 			String url = host + "/vxws/patron/" + patronId + 
-					"/circulationActions/requests/callslips/" + truncatedUbId + "%7C" +
+					"/circulationActions/requests/callslips/" + truncatedAgencyUbId + "%7C" +
 					requestId + "?patron_homedb=" + patronUbId;
+
+	        log.debug("The cancel stack retrieval request is:\nurl=" + url);
 			
 			Document cancelRequestResponse = voyagerSvcMgr.deleteWebServicesDoc(url);
 	
