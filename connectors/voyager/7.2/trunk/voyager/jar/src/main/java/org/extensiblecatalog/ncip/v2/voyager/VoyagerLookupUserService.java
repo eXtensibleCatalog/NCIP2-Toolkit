@@ -108,8 +108,8 @@ public class VoyagerLookupUserService implements LookupUserService {
                 }
             } else {  // User ID not present, assuming Authentication Input
 
-                if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getFromAgencyId() != null){
-                    patronAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+                if (initData.getInitiationHeader() != null && initData.getInitiationHeader().getToAgencyId() != null){
+                    patronAgencyId = initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
                     patronUbId = voyagerConfig.getProperty(patronAgencyId);
                 } else {
                     log.error("No From Agency ID found in the initiation header");

@@ -161,9 +161,9 @@ public class VoyagerRequestItemService implements RequestItemService {
         } else {  // User ID not present, assuming Authentication Input
 
             if (initData.getInitiationHeader() != null && 
-            			initData.getInitiationHeader().getFromAgencyId() != null){
+            			initData.getInitiationHeader().getToAgencyId() != null){
                 patronAgencyId = 
-                		initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+                		initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
                 patronUbId = (String) voyagerConfig.getProperty(patronAgencyId);
             } else {
                 log.error("No From Agency ID found in the initiation header");
@@ -217,16 +217,16 @@ public class VoyagerRequestItemService implements RequestItemService {
         
         boolean success = false;
         boolean ubRequest = false;
-        String toAgencyId = null;
+        String fromAgencyId = null;
         if (requestType.equalsIgnoreCase("Stack Retrieval")) {
         	if (initData.getInitiationHeader() != null && 
-        			initData.getInitiationHeader().getToAgencyId() != null) {
-        		toAgencyId = 
-        				initData.getInitiationHeader().getToAgencyId().getAgencyId().getValue();
+        			initData.getInitiationHeader().getFromAgencyId() != null) {
+        		fromAgencyId = 
+        				initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
         		if (itemAgencyId == null) {
         			ubRequest = false;
         		// it's a UB request UNLESS patron, item, and pickup agencies are the same
-        		} else if (itemAgencyId.equalsIgnoreCase(toAgencyId) && itemAgencyId.equalsIgnoreCase(patronUbId)) {
+        		} else if (itemAgencyId.equalsIgnoreCase(fromAgencyId) && itemAgencyId.equalsIgnoreCase(patronAgencyId)) {
         			ubRequest = false;
         		} else {
         			ubRequest = true;
@@ -240,7 +240,7 @@ public class VoyagerRequestItemService implements RequestItemService {
                 success = processStackRetrieval(itemUbId);
             }
             else if (requestType.equalsIgnoreCase("Stack Retrieval") && ubRequest == true) {
-                success = processUBRequest(toAgencyId, username, password);
+                success = processUBRequest(fromAgencyId, username, password);
             }
             else if (requestType.equalsIgnoreCase("Hold")) {
                 success = processHold();
@@ -376,11 +376,11 @@ public class VoyagerRequestItemService implements RequestItemService {
         }
     }
     
-    private boolean processUBRequest(String toAgencyId, String username, String password) throws ILSException {
+    private boolean processUBRequest(String fromAgencyId, String username, String password) throws ILSException {
 
         String host = voyagerSvcMgr.getUrlFromAgencyId(itemAgencyId);
         String itemUbId = (String) voyagerConfig.getProperty(itemAgencyId);
-        String pickupUbId = (String) voyagerConfig.getProperty(toAgencyId);
+        String pickupUbId = (String) voyagerConfig.getProperty(fromAgencyId);
         
         boolean opacsvrUse = Boolean.parseBoolean((String)voyagerConfig.getProperty(
         		VoyagerConstants.CONFIG_OPACSVR));
