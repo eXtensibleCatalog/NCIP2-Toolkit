@@ -498,12 +498,21 @@ public class VoyagerLookupUserService implements LookupUserService {
 
                 if (!fine.getChildText("itemTitle").equalsIgnoreCase("")){
                     ItemDetails itemDetails = new ItemDetails();
+
                     BibliographicDescription description = new BibliographicDescription();
                     description.setTitle(fine.getChildText("itemTitle"));
+                                        
                     // Set itemId to "".  vxws does not provide it yet toolkit expects it
                     ItemId itemId = new ItemId();
                     itemId.setItemIdentifierValue("");
+                    
+                    // It is still useful to know to which AgencyId this item belongs
+                    String institutionAgencyId = fine.getChildText("dbKey");
+                    institutionAgencyId = voyagerConfig.getUbidFromAgency(institutionAgencyId);
+                    itemId.setAgencyId(new AgencyId(institutionAgencyId));
+
                     itemDetails.setItemId(itemId);
+
                     itemDetails.setBibliographicDescription(description);
                     fiscalTransactionInformation.setItemDetails(itemDetails);
                 }
