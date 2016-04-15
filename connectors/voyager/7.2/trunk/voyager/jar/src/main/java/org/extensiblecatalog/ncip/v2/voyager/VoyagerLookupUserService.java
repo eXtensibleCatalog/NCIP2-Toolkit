@@ -466,6 +466,11 @@ public class VoyagerLookupUserService implements LookupUserService {
         log.debug("Found currencyCode: " + currencyCode);
 
         for (Element institution : institutionElements) {
+        	String totalFineAmount =  institution.getChild("balance").getChildText("finesum").split(" ")[1];
+        	totalFineAmount = totalFineAmount.split("\\.")[0];
+        	BigDecimal totalFinesForInstitution = new BigDecimal(totalFineAmount).multiply(new BigDecimal(100));
+        	totalFines = totalFines.add(totalFinesForInstitution);
+        	
             List<Element> fines = institution.getChildren("fine");
             for (Element fine : fines) {
                 log.debug("Getting here in fines");
@@ -474,8 +479,6 @@ public class VoyagerLookupUserService implements LookupUserService {
                 minorUnit = fineAmount.split("\\.")[1].length();
 
                 fineAmount = fineAmount.split("\\.")[0];
-                totalFines = totalFines.add(
-                		new BigDecimal(fineAmount).multiply(new BigDecimal(100)));
 
                 AccountDetails details = new AccountDetails();
 
@@ -527,7 +530,6 @@ public class VoyagerLookupUserService implements LookupUserService {
                 accountDetails.add(details);
             }
         }
-
         if (totalFines.compareTo(BigDecimal.ZERO) > 0) {
             AccountBalance accountBalance = new AccountBalance();
             accountBalance.setMonetaryValue(totalFines);
