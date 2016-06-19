@@ -45,6 +45,7 @@ public class KohaConstants {
 	public static final String CONF_TRANSFER_BRANCH_TIME = "TransferBranchTime";
 	public static final String CONF_CURRENCY_CODE = "CurrencyCode";
 	public static final String CONF_TRUST_ALL_CERTIFICATES = "TrustAllCertificates";
+	public static final String CONF_USE_REST_API_INSTEAD_OF_SVC = "UseRestApiInsteadOfSvc";
 
 	public static final String CONF_STRING_FORMAT_FOR_EXPIRED = "expired";
 	public static final String CONF_STRING_FORMAT_FOR_TOTALFINES = "totalfines";

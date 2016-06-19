@@ -182,7 +182,7 @@ public class KohaUtil {
 		return null;
 	}
 
-	private static BlockOrTrap createBlockOrTrap(String block) {
+	public static BlockOrTrap createBlockOrTrap(String block) {
 		BlockOrTrap blockOrTrap = new BlockOrTrap();
 		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", block));
 		blockOrTrap.setAgencyId(defaultAgencyId);
@@ -597,6 +597,7 @@ public class KohaUtil {
 
 		String dateDue = (String) loanedItemparsed.get("date_due");
 
+		// TODO implement renewable into Koha's REST API
 		String renewable = (String) loanedItemparsed.get("renewable");
 
 		if (renewable != null)
@@ -616,7 +617,7 @@ public class KohaUtil {
 
 		String transactionId = (String) userFiscalAccountParsed.get("accountno");
 
-		String description = (String) userFiscalAccountParsed.get("description");
+		String description = (String) userFiscalAccountParsed.get("note");
 
 		accountDetail.setAccrualDate(parseGregorianCalendarFromKohaDate(accrualDate));
 

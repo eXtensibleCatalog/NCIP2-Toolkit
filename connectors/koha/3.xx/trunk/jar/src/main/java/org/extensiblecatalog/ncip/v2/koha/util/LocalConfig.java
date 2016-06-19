@@ -10,6 +10,8 @@ import org.extensiblecatalog.ncip.v2.service.ServiceException;
 public class LocalConfig {
 
 	private static boolean echoParticularProblemsToLUIS;
+	
+	private static boolean useRestApiInsteadOfSvc;
 
 	private static String stringFormatForExpired;
 	private static String stringFormatForTotalfines;
@@ -54,6 +56,20 @@ public class LocalConfig {
 	 */
 	public static void setEchoParticularProblemsToLUIS(boolean echoParticularProblemsToLUIS) {
 		LocalConfig.echoParticularProblemsToLUIS = echoParticularProblemsToLUIS;
+	}
+	
+	/**
+	 * @return useRestApiInsteadOfSvc
+	 */
+	public static boolean useRestApiInsteadOfSvc() {
+		return useRestApiInsteadOfSvc;
+	}
+	
+	/**
+	 * @param useRestApiInsteadOfSvc
+	 */
+	public static void setUseRestApiInsteadOfSvc(boolean useRestApiInsteadOfSvc) {
+		LocalConfig.useRestApiInsteadOfSvc = useRestApiInsteadOfSvc;
 	}
 
 	/**

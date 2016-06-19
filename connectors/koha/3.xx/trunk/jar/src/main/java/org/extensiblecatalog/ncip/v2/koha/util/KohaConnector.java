@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.FutureTask;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -50,6 +51,7 @@ import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
 import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -99,6 +101,7 @@ public class KohaConnector {
 			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_PASS));
 
 			LocalConfig.setSvcSuffix(kohaConfig.getProperty(KohaConstants.CONF_SVC_SUFFIX));
+			LocalConfig.setUseRestApiInsteadOfSvc(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_USE_REST_API_INSTEAD_OF_SVC)));
 
 			LocalConfig.setAgencyAddress(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_UNSTRUCTURED_ADDRESS));
 			LocalConfig.setAgencyName(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_TRANSLATED_NAME));
@@ -187,10 +190,52 @@ public class KohaConnector {
 	public JSONObject lookupUser(LookupUserInitiationData initData) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
-
-		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
+		
+		boolean loanedItemsDesired = initData.getLoanedItemsDesired();		
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
 		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			URL patronRestUrl = new RestApiUrlBuilder().getPatron(patronId);
+			
+			String response = getPlainTextResponse(patronRestUrl);
+			
+			JSONObject userInfo = (JSONObject) jsonParser.parse(response);
+		
+			if (loanedItemsDesired) {
+				URL checkoutsRestUrl = new RestApiUrlBuilder().getCheckouts(patronId);
+				
+				response = getPlainTextResponse(checkoutsRestUrl);
+				
+				JSONArray checkouts = (JSONArray) jsonParser.parse(response);
+				
+				userInfo.put("checkouts", checkouts);
+			}
+		
+			if (requestedItemsDesired) {
+				
+				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
+				
+				response = getPlainTextResponse(holdsRestUrl);
+				
+				JSONArray holds = (JSONArray) jsonParser.parse(response);
+				
+				userInfo.put("holds", holds);
+			}
+			
+			if (userFiscalAccountDesired) {
+				
+				URL accountLinesRestUrl = new RestApiUrlBuilder().getAccountLines(patronId);
+
+				response = getPlainTextResponse(accountLinesRestUrl);
+				
+				JSONArray accountLines = (JSONArray) jsonParser.parse(response);
+				
+				userInfo.put("accountLines", accountLines);
+			}
+			
+			return userInfo;
+		}
 
 		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 
@@ -198,7 +243,7 @@ public class KohaConnector {
 				|| initData.getUserPrivilegeDesired();
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER).addRequest(KohaConstants.PARAM_USER_ID, patronId);
-
+		
 		if (loanedItemsDesired) {
 			String appProfileType = KohaUtil.getAppProfileType(initData);
 			

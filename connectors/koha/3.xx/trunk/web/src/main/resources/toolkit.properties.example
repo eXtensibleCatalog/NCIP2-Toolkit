@@ -57,6 +57,8 @@ TrustAllCertificates=false
 
 SVCSuffix=cgi-bin/koha/svc
 
+UseRestApiInsteadOfSvc=true
+
 AdminName=userName
 AdminPass=userPassword
 
