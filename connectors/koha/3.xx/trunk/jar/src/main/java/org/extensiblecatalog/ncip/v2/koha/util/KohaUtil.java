@@ -10,6 +10,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.TimeZone;
 
 import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LoanedItem;
@@ -833,5 +834,10 @@ public class KohaUtil {
 		loanedItemsHistory.setLoanedItems(loanedItems);
 		
 		return loanedItemsHistory;		
+	}
+	public static String convertStreamToString(java.io.InputStream is) {
+	    @SuppressWarnings("resource")
+		Scanner s = new Scanner(is).useDelimiter("\\A");
+	    return s.hasNext() ? s.next() : "";
 	}
 }

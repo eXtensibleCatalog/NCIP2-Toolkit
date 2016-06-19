@@ -25,13 +25,9 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
-import org.extensiblecatalog.ncip.v2.koha.util.SAXHandlers.KohaLoginHandler;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
@@ -57,16 +53,11 @@ import org.extensiblecatalog.ncip.v2.service.Version1UnstructuredAddressType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class KohaConnector {
 
-	private static SAXParser saxParser;
-
 	private static JSONParser jsonParser;
-
-	private static InputSource streamSource;
 
 	private static String currentSessionIdCookie = "";
 
@@ -77,7 +68,6 @@ public class KohaConnector {
 		loginAttempts = 0;
 
 		try {
-			saxParser = SAXParserFactory.newInstance().newSAXParser();
 			jsonParser = new JSONParser();
 			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
@@ -421,6 +411,10 @@ public class KohaConnector {
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;
 	}
+	
+	private static URL getLoginPOSTurl() throws MalformedURLException {
+		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort()).setPath("cgi-bin/koha/mainpage.pl").toURL();
+	}
 
 	private static URLBuilder getCommonSvcURLBuilder() {
 		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort()).setPath(LocalConfig.getSvcSuffix());
@@ -494,23 +488,21 @@ public class KohaConnector {
 	private static void renewSessionCookie() throws IOException, SAXException, KohaException {
 
 		if (++loginAttempts < 5) {
-			HttpURLConnection httpCon = (HttpURLConnection) getCommonSvcNcipURLBuilder(null).toURL().openConnection();
+			HttpURLConnection httpCon = (HttpURLConnection) getLoginPOSTurl().openConnection();
 			httpCon.setDoOutput(true);
 			httpCon.setRequestMethod("POST");
 
 			String credentials = "userid=" + LocalConfig.getAdminName() + "&password=" + LocalConfig.getAdminPass();
+			
+			String additionalPostParams = "&koha_login_context=intranet&branch=";
 
 			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
-			outWriter.write(credentials);
+			outWriter.write(credentials + additionalPostParams);
 			outWriter.close();
 
-			streamSource = new InputSource(httpCon.getInputStream());
-
-			KohaLoginHandler loginHandler = new KohaLoginHandler();
-
-			saxParser.parse(streamSource, loginHandler);
-
-			if (!loginHandler.isLogged()) {
+			String response = KohaUtil.convertStreamToString(httpCon.getInputStream());
+			
+			if (response.contains("login_error")) {
 				throw new KohaException("Invalid credentials were provided in toolkit.properties - cannot log in.");
 			}
 
@@ -524,7 +516,9 @@ public class KohaConnector {
 			}
 
 		} else {
+			loginAttempts = 0;
 			throw KohaException.createTooManyLoginAttempts();
 		}
 	}
+	
 }
