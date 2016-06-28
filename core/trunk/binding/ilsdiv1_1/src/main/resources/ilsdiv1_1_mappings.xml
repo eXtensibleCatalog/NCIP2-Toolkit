@@ -2120,6 +2120,16 @@
     </mapping>
 
     <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.ilsdiv1_1.LoanedItemsHistory</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LoanedItemsHistory</class-b>
+        <field>
+            <a>loanedItems</a>
+            <b>loanedItem</b>
+            <b-hint>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LoanedItem</b-hint>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
         <class-a>org.extensiblecatalog.ncip.v2.service.NameInformation</class-a>
         <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.NameInformation</class-b>
         <field>

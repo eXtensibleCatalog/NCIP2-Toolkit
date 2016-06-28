@@ -27,7 +27,7 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
 	public void setLookupItemSet(
 			ILSDIvOneOneLookupItemSetInitiationData lookupItemSet) {
-		this.ilsdivOneOnelookupItemSet = ilsdivOneOnelookupItemSet;
+		this.ilsdivOneOnelookupItemSet = lookupItemSet;
 	}
 
 	public ILSDIvOneOneLookupItemSetInitiationData getLookupItemSet() {
@@ -36,7 +36,7 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
 	public void setLookupUser(
 			ILSDIvOneOneLookupUserInitiationData lookupUser) {
-		this.ilsdivOneOnelookupUser = ilsdivOneOnelookupUser;
+		this.ilsdivOneOnelookupUser = lookupUser;
 	}
 
 	public ILSDIvOneOneLookupUserInitiationData getLookupUser() {
@@ -100,8 +100,8 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
 		if (ncipMessage != null) {
 
-			Class objClass = ncipMessage.getClass();
-			Class superClass = objClass.getSuperclass();
+			Class<? extends NCIPMessage> objClass = ncipMessage.getClass();
+			Class<?>superClass = objClass.getSuperclass();
 
 			Object[] fields1 = objClass.getDeclaredFields();
 			Object[] fields2 = superClass.getDeclaredFields();

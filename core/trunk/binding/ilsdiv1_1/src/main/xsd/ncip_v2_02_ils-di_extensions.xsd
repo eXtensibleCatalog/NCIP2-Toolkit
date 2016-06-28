@@ -32,7 +32,7 @@
 			<xs:sequence>
 				<xs:element ref="Page" />
 				<xs:element ref="LastPage" />
-				<xs:element ref="ncip:LoanedItem" minOccurs="0"	maxOccurs="10" />
+				<xs:element ref="ncip:LoanedItem" minOccurs="0" maxOccurs="unbounded" />
 				<xs:element ref="ncip:Ext" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>

@@ -88,7 +88,8 @@ public class KohaUtil {
 
 	public static ComponentId createComponentIdAsAccessionNumber(String barcodeValue) {
 		ComponentId componentId = new ComponentId();
-		componentId.setComponentIdentifierType(new ComponentIdentifierType(Version1BibliographicRecordIdentifierCode.VERSION_1_BIBLIOGRAPHIC_RECORD_IDENTIFIER_CODE,
+		componentId.setComponentIdentifierType(new ComponentIdentifierType(
+				Version1BibliographicRecordIdentifierCode.VERSION_1_BIBLIOGRAPHIC_RECORD_IDENTIFIER_CODE,
 				Version1BibliographicRecordIdentifierCode.ACCESSION_NUMBER.getValue()));
 		componentId.setComponentIdentifier(barcodeValue);
 		return componentId;
@@ -101,7 +102,9 @@ public class KohaUtil {
 		String locationVal = "";
 		locationNameInstance.setLocationNameValue(locationVal);
 		// TODO: more to come from requirement for level
-		locationNameInstance.setLocationNameLevel(new BigDecimal("1"));// temporarily set to 1.
+		locationNameInstance.setLocationNameLevel(new BigDecimal("1"));// temporarily
+																		// set
+																		// to 1.
 
 		List<LocationNameInstance> locationNameInstances = new ArrayList<LocationNameInstance>();
 		locationNameInstances.add(locationNameInstance);
@@ -115,7 +118,8 @@ public class KohaUtil {
 		return location;
 	}
 
-	public static LocationNameInstance createLocationNameInstance(String locationNameValue, BigDecimal locationNameLevel) {
+	public static LocationNameInstance createLocationNameInstance(String locationNameValue,
+			BigDecimal locationNameLevel) {
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
 		locationNameInstance.setLocationNameValue(locationNameValue);
 		locationNameInstance.setLocationNameLevel(locationNameLevel);
@@ -184,13 +188,15 @@ public class KohaUtil {
 
 	public static BlockOrTrap createBlockOrTrap(String block) {
 		BlockOrTrap blockOrTrap = new BlockOrTrap();
-		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType("http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", block));
+		blockOrTrap.setBlockOrTrapType(new BlockOrTrapType(
+				"http://www.niso.org/ncip/v1_0/imp1/schemes/blockortraptype/blockortraptype.scm", block));
 		blockOrTrap.setAgencyId(defaultAgencyId);
 		return blockOrTrap;
 	}
 
 	/**
-	 * Tries to convert date string parsed from koha response to GregorianCalendar format.<br />
+	 * Tries to convert date string parsed from koha response to
+	 * GregorianCalendar format.<br />
 	 * Throws SAXException if not successful.
 	 * 
 	 * @param kohaDateParsed
@@ -210,7 +216,8 @@ public class KohaUtil {
 			return null;
 	}
 
-	public static GregorianCalendar parseGregorianCalendarFromKohaLongDate(String kohaLongDateParsed) throws ParseException {
+	public static GregorianCalendar parseGregorianCalendarFromKohaLongDate(String kohaLongDateParsed)
+			throws ParseException {
 		if (kohaLongDateParsed != null && !kohaLongDateParsed.equalsIgnoreCase("0000-00-00 00:00:00")) {
 			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
 
@@ -223,7 +230,8 @@ public class KohaUtil {
 			return null;
 	}
 
-	public static GregorianCalendar parseGregorianCalendarFromKohaDateWithBackslashes(String dateVal) throws ParseException {
+	public static GregorianCalendar parseGregorianCalendarFromKohaDateWithBackslashes(String dateVal)
+			throws ParseException {
 		if (dateVal != null && !dateVal.matches("00/00/0000")) {
 			GregorianCalendar gregorianCalendarDate = new GregorianCalendar(TimeZone.getDefault());
 
@@ -245,7 +253,8 @@ public class KohaUtil {
 			responseHeader = new ResponseHeader();
 
 			if (initiationHeader.getFromAgencyId() != null && initiationHeader.getToAgencyId() != null) {
-				// Reverse From/To AgencyId because of the request was processed (return to initiator)
+				// Reverse From/To AgencyId because of the request was processed
+				// (return to initiator)
 				ToAgencyId toAgencyId = new ToAgencyId();
 				toAgencyId.setAgencyIds(initiationHeader.getFromAgencyId().getAgencyIds());
 
@@ -258,7 +267,8 @@ public class KohaUtil {
 			if (initiationHeader.getFromSystemId() != null && initiationHeader.getToSystemId() != null) {
 				responseHeader.setFromSystemId(initiationHeader.getFromSystemId());
 				responseHeader.setToSystemId(initiationHeader.getToSystemId());
-				if (initiationHeader.getFromAgencyAuthentication() != null && !initiationHeader.getFromAgencyAuthentication().isEmpty())
+				if (initiationHeader.getFromAgencyAuthentication() != null
+						&& !initiationHeader.getFromAgencyAuthentication().isEmpty())
 					responseHeader.setFromSystemAuthentication(initiationHeader.getFromAgencyAuthentication());
 			}
 		}
@@ -267,8 +277,10 @@ public class KohaUtil {
 
 	/**
 	 * Marks expired tokens as expired.<br>
-	 * Note that these expired tokens are removed immediately after new token is created.<br>
-	 * The purpose of not removing those earlier is to let user know of the token expiration.
+	 * Note that these expired tokens are removed immediately after new token is
+	 * created.<br>
+	 * The purpose of not removing those earlier is to let user know of the
+	 * token expiration.
 	 * 
 	 * @param tokens
 	 * @param tokenExpirationTimeInSeconds
@@ -302,10 +314,12 @@ public class KohaUtil {
 		return bibliographicItemId;
 	}
 
-	public static BibliographicItemId createBibliographicItemIdAsLegalDepositNumber(String bibliographicItemIdentifier) {
+	public static BibliographicItemId createBibliographicItemIdAsLegalDepositNumber(
+			String bibliographicItemIdentifier) {
 		BibliographicItemId bibliographicItemId = new BibliographicItemId();
 		bibliographicItemId.setBibliographicItemIdentifier(bibliographicItemIdentifier);
-		bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+		bibliographicItemId
+				.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 		return bibliographicItemId;
 	}
 
@@ -332,12 +346,15 @@ public class KohaUtil {
 	}
 
 	/**
-	 * Converts LookupItemInitiationData to ILSDIvOneOneLookupItemSetInitiationData with respect only to desired services.
+	 * Converts LookupItemInitiationData to
+	 * ILSDIvOneOneLookupItemSetInitiationData with respect only to desired
+	 * services.
 	 * 
 	 * @param initData
 	 * @return luisInitData
 	 */
-	public static ILSDIvOneOneLookupItemSetInitiationData lookupItemInitDataToLUISInitData(LookupItemInitiationData initData) {
+	public static ILSDIvOneOneLookupItemSetInitiationData lookupItemInitDataToLUISInitData(
+			LookupItemInitiationData initData) {
 		ILSDIvOneOneLookupItemSetInitiationData luisInitData = new ILSDIvOneOneLookupItemSetInitiationData();
 
 		luisInitData.setBibliographicDescriptionDesired(initData.getBibliographicDescriptionDesired());
@@ -382,7 +399,7 @@ public class KohaUtil {
 		String zipcode = (String) userInfo.get("zipcode");
 		String country = (String) userInfo.get("country");
 
-		if (!allOfTheseAreNull(streetnumber, addressFirstLine, addressSecondLine, city)) {
+		if (!allOfTheseAreEmpty(streetnumber, addressFirstLine, addressSecondLine, city)) {
 
 			StructuredAddress structuredAddress = new StructuredAddress();
 			structuredAddress.setCountry(country);
@@ -404,7 +421,7 @@ public class KohaUtil {
 		String zipcode2 = (String) userInfo.get("B_zipcode");
 		String country2 = (String) userInfo.get("B_country");
 
-		if (!allOfTheseAreNull(streetnumber2, address2FirstLine, address2SecondLine, city2)) {
+		if (!allOfTheseAreEmpty(streetnumber2, address2FirstLine, address2SecondLine, city2)) {
 
 			StructuredAddress structuredAddress = new StructuredAddress();
 			structuredAddress.setCountry(country2);
@@ -419,42 +436,42 @@ public class KohaUtil {
 		}
 
 		String email = (String) userInfo.get("email");
-		if (email != null) {
+		if (!allOfTheseAreEmpty(email)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.MAILTO, email));
 		}
 
 		String email2 = (String) userInfo.get("emailpro");
-		if (email2 != null) {
+		if (!allOfTheseAreEmpty(email2)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.MAILTO, email2));
 		}
 
 		String email3 = (String) userInfo.get("B_email");
-		if (email3 != null) {
+		if (!allOfTheseAreEmpty(email3)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.MAILTO, email3));
 		}
 
 		String phone = (String) userInfo.get("phone");
-		if (phone != null) {
+		if (!allOfTheseAreEmpty(phone)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, phone));
 		}
 
 		String phone2 = (String) userInfo.get("phonepro");
-		if (phone2 != null) {
+		if (!allOfTheseAreEmpty(phone2)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, phone2));
 		}
 
 		String phone3 = (String) userInfo.get("B_phone");
-		if (phone3 != null) {
+		if (!allOfTheseAreEmpty(phone3)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, phone3));
 		}
 
 		String mobile = (String) userInfo.get("mobile");
-		if (mobile != null) {
+		if (!allOfTheseAreEmpty(mobile)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.TEL, mobile));
 		}
 
 		String fax = (String) userInfo.get("fax");
-		if (fax != null) {
+		if (!allOfTheseAreEmpty(fax)) {
 			userAddressInformations.add(createElectronicAddress(Version1ElectronicAddressType.FAX, fax));
 		}
 
@@ -476,7 +493,8 @@ public class KohaUtil {
 		return userAddressInformation;
 	}
 
-	private static UserAddressInformation createElectronicAddress(ElectronicAddressType electronicAddressType, String electronicAddressData) {
+	private static UserAddressInformation createElectronicAddress(ElectronicAddressType electronicAddressType,
+			String electronicAddressData) {
 		UserAddressInformation userAddressInformation = new UserAddressInformation();
 		userAddressInformation.setUserAddressRoleType(Version1UserAddressRoleType.MULTI_PURPOSE);
 
@@ -488,15 +506,16 @@ public class KohaUtil {
 		return userAddressInformation;
 	}
 
-	private static boolean allOfTheseAreNull(String... values) {
+	private static boolean allOfTheseAreEmpty(String... values) {
 		for (String value : values) {
-			if (value != null)
+			if (value != null && !value.isEmpty())
 				return false;
 		}
 		return true;
 	}
 
-	public static RequestedItem parseRequestedItem(JSONObject requestedItemParsed) throws ParseException, KohaException {
+	public static RequestedItem parseRequestedItem(JSONObject requestedItemParsed)
+			throws ParseException, KohaException {
 
 		RequestedItem requestedItem = new RequestedItem();
 
@@ -698,7 +717,8 @@ public class KohaUtil {
 		if (bibId != null) {
 			BibliographicItemId bibliographicItemId = new BibliographicItemId();
 			bibliographicItemId.setBibliographicItemIdentifier(bibId);
-			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+			bibliographicItemId
+					.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
 			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
 		} else if (isbn != null) {
 			BibliographicItemId bibliographicItemId = new BibliographicItemId();
@@ -710,7 +730,8 @@ public class KohaUtil {
 		bibliographicDescription.setAuthor(author);
 
 		if (mediumTypeVal != null)
-			bibliographicDescription.setMediumType(new MediumType("http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
+			bibliographicDescription.setMediumType(new MediumType(
+					"http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
 
 		bibliographicDescription.setEdition(volume);
 
@@ -722,14 +743,17 @@ public class KohaUtil {
 		return bibliographicDescription;
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal)
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem,
+			ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal)
 			throws ServiceException, ParseException {
 		return parseItemOptionalFields(kohaItem, KohaUtil.luisInitDataToLookupItemInitData(initData, itemIdVal));
 	}
 
-	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemInitiationData initData) throws ServiceException, ParseException {
+	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemInitiationData initData)
+			throws ServiceException, ParseException {
 
-		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired() || initData.getLocationDesired();
+		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired()
+				|| initData.getLocationDesired();
 		ItemOptionalFields iof = new ItemOptionalFields();
 		if (itemInfoDesired) {
 			JSONObject itemInfo = (JSONObject) kohaItem.get("itemInfo");
@@ -761,7 +785,8 @@ public class KohaUtil {
 
 		if (initData.getCirculationStatusDesired()) {
 			String circulationStatus = (String) kohaItem.get("circulationStatus");
-			iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+			iof.setCirculationStatus(Version1CirculationStatus
+					.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
 
 			if (circulationStatus.equalsIgnoreCase("On Loan")) {
 				String dueDateParsed = (String) kohaItem.get("dueDate");
@@ -786,7 +811,9 @@ public class KohaUtil {
 				List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
 				for (Object itemUseRestriction : itemUseRestrictions) {
 					String itemUseRestrictionValue = (String) itemUseRestriction;
-					itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE, itemUseRestrictionValue));
+					itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(
+							Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
+							itemUseRestrictionValue));
 				}
 				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
 			}
@@ -795,7 +822,8 @@ public class KohaUtil {
 		return iof;
 	}
 
-	public static LookupItemInitiationData luisInitDataToLookupItemInitData(ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) {
+	public static LookupItemInitiationData luisInitDataToLookupItemInitData(
+			ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) {
 		LookupItemInitiationData LIinitData = new LookupItemInitiationData();
 		ItemId itemId = new ItemId();
 		itemId.setItemIdentifierValue(itemIdVal);
@@ -817,28 +845,39 @@ public class KohaUtil {
 	}
 
 	public static String getAppProfileType(NCIPInitiationData initData) {
-		if (initData.getInitiationHeader() == null || initData.getInitiationHeader().getApplicationProfileType() == null) {
+		if (initData.getInitiationHeader() == null
+				|| initData.getInitiationHeader().getApplicationProfileType() == null) {
 			return "";
 		}
 		return initData.getInitiationHeader().getApplicationProfileType().getValue();
 	}
-	
-	public static LoanedItemsHistory parseLoanedItemsHistory(JSONObject kohaItem, ILSDIvOneOneLookupUserInitiationData initData) {
+
+	public static LoanedItemsHistory parseLoanedItemsHistory(JSONObject kohaItem,
+			ILSDIvOneOneLookupUserInitiationData initData) {
 		LoanedItemsHistory loanedItemsHistory = new LoanedItemsHistory();
-		
+
 		loanedItemsHistory.setPage(initData.getHistoryDesired().getPage());
-		
+
 		loanedItemsHistory.setLastPage(new BigDecimal(5)); // FIXME
-		
+
 		List<LoanedItem> loanedItems = new ArrayList<LoanedItem>();
-		// TODO add loanedItems
-		loanedItemsHistory.setLoanedItems(loanedItems);
 		
-		return loanedItemsHistory;		
+		LoanedItem loanedItem = new LoanedItem();
+		
+		// FIXME
+		loanedItem.setItemId(KohaUtil.createItemId("1"));
+		loanedItem.setDateDue(new GregorianCalendar());
+		
+		loanedItems.add(loanedItem);
+		loanedItems.add(loanedItem);
+		loanedItemsHistory.setLoanedItems(loanedItems);
+
+		return loanedItemsHistory;
 	}
+
 	public static String convertStreamToString(java.io.InputStream is) {
-	    @SuppressWarnings("resource")
+		@SuppressWarnings("resource")
 		Scanner s = new Scanner(is).useDelimiter("\\A");
-	    return s.hasNext() ? s.next() : "";
+		return s.hasNext() ? s.next() : "";
 	}
 }

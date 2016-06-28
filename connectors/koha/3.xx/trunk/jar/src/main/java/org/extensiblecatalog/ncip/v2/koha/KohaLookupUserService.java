@@ -267,7 +267,7 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 
 			if (initData.getBlockOrTrapDesired()) {
 
-				List<BlockOrTrap> blocks = new ArrayList<BlockOrTrap>();
+				List<BlockOrTrap> blocks = new ArrayList<BlockOrTrap>(4);
 
 				// Parse expiration
 				GregorianCalendar expiryDate = KohaUtil
@@ -316,7 +316,7 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 				JSONArray accountLines = (JSONArray) kohaUser.get("accountLines");
 				
 				if (accountLines != null && accountLines.size() != 0) {
-					List<UserFiscalAccount> userFiscalAccounts = new ArrayList<UserFiscalAccount>();
+					List<UserFiscalAccount> userFiscalAccounts = new ArrayList<UserFiscalAccount>(1);
 					UserFiscalAccount userFiscalAccount = new UserFiscalAccount();
 					List<AccountDetails> accountDetails = new ArrayList<AccountDetails>();
 
