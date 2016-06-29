@@ -27,12 +27,13 @@ import org.xml.sax.SAXException;
 public class KohaCancelRequestItemService implements CancelRequestItemService {
 
 	@Override
-	public CancelRequestItemResponseData performService(CancelRequestItemInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
-			throws ServiceException {
+	public CancelRequestItemResponseData performService(CancelRequestItemInitiationData initData,
+			ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
 		final CancelRequestItemResponseData responseData = new CancelRequestItemResponseData();
 
-		boolean requestIdIsEmpty = initData.getRequestId() == null || initData.getRequestId().getRequestIdentifierValue().isEmpty();
+		boolean requestIdIsEmpty = initData.getRequestId() == null
+				|| initData.getRequestId().getRequestIdentifierValue().isEmpty();
 		boolean itemIdIsEmpty = initData.getItemId() == null || initData.getItemId().getItemIdentifierValue().isEmpty();
 		boolean userIdIsEmpty = initData.getUserId() == null || initData.getUserId().getUserIdentifierValue().isEmpty();
 
@@ -49,7 +50,8 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 			}
 			if (userIdIsEmpty) {
 
-				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null, "Cannot cancel request to unknown user.");
+				Problem p = new Problem(new ProblemType("User Id is undefined."), null, null,
+						"Cannot cancel request to unknown user.");
 				problems.add(p);
 
 			}
@@ -60,12 +62,14 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 			KohaRemoteServiceManager kohaRemoteServiceManager = (KohaRemoteServiceManager) serviceManager;
 
 			try {
-				JSONObject requestItem = kohaRemoteServiceManager.cancelRequestItem(initData, !itemIdIsEmpty);
+				// Throws error exception if fails
+				kohaRemoteServiceManager.cancelRequestItem(initData, !itemIdIsEmpty);
 
-				updateResponseData(responseData, initData, requestItem);
+				updateResponseData(responseData, initData, itemIdIsEmpty, requestIdIsEmpty);
 
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(),
+						"Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 			} catch (SAXException se) {
 				Problem p = new Problem(new ProblemType("Processing SAXException error."), null, se.getMessage());
@@ -74,33 +78,32 @@ public class KohaCancelRequestItemService implements CancelRequestItemService {
 				Problem p = new Problem(new ProblemType(ke.getShortMessage()), null, ke.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (ParserConfigurationException pce) {
-				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null,
+						pce.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null,
+						StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 			}
 		}
 		return responseData;
 	}
 
-	private void updateResponseData(CancelRequestItemResponseData responseData, CancelRequestItemInitiationData initData, JSONObject requestItem) {
+	private void updateResponseData(CancelRequestItemResponseData responseData,
+			CancelRequestItemInitiationData initData, boolean itemIdIsEmpty, boolean requestIdIsEmpty) {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		String userId = (String) requestItem.get("userId");
-		String itemId = (String) requestItem.get("itemId");
-		String requestId = (String) requestItem.get("requestId");
+		responseData.setUserId(initData.getUserId());
 
-		responseData.setUserId(KohaUtil.createUserId(userId));
-		
-		if (itemId != null && ! itemId.isEmpty())
-			responseData.setItemId(KohaUtil.createItemId(itemId));
-		
-		if (requestId != null && ! requestId.isEmpty())
-			responseData.setRequestId(KohaUtil.createRequestId(requestId));
+		if (!itemIdIsEmpty)
+			responseData.setItemId(initData.getItemId());
+
+		if (!requestIdIsEmpty)
+			responseData.setRequestId(initData.getRequestId());
 	}
 }

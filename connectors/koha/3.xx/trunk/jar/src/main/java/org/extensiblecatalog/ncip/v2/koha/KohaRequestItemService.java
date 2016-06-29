@@ -1,6 +1,7 @@
 package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaException;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.koha.util.KohaUtil;
+import org.extensiblecatalog.ncip.v2.koha.util.LocalConfig;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
@@ -80,29 +82,48 @@ public class KohaRequestItemService implements RequestItemService {
 		return responseData;
 	}
 
-	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData, JSONObject requestItem) throws KohaException {
+	private void updateResponseData(RequestItemResponseData responseData, RequestItemInitiationData initData,
+			JSONObject requestItem) throws KohaException {
 
 		ResponseHeader responseHeader = KohaUtil.reverseInitiationHeader(initData);
 
 		if (responseHeader != null)
 			responseData.setResponseHeader(responseHeader);
 
-		String userId = (String) requestItem.get("userId");
-		String itemId = (String) requestItem.get("itemId");
-		String requestId = (String) requestItem.get("requestId");
-
-		boolean itemIdNotSet = false;
-
-		responseData.setUserId(KohaUtil.createUserId(userId));
-		if (itemId != null && !itemId.isEmpty())
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			
+			responseData.setUserId(initData.getUserId());
+			
+			String itemId = (String) requestItem.get("itemnumber");
 			responseData.setItemId(KohaUtil.createItemId(itemId));
-		else
-			itemIdNotSet = true;
+			
+			String agencyIdVal = (String) requestItem.get("branchcode");
+			String requestIdVal = (String) requestItem.get("reserve_id");
+			responseData.setRequestId(KohaUtil.createRequestId(requestIdVal, agencyIdVal));
+			
+			BigDecimal holdQueueLength = new BigDecimal((String) requestItem.get("priority"));
+			responseData.setHoldQueuePosition(holdQueueLength);
+			responseData.setHoldQueueLength(holdQueueLength); // We just created the request - must be the same as position
+			
+		} else {
+			String userId = (String) requestItem.get("userId");
+			String itemId = (String) requestItem.get("itemId");
+			String requestId = (String) requestItem.get("requestId");
 
-		if (requestId != null && !requestId.isEmpty())
-			responseData.setRequestId(KohaUtil.createRequestId(requestId));
-		else if (itemIdNotSet) {
-			throw KohaException.create500InternalServerError("Could not create response message because both requestId & itemId are missing in response from Koha server");
+			boolean itemIdNotSet = false;
+
+			responseData.setUserId(KohaUtil.createUserId(userId));
+			if (itemId != null && !itemId.isEmpty())
+				responseData.setItemId(KohaUtil.createItemId(itemId));
+			else
+				itemIdNotSet = true;
+
+			if (requestId != null && !requestId.isEmpty())
+				responseData.setRequestId(KohaUtil.createRequestId(requestId));
+			else if (itemIdNotSet) {
+				throw KohaException.create500InternalServerError(
+						"Could not create response message because both requestId & itemId are missing in response from Koha server");
+			}
 		}
 
 		responseData.setRequestScopeType(initData.getRequestScopeType());

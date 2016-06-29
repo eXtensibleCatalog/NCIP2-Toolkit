@@ -216,6 +216,11 @@ public class KohaUtil {
 			return null;
 	}
 
+	public static String createKohaDateFromGregorianCalendar(GregorianCalendar date) throws ParseException {
+		
+		return KohaConstants.KOHA_DATE_FORMATTER.format(date.getTime());
+	}
+	
 	public static GregorianCalendar parseGregorianCalendarFromKohaLongDate(String kohaLongDateParsed)
 			throws ParseException {
 		if (kohaLongDateParsed != null && !kohaLongDateParsed.equalsIgnoreCase("0000-00-00 00:00:00")) {

@@ -65,18 +65,24 @@ public class KohaConnector {
 
 	private static int loginAttempts;
 
+	private boolean haveBeenHere = false;
+
 	public KohaConnector() throws ServiceException {
 
 		loginAttempts = 0;
 
 		try {
 			jsonParser = new JSONParser();
-			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(new Properties()).getConfiguration();
+			DefaultConnectorConfiguration config = (DefaultConnectorConfiguration) new ConnectorConfigurationFactory(
+					new Properties()).getConfiguration();
 			KohaConfiguration kohaConfig = new KohaConfiguration(config);
 
-			LocalConfig.setBlockOrTrapStringFormatForExpired(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED));
-			LocalConfig.setBlockOrTrapStringFormatForTotalfines(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES));
-			LocalConfig.setBlockOrTrapStringFormatForDebarred(kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED));
+			LocalConfig.setBlockOrTrapStringFormatForExpired(
+					kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_EXPIRED));
+			LocalConfig.setBlockOrTrapStringFormatForTotalfines(
+					kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_TOTALFINES));
+			LocalConfig.setBlockOrTrapStringFormatForDebarred(
+					kohaConfig.getProperty(KohaConstants.CONF_STRING_FORMAT_FOR_DEBARRED));
 
 			String localeToSet = kohaConfig.getProperty("locale");
 			if (localeToSet != null)
@@ -101,7 +107,8 @@ public class KohaConnector {
 			LocalConfig.setAdminPass(kohaConfig.getProperty(KohaConstants.CONF_ADMIN_PASS));
 
 			LocalConfig.setSvcSuffix(kohaConfig.getProperty(KohaConstants.CONF_SVC_SUFFIX));
-			LocalConfig.setUseRestApiInsteadOfSvc(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_USE_REST_API_INSTEAD_OF_SVC)));
+			LocalConfig.setUseRestApiInsteadOfSvc(
+					Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_USE_REST_API_INSTEAD_OF_SVC)));
 
 			LocalConfig.setAgencyAddress(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_UNSTRUCTURED_ADDRESS));
 			LocalConfig.setAgencyName(kohaConfig.getProperty(KohaConstants.CONF_AGENCY_TRANSLATED_NAME));
@@ -109,18 +116,22 @@ public class KohaConnector {
 			LocalConfig.setUserRegistrationLink(kohaConfig.getProperty(KohaConstants.CONF_USER_REGISTRATION_LINK));
 			LocalConfig.setAuthDataFormatType(kohaConfig.getProperty(KohaConstants.CONF_AUTH_DATA_FORMAT_TYPE));
 
-			LocalConfig.setTokenExpirationTime(Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
+			LocalConfig.setTokenExpirationTime(
+					Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_NEXT_ITEM_TOKEN_EXPIRATION_TIME)));
 
-			LocalConfig.setEchoParticularProblemsToLUIS(Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
+			LocalConfig.setEchoParticularProblemsToLUIS(Boolean
+					.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_INCLUDE_PARTICULAR_PROBLEMS_TO_LUIS)));
 
 			try {
-				LocalConfig.setMaxItemPreparationTimeDelay(Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_MAX_ITEM_PREPARATION_TIME_DELAY)));
+				LocalConfig.setMaxItemPreparationTimeDelay(
+						Integer.parseInt(kohaConfig.getProperty(KohaConstants.CONF_MAX_ITEM_PREPARATION_TIME_DELAY)));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 			try {
-				// This try block checks for "TrustAllCertificates" in configuration & if it is set to "true"
+				// This try block checks for "TrustAllCertificates" in
+				// configuration & if it is set to "true"
 
 				if (Boolean.parseBoolean(kohaConfig.getProperty(KohaConstants.CONF_TRUST_ALL_CERTIFICATES))) {
 					SSLContext ctx = SSLContext.getInstance("TLS");
@@ -142,7 +153,8 @@ public class KohaConnector {
 			throw new ServiceException(ServiceError.CONFIGURATION_ERROR, "Toolkit configuration failed.");
 
 		} catch (Exception e1) {
-			throw new ServiceException(ServiceError.RUNTIME_ERROR, "Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
+			throw new ServiceException(ServiceError.RUNTIME_ERROR,
+					"Failed to initialize SAX Parser from SAXParserFactory." + e1.getMessage());
 		}
 	}
 
@@ -162,7 +174,8 @@ public class KohaConnector {
 		}
 	}
 
-	public JSONObject authenticateUser(String userId, String pw) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
+	public JSONObject authenticateUser(String userId, String pw)
+			throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER);
 
 		urlBuilder.addRequest(KohaConstants.PARAM_USER_ID, userId);
@@ -187,72 +200,67 @@ public class KohaConnector {
 	 * @throws ParseException
 	 * @throws URISyntaxException
 	 */
-	public JSONObject lookupUser(LookupUserInitiationData initData) throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
+	public JSONObject lookupUser(LookupUserInitiationData initData)
+			throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
-		
-		boolean loanedItemsDesired = initData.getLoanedItemsDesired();		
+
+		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
 		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
 			URL patronRestUrl = new RestApiUrlBuilder().getPatron(patronId);
-			
-			String response = getPlainTextResponse(patronRestUrl);
-			
-			JSONObject userInfo = (JSONObject) jsonParser.parse(response);
-		
+
+			JSONObject userInfo = (JSONObject) getJSONResponseFor(patronRestUrl, "GET");
+
 			if (loanedItemsDesired) {
 				URL checkoutsRestUrl = new RestApiUrlBuilder().getCheckouts(patronId);
-				
-				response = getPlainTextResponse(checkoutsRestUrl);
-				
-				JSONArray checkouts = (JSONArray) jsonParser.parse(response);
+
+				JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET");
 				
 				userInfo.put("checkouts", checkouts);
 			}
-		
+
 			if (requestedItemsDesired) {
-				
+
 				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
-				
-				response = getPlainTextResponse(holdsRestUrl);
-				
-				JSONArray holds = (JSONArray) jsonParser.parse(response);
-				
+
+				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
+
 				userInfo.put("holds", holds);
 			}
-			
+
 			if (userFiscalAccountDesired) {
-				
+
 				URL accountLinesRestUrl = new RestApiUrlBuilder().getAccountLines(patronId);
 
-				response = getPlainTextResponse(accountLinesRestUrl);
-				
-				JSONArray accountLines = (JSONArray) jsonParser.parse(response);
-				
+				JSONArray accountLines = (JSONArray) getJSONResponseFor(accountLinesRestUrl, "GET");
+
 				userInfo.put("accountLines", accountLines);
 			}
-			
+
 			return userInfo;
 		}
 
 		boolean blockOrTrapDesired = initData.getBlockOrTrapDesired();
 
-		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired() || initData.getUserAddressInformationDesired()
-				|| initData.getUserPrivilegeDesired();
+		boolean personalInfoDesired = initData.getNameInformationDesired() || initData.getUserIdDesired()
+				|| initData.getUserAddressInformationDesired() || initData.getUserPrivilegeDesired();
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER).addRequest(KohaConstants.PARAM_USER_ID, patronId);
-		
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER)
+				.addRequest(KohaConstants.PARAM_USER_ID, patronId);
+
 		if (loanedItemsDesired) {
 			String appProfileType = KohaUtil.getAppProfileType(initData);
-			
+
 			if (appProfileType.contentEquals("LoanedItemsHistory")) {
 				// Loaned items history desired :)
 				urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_HISTORY_DESIRED);
 			} else {
 				// Regular loaned items desired
-				urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED).addRequest(KohaConstants.PARAM_RENEWABILITY_DESIRED);
+				urlBuilder.addRequest(KohaConstants.PARAM_LOANED_ITEMS_DESIRED)
+						.addRequest(KohaConstants.PARAM_RENEWABILITY_DESIRED);
 			}
 		}
 
@@ -273,33 +281,76 @@ public class KohaConnector {
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject cancelRequestItem(CancelRequestItemInitiationData initData, boolean itemIdIsNotEmpty)
-			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
+	public Object cancelRequestItem(CancelRequestItemInitiationData initData, boolean itemIdIsNotEmpty)
+			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
+			ParseException {
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CANCEL_REQUEST_ITEM).addRequest(KohaConstants.PARAM_USER_ID,
-				initData.getUserId().getUserIdentifierValue());
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-		if (itemIdIsNotEmpty)
-			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue());
-		else
-			urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_ID, initData.getRequestId().getRequestIdentifierValue());
+			String patronId = initData.getUserId().getUserIdentifierValue();
 
-		String response = getPlainTextResponse(urlBuilder.toURL());
+			String reserveId = null;
+			
+			if (initData.getRequestId() != null)
+				reserveId = initData.getRequestId().getRequestIdentifierValue();
 
-		return (JSONObject) jsonParser.parse(response);
+			if (reserveId == null && itemIdIsNotEmpty) {
+				
+				String providedItemId = initData.getItemId().getItemIdentifierValue();
+				
+				String providedItemType = initData.getItemId().getItemIdentifierType().getValue();
+				
+				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
+
+				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
+				
+				for (Object object : holds) {
+					JSONObject hold = (JSONObject) object;
+					
+					String itemId = (String) hold.get("itemnumber");
+					
+					if (itemId != null && itemId.equals(providedItemId)) {
+						reserveId = (String) hold.get("reserve_id");
+						break;
+					}
+				}
+				
+				if (reserveId == null)
+					throw new KohaException("Request not found");
+			}
+
+			URL deleteHoldRestUrl = new RestApiUrlBuilder().deleteHold(reserveId);
+
+			return getJSONResponseFor(deleteHoldRestUrl, "DELETE");
+		} else {
+
+			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CANCEL_REQUEST_ITEM)
+					.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
+
+			if (itemIdIsNotEmpty)
+				urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue());
+			else
+				urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_ID,
+						initData.getRequestId().getRequestIdentifierValue());
+
+
+			return getPlainTextResponse(urlBuilder.toURL());
+		}
 	}
 
-	public JSONObject lookupItem(LookupItemInitiationData initData)
-			throws KohaException, IOException, SAXException, ParserConfigurationException, ParseException, URISyntaxException {
+	public JSONObject lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException,
+			ParserConfigurationException, ParseException, URISyntaxException {
 
 		String itemIdVal = initData.getItemId().getItemIdentifierValue();
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM).addRequest(KohaConstants.PARAM_ITEM_ID, itemIdVal);
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM)
+				.addRequest(KohaConstants.PARAM_ITEM_ID, itemIdVal);
 
 		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
 		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
 		boolean circulationStatusDesired = initData.getCirculationStatusDesired();
 
-		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired() || initData.getLocationDesired();
+		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired()
+				|| initData.getLocationDesired();
 
 		if (itemRestrictionDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
@@ -319,14 +370,17 @@ public class KohaConnector {
 	}
 
 	public JSONObject lookupItem(String id, ILSDIvOneOneLookupItemSetInitiationData initData)
-			throws ParserConfigurationException, IOException, SAXException, KohaException, ParseException, URISyntaxException {
+			throws ParserConfigurationException, IOException, SAXException, KohaException, ParseException,
+			URISyntaxException {
 		return lookupItem(KohaUtil.luisInitDataToLookupItemInitData(initData, id));
 	}
 
 	public JSONObject lookupItemSet(String bibId, ILSDIvOneOneLookupItemSetInitiationData initData)
-			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
+			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
+			ParseException {
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET).addRequest(KohaConstants.PARAM_BIB_ID, bibId);
+		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET)
+				.addRequest(KohaConstants.PARAM_BIB_ID, bibId);
 
 		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
 		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
@@ -346,10 +400,12 @@ public class KohaConnector {
 		if (!bibInfoDesired)
 			urlBuilder.addRequest(KohaConstants.PARAM_NOT_BIB_INFO);
 
-		boolean userIdProvided = initData.getUserId() != null && !initData.getUserId().getUserIdentifierValue().trim().isEmpty();
+		boolean userIdProvided = initData.getUserId() != null
+				&& !initData.getUserId().getUserIdentifierValue().trim().isEmpty();
 
 		if (userIdProvided)
-			urlBuilder.addRequest(KohaConstants.PARAM_CAN_BE_REQUESTED_BY_USERID, initData.getUserId().getUserIdentifierValue());
+			urlBuilder.addRequest(KohaConstants.PARAM_CAN_BE_REQUESTED_BY_USERID,
+					initData.getUserId().getUserIdentifierValue());
 
 		String response = getPlainTextResponse(urlBuilder.toURL(), bibId);
 
@@ -357,73 +413,144 @@ public class KohaConnector {
 	}
 
 	public JSONObject lookupRequest(LookupRequestInitiationData initData, boolean requestIdIsNotEmpty)
-			throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException, URISyntaxException, ParseException {
+			throws KohaException, IOException, SAXException, ParserConfigurationException, ServiceException,
+			URISyntaxException, ParseException {
 
 		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_REQUEST);
 
 		if (requestIdIsNotEmpty)
 			urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_ID, initData.getRequestId().getRequestIdentifierValue());
 		else
-			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue()).addRequest(KohaConstants.PARAM_USER_ID,
-					initData.getUserId().getUserIdentifierValue());
+			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue())
+					.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
 
 		String response = getPlainTextResponse(urlBuilder.toURL());
 
 		return (JSONObject) jsonParser.parse(response);
 	}
 
-	public JSONObject renewItem(RenewItemInitiationData initData)
-			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
+	public JSONObject renewItem(RenewItemInitiationData initData) throws KohaException, IOException, SAXException,
+			ParserConfigurationException, URISyntaxException, ParseException {
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_RENEW_ITEM).addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue())
-				.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-		GregorianCalendar desiredDateDue = initData.getDesiredDateDue();
+			String patronId = initData.getUserId().getUserIdentifierValue();
 
-		if (desiredDateDue != null)
-			urlBuilder.addRequest(KohaConstants.PARAM_DESIRED_DATE_DUE, KohaUtil.convertToKohaDate(desiredDateDue));
+			URL patronRestUrl = new RestApiUrlBuilder().getCheckouts(patronId);
 
-		String response = getPlainTextResponse(urlBuilder.toURL());
+			String checkoutsResponse = getPlainTextResponse(patronRestUrl);
 
-		return (JSONObject) jsonParser.parse(response);
+			JSONArray checkouts = (JSONArray) jsonParser.parse(checkoutsResponse);
+
+			String lookingForItemId = initData.getItemId().getItemIdentifierValue();
+
+			String checkoutId = null;
+
+			for (Object checkoutObj : checkouts) {
+				JSONObject checkout = (JSONObject) checkoutObj;
+
+				String itemId = (String) checkout.get("itemnumber");
+
+				if (itemId != null && lookingForItemId.equals(itemId)) {
+					checkoutId = (String) checkout.get("issue_id");
+					break;
+				}
+			}
+
+			if (checkoutId == null)
+				throw new KohaException("Hold not found");
+
+			URL putCheckoutRestUrl = new RestApiUrlBuilder().putCheckouts(checkoutId);
+
+			JSONObject renewalInfo = (JSONObject) getJSONResponseFor(putCheckoutRestUrl, "PUT");
+
+			return renewalInfo;
+		} else {
+			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_RENEW_ITEM)
+					.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId().getItemIdentifierValue())
+					.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
+
+			GregorianCalendar desiredDateDue = initData.getDesiredDateDue();
+
+			if (desiredDateDue != null)
+				urlBuilder.addRequest(KohaConstants.PARAM_DESIRED_DATE_DUE, KohaUtil.convertToKohaDate(desiredDateDue));
+
+			String response = getPlainTextResponse(urlBuilder.toURL());
+
+			return (JSONObject) jsonParser.parse(response);
+		}
 	}
 
-	public JSONObject requestItem(RequestItemInitiationData initData)
-			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException, ParseException {
+	public JSONObject requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException,
+			ParserConfigurationException, URISyntaxException, ParseException, java.text.ParseException {
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_REQUEST_ITEM).addRequest(KohaConstants.PARAM_USER_ID,
-				initData.getUserId().getUserIdentifierValue());
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			URL postHoldsRestUrl = new RestApiUrlBuilder().postHolds();
+			
+			JSONObject data = new JSONObject();
+			
+			data.put("borrowernumber", Integer.parseInt(initData.getUserId().getUserIdentifierValue()));
+			
+			if (initData.getItemIds() != null && initData.getItemId(0) != null)
+				data.put("itemnumber", Integer.parseInt(initData.getItemId(0).getItemIdentifierValue()));
+			else
+				data.put("biblionumber", Integer.parseInt(initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier()));
+			
+			data.put("branchcode", initData.getPickupLocation().getValue());
+			
+			String expirationDate = KohaUtil.createKohaDateFromGregorianCalendar(initData.getPickupExpiryDate());
+			data.put("expirationdate", expirationDate);
+			
+			try {
+				JSONObject holdCreated = (JSONObject) getJSONResponseFor(postHoldsRestUrl, "POST", data);
+				
+				return holdCreated;
+			} catch (KohaException e) {
+				
+				if (e.getMessage().contains("See Koha logs for details")) // wtf?? :D
+					throw new KohaException("You already have this item requested or you have not permissions to request this item.");
+					
+				throw e;
+			}
+		} else {
+			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_REQUEST_ITEM)
+					.addRequest(KohaConstants.PARAM_USER_ID, initData.getUserId().getUserIdentifierValue());
 
-		if (initData.getItemIds() != null && initData.getItemId(0) != null)
-			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId(0).getItemIdentifierValue());
-		else
-			urlBuilder.addRequest(KohaConstants.PARAM_BIB_ID, initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier());
+			if (initData.getItemIds() != null && initData.getItemId(0) != null)
+				urlBuilder.addRequest(KohaConstants.PARAM_ITEM_ID, initData.getItemId(0).getItemIdentifierValue());
+			else
+				urlBuilder.addRequest(KohaConstants.PARAM_BIB_ID,
+						initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier());
 
-		RequestType requestType = initData.getRequestType();
-		if (requestType != null && requestType.getValue().matches(Version1RequestType.HOLD.getValue() + "|" + Version1RequestType.LOAN.getValue()))
-			urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_TYPE, requestType.getValue());
+			RequestType requestType = initData.getRequestType();
+			if (requestType != null && requestType.getValue()
+					.matches(Version1RequestType.HOLD.getValue() + "|" + Version1RequestType.LOAN.getValue()))
+				urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_TYPE, requestType.getValue());
 
-		GregorianCalendar pickupExpiryDate = initData.getPickupExpiryDate();
-		if (pickupExpiryDate != null)
-			urlBuilder.addRequest(KohaConstants.PARAM_PICKUP_EXPIRY_DATE, KohaUtil.convertToKohaDate(pickupExpiryDate));
+			GregorianCalendar pickupExpiryDate = initData.getPickupExpiryDate();
+			if (pickupExpiryDate != null)
+				urlBuilder.addRequest(KohaConstants.PARAM_PICKUP_EXPIRY_DATE,
+						KohaUtil.convertToKohaDate(pickupExpiryDate));
 
-		GregorianCalendar earliestDateNeeded = initData.getEarliestDateNeeded();
-		if (earliestDateNeeded != null)
-			urlBuilder.addRequest(KohaConstants.PARAM_EARLIEST_DATE_NEEDED, KohaUtil.convertToKohaDate(earliestDateNeeded));
+			GregorianCalendar earliestDateNeeded = initData.getEarliestDateNeeded();
+			if (earliestDateNeeded != null)
+				urlBuilder.addRequest(KohaConstants.PARAM_EARLIEST_DATE_NEEDED,
+						KohaUtil.convertToKohaDate(earliestDateNeeded));
 
-		PickupLocation pickupLocation = initData.getPickupLocation();
-		if (pickupLocation != null)
-			urlBuilder.addRequest(KohaConstants.PARAM_PICKUP_LOCATION, pickupLocation.getValue());
+			PickupLocation pickupLocation = initData.getPickupLocation();
+			if (pickupLocation != null)
+				urlBuilder.addRequest(KohaConstants.PARAM_PICKUP_LOCATION, pickupLocation.getValue());
 
-		String userNote = initData.getUserNote();
-		if (userNote != null)
-			urlBuilder.addRequest(KohaConstants.PARAM_NOTES, userNote);
+			String userNote = initData.getUserNote();
+			if (userNote != null)
+				urlBuilder.addRequest(KohaConstants.PARAM_NOTES, userNote);
 
-		URL url = urlBuilder.toURL();
+			URL url = urlBuilder.toURL();
 
-		String response = getPlainTextResponse(url);
+			String response = getPlainTextResponse(url);
 
-		return (JSONObject) jsonParser.parse(response);
+			return (JSONObject) jsonParser.parse(response);
+		}
 	}
 
 	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {
@@ -456,24 +583,28 @@ public class KohaConnector {
 		organizationNameInformations.add(organizationNameInfo);
 		return organizationNameInformations;
 	}
-	
+
 	private static URL getLoginPOSTurl() throws MalformedURLException {
-		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort()).setPath("cgi-bin/koha/mainpage.pl").toURL();
+		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort())
+				.setPath("cgi-bin/koha/mainpage.pl").toURL();
 	}
 
 	private static URLBuilder getCommonSvcURLBuilder() {
-		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort()).setPath(LocalConfig.getSvcSuffix());
+		return new URLBuilder().setBase(LocalConfig.getServerName(), LocalConfig.getIntranetServerPort())
+				.setPath(LocalConfig.getSvcSuffix());
 	}
 
 	private static URLBuilder getCommonSvcNcipURLBuilder(String service) {
-		return getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_NCIP).addRequest(KohaConstants.PARAM_SERVICE, service);
+		return getCommonSvcURLBuilder().appendPath(KohaConstants.SVC_NCIP).addRequest(KohaConstants.PARAM_SERVICE,
+				service);
 	}
 
 	private String getPlainTextResponse(URL url) throws KohaException, IOException, SAXException, URISyntaxException {
 		return getPlainTextResponse(url, null);
 	}
 
-	private String getPlainTextResponse(URL url, String identifier) throws KohaException, IOException, SAXException, URISyntaxException {
+	private String getPlainTextResponse(URL url, String identifier)
+			throws KohaException, IOException, SAXException, URISyntaxException {
 
 		boolean isHttps = url.getProtocol().equals("https");
 
@@ -521,6 +652,67 @@ public class KohaConnector {
 		}
 	}
 
+	private Object getJSONResponseFor(URL url, String method)
+			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
+
+		return getJSONResponseFor(url, method, (String) null); 
+	}
+
+	private Object getJSONResponseFor(URL url, String method, JSONObject json)
+			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
+
+		return getJSONResponseFor(url, method, json.toJSONString()); 
+	}
+
+	private Object getJSONResponseFor(URL url, String method, String data)
+			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
+		
+		if (currentSessionIdCookie.isEmpty())
+			renewSessionCookie();
+
+		HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+		httpCon.addRequestProperty("Cookie", currentSessionIdCookie);
+		httpCon.setRequestMethod(method);
+		
+		if (data != null) {
+			httpCon.setDoOutput(true);
+			
+			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
+			outWriter.write(data);
+			outWriter.close();
+		}
+
+		int statusCode = httpCon.getResponseCode();
+
+		if (statusCode > 399) {
+
+			String content = KohaUtil.convertStreamToString(httpCon.getErrorStream());
+
+			if (statusCode == 403 && content.contains("expired") && !haveBeenHere) {
+				haveBeenHere = true;
+				renewSessionCookie();
+				return getJSONResponseFor(url, method);
+			}
+
+			haveBeenHere = false;
+
+			httpCon.disconnect();
+
+			JSONObject error = (JSONObject) jsonParser.parse(content);
+			
+			if (error == null)
+				throw new KohaException(content);
+
+			throw new KohaException((String) error.get("error"));
+		}
+
+		String rawResponse = KohaUtil.convertStreamToString(httpCon.getInputStream());
+
+		Object response = jsonParser.parse(rawResponse);
+
+		return response;
+	}
+
 	/**
 	 * Logins definer admin user (from settings in toolkit.properties) & saves
 	 * cookies to be able to continue parsing requests as logged user.
@@ -538,7 +730,7 @@ public class KohaConnector {
 			httpCon.setRequestMethod("POST");
 
 			String credentials = "userid=" + LocalConfig.getAdminName() + "&password=" + LocalConfig.getAdminPass();
-			
+
 			String additionalPostParams = "&koha_login_context=intranet&branch=";
 
 			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
@@ -546,7 +738,7 @@ public class KohaConnector {
 			outWriter.close();
 
 			String response = KohaUtil.convertStreamToString(httpCon.getInputStream());
-			
+
 			if (response.contains("login_error")) {
 				throw new KohaException("Invalid credentials were provided in toolkit.properties - cannot log in.");
 			}
@@ -556,14 +748,33 @@ public class KohaConnector {
 			for (String cookie : cookies) {
 				if (cookie.contains("CGISESSID=")) {
 					currentSessionIdCookie = cookie;
+					loginAttempts = 0;
 					break;
 				}
 			}
 
 		} else {
-			loginAttempts = 0;
+			asyncWait15minutesAndResetLoginAttempts();
+
 			throw KohaException.createTooManyLoginAttempts();
 		}
 	}
-	
+
+	private static void asyncWait15minutesAndResetLoginAttempts() {
+		new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(15 * 60 * 1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				loginAttempts = 0;
+
+			}
+		}.run();
+
+	}
+
 }

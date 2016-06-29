@@ -34,6 +34,13 @@ public class RestApiUrlBuilder extends URLBuilder {
 		return toReturn.toURL();
 	}
 
+	public URL deleteHold(String reserveId) throws MalformedURLException {
+		
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("holds");
+		
+		return toReturn.appendPath(reserveId).toURL();
+	}
+
 	public URL getCheckouts(String patronId) throws MalformedURLException {
 		
 		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("checkouts");
@@ -42,6 +49,13 @@ public class RestApiUrlBuilder extends URLBuilder {
 			return toReturn.addRequest("borrowernumber", patronId).toURL();
 			
 		return toReturn.toURL();
+	}
+
+	public URL putCheckouts(String checkoutId) throws MalformedURLException {
+		
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("checkouts");
+		
+		return toReturn.appendPath(checkoutId).toURL();
 	}
 	
 	public URL getAccountLines(String patronId) throws MalformedURLException {
@@ -52,5 +66,9 @@ public class RestApiUrlBuilder extends URLBuilder {
 			return toReturn.addRequest("borrowernumber", patronId).toURL();
 			
 		return toReturn.toURL();
+	}
+
+	public URL postHolds() throws MalformedURLException {
+		return this.getHolds(null);
 	}
 }

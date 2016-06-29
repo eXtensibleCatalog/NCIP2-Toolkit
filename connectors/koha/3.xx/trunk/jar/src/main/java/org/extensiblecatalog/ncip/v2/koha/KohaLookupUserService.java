@@ -330,7 +330,7 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 						if (amount == null)
 							amount = details.getFiscalTransactionInformation().getAmount().getMonetaryValue();
 						else
-							amount.add(details.getFiscalTransactionInformation().getAmount().getMonetaryValue());
+							amount = amount.add(details.getFiscalTransactionInformation().getAmount().getMonetaryValue());
 					}
 					userFiscalAccount.setAccountBalance(KohaUtil.createAccountBalance(amount));
 
