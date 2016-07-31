@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip"
+	ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+	<ns1:LookupAgencyResponse>
+		<ns1:AgencyId
+			ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyelementtype/agencyelementtype.scm">ABG001</ns1:AgencyId>
+		<ns1:OrganizationNameInformation>
+			<ns1:OrganizationNameType
+				ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/organizationnametype/organizationnametype.scm">Translated Name</ns1:OrganizationNameType>
+			<ns1:OrganizationName>Městská knihovna v Praze</ns1:OrganizationName>
+		</ns1:OrganizationNameInformation>
+		<ns1:AgencyAddressInformation>
+			<ns1:AgencyAddressRoleType
+				ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/agencyaddressroletype/agencyaddressroletype.scm">Official</ns1:AgencyAddressRoleType>
+			<ns1:PhysicalAddress>
+				<ns1:UnstructuredAddress>
+					<ns1:UnstructuredAddressType
+						ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+					<ns1:UnstructuredAddressData>Mariánské náměstí 1/98, 115 72 Praha 1
+					</ns1:UnstructuredAddressData>
+				</ns1:UnstructuredAddress>
+				<ns1:PhysicalAddressType
+					ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/physicaladdresstype/physicaladdresstype.scm">Street Address</ns1:PhysicalAddressType>
+			</ns1:PhysicalAddress>
+		</ns1:AgencyAddressInformation>
+
+		<ns1:Ext>
+			<ns1:LocationName>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>356</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Barrandov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Wassermannova 926, 15200 Praha 5
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>298</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Bohnice</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Těšínská 600, 18100 Praha 8
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>209</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Břevnov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Bělohorská 56/1666, 16900 Praha 6
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>427</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Černý Most</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>gen. Janouška 1060, 19800 Praha 9
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>222</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Dědina</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Žukovského 888, 16100 Praha 6
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>226</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Dejvice</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Technická 2710/6, 16000 Praha 6
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>291</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Dittrichova</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Dittrichova 2, 12000 Praha 2
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>323</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Dům čtení</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Ruská 192/1455, 10000 Praha 10
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>98</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Hloubětín</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Poděbradská 489, 19800 Praha 9
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>147</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Hostivař</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Golfová 910, 10200 Praha 10
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>33</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Hradčany</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Pohořelec 25/111, 11800 Praha 1
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>439</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Chodov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Jírovcovo nám. 1782, 14800 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>61</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Kobylisy</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Klapkova 3/26, 18200 Praha 8
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>127</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Korunní</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Korunní 68/2160, 10100 Praha 10
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>345</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Krč</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Štúrova 12/1282, 14200 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>431</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Ládví</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Burešova 2/1661, 18200 Praha 8
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>411</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Lužiny</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Archeologická 2256, 15500 Praha 5
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>161</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Michle</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Michelská 7/1, 14000 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>173</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Modřany</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Vazovova 3229, 14300 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>244</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Novodvorská</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Novodvorská 151/452, 14200 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>333</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Opatov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Opatovská 1754, 14900 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>36</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Ostrčilovo nám.</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Ostrčilovo nám. 1/518, 12000 Praha
+									2</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>277</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Ostrovského</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Na Skalce 29/972, 15000 Praha 5
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>251</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Petřiny</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Mahulenina 31/1185, 16200 Praha 6
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>309</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Prosek</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Měšická 806/3, 19000 Praha 9
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>43</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Sedmička</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Tusarova 429/35, 17000 Praha 7
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>377</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Skalka</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Rubensova 2/2237, 10000 Praha 10
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>183</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Smíchov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>nám. 14. října 83, 15000 Praha 5
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>267</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Spořilov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Postupická 7/2932, 14100 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>419</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Stodůlky</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Kovářova 1615, 15500 Praha 5
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>68</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Školská</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Školská 30/1267, 11000 Praha 1
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>4</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Ústřední knihovna</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Mariánské nám. 1, 11572 Praha 1
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>198</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Velká Chuchle</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Starochuchelská 7/20, 15900 Praha 5
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>164</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Vikova</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Vikova 4/1223, 14000 Praha 4
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>375</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Vozovna</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Za Žižkovskou vozovnou 18, 13000
+									Praha 3</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>84</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Vysočany</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Zbuzkova 34/285, 19000 Praha 9
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>591</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Vzácné tisky - objednávka</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>U Brusnice 220, 16000 Praha 6
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>273</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Zahradní Město</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Topolová 2961, 10600 Praha 10
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>367</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Záhřebská</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Záhřebská 22, 12000 Praha 2
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+				<ns1:LocationNameInstance>
+					<ns1:LocationNameLevel>109</ns1:LocationNameLevel>
+					<ns1:LocationNameValue>Žižkov</ns1:LocationNameValue>
+					<ns1:Ext>
+						<ns1:PhysicalAddress>
+							<ns1:UnstructuredAddress>
+								<ns1:UnstructuredAddressType
+									ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/unstructuredaddresstype/unstructuredaddresstype.scm">Newline-Delimited Text</ns1:UnstructuredAddressType>
+								<ns1:UnstructuredAddressData>Husitská 70/110, 13000 Praha 3
+								</ns1:UnstructuredAddressData>
+							</ns1:UnstructuredAddress>
+							<ns1:PhysicalAddressType>Street Address</ns1:PhysicalAddressType>
+						</ns1:PhysicalAddress>
+					</ns1:Ext>
+				</ns1:LocationNameInstance>
+
+			</ns1:LocationName>
+		</ns1:Ext>
+
+	</ns1:LookupAgencyResponse>
+</ns1:NCIPMessage>

@@ -217,27 +217,40 @@ public class KohaConnector {
 			if (loanedItemsDesired) {
 				URL checkoutsRestUrl = new RestApiUrlBuilder().getCheckouts(patronId);
 
-				JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET");
-				
-				userInfo.put("checkouts", checkouts);
+				try {
+					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET");
+
+					userInfo.put("checkouts", checkouts);
+				} catch (ParseException e) {
+
+				}
 			}
 
 			if (requestedItemsDesired) {
 
 				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
 
-				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
+				try {
+					JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
 
-				userInfo.put("holds", holds);
+					userInfo.put("holds", holds);
+				} catch (ParseException e) {
+
+				}
 			}
 
 			if (userFiscalAccountDesired) {
 
 				URL accountLinesRestUrl = new RestApiUrlBuilder().getAccountLines(patronId);
 
-				JSONArray accountLines = (JSONArray) getJSONResponseFor(accountLinesRestUrl, "GET");
+				try {
 
-				userInfo.put("accountLines", accountLines);
+					JSONArray accountLines = (JSONArray) getJSONResponseFor(accountLinesRestUrl, "GET");
+
+					userInfo.put("accountLines", accountLines);
+				} catch (ParseException e) {
+
+				}
 			}
 
 			return userInfo;
@@ -290,31 +303,31 @@ public class KohaConnector {
 			String patronId = initData.getUserId().getUserIdentifierValue();
 
 			String reserveId = null;
-			
+
 			if (initData.getRequestId() != null)
 				reserveId = initData.getRequestId().getRequestIdentifierValue();
 
 			if (reserveId == null && itemIdIsNotEmpty) {
-				
+
 				String providedItemId = initData.getItemId().getItemIdentifierValue();
-				
+
 				String providedItemType = initData.getItemId().getItemIdentifierType().getValue();
-				
+
 				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
 
 				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
-				
+
 				for (Object object : holds) {
 					JSONObject hold = (JSONObject) object;
-					
+
 					String itemId = (String) hold.get("itemnumber");
-					
+
 					if (itemId != null && itemId.equals(providedItemId)) {
 						reserveId = (String) hold.get("reserve_id");
 						break;
 					}
 				}
-				
+
 				if (reserveId == null)
 					throw new KohaException("Request not found");
 			}
@@ -332,7 +345,6 @@ public class KohaConnector {
 			else
 				urlBuilder.addRequest(KohaConstants.PARAM_REQUEST_ID,
 						initData.getRequestId().getRequestIdentifierValue());
-
 
 			return getPlainTextResponse(urlBuilder.toURL());
 		}
@@ -486,30 +498,32 @@ public class KohaConnector {
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
 			URL postHoldsRestUrl = new RestApiUrlBuilder().postHolds();
-			
+
 			JSONObject data = new JSONObject();
-			
+
 			data.put("borrowernumber", Integer.parseInt(initData.getUserId().getUserIdentifierValue()));
-			
+
 			if (initData.getItemIds() != null && initData.getItemId(0) != null)
 				data.put("itemnumber", Integer.parseInt(initData.getItemId(0).getItemIdentifierValue()));
 			else
-				data.put("biblionumber", Integer.parseInt(initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier()));
-			
+				data.put("biblionumber", Integer.parseInt(
+						initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier()));
+
 			data.put("branchcode", initData.getPickupLocation().getValue());
-			
+
 			String expirationDate = KohaUtil.createKohaDateFromGregorianCalendar(initData.getPickupExpiryDate());
 			data.put("expirationdate", expirationDate);
-			
+
 			try {
 				JSONObject holdCreated = (JSONObject) getJSONResponseFor(postHoldsRestUrl, "POST", data);
-				
+
 				return holdCreated;
 			} catch (KohaException e) {
-				
-				if (e.getMessage().contains("See Koha logs for details")) // wtf?? :D
-					throw new KohaException("You already have this item requested or you have not permissions to request this item.");
-					
+
+				if (e.getMessage().contains("See Koha logs for details")) // wtf??
+					throw new KohaException(
+							"You already have this item requested or you have not permissions to request this item.");
+
 				throw e;
 			}
 		} else {
@@ -655,28 +669,28 @@ public class KohaConnector {
 	private Object getJSONResponseFor(URL url, String method)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
 
-		return getJSONResponseFor(url, method, (String) null); 
+		return getJSONResponseFor(url, method, (String) null);
 	}
 
 	private Object getJSONResponseFor(URL url, String method, JSONObject json)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
 
-		return getJSONResponseFor(url, method, json.toJSONString()); 
+		return getJSONResponseFor(url, method, json.toJSONString());
 	}
 
 	private Object getJSONResponseFor(URL url, String method, String data)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
-		
+
 		if (currentSessionIdCookie.isEmpty())
 			renewSessionCookie();
 
 		HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 		httpCon.addRequestProperty("Cookie", currentSessionIdCookie);
 		httpCon.setRequestMethod(method);
-		
+
 		if (data != null) {
 			httpCon.setDoOutput(true);
-			
+
 			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
 			outWriter.write(data);
 			outWriter.close();
@@ -699,7 +713,7 @@ public class KohaConnector {
 			httpCon.disconnect();
 
 			JSONObject error = (JSONObject) jsonParser.parse(content);
-			
+
 			if (error == null)
 				throw new KohaException(content);
 
