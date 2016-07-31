@@ -7,11 +7,12 @@ core/trunk/binding/ilsdiv1_0/src/main/java/META-INF/
 core/trunk/binding/ilsdiv1_0/src/main/java/org/extensiblecatalog/ncip/v2/binding/ilsdiv1_0/jaxb/elements/
 core/trunk/binding/ilsdiv1_0_bc/src/main/java/META-INF/
 core/trunk/binding/ilsdiv1_0_bc/src/main/java/org/extensiblecatalog/ncip/v2/binding/ilsdiv1_0_bc/jaxb/elements/
-core/trunk/binding/ilsdiv1_1/src/main/java/META-INF/
-core/trunk/binding/ilsdiv1_1/src/main/java/org/extensiblecatalog/ncip/v2/binding/ilsdiv1_1/jaxb/elements/
 core/trunk/binding/ncipv2_01/src/main/java/META-INF/
 core/trunk/binding/ncipv2_01/src/main/java/org/extensiblecatalog/ncip/v2/binding/ncipv2_01/jaxb/elements/
 core/trunk/binding/ncipv2_02/src/main/java/META-INF/
 core/trunk/binding/ncipv2_02/src/main/java/org/extensiblecatalog/ncip/v2/binding/ncipv2_02/jaxb/elements/
 core/trunk/binding/wclv1_0/src/main/java/META-INF/
 core/trunk/binding/wclv1_0/src/main/java/org/extensiblecatalog/ncip/v2/binding/wclv1_0/jaxb/elements/
+
+core/trunk/binding/ilsdiv1_1/src/main/java/META-INF/
+core/trunk/binding/ilsdiv1_1/src/main/java/org/extensiblecatalog/ncip/v2/binding/ilsdiv1_1/jaxb/elements/
