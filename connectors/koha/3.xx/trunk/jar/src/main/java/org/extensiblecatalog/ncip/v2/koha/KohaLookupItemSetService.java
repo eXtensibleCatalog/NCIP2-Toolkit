@@ -2,6 +2,7 @@ package org.extensiblecatalog.ncip.v2.koha;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemInformation;
 import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.ItemUseRestrictionType;
+import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemSetResponseData;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
@@ -47,7 +49,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
-public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LookupItemSetService {
+public class KohaLookupItemSetService
+		implements org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LookupItemSetService {
 
 	private static HashMap<String, ItemToken> tokens = new HashMap<String, ItemToken>();
 
@@ -64,14 +67,16 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 	private int itemsForwarded;
 
 	private ItemToken nextItemToken;
+	
+	private KohaRemoteServiceManager kohaSvcMgr;
 
 	@Override
-	public LookupItemSetResponseData performService(ILSDIvOneOneLookupItemSetInitiationData initData, ServiceContext serviceContext, RemoteServiceManager serviceManager)
-			throws ServiceException {
+	public LookupItemSetResponseData performService(ILSDIvOneOneLookupItemSetInitiationData initData,
+			ServiceContext serviceContext, RemoteServiceManager serviceManager) throws ServiceException {
 
 		maximumItemsCount = parseMaximumItemsCount(initData);
 
-		KohaRemoteServiceManager kohaSvcMgr = (KohaRemoteServiceManager) serviceManager;
+		kohaSvcMgr = (KohaRemoteServiceManager) serviceManager;
 
 		final LookupItemSetResponseData responseData = new LookupItemSetResponseData();
 
@@ -86,23 +91,23 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 			}
 		} catch (ServiceException se) {
 			if (se.getError().equals(ServiceError.UNSUPPORTED_REQUEST)) {
-				Problem p = new Problem(new ProblemType("Unknown NextItemToken was used."), null, null, "It has probably been deleted.");
+				Problem p = new Problem(new ProblemType("Unknown NextItemToken was used."), null, null,
+						"It has probably been deleted.");
 				problems.add(p);
 			}
 		}
 
-		boolean itemIdsIsEmpty = initData.getItemIds() == null || initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
+		boolean itemIdsIsEmpty = initData.getItemIds() == null
+				|| initData.getItemIds().size() == 1 && initData.getItemId(0).getItemIdentifierValue().isEmpty();
 
 		// TODO: Make this mind**** human-readable :D ...
-		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null
-				|| initData.getBibliographicIds().size() == 1
-				&& (initData.getBibliographicId(0).getBibliographicRecordId() == null || initData.getBibliographicId(0).getBibliographicRecordId()
-						.getBibliographicRecordIdentifier().isEmpty());
+		boolean bibRecIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
+				&& (initData.getBibliographicId(0).getBibliographicRecordId() == null || initData.getBibliographicId(0)
+						.getBibliographicRecordId().getBibliographicRecordIdentifier().isEmpty());
 
-		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null
-				|| initData.getBibliographicIds().size() == 1
-				&& (initData.getBibliographicId(0).getBibliographicItemId() == null || initData.getBibliographicId(0).getBibliographicItemId().getBibliographicItemIdentifier()
-						.isEmpty());
+		boolean bibItemIdIsEmpty = initData.getBibliographicIds() == null || initData.getBibliographicIds().size() == 1
+				&& (initData.getBibliographicId(0).getBibliographicItemId() == null || initData.getBibliographicId(0)
+						.getBibliographicItemId().getBibliographicItemIdentifier().isEmpty());
 
 		if (itemIdsIsEmpty && bibRecIdIsEmpty && bibItemIdIsEmpty) {
 
@@ -125,7 +130,9 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 				parseItemIds(initData, responseData, kohaSvcMgr);
 
 			} else {
-				Problem p = new Problem(new ProblemType("LookupItemSet service has no implemented service to process HoldingsSetId."), null, null);
+				Problem p = new Problem(
+						new ProblemType("LookupItemSet service has no implemented service to process HoldingsSetId."),
+						null, null);
 				responseData.setProblems(Arrays.asList(p));
 			}
 
@@ -152,7 +159,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 	 * @param kohaSvcMgr
 	 * @param nextItemToken
 	 */
-	private void parseBibIds(ILSDIvOneOneLookupItemSetInitiationData initData, LookupItemSetResponseData responseData, KohaRemoteServiceManager kohaSvcMgr) {
+	private void parseBibIds(ILSDIvOneOneLookupItemSetInitiationData initData, LookupItemSetResponseData responseData,
+			KohaRemoteServiceManager kohaSvcMgr) {
 
 		boolean wantSeeAllProblems = LocalConfig.isEchoParticularProblemsToLUIS();
 
@@ -172,8 +180,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 
 					if (bibRecordIdVal.isEmpty()) {
 						if (wantSeeAllProblems) {
-							Problem problem = new Problem(new ProblemType("Empty BibliographicRecordIdentifierValue."), null,
-									"Here you have specified empty BibliographicRecordIdentifierValue.");
+							Problem problem = new Problem(new ProblemType("Empty BibliographicRecordIdentifierValue."),
+									null, "Here you have specified empty BibliographicRecordIdentifierValue.");
 							bibInformation.setProblems(Arrays.asList(problem));
 							bibInformation.setBibliographicId(bibId);
 							bibInformations.add(bibInformation);
@@ -214,8 +222,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 
 					if (bibItemIdVal.isEmpty()) {
 						if (wantSeeAllProblems) {
-							Problem problem = new Problem(new ProblemType("Empty BibliographicItemIdentifierValue."), null,
-									"Here you have specified empty BibliographicItemIdentifierValue.");
+							Problem problem = new Problem(new ProblemType("Empty BibliographicItemIdentifierValue."),
+									null, "Here you have specified empty BibliographicItemIdentifierValue.");
 							bibInformation.setProblems(Arrays.asList(problem));
 							bibInformations.add(bibInformation);
 						}
@@ -240,17 +248,20 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 
 				} else {
 
-					bibInformation.setProblems(ServiceHelper.generateProblems(Version1GeneralProcessingError.NEEDED_DATA_MISSING, "BibliographicItemId/RecordId", null,
+					bibInformation.setProblems(ServiceHelper.generateProblems(
+							Version1GeneralProcessingError.NEEDED_DATA_MISSING, "BibliographicItemId/RecordId", null,
 							"BibliographicItemId/RecordId was not properly set. Please think about turning on SchemaValidation in toolkit.properties."));
 					bibInformations.add(bibInformation);
 					++itemsForwarded;
 				}
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(),
+						"Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (ParserConfigurationException pce) {
-				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null,
+						pce.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (SAXException se) {
@@ -265,20 +276,22 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 						boolean userNotFound = false;
 
 						if (ke.getMessage().equals("User not found..\n")) {
-							p = new Problem(Version1LookupUserProcessingError.UNKNOWN_USER, null, "User you specified in Ext element was not found.");
+							p = new Problem(Version1LookupUserProcessingError.UNKNOWN_USER, null,
+									"User you specified in Ext element was not found.");
 
 							responseData.setProblems(Arrays.asList(p));
 							break;
 						} else {
-							p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + ke.getNotFoundIdentifierValue()
-									+ ", you are searching for, does not exist.");
+							p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item "
+									+ ke.getNotFoundIdentifierValue() + ", you are searching for, does not exist.");
 						}
 						bibInformation.setProblems(Arrays.asList(p));
 
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
-						// Do not create NextItemToken if this is last item desired
+						// Do not create NextItemToken if this is last item
+						// desired
 						boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
 
 						if (createNextItemToken) {
@@ -303,7 +316,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 					break;
 				}
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null,
+						StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			}
@@ -320,7 +334,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 	 * @param kohaSvcMgr
 	 * @param nextItemToken
 	 */
-	private void parseItemIds(ILSDIvOneOneLookupItemSetInitiationData initData, LookupItemSetResponseData responseData, KohaRemoteServiceManager kohaSvcMgr) {
+	private void parseItemIds(ILSDIvOneOneLookupItemSetInitiationData initData, LookupItemSetResponseData responseData,
+			KohaRemoteServiceManager kohaSvcMgr) {
 
 		boolean wantSeeAllProblems = LocalConfig.isEchoParticularProblemsToLUIS();
 
@@ -339,7 +354,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 			if (itemIdVal.isEmpty()) {
 				if (wantSeeAllProblems) {
 					bibInformation = new BibInformation();
-					Problem problem = new Problem(new ProblemType("Empty ItemIdIdentifierValue."), null, "Here you have specified empty ItemIdIdentifierValue.");
+					Problem problem = new Problem(new ProblemType("Empty ItemIdIdentifierValue."), null,
+							"Here you have specified empty ItemIdIdentifierValue.");
 					bibInformation.setProblems(Arrays.asList(problem));
 					bibInformations.add(bibInformation);
 				} else
@@ -352,7 +368,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 				JSONObject kohaItem = kohaSvcMgr.lookupItem(itemIdVal, initData);
 
 				BibliographicId bibliographicId = new BibliographicId();
-				BibliographicRecordId bibliographicItemId = KohaUtil.createBibliographicRecordIdAsAccessionNumber(itemIdVal);
+				BibliographicRecordId bibliographicItemId = KohaUtil
+						.createBibliographicRecordIdAsAccessionNumber(itemIdVal);
 				bibliographicId.setBibliographicRecordId(bibliographicItemId);
 
 				bibInformation.setBibliographicId(bibliographicId);
@@ -381,11 +398,13 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 					break;
 				}
 			} catch (IOException ie) {
-				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(), "Are you connected to the Internet/Intranet?");
+				Problem p = new Problem(new ProblemType("Processing IOException error."), ie.getMessage(),
+						"Are you connected to the Internet/Intranet?");
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (ParserConfigurationException pce) {
-				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null, pce.getMessage());
+				Problem p = new Problem(new ProblemType("Processing ParserConfigurationException error."), null,
+						pce.getMessage());
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			} catch (SAXException se) {
@@ -395,15 +414,19 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 			} catch (KohaException ke) {
 				if (ke.getShortMessage().equals(KohaException.NOT_FOUND_404)) {
 					if (wantSeeAllProblems) {
-						Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null, "Item " + itemIdVal + ", you are searching for, does not exist.");
+						Problem p = new Problem(Version1LookupItemProcessingError.UNKNOWN_ITEM, null,
+								"Item " + itemIdVal + ", you are searching for, does not exist.");
 
 						bibInformation.setProblems(Arrays.asList(p));
 
-						// Note that Problem elements within <ns1:BibInformation> is also considered as one item forwarded
+						// Note that Problem elements within
+						// <ns1:BibInformation> is also considered as one item
+						// forwarded
 						bibInformations.add(bibInformation);
 						++itemsForwarded;
 
-						// Do not create NextItemToken if this is last item desired
+						// Do not create NextItemToken if this is last item
+						// desired
 						boolean createNextItemToken = maximumItemsCount == itemsForwarded && !isLast;
 
 						if (createNextItemToken) {
@@ -426,7 +449,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 					break;
 				}
 			} catch (Exception e) {
-				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null, StringUtils.join(e.getStackTrace(), "\n"));
+				Problem p = new Problem(new ProblemType("Unknown processing exception error."), null,
+						StringUtils.join(e.getStackTrace(), "\n"));
 				responseData.setProblems(Arrays.asList(p));
 				break;
 			}
@@ -434,7 +458,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 
 	}
 
-	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response, ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal) throws ServiceException, ParseException {
+	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response,
+			ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal) throws ServiceException, ParseException, ParserConfigurationException, IOException, SAXException, KohaException, org.json.simple.parser.ParseException, URISyntaxException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
 		int startFrom = 0, maxItemsToParse = 0;
@@ -445,140 +470,271 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 			maxItemsToParse = maximumItemsCount - itemsForwarded;
 		}
 
-		if (initData.getBibliographicDescriptionDesired()) {
-			JSONObject itemInfo = (JSONObject) response.get("bibInfo");
-			BibliographicDescription bibliographicDescription = KohaUtil.parseBibliographicDescription(itemInfo);
-			holdingsSet.setBibliographicDescription(bibliographicDescription);
-		}
-
-		Long numberOfPieces = (Long) response.get("itemsCount");
-
 		List<ItemInformation> itemInformations = new ArrayList<ItemInformation>();
 
-		JSONArray items = (JSONArray) response.get("items");
-
 		int i;
-		for (i = startFrom; i < items.size(); ++i) {
-			boolean canContinue = maxItemsToParse == 0 || maxItemsToParse > i - startFrom;
-			if (canContinue) {
-				JSONObject itemInfo = (JSONObject) items.get(i);
-				ItemInformation itemInformation = new ItemInformation();
 
-				ItemOptionalFields iof = new ItemOptionalFields();
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-				String itemId = (String) itemInfo.get("itemnumber");
-				String agencyId = (String) itemInfo.get("holdingbranch");
+			if (initData.getBibliographicDescriptionDesired()) {
+				BibliographicDescription bibliographicDescription = KohaUtil.parseBibliographicDescription(response);
+				holdingsSet.setBibliographicDescription(bibliographicDescription);
+			}
+			
+			JSONArray items = (JSONArray) response.get("items");
+			int numberOfPieces = items.size();
+			
+			for (i = startFrom; i < items.size(); ++i) {
+				boolean canContinue = maxItemsToParse == 0 || maxItemsToParse > i - startFrom;
+				if (canContinue) {
+					JSONObject itemInfo = (JSONObject) items.get(i);
+					ItemInformation itemInformation = new ItemInformation();
 
-				itemInformation.setItemId(KohaUtil.createItemId(itemId, agencyId));
+					String itemId = (String) itemInfo.get("itemnumber");
 
-				if (initData.getLocationDesired()) {
-					String homeBranch = (String) itemInfo.get("homebranch");
-					String locationVal = (String) itemInfo.get("location");
-					if (homeBranch != null || locationVal != null) {
-						iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
+					LookupItemInitiationData initDataLookupItem = KohaUtil.luisInitDataToLookupItemInitData(initData, itemId);
+					
+					itemInfo = kohaSvcMgr.lookupItem(itemId, initData);
+					
+					ItemOptionalFields iof = new ItemOptionalFields();
+
+					String agencyId = (String) itemInfo.get("holdingbranch");
+
+					itemInformation.setItemId(KohaUtil.createItemId(itemId, agencyId));
+
+					if (initData.getLocationDesired()) {
+						String homeBranch = (String) itemInfo.get("holdingbranch");
+						String locationVal = (String) itemInfo.get("location");
+						if (homeBranch != null || locationVal != null) {
+							iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
+						}
 					}
-				}
 
-				if (initData.getItemDescriptionDesired()) {
-					ItemDescription itemDescription = new ItemDescription();
+					if (initData.getItemDescriptionDesired()) {
+						ItemDescription itemDescription = new ItemDescription();
 
-					if (numberOfPieces != null)
 						itemDescription.setNumberOfPieces(new BigDecimal(numberOfPieces));
 
-					String callNumber = (String) itemInfo.get("itemcallnumber");
-					String copyNumber = (String) itemInfo.get("copynumber");
+						String callNumber = (String) itemInfo.get("itemcallnumber");
+						String copyNumber = (String) itemInfo.get("copynumber");
 
-					itemDescription.setCallNumber(callNumber);
-					itemDescription.setCopyNumber(copyNumber);
+						itemDescription.setCallNumber(callNumber);
+						itemDescription.setCopyNumber(copyNumber);
 
-					iof.setItemDescription(itemDescription);
-				}
-
-				if (initData.getCirculationStatusDesired()) {
-					String circulationStatus = (String) itemInfo.get("circulationStatus");
-					iof.setCirculationStatus(Version1CirculationStatus.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+						iof.setItemDescription(itemDescription);
+					}
 					
-					if (circulationStatus.equalsIgnoreCase("On Loan")) {
-						String dueDateParsed = (String) itemInfo.get("dueDate");
+					JSONObject availabilityJSON = (JSONObject) itemInfo.get("availability");
+
+					if (initData.getCirculationStatusDesired()) {
+						iof.setCirculationStatus(KohaUtil.parseCirculationStatus(availabilityJSON, iof));
+					}
+
+					if (initData.getHoldQueueLengthDesired()) {
 						
-						if (dueDateParsed != null) {
-							GregorianCalendar dueDate = KohaUtil.parseGregorianCalendarFromKohaDate(dueDateParsed);
-							iof.setDateDue(dueDate);
-						}
+						Long holdQueueLength = (Long) availabilityJSON.get("hold_queue_length");
+						
+						if (holdQueueLength != null)
+							iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
 					}
-				}
 
-				if (initData.getHoldQueueLengthDesired()) {
-					String holdQueueLength = (String) itemInfo.get("holdQueueLength");
+					if (initData.getUserId() != null) {
 
-					if (holdQueueLength != null)
-						iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
-				}
+						// TODO after impelmented bug https://bugs.koha-community.org/bugzilla3/show_bug.cgi?id=17003
+						
+						// Process "Not For Loan" as the output of inability of
+						// requesting an item with provided UserId
+						List<ItemUseRestrictionType> itemUseRestrictionTypes;
 
-				if (initData.getItemUseRestrictionTypeDesired()) {
-					JSONArray itemUseRestrictions = (JSONArray) itemInfo.get("itemUseRestrictions");
-					if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
-						List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-						for (Object itemUseRestriction : itemUseRestrictions) {
-							String itemUseRestrictionValue = (String) itemUseRestriction;
-							itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
-									itemUseRestrictionValue));
-						}
-						iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+						boolean createdRestrictionsAlready = iof.getItemUseRestrictionTypes() != null
+								&& iof.getItemUseRestrictionTypes().size() > 0;
+
+						if (createdRestrictionsAlready) {
+							itemUseRestrictionTypes = iof.getItemUseRestrictionTypes();
+						} else
+							itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+
+						String canBeRequestedVal = (String) itemInfo.get("canBeRequested");
+
+						// Do not create "Not For Loan" if it's null - maybe
+						// Koha ILS not updated?
+						boolean cannotBeRequested = canBeRequestedVal != null && !canBeRequestedVal.equals("y");
+
+						if (cannotBeRequested)
+							itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.NOT_FOR_LOAN);
+
+						// Do not set empty list ..
+						if (createdRestrictionsAlready || cannotBeRequested)
+							iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
 					}
+
+					itemInformation.setItemOptionalFields(iof);
+					itemInformations.add(itemInformation);
+					++itemsForwarded;
+
+				} else {
+
+					ItemToken itemToken = new ItemToken();
+
+					itemToken.setBibliographicId(bibIdVal);
+
+					itemToken.setIsRecordId(true);
+
+					itemToken.setNoOfDoneItemIds(i);
+
+					String tokenKey = Integer.toString(random.nextInt());
+
+					itemToken.setNextToken(tokenKey);
+
+					addItemToken(tokenKey, itemToken);
+
+					newTokenKey = tokenKey;
+					break;
+
 				}
-
-				if (initData.getUserId() != null) {
-
-					// Process "Not For Loan" as the output of inability of requesting an item with provided UserId
-					List<ItemUseRestrictionType> itemUseRestrictionTypes;
-
-					boolean createdRestrictionsAlready = iof.getItemUseRestrictionTypes() != null && iof.getItemUseRestrictionTypes().size() > 0;
-
-					if (createdRestrictionsAlready) {
-						itemUseRestrictionTypes = iof.getItemUseRestrictionTypes();
-					} else
-						itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-
-					String canBeRequestedVal = (String) itemInfo.get("canBeRequested");
-
-					// Do not create "Not For Loan" if it's null - maybe Koha ILS not updated?
-					boolean cannotBeRequested = canBeRequestedVal != null && !canBeRequestedVal.equals("y");
-
-					if (cannotBeRequested)
-						itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.NOT_FOR_LOAN);
-
-					// Do not set empty list ..
-					if (createdRestrictionsAlready || cannotBeRequested)
-						iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
-				}
-
-				itemInformation.setItemOptionalFields(iof);
-				itemInformations.add(itemInformation);
-				++itemsForwarded;
-
-			} else {
-
-				ItemToken itemToken = new ItemToken();
-
-				itemToken.setBibliographicId(bibIdVal);
-
-				itemToken.setIsRecordId(true);
-
-				itemToken.setNoOfDoneItemIds(i);
-
-				String tokenKey = Integer.toString(random.nextInt());
-
-				itemToken.setNextToken(tokenKey);
-
-				addItemToken(tokenKey, itemToken);
-
-				newTokenKey = tokenKey;
-				break;
 
 			}
-		}
+			//
+			// END OF REST API LOGIC
+			//
+		} else {
+			if (initData.getBibliographicDescriptionDesired()) {
+				JSONObject itemInfo = (JSONObject) response.get("bibInfo");
+				BibliographicDescription bibliographicDescription = KohaUtil.parseBibliographicDescription(itemInfo);
+				holdingsSet.setBibliographicDescription(bibliographicDescription);
+			}
 
+			Long numberOfPieces = (Long) response.get("itemsCount");
+
+			JSONArray items = (JSONArray) response.get("items");
+			for (i = startFrom; i < items.size(); ++i) {
+				boolean canContinue = maxItemsToParse == 0 || maxItemsToParse > i - startFrom;
+				if (canContinue) {
+					JSONObject itemInfo = (JSONObject) items.get(i);
+					ItemInformation itemInformation = new ItemInformation();
+
+					ItemOptionalFields iof = new ItemOptionalFields();
+
+					String itemId = (String) itemInfo.get("itemnumber");
+					String agencyId = (String) itemInfo.get("holdingbranch");
+
+					itemInformation.setItemId(KohaUtil.createItemId(itemId, agencyId));
+
+					if (initData.getLocationDesired()) {
+						String homeBranch = (String) itemInfo.get("homebranch");
+						String locationVal = (String) itemInfo.get("location");
+						if (homeBranch != null || locationVal != null) {
+							iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
+						}
+					}
+
+					if (initData.getItemDescriptionDesired()) {
+						ItemDescription itemDescription = new ItemDescription();
+
+						if (numberOfPieces != null)
+							itemDescription.setNumberOfPieces(new BigDecimal(numberOfPieces));
+
+						String callNumber = (String) itemInfo.get("itemcallnumber");
+						String copyNumber = (String) itemInfo.get("copynumber");
+
+						itemDescription.setCallNumber(callNumber);
+						itemDescription.setCopyNumber(copyNumber);
+
+						iof.setItemDescription(itemDescription);
+					}
+
+					if (initData.getCirculationStatusDesired()) {
+						String circulationStatus = (String) itemInfo.get("circulationStatus");
+						iof.setCirculationStatus(Version1CirculationStatus
+								.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+
+						if (circulationStatus.equalsIgnoreCase("On Loan")) {
+							String dueDateParsed = (String) itemInfo.get("dueDate");
+
+							if (dueDateParsed != null) {
+								GregorianCalendar dueDate = KohaUtil.parseGregorianCalendarFromKohaDate(dueDateParsed);
+								iof.setDateDue(dueDate);
+							}
+						}
+					}
+
+					if (initData.getHoldQueueLengthDesired()) {
+						String holdQueueLength = (String) itemInfo.get("holdQueueLength");
+
+						if (holdQueueLength != null)
+							iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
+					}
+
+					if (initData.getItemUseRestrictionTypeDesired()) {
+						JSONArray itemUseRestrictions = (JSONArray) itemInfo.get("itemUseRestrictions");
+						if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
+							List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+							for (Object itemUseRestriction : itemUseRestrictions) {
+								String itemUseRestrictionValue = (String) itemUseRestriction;
+								itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(
+										Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
+										itemUseRestrictionValue));
+							}
+							iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+						}
+					}
+
+					if (initData.getUserId() != null) {
+
+						// Process "Not For Loan" as the output of inability of
+						// requesting an item with provided UserId
+						List<ItemUseRestrictionType> itemUseRestrictionTypes;
+
+						boolean createdRestrictionsAlready = iof.getItemUseRestrictionTypes() != null
+								&& iof.getItemUseRestrictionTypes().size() > 0;
+
+						if (createdRestrictionsAlready) {
+							itemUseRestrictionTypes = iof.getItemUseRestrictionTypes();
+						} else
+							itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+
+						String canBeRequestedVal = (String) itemInfo.get("canBeRequested");
+
+						// Do not create "Not For Loan" if it's null - maybe
+						// Koha ILS not updated?
+						boolean cannotBeRequested = canBeRequestedVal != null && !canBeRequestedVal.equals("y");
+
+						if (cannotBeRequested)
+							itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.NOT_FOR_LOAN);
+
+						// Do not set empty list ..
+						if (createdRestrictionsAlready || cannotBeRequested)
+							iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+					}
+
+					itemInformation.setItemOptionalFields(iof);
+					itemInformations.add(itemInformation);
+					++itemsForwarded;
+
+				} else {
+
+					ItemToken itemToken = new ItemToken();
+
+					itemToken.setBibliographicId(bibIdVal);
+
+					itemToken.setIsRecordId(true);
+
+					itemToken.setNoOfDoneItemIds(i);
+
+					String tokenKey = Integer.toString(random.nextInt());
+
+					itemToken.setNextToken(tokenKey);
+
+					addItemToken(tokenKey, itemToken);
+
+					newTokenKey = tokenKey;
+					break;
+
+				}
+
+			}
+
+		}
 		if (maxItemsToParse != 0 && maxItemsToParse == i - startFrom && !isLast && newTokenKey == null) {
 			ItemToken itemToken = new ItemToken();
 
@@ -602,7 +758,9 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 		return holdingsSet;
 	}
 
-	private HoldingsSet parseHoldingsSetFromLookupItem(JSONObject kohaItem, ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal) throws ServiceException, ParseException {
+	private HoldingsSet parseHoldingsSetFromLookupItem(JSONObject kohaItem,
+			ILSDIvOneOneLookupItemSetInitiationData initData, String itemIdVal)
+			throws ServiceException, ParseException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 		ItemInformation itemInfo = new ItemInformation();
 
@@ -613,7 +771,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 	}
 
 	/**
-	 * Returns ItemToken stored in static HashMap, associated with {@link String} tokenKey.<br />
+	 * Returns ItemToken stored in static HashMap, associated with
+	 * {@link String} tokenKey.<br />
 	 * If passed tokenKey is empty or null, null will be returned.
 	 * 
 	 * @param tokenKey
@@ -622,7 +781,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 	 * @return {@link org.extensiblecatalog.ncip.v2.koha.util.ItemToken}
 	 * @throws ServiceException
 	 */
-	private ItemToken parseItemToken(ILSDIvOneOneLookupItemSetInitiationData initData, KohaRemoteServiceManager kohaSvcMgr) throws ServiceException {
+	private ItemToken parseItemToken(ILSDIvOneOneLookupItemSetInitiationData initData,
+			KohaRemoteServiceManager kohaSvcMgr) throws ServiceException {
 
 		String tokenKey = initData.getNextItemToken();
 		List<BibliographicId> bibIds;
@@ -645,7 +805,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 				if (bibIds != null && bibIds.size() > 0) {
 					index = getBibIdIndex(bibIds, nextItemToken.getBibliographicId());
 					if (index > -1) {
-						// We can't remove bibId, which is not completely processed due to MaximumItemsCount
+						// We can't remove bibId, which is not completely
+						// processed due to MaximumItemsCount
 						if (nextItemToken.isRecordId() && !nextItemToken.doneWithRecordId())
 							bibIds.subList(0, index).clear();
 						else
@@ -662,14 +823,16 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 			} else if (nextItemToken == null) {
 				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, null, null);
 			} else {
-				// Do nothing .. token expiration will be announced to user with Problem element in responseData
+				// Do nothing .. token expiration will be announced to user with
+				// Problem element in responseData
 			}
 		}
 		return nextItemToken;
 	}
 
 	/**
-	 * Zero (0) means there was no MaximumItemsCount element set in initiation message.
+	 * Zero (0) means there was no MaximumItemsCount element set in initiation
+	 * message.
 	 * 
 	 * @param initData
 	 * @return {@link Integer}
@@ -680,14 +843,16 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 			try {
 				return initData.getMaximumItemsCount().intValueExact();
 			} catch (Exception e) {
-				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST, "MaximumItemsCount element is not in correct format. " + e.getMessage());
+				throw new ServiceException(ServiceError.UNSUPPORTED_REQUEST,
+						"MaximumItemsCount element is not in correct format. " + e.getMessage());
 			}
 		else
 			return 0;
 	}
 
 	/**
-	 * Returns -1 if in passed list of BibliographicIds was not found specified bibId.
+	 * Returns -1 if in passed list of BibliographicIds was not found specified
+	 * bibId.
 	 * 
 	 * @param bibIds
 	 * @param bibId
@@ -702,7 +867,8 @@ public class KohaLookupItemSetService implements org.extensiblecatalog.ncip.v2.i
 					return i;
 				}
 			} else if (bibIdFromList.getBibliographicRecordId() != null) {
-				if (bibIds.get(i).getBibliographicRecordId().getBibliographicRecordIdentifier().equalsIgnoreCase(bibId)) {
+				if (bibIds.get(i).getBibliographicRecordId().getBibliographicRecordIdentifier()
+						.equalsIgnoreCase(bibId)) {
 					return i;
 				}
 			}

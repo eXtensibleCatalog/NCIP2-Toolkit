@@ -366,7 +366,7 @@ public class KohaConnector {
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
 			// Gets also itemDescription's itemcallnumber & copynumber
-			URL itemsRestUrl = new RestApiUrlBuilder().getItems(itemIdVal); 
+			URL itemsRestUrl = new RestApiUrlBuilder().getItems(itemIdVal);
 
 			String itemsResponse = getPlainTextResponse(itemsRestUrl);
 
@@ -384,15 +384,15 @@ public class KohaConnector {
 			}
 
 			if (initData.getBibliographicDescriptionDesired()) {
-				
+
 				String bibIdVal = (String) item.get("biblionumber");
-				
+
 				URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibIdVal);
-				
+
 				String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
-				
+
 				JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
-				
+
 				item.put("biblio", biblio);
 			}
 
@@ -429,37 +429,50 @@ public class KohaConnector {
 			throws KohaException, IOException, SAXException, ParserConfigurationException, URISyntaxException,
 			ParseException {
 
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET)
-				.addRequest(KohaConstants.PARAM_BIB_ID, bibId);
-
 		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
 		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
 		boolean circulationStatusDesired = initData.getCirculationStatusDesired();
 
 		boolean bibInfoDesired = initData.getBibliographicDescriptionDesired();
 
-		if (itemRestrictionDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			
+			URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibId);
+			
+			String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
+			
+			JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
+			
+			return biblio;
+			
+		} else {
 
-		if (holdQueueLengthDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_HOLD_QUEUE_LENGTH_DESIRED);
+			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET)
+					.addRequest(KohaConstants.PARAM_BIB_ID, bibId);
 
-		if (circulationStatusDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_CIRCULATION_STATUS_DESIRED);
+			if (itemRestrictionDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
 
-		if (!bibInfoDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_NOT_BIB_INFO);
+			if (holdQueueLengthDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_HOLD_QUEUE_LENGTH_DESIRED);
 
-		boolean userIdProvided = initData.getUserId() != null
-				&& !initData.getUserId().getUserIdentifierValue().trim().isEmpty();
+			if (circulationStatusDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_CIRCULATION_STATUS_DESIRED);
 
-		if (userIdProvided)
-			urlBuilder.addRequest(KohaConstants.PARAM_CAN_BE_REQUESTED_BY_USERID,
-					initData.getUserId().getUserIdentifierValue());
+			if (!bibInfoDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_NOT_BIB_INFO);
 
-		String response = getPlainTextResponse(urlBuilder.toURL(), bibId);
+			boolean userIdProvided = initData.getUserId() != null
+					&& !initData.getUserId().getUserIdentifierValue().trim().isEmpty();
 
-		return (JSONObject) jsonParser.parse(response);
+			if (userIdProvided)
+				urlBuilder.addRequest(KohaConstants.PARAM_CAN_BE_REQUESTED_BY_USERID,
+						initData.getUserId().getUserIdentifierValue());
+
+			String response = getPlainTextResponse(urlBuilder.toURL(), bibId);
+
+			return (JSONObject) jsonParser.parse(response);
+		}
 	}
 
 	public JSONObject lookupRequest(LookupRequestInitiationData initData, boolean requestIdIsNotEmpty)

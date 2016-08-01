@@ -711,41 +711,70 @@ public class KohaUtil {
 	public static BibliographicDescription parseBibliographicDescription(JSONObject itemInfo) {
 		BibliographicDescription bibliographicDescription = new BibliographicDescription();
 
-		String bibId = (String) itemInfo.get("biblionumber");
-		String author = (String) itemInfo.get("author");
-		String mediumTypeVal = (String) itemInfo.get("itype");
-		String placeOfPublication = (String) itemInfo.get("place");
-		String publisher = (String) itemInfo.get("publishercode");
-		String volume = (String) itemInfo.get("volume");
-		String title = (String) itemInfo.get("title");
-		String isbn = (String) itemInfo.get("isbn");
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-		if (bibId != null) {
-			BibliographicItemId bibliographicItemId = new BibliographicItemId();
-			bibliographicItemId.setBibliographicItemIdentifier(bibId);
-			bibliographicItemId
-					.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
-		} else if (isbn != null) {
-			BibliographicItemId bibliographicItemId = new BibliographicItemId();
-			bibliographicItemId.setBibliographicItemIdentifier(isbn);
-			bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.ISBN);
-			bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+			if ((String) itemInfo.get("itemnumber") != null) {
+
+				bibliographicDescription.setPublisher((String) itemInfo.get("publishercode"));
+				String mediumTypeVal = (String) itemInfo.get("itype");
+				String bibId = (String) itemInfo.get("biblionumber");
+				if (mediumTypeVal != null)
+					bibliographicDescription.setMediumType(new MediumType(
+							"http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
+
+				if (bibId != null) {
+					BibliographicItemId bibliographicItemId = new BibliographicItemId();
+					bibliographicItemId.setBibliographicItemIdentifier(bibId);
+					bibliographicItemId.setBibliographicItemIdentifierCode(
+							Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+					bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+				}
+
+				itemInfo = (JSONObject) itemInfo.get("biblio");
+			}
+
+			bibliographicDescription.setAuthor((String) itemInfo.get("author"));
+			bibliographicDescription.setPublicationDate((String) itemInfo.get("copyrightdate"));
+			bibliographicDescription.setTitle((String) itemInfo.get("title"));
+			bibliographicDescription.setEdition((String) itemInfo.get("seriestitle"));
+
+		} else {
+			String bibId = (String) itemInfo.get("biblionumber");
+			String author = (String) itemInfo.get("author");
+			String mediumTypeVal = (String) itemInfo.get("itype");
+			String placeOfPublication = (String) itemInfo.get("place");
+			String publisher = (String) itemInfo.get("publishercode");
+			String volume = (String) itemInfo.get("volume");
+			String title = (String) itemInfo.get("title");
+			String isbn = (String) itemInfo.get("isbn");
+
+			if (bibId != null) {
+				BibliographicItemId bibliographicItemId = new BibliographicItemId();
+				bibliographicItemId.setBibliographicItemIdentifier(bibId);
+				bibliographicItemId.setBibliographicItemIdentifierCode(
+						Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+				bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+			} else if (isbn != null) {
+				BibliographicItemId bibliographicItemId = new BibliographicItemId();
+				bibliographicItemId.setBibliographicItemIdentifier(isbn);
+				bibliographicItemId.setBibliographicItemIdentifierCode(Version1BibliographicItemIdentifierCode.ISBN);
+				bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+			}
+
+			bibliographicDescription.setAuthor(author);
+
+			if (mediumTypeVal != null)
+				bibliographicDescription.setMediumType(new MediumType(
+						"http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
+
+			bibliographicDescription.setEdition(volume);
+
+			bibliographicDescription.setPlaceOfPublication(placeOfPublication);
+			bibliographicDescription.setPublisher(publisher);
+
+			bibliographicDescription.setTitle(title);
+
 		}
-
-		bibliographicDescription.setAuthor(author);
-
-		if (mediumTypeVal != null)
-			bibliographicDescription.setMediumType(new MediumType(
-					"http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
-
-		bibliographicDescription.setEdition(volume);
-
-		bibliographicDescription.setPlaceOfPublication(placeOfPublication);
-		bibliographicDescription.setPublisher(publisher);
-
-		bibliographicDescription.setTitle(title);
-
 		return bibliographicDescription;
 	}
 
@@ -761,69 +790,24 @@ public class KohaUtil {
 		ItemOptionalFields iof = new ItemOptionalFields();
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
-			
+
 			JSONObject availabilityJSON = (JSONObject) kohaItem.get("availability");
 
 			if (initData.getCirculationStatusDesired()) {
 
-				CirculationStatus availability;
+				CirculationStatus availability = parseCirculationStatus(availabilityJSON, iof);
 
-				JSONObject checkout = (JSONObject) availabilityJSON.get("checkout");
-				if ((Boolean) checkout.get("available")) {
-
-					availability = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
-
-				} else if ((Boolean) ((JSONObject) availabilityJSON.get("hold")).get("available")) {
-
-					availability = Version1CirculationStatus.ON_LOAN;
-
-					String dueDateParsed = (String) checkout.get("expected_available");
-
-					if (dueDateParsed != null && !dueDateParsed.isEmpty()) {
-						iof.setDateDue(parseGregorianCalendarFromKohaLongDate(dueDateParsed));
-					}
-
-				} else {
-					availability = Version1CirculationStatus.NOT_AVAILABLE;
-				}
-				
 				iof.setCirculationStatus(availability);
 			}
 
-			JSONObject biblioJSON = (JSONObject) kohaItem.get("biblio");
-
 			if (initData.getBibliographicDescriptionDesired()) {
-				BibliographicDescription bibliographicDescription = new BibliographicDescription();
-
-				bibliographicDescription.setAuthor((String) biblioJSON.get("author"));
-				bibliographicDescription.setPublicationDate((String) biblioJSON.get("copyrightdate"));
-				bibliographicDescription.setTitle((String) biblioJSON.get("title"));
-				bibliographicDescription.setPublisher((String) kohaItem.get("publishercode"));
-				bibliographicDescription.setEdition((String) biblioJSON.get("seriestitle"));
-
-				String mediumTypeVal = (String) kohaItem.get("itype");
-
-				if (mediumTypeVal != null)
-					bibliographicDescription.setMediumType(new MediumType(
-							"http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
-
-				String bibId = (String) kohaItem.get("biblionumber");
-
-				if (bibId != null) {
-					BibliographicItemId bibliographicItemId = new BibliographicItemId();
-					bibliographicItemId.setBibliographicItemIdentifier(bibId);
-					bibliographicItemId.setBibliographicItemIdentifierCode(
-							Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
-					bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
-				}
-
-				iof.setBibliographicDescription(bibliographicDescription);
+				iof.setBibliographicDescription(parseBibliographicDescription(kohaItem));
 			}
-			
+
 			if (initData.getHoldQueueLengthDesired()) {
 				iof.setHoldQueueLength(new BigDecimal(((Long) availabilityJSON.get("hold_queue_length"))));
 			}
-			
+
 			if (initData.getItemDescriptionDesired()) {
 				ItemDescription itemDescription = new ItemDescription();
 
@@ -835,11 +819,11 @@ public class KohaUtil {
 
 				iof.setItemDescription(itemDescription);
 			}
-			
+
 			if (initData.getLocationDesired()) {
 				String holdingBranch = (String) availabilityJSON.get("holdingbranch");
 				String locationVal = (String) availabilityJSON.get("location");
-				
+
 				if (holdingBranch != null || locationVal != null) {
 					iof.setLocations(KohaUtil.createLocations(holdingBranch, locationVal));
 				}
@@ -915,6 +899,36 @@ public class KohaUtil {
 		}
 
 		return iof;
+	}
+
+	public static CirculationStatus parseCirculationStatus(JSONObject availabilityJSON, ItemOptionalFields iof)
+			throws ParseException {
+		
+		CirculationStatus availability;
+
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			JSONObject checkout = (JSONObject) availabilityJSON.get("checkout");
+			if ((Boolean) checkout.get("available")) {
+
+				availability = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
+
+			} else if ((Boolean) ((JSONObject) availabilityJSON.get("hold")).get("available")) {
+
+				availability = Version1CirculationStatus.ON_LOAN;
+
+				String dueDateParsed = (String) checkout.get("expected_available");
+
+				if (iof != null && dueDateParsed != null && !dueDateParsed.isEmpty()) {
+					iof.setDateDue(parseGregorianCalendarFromKohaLongDate(dueDateParsed));
+				}
+
+			} else {
+				availability = Version1CirculationStatus.NOT_AVAILABLE;
+			}
+
+			return availability;
+		}
+		return null;
 	}
 
 	public static LookupItemInitiationData luisInitDataToLookupItemInitData(
