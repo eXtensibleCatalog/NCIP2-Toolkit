@@ -793,7 +793,7 @@ public class KohaUtil {
 
 			JSONObject availabilityJSON = (JSONObject) kohaItem.get("availability");
 
-			if (initData.getCirculationStatusDesired()) {
+			if (availabilityJSON != null && initData.getCirculationStatusDesired()) {
 
 				CirculationStatus availability = parseCirculationStatus(availabilityJSON, iof);
 
@@ -804,7 +804,7 @@ public class KohaUtil {
 				iof.setBibliographicDescription(parseBibliographicDescription(kohaItem));
 			}
 
-			if (initData.getHoldQueueLengthDesired()) {
+			if (availabilityJSON != null && initData.getHoldQueueLengthDesired()) {
 				iof.setHoldQueueLength(new BigDecimal(((Long) availabilityJSON.get("hold_queue_length"))));
 			}
 
@@ -820,7 +820,7 @@ public class KohaUtil {
 				iof.setItemDescription(itemDescription);
 			}
 
-			if (initData.getLocationDesired()) {
+			if (availabilityJSON != null && initData.getLocationDesired()) {
 				String holdingBranch = (String) availabilityJSON.get("holdingbranch");
 				String locationVal = (String) availabilityJSON.get("location");
 
@@ -903,7 +903,7 @@ public class KohaUtil {
 
 	public static CirculationStatus parseCirculationStatus(JSONObject availabilityJSON, ItemOptionalFields iof)
 			throws ParseException {
-		
+
 		CirculationStatus availability;
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {

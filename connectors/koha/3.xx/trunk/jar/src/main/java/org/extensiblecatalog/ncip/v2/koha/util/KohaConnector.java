@@ -373,27 +373,46 @@ public class KohaConnector {
 			JSONObject item = (JSONObject) jsonParser.parse(itemsResponse);
 
 			if (circulationStatusDesired || holdQueueLengthDesired || initData.getLocationDesired()) {
-				URL availabilityRestUrl = new RestApiUrlBuilder().getItemAvailability(itemIdVal);
+				try {
 
-				String itemAvailabilityResponse = getPlainTextResponse(availabilityRestUrl);
+					URL availabilityRestUrl = new RestApiUrlBuilder().getItemAvailability(itemIdVal);
 
-				JSONObject itemAvailability = (JSONObject) ((JSONArray) jsonParser.parse(itemAvailabilityResponse))
-						.get(0);
+					String itemAvailabilityResponse = getPlainTextResponse(availabilityRestUrl);
 
-				item.put("availability", itemAvailability);
+					JSONObject itemAvailability = (JSONObject) ((JSONArray) jsonParser.parse(itemAvailabilityResponse))
+							.get(0);
+
+					item.put("availability", itemAvailability);
+
+				} catch (KohaException ke) {
+
+					if (!ke.getShortMessage().equals(KohaException.NOT_FOUND_404))
+						throw ke;
+
+					// Current version of REST API does not support availability
+				}
 			}
 
 			if (initData.getBibliographicDescriptionDesired()) {
+				try {
 
-				String bibIdVal = (String) item.get("biblionumber");
+					String bibIdVal = (String) item.get("biblionumber");
 
-				URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibIdVal);
+					URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibIdVal);
 
-				String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
+					String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
 
-				JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
+					JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
 
-				item.put("biblio", biblio);
+					item.put("biblio", biblio);
+
+				} catch (KohaException ke) {
+
+					if (!ke.getShortMessage().equals(KohaException.NOT_FOUND_404))
+						throw ke;
+
+					// Current version of REST API does not support availability
+				}
 			}
 
 			return item;
@@ -436,15 +455,15 @@ public class KohaConnector {
 		boolean bibInfoDesired = initData.getBibliographicDescriptionDesired();
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
-			
+
 			URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibId);
-			
+
 			String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
-			
+
 			JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
-			
+
 			return biblio;
-			
+
 		} else {
 
 			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM_SET)
