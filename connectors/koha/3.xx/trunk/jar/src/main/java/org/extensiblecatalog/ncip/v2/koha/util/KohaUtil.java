@@ -25,6 +25,7 @@ import org.extensiblecatalog.ncip.v2.service.BibliographicItemId;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordId;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrap;
 import org.extensiblecatalog.ncip.v2.service.BlockOrTrapType;
+import org.extensiblecatalog.ncip.v2.service.CirculationStatus;
 import org.extensiblecatalog.ncip.v2.service.ComponentId;
 import org.extensiblecatalog.ncip.v2.service.ComponentIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
@@ -217,10 +218,10 @@ public class KohaUtil {
 	}
 
 	public static String createKohaDateFromGregorianCalendar(GregorianCalendar date) throws ParseException {
-		
+
 		return KohaConstants.KOHA_DATE_FORMATTER.format(date.getTime());
 	}
-	
+
 	public static GregorianCalendar parseGregorianCalendarFromKohaLongDate(String kohaLongDateParsed)
 			throws ParseException {
 		if (kohaLongDateParsed != null && !kohaLongDateParsed.equalsIgnoreCase("0000-00-00 00:00:00")) {
@@ -757,70 +758,159 @@ public class KohaUtil {
 	public static ItemOptionalFields parseItemOptionalFields(JSONObject kohaItem, LookupItemInitiationData initData)
 			throws ServiceException, ParseException {
 
-		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired()
-				|| initData.getLocationDesired();
 		ItemOptionalFields iof = new ItemOptionalFields();
-		if (itemInfoDesired) {
-			JSONObject itemInfo = (JSONObject) kohaItem.get("itemInfo");
 
-			if (initData.getLocationDesired()) {
-				String homeBranch = (String) itemInfo.get("homebranch");
-				String locationVal = (String) itemInfo.get("location");
-				if (homeBranch != null || locationVal != null) {
-					iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			
+			JSONObject availabilityJSON = (JSONObject) kohaItem.get("availability");
+
+			if (initData.getCirculationStatusDesired()) {
+
+				CirculationStatus availability;
+
+				JSONObject checkout = (JSONObject) availabilityJSON.get("checkout");
+				if ((Boolean) checkout.get("available")) {
+
+					availability = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
+
+				} else if ((Boolean) ((JSONObject) availabilityJSON.get("hold")).get("available")) {
+
+					availability = Version1CirculationStatus.ON_LOAN;
+
+					String dueDateParsed = (String) checkout.get("expected_available");
+
+					if (dueDateParsed != null && !dueDateParsed.isEmpty()) {
+						iof.setDateDue(parseGregorianCalendarFromKohaLongDate(dueDateParsed));
+					}
+
+				} else {
+					availability = Version1CirculationStatus.NOT_AVAILABLE;
 				}
+				
+				iof.setCirculationStatus(availability);
 			}
 
+			JSONObject biblioJSON = (JSONObject) kohaItem.get("biblio");
+
+			if (initData.getBibliographicDescriptionDesired()) {
+				BibliographicDescription bibliographicDescription = new BibliographicDescription();
+
+				bibliographicDescription.setAuthor((String) biblioJSON.get("author"));
+				bibliographicDescription.setPublicationDate((String) biblioJSON.get("copyrightdate"));
+				bibliographicDescription.setTitle((String) biblioJSON.get("title"));
+				bibliographicDescription.setPublisher((String) kohaItem.get("publishercode"));
+				bibliographicDescription.setEdition((String) biblioJSON.get("seriestitle"));
+
+				String mediumTypeVal = (String) kohaItem.get("itype");
+
+				if (mediumTypeVal != null)
+					bibliographicDescription.setMediumType(new MediumType(
+							"http://www.niso.org/ncip/v1_0/imp1/schemes/mediumtype/mediumtype.scm", mediumTypeVal));
+
+				String bibId = (String) kohaItem.get("biblionumber");
+
+				if (bibId != null) {
+					BibliographicItemId bibliographicItemId = new BibliographicItemId();
+					bibliographicItemId.setBibliographicItemIdentifier(bibId);
+					bibliographicItemId.setBibliographicItemIdentifierCode(
+							Version1BibliographicItemIdentifierCode.LEGAL_DEPOSIT_NUMBER);
+					bibliographicDescription.setBibliographicItemIds(Arrays.asList(bibliographicItemId));
+				}
+
+				iof.setBibliographicDescription(bibliographicDescription);
+			}
+			
+			if (initData.getHoldQueueLengthDesired()) {
+				iof.setHoldQueueLength(new BigDecimal(((Long) availabilityJSON.get("hold_queue_length"))));
+			}
+			
 			if (initData.getItemDescriptionDesired()) {
 				ItemDescription itemDescription = new ItemDescription();
 
-				String callNumber = (String) itemInfo.get("itemcallnumber");
-				String copyNumber = (String) itemInfo.get("copynumber");
+				String callNumber = (String) kohaItem.get("itemcallnumber");
+				String copyNumber = (String) kohaItem.get("copynumber");
 
 				itemDescription.setCallNumber(callNumber);
 				itemDescription.setCopyNumber(copyNumber);
 
 				iof.setItemDescription(itemDescription);
 			}
-
-			if (initData.getBibliographicDescriptionDesired())
-				iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(itemInfo));
-
-		}
-
-		if (initData.getCirculationStatusDesired()) {
-			String circulationStatus = (String) kohaItem.get("circulationStatus");
-			iof.setCirculationStatus(Version1CirculationStatus
-					.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
-
-			if (circulationStatus.equalsIgnoreCase("On Loan")) {
-				String dueDateParsed = (String) kohaItem.get("dueDate");
-
-				if (dueDateParsed != null) {
-					GregorianCalendar dueDate = parseGregorianCalendarFromKohaDate(dueDateParsed);
-					iof.setDateDue(dueDate);
+			
+			if (initData.getLocationDesired()) {
+				String holdingBranch = (String) availabilityJSON.get("holdingbranch");
+				String locationVal = (String) availabilityJSON.get("location");
+				
+				if (holdingBranch != null || locationVal != null) {
+					iof.setLocations(KohaUtil.createLocations(holdingBranch, locationVal));
 				}
 			}
-		}
+		} else
 
-		if (initData.getHoldQueueLengthDesired()) {
-			String holdQueueLength = (String) kohaItem.get("holdQueueLength");
+		{
+			boolean itemInfoDesired = initData.getBibliographicDescriptionDesired()
+					|| initData.getItemDescriptionDesired() || initData.getLocationDesired();
+			if (itemInfoDesired) {
+				JSONObject itemInfo = (JSONObject) kohaItem.get("itemInfo");
 
-			if (holdQueueLength != null)
-				iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
-		}
-
-		if (initData.getItemUseRestrictionTypeDesired()) {
-			JSONArray itemUseRestrictions = (JSONArray) kohaItem.get("itemUseRestrictions");
-			if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
-				List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
-				for (Object itemUseRestriction : itemUseRestrictions) {
-					String itemUseRestrictionValue = (String) itemUseRestriction;
-					itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(
-							Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
-							itemUseRestrictionValue));
+				if (initData.getLocationDesired()) {
+					String homeBranch = (String) itemInfo.get("homebranch");
+					String locationVal = (String) itemInfo.get("location");
+					if (homeBranch != null || locationVal != null) {
+						iof.setLocations(KohaUtil.createLocations(homeBranch, locationVal));
+					}
 				}
-				iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+
+				if (initData.getItemDescriptionDesired()) {
+					ItemDescription itemDescription = new ItemDescription();
+
+					String callNumber = (String) itemInfo.get("itemcallnumber");
+					String copyNumber = (String) itemInfo.get("copynumber");
+
+					itemDescription.setCallNumber(callNumber);
+					itemDescription.setCopyNumber(copyNumber);
+
+					iof.setItemDescription(itemDescription);
+				}
+
+				if (initData.getBibliographicDescriptionDesired())
+					iof.setBibliographicDescription(KohaUtil.parseBibliographicDescription(itemInfo));
+
+			}
+
+			if (initData.getCirculationStatusDesired()) {
+				String circulationStatus = (String) kohaItem.get("circulationStatus");
+				iof.setCirculationStatus(Version1CirculationStatus
+						.find(Version1CirculationStatus.VERSION_1_CIRCULATION_STATUS, circulationStatus));
+
+				if (circulationStatus.equalsIgnoreCase("On Loan")) {
+					String dueDateParsed = (String) kohaItem.get("dueDate");
+
+					if (dueDateParsed != null) {
+						GregorianCalendar dueDate = parseGregorianCalendarFromKohaDate(dueDateParsed);
+						iof.setDateDue(dueDate);
+					}
+				}
+			}
+
+			if (initData.getHoldQueueLengthDesired()) {
+				String holdQueueLength = (String) kohaItem.get("holdQueueLength");
+
+				if (holdQueueLength != null)
+					iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
+			}
+
+			if (initData.getItemUseRestrictionTypeDesired()) {
+				JSONArray itemUseRestrictions = (JSONArray) kohaItem.get("itemUseRestrictions");
+				if (itemUseRestrictions != null && itemUseRestrictions.size() != 0) {
+					List<ItemUseRestrictionType> itemUseRestrictionTypes = new ArrayList<ItemUseRestrictionType>();
+					for (Object itemUseRestriction : itemUseRestrictions) {
+						String itemUseRestrictionValue = (String) itemUseRestriction;
+						itemUseRestrictionTypes.add(Version1ItemUseRestrictionType.find(
+								Version1ItemUseRestrictionType.VERSION_1_ITEM_USE_RESTRICTION_TYPE,
+								itemUseRestrictionValue));
+					}
+					iof.setItemUseRestrictionTypes(itemUseRestrictionTypes);
+				}
 			}
 		}
 
@@ -866,13 +956,13 @@ public class KohaUtil {
 		loanedItemsHistory.setLastPage(new BigDecimal(5)); // FIXME
 
 		List<LoanedItem> loanedItems = new ArrayList<LoanedItem>();
-		
+
 		LoanedItem loanedItem = new LoanedItem();
-		
+
 		// FIXME
 		loanedItem.setItemId(KohaUtil.createItemId("1"));
 		loanedItem.setDateDue(new GregorianCalendar());
-		
+
 		loanedItems.add(loanedItem);
 		loanedItems.add(loanedItem);
 		loanedItemsHistory.setLoanedItems(loanedItems);

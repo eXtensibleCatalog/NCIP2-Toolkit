@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -228,7 +229,7 @@ public class KohaConnector {
 
 			if (requestedItemsDesired) {
 
-				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
+				URL holdsRestUrl = new RestApiUrlBuilder().getHoldsOfPatron(patronId);
 
 				try {
 					JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
@@ -313,7 +314,7 @@ public class KohaConnector {
 
 				String providedItemType = initData.getItemId().getItemIdentifierType().getValue();
 
-				URL holdsRestUrl = new RestApiUrlBuilder().getHolds(patronId);
+				URL holdsRestUrl = new RestApiUrlBuilder().getHoldsOfPatron(patronId);
 
 				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
 
@@ -354,8 +355,6 @@ public class KohaConnector {
 			ParserConfigurationException, ParseException, URISyntaxException {
 
 		String itemIdVal = initData.getItemId().getItemIdentifierValue();
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM)
-				.addRequest(KohaConstants.PARAM_ITEM_ID, itemIdVal);
 
 		boolean itemRestrictionDesired = initData.getItemUseRestrictionTypeDesired();
 		boolean holdQueueLengthDesired = initData.getHoldQueueLengthDesired();
@@ -364,21 +363,60 @@ public class KohaConnector {
 		boolean itemInfoDesired = initData.getBibliographicDescriptionDesired() || initData.getItemDescriptionDesired()
 				|| initData.getLocationDesired();
 
-		if (itemRestrictionDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-		if (holdQueueLengthDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_HOLD_QUEUE_LENGTH_DESIRED);
+			// Gets also itemDescription's itemcallnumber & copynumber
+			URL itemsRestUrl = new RestApiUrlBuilder().getItems(itemIdVal); 
 
-		if (circulationStatusDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_CIRCULATION_STATUS_DESIRED);
+			String itemsResponse = getPlainTextResponse(itemsRestUrl);
 
-		if (!itemInfoDesired)
-			urlBuilder.addRequest(KohaConstants.PARAM_NOT_ITEM_INFO);
+			JSONObject item = (JSONObject) jsonParser.parse(itemsResponse);
 
-		String response = getPlainTextResponse(urlBuilder.toURL(), itemIdVal);
+			if (circulationStatusDesired || holdQueueLengthDesired || initData.getLocationDesired()) {
+				URL availabilityRestUrl = new RestApiUrlBuilder().getItemAvailability(itemIdVal);
 
-		return (JSONObject) jsonParser.parse(response);
+				String itemAvailabilityResponse = getPlainTextResponse(availabilityRestUrl);
+
+				JSONObject itemAvailability = (JSONObject) ((JSONArray) jsonParser.parse(itemAvailabilityResponse))
+						.get(0);
+
+				item.put("availability", itemAvailability);
+			}
+
+			if (initData.getBibliographicDescriptionDesired()) {
+				
+				String bibIdVal = (String) item.get("biblionumber");
+				
+				URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibIdVal);
+				
+				String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
+				
+				JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
+				
+				item.put("biblio", biblio);
+			}
+
+			return item;
+		} else {
+			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_ITEM)
+					.addRequest(KohaConstants.PARAM_ITEM_ID, itemIdVal);
+
+			if (itemRestrictionDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_ITEM_USE_RESTRICTION_TYPE_DESIRED);
+
+			if (holdQueueLengthDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_HOLD_QUEUE_LENGTH_DESIRED);
+
+			if (circulationStatusDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_CIRCULATION_STATUS_DESIRED);
+
+			if (!itemInfoDesired)
+				urlBuilder.addRequest(KohaConstants.PARAM_NOT_ITEM_INFO);
+
+			String response = getPlainTextResponse(urlBuilder.toURL(), itemIdVal);
+
+			return (JSONObject) jsonParser.parse(response);
+		}
 	}
 
 	public JSONObject lookupItem(String id, ILSDIvOneOneLookupItemSetInitiationData initData)
