@@ -615,21 +615,45 @@ public class KohaUtil {
 		return requestId;
 	}
 
-	public static ILSDIv1_1_LoanedItem parseLoanedItem(JSONObject loanedItemparsed) throws ParseException {
+	public static ILSDIv1_1_LoanedItem parseLoanedItem(JSONObject loanedItemParsed) throws ParseException {
 		ILSDIv1_1_LoanedItem loanedItem = new ILSDIv1_1_LoanedItem();
 
-		String itemId = (String) loanedItemparsed.get("itemnumber");
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-		String dateDue = (String) loanedItemparsed.get("date_due");
+			String itemId = (String) loanedItemParsed.get("itemnumber");
+			
+			String agencyId = (String) loanedItemParsed.get("branchcode");
 
-		// TODO implement renewable into Koha's REST API
-		String renewable = (String) loanedItemparsed.get("renewable");
+			String dateDue = (String) loanedItemParsed.get("date_due");
+			
+			String dateCheckedOut = (String) loanedItemParsed.get("issuedate");
 
-		if (renewable != null)
-			loanedItem.setRenewalNotPermitted(!renewable.equals("y"));
+			// TODO implement renewable into Koha's REST API
+			String renewable = (String) loanedItemParsed.get("renewable");
+			
+			loanedItem.setItemId(createItemId(itemId, agencyId));
+			
+			if (dateDue != null)
+				loanedItem.setDateDue(parseGregorianCalendarFromKohaLongDate(dateDue));
+			else
+				loanedItem.setIndeterminateLoanPeriodFlag(true);
+			
+			if (dateCheckedOut != null)
+				loanedItem.setDateCheckedOut(parseGregorianCalendarFromKohaLongDate(dateCheckedOut));
+		} else {
 
-		loanedItem.setItemId(createItemId(itemId));
-		loanedItem.setDateDue(parseGregorianCalendarFromKohaDate(dateDue));
+			String itemId = (String) loanedItemParsed.get("itemnumber");
+
+			String dateDue = (String) loanedItemParsed.get("date_due");
+
+			String renewable = (String) loanedItemParsed.get("renewable");
+
+			if (renewable != null)
+				loanedItem.setRenewalNotPermitted(!renewable.equals("y"));
+
+			loanedItem.setItemId(createItemId(itemId));
+			loanedItem.setDateDue(parseGregorianCalendarFromKohaDate(dateDue));
+		}
 		return loanedItem;
 	}
 
@@ -962,23 +986,28 @@ public class KohaUtil {
 	}
 
 	public static LoanedItemsHistory parseLoanedItemsHistory(JSONObject kohaItem,
-			ILSDIvOneOneLookupUserInitiationData initData) {
+			ILSDIvOneOneLookupUserInitiationData initData) throws ParseException {
+
+		JSONObject loanedItemsHistoryParsed = (JSONObject) kohaItem.get("loanedItemsHistory");
+		
+		int totalCount = (Integer) loanedItemsHistoryParsed.get("size");
+		
+		int lastPage = totalCount > 0 ? (--totalCount / 10) + 1 : 0;
+		
 		LoanedItemsHistory loanedItemsHistory = new LoanedItemsHistory();
 
 		loanedItemsHistory.setPage(initData.getHistoryDesired().getPage());
-
-		loanedItemsHistory.setLastPage(new BigDecimal(5)); // FIXME
-
+		loanedItemsHistory.setLastPage(new BigDecimal(lastPage));
+		
+		JSONArray loanedItemsParsed = (JSONArray) loanedItemsHistoryParsed.get("items");
 		List<LoanedItem> loanedItems = new ArrayList<LoanedItem>();
 
-		LoanedItem loanedItem = new LoanedItem();
-
-		// FIXME
-		loanedItem.setItemId(KohaUtil.createItemId("1"));
-		loanedItem.setDateDue(new GregorianCalendar());
-
-		loanedItems.add(loanedItem);
-		loanedItems.add(loanedItem);
+		for (Object loanedItemParsedObj : loanedItemsParsed) {
+			JSONObject loanedItemParsed = (JSONObject) loanedItemParsedObj;
+			
+			loanedItems.add(parseLoanedItem(loanedItemParsed));
+		}
+		
 		loanedItemsHistory.setLoanedItems(loanedItems);
 
 		return loanedItemsHistory;

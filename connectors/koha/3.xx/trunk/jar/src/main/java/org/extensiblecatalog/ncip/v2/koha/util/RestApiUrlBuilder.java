@@ -107,6 +107,26 @@ public class RestApiUrlBuilder extends URLBuilder {
 		return toReturn.toURL();
 	}
 
+	public URL getCheckoutsHistoryForPatron(String patronId) throws MalformedURLException, KohaException {
+
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("checkouts", "history");
+
+		if (patronId != null)
+			return toReturn.addRequest("borrowernumber", patronId).toURL();
+
+		throw new KohaException("patronId cannot be null while getting user history");
+	}
+
+	public URL getCheckoutsHistory(String checkoutId) throws MalformedURLException, KohaException {
+
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("checkouts", "history");
+
+		if (checkoutId != null)
+			return toReturn.appendPath(checkoutId).toURL();
+
+		throw new KohaException("checkoutId cannot be null while getting user history");
+	}
+
 	public URL postHolds() throws MalformedURLException {
 		return this.getHoldsOfPatron(null);
 	}

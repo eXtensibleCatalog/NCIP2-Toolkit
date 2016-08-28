@@ -343,8 +343,6 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 			}
 
 			if (initData.getHistoryDesired() != null) {
-
-				// FIXME
 				LoanedItemsHistory loanedItemsHistory = KohaUtil.parseLoanedItemsHistory(kohaUser, initData);
 				responseData.setLoanedItemsHistory(loanedItemsHistory);
 			}

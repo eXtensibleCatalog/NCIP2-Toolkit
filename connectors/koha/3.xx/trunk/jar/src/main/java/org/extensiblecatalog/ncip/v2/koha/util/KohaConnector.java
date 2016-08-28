@@ -30,10 +30,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
+import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIvOneOneLookupUserResponseData;
+import org.extensiblecatalog.ncip.v2.ilsdiv1_1.LoanedItemsHistory;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
+import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LoanedItem;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
@@ -200,15 +204,17 @@ public class KohaConnector {
 	 * @throws SAXException
 	 * @throws ParseException
 	 * @throws URISyntaxException
+	 * @throws java.text.ParseException
 	 */
-	public JSONObject lookupUser(LookupUserInitiationData initData)
-			throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
+	public JSONObject lookupUser(ILSDIvOneOneLookupUserInitiationData initData) throws MalformedURLException,
+			KohaException, IOException, SAXException, URISyntaxException, ParseException, java.text.ParseException {
 
 		String patronId = initData.getUserId().getUserIdentifierValue();
 
 		boolean loanedItemsDesired = initData.getLoanedItemsDesired();
 		boolean requestedItemsDesired = initData.getRequestedItemsDesired();
 		boolean userFiscalAccountDesired = initData.getUserFiscalAccountDesired();
+		boolean loanedItemsHistoryDesired = initData.getHistoryDesired() != null;
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
 			URL patronRestUrl = new RestApiUrlBuilder().getPatron(patronId);
@@ -222,6 +228,41 @@ public class KohaConnector {
 					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET");
 
 					userInfo.put("checkouts", checkouts);
+				} catch (ParseException e) {
+
+				}
+			}
+
+			if (loanedItemsHistoryDesired) {
+
+				URL checkoutsHistoryUrl = new RestApiUrlBuilder().getCheckoutsHistoryForPatron(patronId);
+
+				JSONArray checkoutsHistory;
+				try {
+					checkoutsHistory = (JSONArray) getJSONResponseFor(checkoutsHistoryUrl, "GET");
+					
+					int page = initData.getHistoryDesired().getPage().intValue();
+
+					JSONObject loanedItemsHistory = new JSONObject();
+
+					loanedItemsHistory.put("size", checkoutsHistory.size());
+
+					JSONArray checkoutsHistoryItems = new JSONArray();
+
+					for (int i = --page * 10; i < checkoutsHistory.size(); ++i) {
+
+						String checkoutId = (String) ((JSONObject) checkoutsHistory.get(i)).get("issue_id");
+
+						checkoutsHistoryUrl = new RestApiUrlBuilder().getCheckoutsHistory(checkoutId);
+
+						JSONObject loanedItemParsed = (JSONObject) getJSONResponseFor(checkoutsHistoryUrl, "GET");
+
+						checkoutsHistoryItems.add(loanedItemParsed);
+					}
+
+					loanedItemsHistory.put("items", checkoutsHistoryItems);
+
+					userInfo.put("loanedItemsHistory", loanedItemsHistory);
 				} catch (ParseException e) {
 
 				}
@@ -411,7 +452,7 @@ public class KohaConnector {
 					if (!ke.getShortMessage().equals(KohaException.NOT_FOUND_404))
 						throw ke;
 
-					// Current version of REST API does not support availability
+					// Current version of REST API does not support biblios
 				}
 			}
 
