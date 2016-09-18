@@ -25,6 +25,8 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 	
 	protected ILSDIvOneOneLookupUserResponseData ilsdivOneOnelookupUserResponse;
 
+	protected ILSDIvOneOneLookupAgencyResponseData ilsdivOneOnelookupAgencyResponse;
+
 	public void setLookupItemSet(
 			ILSDIvOneOneLookupItemSetInitiationData lookupItemSet) {
 		this.ilsdivOneOnelookupItemSet = lookupItemSet;
@@ -49,6 +51,14 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 
     public ILSDIvOneOneLookupUserResponseData getLookupUserResponse() {
         return ilsdivOneOnelookupUserResponse;
+    }
+	
+	public void setILSDIvOneOneLookupAgencyResponse(ILSDIvOneOneLookupAgencyResponseData ilsdivOneOnelookupAgencyResponse) {
+		this.ilsdivOneOnelookupAgencyResponse = ilsdivOneOnelookupAgencyResponse;
+	}
+
+    public ILSDIvOneOneLookupAgencyResponseData getLookupAgencyResponse() {
+        return ilsdivOneOnelookupAgencyResponse;
     }
 	
 	@Override
@@ -115,26 +125,25 @@ public class ILSDIv1_1_NCIPMessage extends NCIPMessage {
 					Field f = (Field) field;
 
 					String toSearch = "get" + f.getName();
+					
+					Object obj = null;
 
 					if (toSearch.equalsIgnoreCase("getilsdivOneOnelookupItemSet")) {
-						Object obj = super.getLookupItemSet();
-						if (obj != null) {
-							result = (NCIPData) obj;
-							break;
-						}
+						obj = super.getLookupItemSet();
 					} else if (toSearch.equalsIgnoreCase("getilsdivOneOnelookupUser")) {
-						Object obj = super.getLookupUser();
-						if (obj != null) {
-							result = (NCIPData) obj;
-							break;
-						}
+						obj = super.getLookupUser();
+					}
+					
+					if (obj != null) {
+						result = (NCIPData) obj;
+						break;
 					}
 
 					Method m = ReflectionHelper.findMethod(superClass, toSearch);
 
 					if (m != null) {
 
-						Object obj = m.invoke(ncipMessage);
+						obj = m.invoke(ncipMessage);
 						if (obj != null
 								&& NCIPData.class.isAssignableFrom(obj
 										.getClass())) {

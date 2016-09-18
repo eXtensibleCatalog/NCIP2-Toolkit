@@ -1695,6 +1695,16 @@
     </mapping>
 
     <mapping map-null="false">
+        <class-a>org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIv1_1_LocationNameInstance</class-a>
+        <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LocationNameInstance</class-b>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_EmptyFieldExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.PhysicalAddress">
+            <a>physicalAddress</a>
+            <b>ext</b>
+        </field>
+    </mapping>
+
+    <mapping map-null="false">
         <class-a>org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData</class-a>
         <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LookupAgency</class-b>
         <field>
@@ -1705,7 +1715,7 @@
     </mapping>
 
     <mapping map-null="false">
-        <class-a>org.extensiblecatalog.ncip.v2.service.LookupAgencyResponseData</class-a>
+        <class-a>org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIvOneOneLookupAgencyResponseData</class-a>
         <class-b>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LookupAgencyResponse</class-b>
         <field>
             <a>authenticationPrompts</a>
@@ -1741,6 +1751,11 @@
             <a>problems</a>
             <b>problem</b>
             <b-hint>org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.Problem</b-hint>
+        </field>
+        <field custom-converter="org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.dozer.ILSDIv1_1_ExtensionConverter"
+                custom-converter-param="org.extensiblecatalog.ncip.v2.service.LocationName,org.extensiblecatalog.ncip.v2.binding.ilsdiv1_1.jaxb.elements.LocationName">
+            <a>locationName</a>
+            <b>ext</b>
         </field>
     </mapping>
 

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -12,12 +11,12 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.concurrent.FutureTask;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -30,14 +29,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.extensiblecatalog.ncip.v2.common.ConnectorConfigurationFactory;
 import org.extensiblecatalog.ncip.v2.common.DefaultConnectorConfiguration;
-import org.extensiblecatalog.ncip.v2.ilsdiv1_1.ILSDIvOneOneLookupUserResponseData;
-import org.extensiblecatalog.ncip.v2.ilsdiv1_1.LoanedItemsHistory;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.AgencyAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
 import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupItemSetInitiationData;
 import org.extensiblecatalog.ncip.v2.service.ILSDIvOneOneLookupUserInitiationData;
-import org.extensiblecatalog.ncip.v2.service.LoanedItem;
+import org.extensiblecatalog.ncip.v2.service.LookupAgencyInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupRequestInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
@@ -52,6 +50,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
 import org.extensiblecatalog.ncip.v2.service.UnstructuredAddress;
 import org.extensiblecatalog.ncip.v2.service.Version1AgencyAddressRoleType;
+import org.extensiblecatalog.ncip.v2.service.Version1ElectronicAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1OrganizationNameType;
 import org.extensiblecatalog.ncip.v2.service.Version1PhysicalAddressType;
 import org.extensiblecatalog.ncip.v2.service.Version1RequestType;
@@ -206,6 +205,7 @@ public class KohaConnector {
 	 * @throws URISyntaxException
 	 * @throws java.text.ParseException
 	 */
+	@SuppressWarnings("unchecked")
 	public JSONObject lookupUser(ILSDIvOneOneLookupUserInitiationData initData) throws MalformedURLException,
 			KohaException, IOException, SAXException, URISyntaxException, ParseException, java.text.ParseException {
 
@@ -240,7 +240,7 @@ public class KohaConnector {
 				JSONArray checkoutsHistory;
 				try {
 					checkoutsHistory = (JSONArray) getJSONResponseFor(checkoutsHistoryUrl, "GET");
-					
+
 					int page = initData.getHistoryDesired().getPage().intValue();
 
 					JSONObject loanedItemsHistory = new JSONObject();
@@ -353,8 +353,6 @@ public class KohaConnector {
 
 				String providedItemId = initData.getItemId().getItemIdentifierValue();
 
-				String providedItemType = initData.getItemId().getItemIdentifierType().getValue();
-
 				URL holdsRestUrl = new RestApiUrlBuilder().getHoldsOfPatron(patronId);
 
 				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
@@ -392,6 +390,7 @@ public class KohaConnector {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject lookupItem(LookupItemInitiationData initData) throws KohaException, IOException, SAXException,
 			ParserConfigurationException, ParseException, URISyntaxException {
 
@@ -604,6 +603,7 @@ public class KohaConnector {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject requestItem(RequestItemInitiationData initData) throws KohaException, IOException, SAXException,
 			ParserConfigurationException, URISyntaxException, ParseException, java.text.ParseException {
 
@@ -677,8 +677,48 @@ public class KohaConnector {
 			return (JSONObject) jsonParser.parse(response);
 		}
 	}
+	
+	public void lookupAgency(LookupAgencyInitiationData initData, List<AgencyAddressInformation> addresses) throws KohaException, IOException, SAXException, URISyntaxException, ParseException {
+		
+		// Add Official agency
+		addresses.add(getOfficialAgencyPhysicalAddressInformation());
+		
+		// Add remaining agencies if any
+		URL librariesRestUrl = new RestApiUrlBuilder().getLibraries();
 
-	public AgencyAddressInformation getAgencyPhysicalAddressInformation() {
+		String librariesResponse = getPlainTextResponse(librariesRestUrl);
+
+		JSONArray libraries = (JSONArray) jsonParser.parse(librariesResponse);
+
+		GregorianCalendar validFrom = new GregorianCalendar();		
+		GregorianCalendar validTo = new GregorianCalendar();
+		validTo.add(GregorianCalendar.YEAR, 50);
+		
+		for(Object libraryObj : libraries) {
+			JSONObject library = (JSONObject) libraryObj;
+
+			String branchcode = (String) library.get("branchcode");
+			String branchname = (String) library.get("branchname");
+			String branchaddress = (String) library.get("branchaddress1");
+			
+			AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
+
+			PhysicalAddress physicalAddress = new PhysicalAddress();
+			physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
+			UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
+			unstructuredAddress.setUnstructuredAddressType(new Version1UnstructuredAddressType("agency-display-name", branchname));
+			unstructuredAddress.setUnstructuredAddressData(branchaddress);
+			physicalAddress.setUnstructuredAddress(unstructuredAddress);
+			
+			agencyAddressInformation.setPhysicalAddress(physicalAddress);
+			agencyAddressInformation.setAgencyAddressRoleType(new Version1AgencyAddressRoleType("agency-id", branchcode));
+			agencyAddressInformation.setValidFromDate(validFrom);
+			agencyAddressInformation.setValidToDate(validTo);
+			addresses.add(agencyAddressInformation);
+		}
+	}
+
+	public AgencyAddressInformation getOfficialAgencyPhysicalAddressInformation() {
 		AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
 
 		PhysicalAddress physicalAddress = new PhysicalAddress();
@@ -849,7 +889,7 @@ public class KohaConnector {
 	 */
 	private static void renewSessionCookie() throws IOException, SAXException, KohaException {
 
-		if (++loginAttempts < 5) {
+		if (++loginAttempts < 2) {
 			HttpURLConnection httpCon = (HttpURLConnection) getLoginPOSTurl().openConnection();
 			httpCon.setDoOutput(true);
 			httpCon.setRequestMethod("POST");

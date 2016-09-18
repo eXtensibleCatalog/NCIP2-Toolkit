@@ -130,4 +130,11 @@ public class RestApiUrlBuilder extends URLBuilder {
 	public URL postHolds() throws MalformedURLException {
 		return this.getHoldsOfPatron(null);
 	}
+
+	public URL getLibraries() throws MalformedURLException {
+
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("libraries");
+
+		return toReturn.toURL();
+	}
 }

@@ -121,4 +121,6 @@ public class KohaConstants {
 
 	public static final String APP_PROFILE_TYPE_CAN_BE_REQUESTED = "Can Be Requested";
 	public static final String APP_PROFILE_TYPE_CAN_BE_RENEWED = "Can Be Renewed";
+
+	public static final String REGISTRATION_LINK_CONS_AGR_TYPE = "http://www.knihovny.cz/registration_link";
 }

@@ -25,7 +25,7 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name="LastPage" type="xs:positiveInteger" />
+	<xs:element name="LastPage" type="xs:nonNegativeInteger" />
 
 	<xs:element name="LoanedItemsHistory">
 		<xs:complexType>
