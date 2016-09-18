@@ -184,7 +184,7 @@ public class KohaConnector {
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
 			URL authRestUrl = new RestApiUrlBuilder().postAuth();
-			
+
 			String credentials = "userid=" + userId + "&password=" + pw;
 
 			JSONObject authResponse = (JSONObject) getJSONResponseFor(authRestUrl, "POST", credentials);
@@ -240,6 +240,26 @@ public class KohaConnector {
 				try {
 					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET");
 
+					int checkoutsSize = checkouts.size();
+
+					for (int i = 0; i < checkoutsSize; ++i) {
+						JSONObject checkout = (JSONObject) checkouts.get(i);
+
+						String checkoutId = (String) checkout.get("issue_id");
+
+						String renewable = "y";
+						URL renewableRestUrl = new RestApiUrlBuilder().getCheckoutRenewable(checkoutId);
+
+						try {
+							JSONObject renewability = (JSONObject) getJSONResponseFor(renewableRestUrl, "GET");
+						} catch (KohaException e) {
+							renewable = "n";
+						} catch (Exception e) {
+						}
+
+						checkout.put("renewable", renewable);
+					}
+					
 					userInfo.put("checkouts", checkouts);
 				} catch (ParseException e) {
 

@@ -628,8 +628,10 @@ public class KohaUtil {
 			
 			String dateCheckedOut = (String) loanedItemParsed.get("issuedate");
 
-			// TODO implement renewable into Koha's REST API
 			String renewable = (String) loanedItemParsed.get("renewable");
+
+			if (renewable != null)
+				loanedItem.setRenewalNotPermitted(!renewable.equals("y"));
 			
 			loanedItem.setItemId(createItemId(itemId, agencyId));
 			

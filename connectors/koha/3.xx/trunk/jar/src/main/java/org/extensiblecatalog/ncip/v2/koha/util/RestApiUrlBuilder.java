@@ -80,6 +80,16 @@ public class RestApiUrlBuilder extends URLBuilder {
 		return toReturn.appendPath(reserveId).toURL();
 	}
 
+	public URL getCheckoutRenewable(String checkoutId) throws KohaException, MalformedURLException {
+
+		if (checkoutId == null)
+			throw new KohaException("checkoutId cannot be null while getting checkout renewability");
+		
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("checkouts", checkoutId, "renewability");
+
+		return toReturn.toURL();
+	}
+
 	public URL getCheckouts(String patronId) throws MalformedURLException {
 
 		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("checkouts");
