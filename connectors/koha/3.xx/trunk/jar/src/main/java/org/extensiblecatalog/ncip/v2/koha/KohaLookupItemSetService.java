@@ -67,7 +67,7 @@ public class KohaLookupItemSetService
 	private int itemsForwarded;
 
 	private ItemToken nextItemToken;
-	
+
 	private KohaRemoteServiceManager kohaSvcMgr;
 
 	@Override
@@ -234,9 +234,14 @@ public class KohaLookupItemSetService
 
 					bibInformation.setBibliographicId(bibId);
 
-					holdingSets = Arrays.asList(parseHoldingsSetFromLookupItemSet(response, initData, bibItemIdVal));
+					HoldingsSet holdingsSet = parseHoldingsSetFromLookupItemSet(response, initData, bibItemIdVal);
 
-					bibInformation.setHoldingsSets(holdingSets);
+					if (holdingsSet.getItemInformations() != null && holdingsSet.getItemInformations().size() > 0) {
+
+						holdingSets = Arrays.asList(holdingsSet);
+
+						bibInformation.setHoldingsSets(holdingSets);
+					}
 
 					bibInformations.add(bibInformation);
 
@@ -459,7 +464,9 @@ public class KohaLookupItemSetService
 	}
 
 	private HoldingsSet parseHoldingsSetFromLookupItemSet(JSONObject response,
-			ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal) throws ServiceException, ParseException, ParserConfigurationException, IOException, SAXException, KohaException, org.json.simple.parser.ParseException, URISyntaxException {
+			ILSDIvOneOneLookupItemSetInitiationData initData, String bibIdVal)
+			throws ServiceException, ParseException, ParserConfigurationException, IOException, SAXException,
+			KohaException, org.json.simple.parser.ParseException, URISyntaxException {
 		HoldingsSet holdingsSet = new HoldingsSet();
 
 		int startFrom = 0, maxItemsToParse = 0;
@@ -480,10 +487,10 @@ public class KohaLookupItemSetService
 				BibliographicDescription bibliographicDescription = KohaUtil.parseBibliographicDescription(response);
 				holdingsSet.setBibliographicDescription(bibliographicDescription);
 			}
-			
+
 			JSONArray items = (JSONArray) response.get("items");
 			int numberOfPieces = items.size();
-			
+
 			for (i = startFrom; i < items.size(); ++i) {
 				boolean canContinue = maxItemsToParse == 0 || maxItemsToParse > i - startFrom;
 				if (canContinue) {
@@ -492,10 +499,11 @@ public class KohaLookupItemSetService
 
 					String itemId = (String) itemInfo.get("itemnumber");
 
-					LookupItemInitiationData initDataLookupItem = KohaUtil.luisInitDataToLookupItemInitData(initData, itemId);
-					
+					LookupItemInitiationData initDataLookupItem = KohaUtil.luisInitDataToLookupItemInitData(initData,
+							itemId);
+
 					itemInfo = kohaSvcMgr.lookupItem(itemId, initData);
-					
+
 					ItemOptionalFields iof = new ItemOptionalFields();
 
 					String agencyId = (String) itemInfo.get("holdingbranch");
@@ -523,7 +531,7 @@ public class KohaLookupItemSetService
 
 						iof.setItemDescription(itemDescription);
 					}
-					
+
 					JSONObject availabilityJSON = (JSONObject) itemInfo.get("availability");
 
 					if (initData.getCirculationStatusDesired()) {
@@ -531,17 +539,18 @@ public class KohaLookupItemSetService
 					}
 
 					if (initData.getHoldQueueLengthDesired()) {
-						
+
 						Long holdQueueLength = (Long) availabilityJSON.get("hold_queue_length");
-						
+
 						if (holdQueueLength != null)
 							iof.setHoldQueueLength(new BigDecimal(holdQueueLength));
 					}
 
 					if (initData.getUserId() != null) {
 
-						// TODO after impelmented bug https://bugs.koha-community.org/bugzilla3/show_bug.cgi?id=17003
-						
+						// TODO after impelmented bug
+						// https://bugs.koha-community.org/bugzilla3/show_bug.cgi?id=13927
+
 						// Process "Not For Loan" as the output of inability of
 						// requesting an item with provided UserId
 						List<ItemUseRestrictionType> itemUseRestrictionTypes;
@@ -593,6 +602,12 @@ public class KohaLookupItemSetService
 
 				}
 
+			}
+
+			// Add empty iteminformation as it is required by scheme even though this biblio doesn't really have any items
+			if (itemInformations.size() == 0) {
+				ItemInformation itemInformation = new ItemInformation();
+				itemInformations.add(itemInformation);
 			}
 			//
 			// END OF REST API LOGIC

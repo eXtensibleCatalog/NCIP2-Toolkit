@@ -232,13 +232,13 @@ public class KohaConnector {
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
 			URL patronRestUrl = new RestApiUrlBuilder().getPatron(patronId);
 
-			JSONObject userInfo = (JSONObject) getJSONResponseFor(patronRestUrl, "GET");
+			JSONObject userInfo = (JSONObject) getJSONResponseFor(patronRestUrl, "GET", patronId);
 
 			if (loanedItemsDesired) {
 				URL checkoutsRestUrl = new RestApiUrlBuilder().getCheckouts(patronId);
 
 				try {
-					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET");
+					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET", patronId);
 
 					int checkoutsSize = checkouts.size();
 
@@ -251,7 +251,7 @@ public class KohaConnector {
 						URL renewableRestUrl = new RestApiUrlBuilder().getCheckoutRenewable(checkoutId);
 
 						try {
-							JSONObject renewability = (JSONObject) getJSONResponseFor(renewableRestUrl, "GET");
+							JSONObject renewability = (JSONObject) getJSONResponseFor(renewableRestUrl, "GET", checkoutId);
 						} catch (KohaException e) {
 							renewable = "n";
 						} catch (Exception e) {
@@ -272,7 +272,7 @@ public class KohaConnector {
 
 				JSONArray checkoutsHistory;
 				try {
-					checkoutsHistory = (JSONArray) getJSONResponseFor(checkoutsHistoryUrl, "GET");
+					checkoutsHistory = (JSONArray) getJSONResponseFor(checkoutsHistoryUrl, "GET", patronId);
 
 					int page = initData.getHistoryDesired().getPage().intValue();
 
@@ -288,7 +288,7 @@ public class KohaConnector {
 
 						checkoutsHistoryUrl = new RestApiUrlBuilder().getCheckoutsHistory(checkoutId);
 
-						JSONObject loanedItemParsed = (JSONObject) getJSONResponseFor(checkoutsHistoryUrl, "GET");
+						JSONObject loanedItemParsed = (JSONObject) getJSONResponseFor(checkoutsHistoryUrl, "GET", checkoutId);
 
 						checkoutsHistoryItems.add(loanedItemParsed);
 					}
@@ -306,7 +306,7 @@ public class KohaConnector {
 				URL holdsRestUrl = new RestApiUrlBuilder().getHoldsOfPatron(patronId);
 
 				try {
-					JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
+					JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET", patronId);
 
 					userInfo.put("holds", holds);
 				} catch (ParseException e) {
@@ -320,7 +320,7 @@ public class KohaConnector {
 
 				try {
 
-					JSONArray accountLines = (JSONArray) getJSONResponseFor(accountLinesRestUrl, "GET");
+					JSONArray accountLines = (JSONArray) getJSONResponseFor(accountLinesRestUrl, "GET", patronId);
 
 					userInfo.put("accountLines", accountLines);
 				} catch (ParseException e) {
@@ -388,7 +388,7 @@ public class KohaConnector {
 
 				URL holdsRestUrl = new RestApiUrlBuilder().getHoldsOfPatron(patronId);
 
-				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET");
+				JSONArray holds = (JSONArray) getJSONResponseFor(holdsRestUrl, "GET", patronId);
 
 				for (Object object : holds) {
 					JSONObject hold = (JSONObject) object;
@@ -407,7 +407,7 @@ public class KohaConnector {
 
 			URL deleteHoldRestUrl = new RestApiUrlBuilder().deleteHold(reserveId);
 
-			return getJSONResponseFor(deleteHoldRestUrl, "DELETE");
+			return getJSONResponseFor(deleteHoldRestUrl, "DELETE", reserveId);
 		} else {
 
 			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CANCEL_REQUEST_ITEM)
@@ -531,9 +531,7 @@ public class KohaConnector {
 
 			URL bibliosRestUrl = new RestApiUrlBuilder().getBiblios(bibId);
 
-			String bibliosResponse = getPlainTextResponse(bibliosRestUrl);
-
-			JSONObject biblio = (JSONObject) jsonParser.parse(bibliosResponse);
+			JSONObject biblio = (JSONObject) getJSONResponseFor(bibliosRestUrl, "GET", bibId);
 
 			return biblio;
 
@@ -617,7 +615,7 @@ public class KohaConnector {
 
 			URL putCheckoutRestUrl = new RestApiUrlBuilder().putCheckouts(checkoutId);
 
-			JSONObject renewalInfo = (JSONObject) getJSONResponseFor(putCheckoutRestUrl, "PUT");
+			JSONObject renewalInfo = (JSONObject) getJSONResponseFor(putCheckoutRestUrl, "PUT", checkoutId);
 
 			return renewalInfo;
 		} else {
@@ -659,7 +657,7 @@ public class KohaConnector {
 			data.put("expirationdate", expirationDate);
 
 			try {
-				JSONObject holdCreated = (JSONObject) getJSONResponseFor(postHoldsRestUrl, "POST", data);
+				JSONObject holdCreated = (JSONObject) getJSONResponseFor(postHoldsRestUrl, "POST", data, null);
 
 				return holdCreated;
 			} catch (KohaException e) {
@@ -853,19 +851,19 @@ public class KohaConnector {
 		}
 	}
 
-	private Object getJSONResponseFor(URL url, String method)
+	private Object getJSONResponseFor(URL url, String method, String notFoundIdentifierValue)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
 
-		return getJSONResponseFor(url, method, (String) null);
+		return getJSONResponseFor(url, method, (String) null, notFoundIdentifierValue);
 	}
 
-	private Object getJSONResponseFor(URL url, String method, JSONObject json)
+	private Object getJSONResponseFor(URL url, String method, JSONObject json, String notFoundIdentifierValue)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
 
-		return getJSONResponseFor(url, method, json.toJSONString());
+		return getJSONResponseFor(url, method, json.toJSONString(), notFoundIdentifierValue);
 	}
 
-	private Object getJSONResponseFor(URL url, String method, String data)
+	private Object getJSONResponseFor(URL url, String method, String data, String notFoundIdentifierValue)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
 
 		if (currentSessionIdCookie.isEmpty())
@@ -892,7 +890,7 @@ public class KohaConnector {
 			if (statusCode == 403 && content.contains("expired") && !haveBeenHere) {
 				haveBeenHere = true;
 				renewSessionCookie();
-				return getJSONResponseFor(url, method);
+				return getJSONResponseFor(url, method, data, notFoundIdentifierValue);
 			}
 
 			haveBeenHere = false;
@@ -901,9 +899,17 @@ public class KohaConnector {
 
 			JSONObject error = (JSONObject) jsonParser.parse(content);
 
+			if (statusCode == 404 && notFoundIdentifierValue != null) {
+				
+				if (error == null)
+					throw KohaException.create404NotFoundException(content, notFoundIdentifierValue);
+				
+				throw KohaException.create404NotFoundException((String) error.get("error"), notFoundIdentifierValue);
+			}
+
 			if (error == null)
 				throw new KohaException(content);
-
+			
 			throw new KohaException((String) error.get("error"));
 		}
 
