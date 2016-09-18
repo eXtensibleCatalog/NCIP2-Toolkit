@@ -139,6 +139,14 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 		 * Will throw Exception if something is wrong
 		 */
 		JSONObject response = kohaRemoteServiceManager.authenticateUser(userId, pass);
+		
+		String userIdVal = null;
+		
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
+			
+			userIdVal = (String) response.get("borrowernumber");
+			
+		} else {
 
 		String authorized = (String) response.get("authorized");
 
@@ -146,7 +154,8 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 			throw new KohaException(KohaException.INVALID_CREDENTIALS_PROVIDED,
 					"ILS could not authorize provided credentials - either User Id or Password is wrong");
 
-		String userIdVal = (String) response.get("borNo");
+		userIdVal = (String) response.get("borNo");
+		
 		if (userIdVal == null || userIdVal.trim().isEmpty()) {
 			try {
 				// We need to verify userId is an integer all the time - if it
@@ -160,6 +169,9 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 						"Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
 			}
 		}
+
+		}
+		
 		// Setting user id means authentication was successful - otherwise there
 		// should be thrown an Problem element instead
 		initData.setUserId(KohaUtil.createUserId(userIdVal, LocalConfig.getDefaultAgency()));

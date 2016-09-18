@@ -137,4 +137,11 @@ public class RestApiUrlBuilder extends URLBuilder {
 
 		return toReturn.toURL();
 	}
+
+	public URL postAuth() throws MalformedURLException {
+
+		RestApiUrlBuilder toReturn = (RestApiUrlBuilder) this.appendPath("auth", "session");
+
+		return toReturn.toURL();
+	}
 }

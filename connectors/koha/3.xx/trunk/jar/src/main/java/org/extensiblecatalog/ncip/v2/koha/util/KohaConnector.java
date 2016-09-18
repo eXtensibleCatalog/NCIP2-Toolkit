@@ -180,16 +180,29 @@ public class KohaConnector {
 
 	public JSONObject authenticateUser(String userId, String pw)
 			throws MalformedURLException, KohaException, IOException, SAXException, URISyntaxException, ParseException {
-		URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER);
 
-		urlBuilder.addRequest(KohaConstants.PARAM_USER_ID, userId);
-		urlBuilder.addRequest(KohaConstants.PARAM_PW, pw);
+		if (LocalConfig.useRestApiInsteadOfSvc()) {
 
-		urlBuilder.addRequest(KohaConstants.PARAM_BOR_NO_DESIRED);
+			URL authRestUrl = new RestApiUrlBuilder().postAuth();
+			
+			String credentials = "userid=" + userId + "&password=" + pw;
 
-		String rawResponse = getPlainTextResponse(urlBuilder.toURL());
+			JSONObject authResponse = (JSONObject) getJSONResponseFor(authRestUrl, "POST", credentials);
 
-		return (JSONObject) jsonParser.parse(rawResponse);
+			return authResponse;
+		} else {
+			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_LOOKUP_USER);
+
+			urlBuilder.addRequest(KohaConstants.PARAM_USER_ID, userId);
+			urlBuilder.addRequest(KohaConstants.PARAM_PW, pw);
+
+			urlBuilder.addRequest(KohaConstants.PARAM_BOR_NO_DESIRED);
+
+			String rawResponse = getPlainTextResponse(urlBuilder.toURL());
+
+			return (JSONObject) jsonParser.parse(rawResponse);
+
+		}
 	}
 
 	/**
@@ -677,12 +690,13 @@ public class KohaConnector {
 			return (JSONObject) jsonParser.parse(response);
 		}
 	}
-	
-	public void lookupAgency(LookupAgencyInitiationData initData, List<AgencyAddressInformation> addresses) throws KohaException, IOException, SAXException, URISyntaxException, ParseException {
-		
+
+	public void lookupAgency(LookupAgencyInitiationData initData, List<AgencyAddressInformation> addresses)
+			throws KohaException, IOException, SAXException, URISyntaxException, ParseException {
+
 		// Add Official agency
 		addresses.add(getOfficialAgencyPhysicalAddressInformation());
-		
+
 		// Add remaining agencies if any
 		URL librariesRestUrl = new RestApiUrlBuilder().getLibraries();
 
@@ -690,28 +704,30 @@ public class KohaConnector {
 
 		JSONArray libraries = (JSONArray) jsonParser.parse(librariesResponse);
 
-		GregorianCalendar validFrom = new GregorianCalendar();		
+		GregorianCalendar validFrom = new GregorianCalendar();
 		GregorianCalendar validTo = new GregorianCalendar();
 		validTo.add(GregorianCalendar.YEAR, 50);
-		
-		for(Object libraryObj : libraries) {
+
+		for (Object libraryObj : libraries) {
 			JSONObject library = (JSONObject) libraryObj;
 
 			String branchcode = (String) library.get("branchcode");
 			String branchname = (String) library.get("branchname");
 			String branchaddress = (String) library.get("branchaddress1");
-			
+
 			AgencyAddressInformation agencyAddressInformation = new AgencyAddressInformation();
 
 			PhysicalAddress physicalAddress = new PhysicalAddress();
 			physicalAddress.setPhysicalAddressType(Version1PhysicalAddressType.STREET_ADDRESS);
 			UnstructuredAddress unstructuredAddress = new UnstructuredAddress();
-			unstructuredAddress.setUnstructuredAddressType(new Version1UnstructuredAddressType("agency-display-name", branchname));
+			unstructuredAddress
+					.setUnstructuredAddressType(new Version1UnstructuredAddressType("agency-display-name", branchname));
 			unstructuredAddress.setUnstructuredAddressData(branchaddress);
 			physicalAddress.setUnstructuredAddress(unstructuredAddress);
-			
+
 			agencyAddressInformation.setPhysicalAddress(physicalAddress);
-			agencyAddressInformation.setAgencyAddressRoleType(new Version1AgencyAddressRoleType("agency-id", branchcode));
+			agencyAddressInformation
+					.setAgencyAddressRoleType(new Version1AgencyAddressRoleType("agency-id", branchcode));
 			agencyAddressInformation.setValidFromDate(validFrom);
 			agencyAddressInformation.setValidToDate(validTo);
 			addresses.add(agencyAddressInformation);
