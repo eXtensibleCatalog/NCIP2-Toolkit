@@ -17,6 +17,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.*;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -70,6 +71,8 @@ public class KohaConnector {
 	private static int loginAttempts;
 
 	private boolean haveBeenHere = false;
+
+	private String contentType = null;
 
 	public KohaConnector() throws ServiceException {
 
@@ -187,7 +190,12 @@ public class KohaConnector {
 
 			String credentials = "userid=" + userId + "&password=" + pw;
 
+			String oldContentType = this.contentType;
+
+			this.contentType = "application/x-www-form-urlencoded";
 			JSONObject authResponse = (JSONObject) getJSONResponseFor(authRestUrl, "POST", credentials);
+
+			this.contentType = oldContentType;
 
 			return authResponse;
 		} else {
@@ -238,7 +246,7 @@ public class KohaConnector {
 				URL checkoutsRestUrl = new RestApiUrlBuilder().getCheckouts(patronId);
 
 				try {
-					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET", patronId);
+					JSONArray checkouts = (JSONArray) getJSONResponseFor(checkoutsRestUrl, "GET", patronId, patronId);
 
 					int checkoutsSize = checkouts.size();
 
@@ -251,7 +259,7 @@ public class KohaConnector {
 						URL renewableRestUrl = new RestApiUrlBuilder().getCheckoutRenewable(checkoutId);
 
 						try {
-							JSONObject renewability = (JSONObject) getJSONResponseFor(renewableRestUrl, "GET", checkoutId);
+							JSONObject renewability = (JSONObject) getJSONResponseFor(renewableRestUrl, "GET", checkoutId, patronId + checkoutId);
 						} catch (KohaException e) {
 							renewable = "n";
 						} catch (Exception e) {
@@ -851,10 +859,10 @@ public class KohaConnector {
 		}
 	}
 
-	private Object getJSONResponseFor(URL url, String method, String notFoundIdentifierValue)
+	private Object getJSONResponseFor(URL url, String method, String data)
 			throws MalformedURLException, IOException, KohaException, ParseException, SAXException {
 
-		return getJSONResponseFor(url, method, (String) null, notFoundIdentifierValue);
+		return getJSONResponseFor(url, method, data, null);
 	}
 
 	private Object getJSONResponseFor(URL url, String method, JSONObject json, String notFoundIdentifierValue)
@@ -871,15 +879,22 @@ public class KohaConnector {
 
 		HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 		httpCon.addRequestProperty("Cookie", currentSessionIdCookie);
+
+		if (this.contentType != null)
+			httpCon.addRequestProperty("Content-Type", this.contentType);
+
 		httpCon.setRequestMethod(method);
 
-		if (data != null) {
+
+		if (! method.equals("GET") && data != null) {
 			httpCon.setDoOutput(true);
 
 			OutputStreamWriter outWriter = new OutputStreamWriter(httpCon.getOutputStream());
 			outWriter.write(data);
 			outWriter.close();
 		}
+
+		//Map<String, List<String>> requestHeaders = httpCon.getHeaderFields();
 
 		int statusCode = httpCon.getResponseCode();
 
@@ -897,7 +912,11 @@ public class KohaConnector {
 
 			httpCon.disconnect();
 
-			JSONObject error = (JSONObject) jsonParser.parse(content);
+			
+			JSONObject error = null;
+			try {
+				error = (JSONObject) jsonParser.parse(content);
+			} catch(Exception e) {}
 
 			if (statusCode == 404 && notFoundIdentifierValue != null) {
 				
@@ -907,10 +926,12 @@ public class KohaConnector {
 				throw KohaException.create404NotFoundException((String) error.get("error"), notFoundIdentifierValue);
 			}
 
+			content = content + " using content-type:" + this.contentType + " method: " + method + " data: " + data + " url:" + url + " status: " + statusCode + " Cookie: "+ currentSessionIdCookie + " Response Headers: "+ httpCon.getHeaderFields();
+
 			if (error == null)
 				throw new KohaException(content);
 			
-			throw new KohaException((String) error.get("error"));
+			throw new KohaException(((String) error.get("error")) + content);
 		}
 
 		String rawResponse = KohaUtil.convertStreamToString(httpCon.getInputStream());
