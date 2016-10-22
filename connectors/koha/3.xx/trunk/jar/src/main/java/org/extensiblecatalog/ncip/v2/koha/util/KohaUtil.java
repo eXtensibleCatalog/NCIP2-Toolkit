@@ -933,13 +933,24 @@ public class KohaUtil {
 		CirculationStatus availability;
 
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
+
+			String location = (String) availabilityJSON.get("location");
+
+			if (location != null && location.equals("PROC"))
+				return Version1CirculationStatus.IN_PROCESS;
+
 			JSONObject checkout = (JSONObject) availabilityJSON.get("checkout");
-			if ((Boolean) checkout.get("available")) {
+			Boolean checkoutable = (Boolean) checkout.get("available");
 
-				availability = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
-
-			} else if ((Boolean) ((JSONObject) availabilityJSON.get("hold")).get("available")) {
-
+			JSONArray checkoutDescription = (JSONArray) checkout.get("description");
+			Boolean onLoan = checkoutDescription.toString().contains("onloan");
+			
+			JSONObject hold = (JSONObject) availabilityJSON.get("hold");
+			Boolean holdable = (Boolean) hold.get("available");
+		
+			if (! holdable) {
+				availability = Version1CirculationStatus.NOT_AVAILABLE;
+			} else if (onLoan) {
 				availability = Version1CirculationStatus.ON_LOAN;
 
 				String dueDateParsed = (String) checkout.get("expected_available");
@@ -948,8 +959,10 @@ public class KohaUtil {
 					iof.setDateDue(parseGregorianCalendarFromKohaLongDate(dueDateParsed));
 				}
 
+			} else if (checkoutable) {
+				availability = Version1CirculationStatus.AVAILABLE_FOR_PICKUP;
 			} else {
-				availability = Version1CirculationStatus.NOT_AVAILABLE;
+				availability = Version1CirculationStatus.AVAILABLE_ON_SHELF;
 			}
 
 			return availability;
