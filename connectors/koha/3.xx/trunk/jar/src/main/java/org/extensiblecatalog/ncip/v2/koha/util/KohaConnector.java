@@ -289,8 +289,12 @@ public class KohaConnector {
 					loanedItemsHistory.put("size", checkoutsHistory.size());
 
 					JSONArray checkoutsHistoryItems = new JSONArray();
+					
+					int pageStep = 10;					
+					int currentPageRank = --page * pageStep;					
+					int nextPageRank = currentPageRank + pageStep;
 
-					for (int i = --page * 10; i < checkoutsHistory.size(); ++i) {
+					for (int i = currentPageRank; i < checkoutsHistory.size() && i != nextPageRank; ++i) {
 
 						String checkoutId = (String) ((JSONObject) checkoutsHistory.get(i)).get("issue_id");
 
