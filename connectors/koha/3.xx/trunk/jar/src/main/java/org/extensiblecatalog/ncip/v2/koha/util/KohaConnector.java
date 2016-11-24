@@ -661,8 +661,11 @@ public class KohaConnector {
 
 			data.put("branchcode", initData.getPickupLocation().getValue());
 
-			String expirationDate = KohaUtil.createKohaDateFromGregorianCalendar(initData.getPickupExpiryDate());
-			data.put("expirationdate", expirationDate);
+			GregorianCalendar pickupExpiryDate = initData.getPickupExpiryDate();
+			if (pickupExpiryDate != null) {
+				String expirationDate = KohaUtil.createKohaDateFromGregorianCalendar(pickupExpiryDate);
+				data.put("expirationdate", expirationDate);
+			}
 
 			try {
 				JSONObject holdCreated = (JSONObject) getJSONResponseFor(postHoldsRestUrl, "POST", data, null);
