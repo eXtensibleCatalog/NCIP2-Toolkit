@@ -415,7 +415,7 @@ public class KohaConnector {
 
 			URL deleteHoldRestUrl = new RestApiUrlBuilder().deleteHold(reserveId);
 
-			return getJSONResponseFor(deleteHoldRestUrl, "DELETE", reserveId);
+			return getJSONResponseFor(deleteHoldRestUrl, "DELETE", null);
 		} else {
 
 			URLBuilder urlBuilder = getCommonSvcNcipURLBuilder(KohaConstants.SERVICE_CANCEL_REQUEST_ITEM)
