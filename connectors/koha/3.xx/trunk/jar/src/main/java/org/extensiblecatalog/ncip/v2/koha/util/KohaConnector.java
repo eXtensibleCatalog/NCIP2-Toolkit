@@ -909,7 +909,7 @@ public class KohaConnector {
 
 			String content = KohaUtil.convertStreamToString(httpCon.getErrorStream());
 
-			if (statusCode == 403 && content.contains("expired") && !haveBeenHere) {
+			if (statusCode == 403 && !haveBeenHere) {
 				haveBeenHere = true;
 				renewSessionCookie();
 				return getJSONResponseFor(url, method, data, notFoundIdentifierValue);
