@@ -8,12 +8,8 @@ ENV LANG C.UTF-8
 # Add user to manage home dir
 RUN adduser --disabled-password --gecos "" xcncip2toolkit
 
-# Install maven ..
-RUN wget -O /tmp/apache-tomcat.tar.gz http://apache.lauf-forum.at/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
-RUN cd /opt && tar -xf /tmp/apache-tomcat.tar.gz && ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/local/bin/
-
-# openjdk-7-jdk needed for javac in order to run mvn install ..
-RUN apt-get update && apt-get upgrade -y && apt-get install -y openjdk-7-jdk vim git
+# Install dependencies
+RUN apt-get update && apt-get upgrade -y && apt-get install -y openjdk-7-jdk vim git maven && apt-get clean
 
 USER xcncip2toolkit
 
