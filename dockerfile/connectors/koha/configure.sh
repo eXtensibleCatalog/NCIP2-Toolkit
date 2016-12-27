@@ -23,7 +23,7 @@ fi
 cp $dir/toolkit.properties.example $configTmp
 
 echo
-echo "Koha's configTmpuration is on schedule.."
+echo "Koha's configuration is on schedule.."
 echo ""
 echo "Please note that toolkit's koha connector cannot work without access to intranet, thus it is needed to provide."
 echo ""
@@ -66,7 +66,5 @@ sed -i "s_KohaPortHere_$(echo $port)_g" $configTmp
 sed -i "s_IntranetAdministratorNameHere_$(echo $adminName)_g" $configTmp
 sed -i "s_IntranetAdministratorPassHere_$(echo $adminPass)_g" $configTmp
 
-native2ascii -encoding utf8 $configTmp $configTmp
+native2ascii -encoding utf8 $configTmp $config
 
-# Move the temp config to the real config
-mv $configTmp $config
