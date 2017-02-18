@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -51,7 +51,6 @@ import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
 import org.extensiblecatalog.ncip.v2.service.Version1AuthenticationInputType;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Duration;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
@@ -334,7 +333,13 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 
 					for (int i = 0; i < accountLines.size(); ++i) {
 						JSONObject accountLine = (JSONObject) accountLines.get(i);
-						accountDetails.add(KohaUtil.parseAccountDetails(accountLine));
+						AccountDetails accountDetail = KohaUtil.parseAccountDetails(accountLine);
+						
+						BigDecimal fineValue = accountDetail.getFiscalTransactionInformation().getAmount().getMonetaryValue();
+						
+						// Add only if it is non-zero
+						if (fineValue.compareTo(BigDecimal.ZERO) != 0)
+							accountDetails.add(accountDetail);
 					}
 
 					BigDecimal amount = null; // Sum all transactions ..

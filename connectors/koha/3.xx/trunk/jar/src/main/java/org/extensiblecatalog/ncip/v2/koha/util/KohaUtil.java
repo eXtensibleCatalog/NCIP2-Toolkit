@@ -662,13 +662,14 @@ public class KohaUtil {
 	public static AccountDetails parseAccountDetails(JSONObject userFiscalAccountParsed) throws ParseException {
 		AccountDetails accountDetail = new AccountDetails();
 
-		String amount = (String) userFiscalAccountParsed.get("amount");
+		String amountoutstanding = (String) userFiscalAccountParsed.get("amountoutstanding");
 
 		String accrualDate = (String) userFiscalAccountParsed.get("date");
 
 		String transactionId = (String) userFiscalAccountParsed.get("accountno");
 
-		String description = (String) userFiscalAccountParsed.get("note");
+		//String description = (String) userFiscalAccountParsed.get("note");
+		String description = (String) userFiscalAccountParsed.get("description");
 
 		accountDetail.setAccrualDate(parseGregorianCalendarFromKohaDate(accrualDate));
 
@@ -681,7 +682,7 @@ public class KohaUtil {
 		fiscalTransactionInformation.setFiscalTransactionType(Version1FiscalTransactionType.SERVICE_CHARGE);
 		fiscalTransactionInformation.setFiscalTransactionReferenceId(fiscalTransactionReferenceId);
 
-		fiscalTransactionInformation.setAmount(createAmount(amount));
+		fiscalTransactionInformation.setAmount(createAmount(amountoutstanding));
 
 		fiscalTransactionInformation.setFiscalTransactionDescription(description);
 
