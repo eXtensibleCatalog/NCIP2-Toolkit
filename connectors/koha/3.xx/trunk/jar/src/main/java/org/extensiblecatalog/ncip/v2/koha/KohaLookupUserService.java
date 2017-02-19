@@ -105,6 +105,24 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 			responseData.setProblems(Arrays.asList(p));
 
 		}
+
+		/*
+		 * There is a possibility of having thrown an exception after
+		 * responseData has assigned some data .. But schema disallows to have
+		 * anything more than just Problem if any ..
+		 */
+		if (responseData.getProblems() != null && responseData.getProblems().size() > 0) {
+			responseData.setUserId(null);
+			responseData.setUserFiscalAccounts(null);
+			responseData.setUserFiscalAccountSummary(null);
+			responseData.setLoanedItems(null);
+			responseData.setLoanedItemsCounts(null);
+			responseData.setLoanedItemsHistory(null);
+			responseData.setRequestedItems(null);
+			responseData.setRequestedItemsCounts(null);
+			responseData.setUserOptionalFields(null);
+		}
+
 		return responseData;
 	}
 
@@ -138,39 +156,41 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 		 * Will throw Exception if something is wrong
 		 */
 		JSONObject response = kohaRemoteServiceManager.authenticateUser(userId, pass);
-		
+
 		String userIdVal = null;
-		
+
 		if (LocalConfig.useRestApiInsteadOfSvc()) {
-			
+
 			userIdVal = (String) response.get("borrowernumber");
-			
+
 		} else {
 
-		String authorized = (String) response.get("authorized");
+			String authorized = (String) response.get("authorized");
 
-		if (authorized == null || !authorized.equals("y"))
-			throw new KohaException(KohaException.INVALID_CREDENTIALS_PROVIDED,
-					"ILS could not authorize provided credentials - either User Id or Password is wrong");
+			if (authorized == null || !authorized.equals("y"))
+				throw new KohaException(KohaException.INVALID_CREDENTIALS_PROVIDED,
+						"ILS could not authorize provided credentials - either User Id or Password is wrong");
 
-		userIdVal = (String) response.get("borNo");
-		
-		if (userIdVal == null || userIdVal.trim().isEmpty()) {
-			try {
-				// We need to verify userId is an integer all the time - if it
-				// is, then we don't need userIdVal from Koha ILS - we actually
-				// supplied it
-				userIdVal = String.valueOf((Integer.parseInt(userId)));
-			} catch (NumberFormatException e) {
-				// If it's thrown, that mean userId is an string & Koha ILS
-				// unexpectedly returned successful authentication
-				throw KohaException.create400BadRequestException(
-						"Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
+			userIdVal = (String) response.get("borNo");
+
+			if (userIdVal == null || userIdVal.trim().isEmpty()) {
+				try {
+					// We need to verify userId is an integer all the time - if
+					// it
+					// is, then we don't need userIdVal from Koha ILS - we
+					// actually
+					// supplied it
+					userIdVal = String.valueOf((Integer.parseInt(userId)));
+				} catch (NumberFormatException e) {
+					// If it's thrown, that mean userId is an string & Koha ILS
+					// unexpectedly returned successful authentication
+					throw KohaException.create400BadRequestException(
+							"Sorry, Koha ILS authenticated user succesfully, but did not return borrowernumber.");
+				}
 			}
-		}
 
 		}
-		
+
 		// Setting user id means authentication was successful - otherwise there
 		// should be thrown an Problem element instead
 		initData.setUserId(KohaUtil.createUserId(userIdVal, LocalConfig.getDefaultAgency()));
@@ -323,9 +343,9 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 			}
 
 			if (initData.getUserFiscalAccountDesired()) {
-				
+
 				JSONArray accountLines = (JSONArray) kohaUser.get("accountLines");
-				
+
 				if (accountLines != null && accountLines.size() != 0) {
 					List<UserFiscalAccount> userFiscalAccounts = new ArrayList<UserFiscalAccount>(1);
 					UserFiscalAccount userFiscalAccount = new UserFiscalAccount();
@@ -334,9 +354,13 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 					for (int i = 0; i < accountLines.size(); ++i) {
 						JSONObject accountLine = (JSONObject) accountLines.get(i);
 						AccountDetails accountDetail = KohaUtil.parseAccountDetails(accountLine);
-						
-						BigDecimal fineValue = accountDetail.getFiscalTransactionInformation().getAmount().getMonetaryValue();
-						
+
+						if (accountDetail == null)
+							continue;
+
+						BigDecimal fineValue = accountDetail.getFiscalTransactionInformation().getAmount()
+								.getMonetaryValue();
+
 						// Add only if it is non-zero
 						if (fineValue.compareTo(BigDecimal.ZERO) != 0)
 							accountDetails.add(accountDetail);
@@ -347,15 +371,21 @@ public class KohaLookupUserService implements org.extensiblecatalog.ncip.v2.ilsd
 						if (amount == null)
 							amount = details.getFiscalTransactionInformation().getAmount().getMonetaryValue();
 						else
-							amount = amount.add(details.getFiscalTransactionInformation().getAmount().getMonetaryValue());
+							amount = amount
+									.add(details.getFiscalTransactionInformation().getAmount().getMonetaryValue());
 					}
-					userFiscalAccount.setAccountBalance(KohaUtil.createAccountBalance(amount));
 
-					userFiscalAccount.setAccountDetails(accountDetails);
-					userFiscalAccounts.add(userFiscalAccount); // Suppose user has
-																// only one account
-																// ..
-					responseData.setUserFiscalAccounts(userFiscalAccounts);
+					if (amount != null) {
+						userFiscalAccount.setAccountBalance(KohaUtil.createAccountBalance(amount));
+
+						userFiscalAccount.setAccountDetails(accountDetails);
+						userFiscalAccounts.add(userFiscalAccount); // Suppose
+																	// user has
+																	// only one
+																	// account
+																	// ..
+						responseData.setUserFiscalAccounts(userFiscalAccounts);
+					}
 				}
 			}
 

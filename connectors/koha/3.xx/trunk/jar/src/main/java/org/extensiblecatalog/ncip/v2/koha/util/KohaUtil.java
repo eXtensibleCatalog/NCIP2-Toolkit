@@ -663,6 +663,9 @@ public class KohaUtil {
 		AccountDetails accountDetail = new AccountDetails();
 
 		String amountoutstanding = (String) userFiscalAccountParsed.get("amountoutstanding");
+		
+		if (amountoutstanding == null)
+			return null;
 
 		String accrualDate = (String) userFiscalAccountParsed.get("date");
 
