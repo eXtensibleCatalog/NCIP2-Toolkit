@@ -685,7 +685,7 @@ public class KohaUtil {
 		fiscalTransactionInformation.setFiscalTransactionType(Version1FiscalTransactionType.SERVICE_CHARGE);
 		fiscalTransactionInformation.setFiscalTransactionReferenceId(fiscalTransactionReferenceId);
 
-		fiscalTransactionInformation.setAmount(createAmount(amountoutstanding));
+		fiscalTransactionInformation.setAmount(createNegativeAmount(amountoutstanding));
 
 		fiscalTransactionInformation.setFiscalTransactionDescription(description);
 
@@ -694,14 +694,14 @@ public class KohaUtil {
 		return accountDetail;
 	}
 
-	private static Amount createAmount(String amountParsed) {
+	private static Amount createNegativeAmount(String amountParsed) {
 		Amount amount = new Amount();
 		String[] splitted = amountParsed.split("\\.");
 		String hundredths = splitted.length == 2 ? splitted[0] + splitted[1].substring(0, 2) : splitted[0] + "00";
 		BigDecimal amountVal = new BigDecimal(hundredths);
 
 		amount.setCurrencyCode(new CurrencyCode(LocalConfig.getCurrencyCode(), 2));
-		amount.setMonetaryValue(amountVal);
+		amount.setMonetaryValue(amountVal.negate());
 		return amount;
 	}
 
