@@ -353,6 +353,22 @@
 
     <!-- project metadata -->
     <distributionManagement>
+<!-- FOLIO-2441 start -->
+      <repository>
+        <id>folio-nexus</id>
+        <name>FOLIO Release Repository</name>
+        <url>https://repository.folio.org/repository/maven-releases/</url>
+        <uniqueVersion>false</uniqueVersion>
+        <layout>default</layout>
+      </repository>
+      <snapshotRepository>
+        <id>folio-nexus</id>
+        <name>FOLIO Snapshot Repository</name>
+        <uniqueVersion>true</uniqueVersion>
+        <url>https://repository.folio.org/repository/maven-snapshots/</url>
+        <layout>default</layout>
+      </snapshotRepository>
+<!-- FOLIO-2441 end -->
     </distributionManagement>
     
     <organization>
