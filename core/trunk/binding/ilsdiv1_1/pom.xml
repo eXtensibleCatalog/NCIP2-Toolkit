@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<!-- This is a version 4 POM file. -->
 	<modelVersion>4.0.0</modelVersion>
@@ -8,7 +7,7 @@
 	<!-- The project details. -->
 	<groupId>org.extensiblecatalog.ncip.v2</groupId>
 	<artifactId>binding-ilsdiv1_1</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>2.0.0</version>
 	<packaging>jar</packaging>
 	<name>NCIP V2 ILS-DI v2 Extensions Binding</name>
 	<description>NCIP V2 ILS-DI V2 Extensions Binding</description>
@@ -29,7 +28,7 @@
 	<parent>
 		<groupId>org.extensiblecatalog.ncip.v2</groupId>
 		<artifactId>binding</artifactId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>2.0.0</version>
 	</parent>
 
 	<dependencies>
