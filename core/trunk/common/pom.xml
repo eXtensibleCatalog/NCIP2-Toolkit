@@ -7,7 +7,7 @@
     <!-- The project details. -->
     <groupId>org.extensiblecatalog.ncip.v2</groupId>
     <artifactId>common</artifactId>
-   <version>2.0.0</version>
+   <version>2.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>NCIP V2 Common</name>
     <description>NCIP V2 Common</description>
@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.extensiblecatalog.ncip.v2</groupId>
         <artifactId>root</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
