@@ -8,7 +8,7 @@
     <!-- The project details. -->
     <groupId>org.extensiblecatalog.ncip.v2</groupId>
     <artifactId>dummy-parent</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>NCIP V2 Dummy Parent</name>
     <description>NCIP V2 Dummy Parent</description>
@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.extensiblecatalog.ncip.v2</groupId>
         <artifactId>root</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- The list of child modules. -->

@@ -9,7 +9,7 @@
     <groupId>org.extensiblecatalog.ncip.v2</groupId>
     <artifactId>examples</artifactId>
     <packaging>jar</packaging>
-    <version>1.2-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>NCIP V2 Examples</name>
     <description>NCIP V2 Examples</description>
 
@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.extensiblecatalog.ncip.v2</groupId>
         <artifactId>root</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
