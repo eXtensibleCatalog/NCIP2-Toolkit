@@ -34,7 +34,7 @@ pipeline {
           maven: 'maven3-jenkins-slave-all',
           mavenSettingsConfig: 'folioci-maven-settings') {
           dir ('core/trunk') {
-            sh 'mvn -DskipTests clean install'
+            sh 'mvn clean install'
           }
         }
       }
