@@ -69,7 +69,7 @@ public class BaseTestJAXBTranslator implements Runnable {
     public void doTest() throws FileNotFoundException, ToolkitException {
                                                                                                
         String sampleFilesDirectory = System.getProperty(BaseTestJAXBTranslator.class.getName() + ".sampleFilesDir",
-                "src/test/data/sampleNCIPMessages");
+                "src/test/data/sampleMessages");
         if (sampleFilesDirectory == null) {
             Assert.fail("Test failed because system property " + BaseTestJAXBTranslator.class.getName() +
                     ".sampleFilesDir was not set. It must be set to a directory containing sample NCIP messages.");
