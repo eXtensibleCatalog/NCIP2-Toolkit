@@ -7,7 +7,7 @@
     <!-- The project details. -->
     <groupId>org.extensiblecatalog.ncip.v2</groupId>
     <artifactId>root</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>NCIP 2 Toolkit Root</name>
     <description>NCIP 2 Toolkit Root</description>
