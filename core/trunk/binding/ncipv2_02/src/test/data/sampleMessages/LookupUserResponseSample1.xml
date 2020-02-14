@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+        ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+    <ns1:LookupUserResponse>
+        <ns1:UserId>
+            <ns1:UserIdentifierValue>987181</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:LoanedItem>
+            <ns1:ItemId>
+                <ns1:ItemIdentifierValue>09128312</ns1:ItemIdentifierValue>
+            </ns1:ItemId>
+            <ns1:ReminderLevel>1</ns1:ReminderLevel>
+            <ns1:DateDue>2010-11-20T00:00:00.329Z</ns1:DateDue>
+            <ns1:Amount>
+                <ns1:CurrencyCode ns1:Scheme="http://www.bsi-global.com/Technical+Information/Publications/_Publications/tig90x.doc">USD</ns1:CurrencyCode>
+                <ns1:MonetaryValue>0</ns1:MonetaryValue>
+            </ns1:Amount>
+            <ns1:Ext>
+                <ns1:BibliographicDescription>
+                    <ns1:BibliographicRecordId>
+                        <ns1:BibliographicRecordIdentifier>012983098123</ns1:BibliographicRecordIdentifier>
+                        <ns1:AgencyId>Main</ns1:AgencyId>
+                    </ns1:BibliographicRecordId>
+                    <ns1:Title>Steal this book!</ns1:Title>
+                </ns1:BibliographicDescription>
+            </ns1:Ext>
+        </ns1:LoanedItem>
+        <ns1:RequestedItem>
+            <ns1:ItemId>
+                <ns1:ItemIdentifierValue>09128312</ns1:ItemIdentifierValue>
+            </ns1:ItemId>
+            <ns1:RequestType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">Loan</ns1:RequestType>
+            <ns1:RequestStatusType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requeststatustype/requeststatustype.scm">Available For Pickup</ns1:RequestStatusType>
+            <ns1:DatePlaced>2010-11-20T00:00:00.329Z</ns1:DatePlaced>
+            <ns1:Title>Steal this book!</ns1:Title>
+            <ns1:Ext>
+                <ns1:BibliographicDescription>
+                    <ns1:BibliographicRecordId>
+                        <ns1:BibliographicRecordIdentifier>012983098123</ns1:BibliographicRecordIdentifier>
+                        <ns1:AgencyId>Main</ns1:AgencyId>
+                    </ns1:BibliographicRecordId>
+                </ns1:BibliographicDescription>
+            </ns1:Ext>
+        </ns1:RequestedItem>
+</ns1:LookupUserResponse>
+</ns1:NCIPMessage>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:NCIPMessage
+   ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd" xmlns:ns1="http://www.niso.org/2008/ncip">
+   <ns1:CheckInItem>
+      <ns1:InitiationHeader>
+         <ns1:FromAgencyId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">Dummy NCIP Responder</ns1:AgencyId>
+         </ns1:FromAgencyId>
+         <ns1:ToAgencyId>
+            <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+         </ns1:ToAgencyId>
+      </ns1:InitiationHeader>
+      <ns1:MandatedAction>
+         <ns1:DateEventOccurred>2010-10-21T16:17:34.354Z</ns1:DateEventOccurred>
+      </ns1:MandatedAction>
+      <ns1:ItemId>
+         <ns1:AgencyId ns1:Scheme="localhost/ncip/v1/schemes/agencies/1">MIT</ns1:AgencyId>
+         <ns1:ItemIdentifierType ns1:Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/visibleitemidentifiertype/visibleitemidentifiertype.scm">Barcode</ns1:ItemIdentifierType>
+         <ns1:ItemIdentifierValue>10923123</ns1:ItemIdentifierValue>
+      </ns1:ItemId>
+   </ns1:CheckInItem>
+</ns1:NCIPMessage>
