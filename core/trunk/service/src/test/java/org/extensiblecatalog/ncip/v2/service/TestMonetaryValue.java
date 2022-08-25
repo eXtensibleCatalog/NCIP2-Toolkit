@@ -10,6 +10,7 @@ package org.extensiblecatalog.ncip.v2.service;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -24,6 +25,7 @@ public class TestMonetaryValue {
      * different "minor unit" value (0, 2 and 3) that occurs in the NCIP {@link Version1CurrencyCode}.
      *
      */
+    @Ignore
     @Test
     public void testFormatting() {
 

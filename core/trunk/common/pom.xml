@@ -33,10 +33,9 @@
              <version>${servletVersion}</version>
         </dependency> 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <scope>compile</scope>
+           <groupId>ch.qos.reload4j</groupId>
+           <artifactId>reload4j</artifactId>
+           <version>1.2.22</version>
         </dependency>
 
         <dependency>
@@ -154,7 +153,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-agent</artifactId>
-                <version>${springVersion}</version>
+                <version>${springVersionAgent}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>

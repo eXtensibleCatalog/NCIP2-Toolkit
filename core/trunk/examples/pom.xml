@@ -127,17 +127,16 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4jVersion}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+            <version>1.2.22</version>
+       </dependency>
+       <dependency>
+           <groupId>org.slf4j</groupId>
+           <artifactId>slf4j-log4j12</artifactId>
+           <version>${slf4jVersion}</version>
+           <scope>test</scope>
+		</dependency>
+	</dependencies>
 
 </project>

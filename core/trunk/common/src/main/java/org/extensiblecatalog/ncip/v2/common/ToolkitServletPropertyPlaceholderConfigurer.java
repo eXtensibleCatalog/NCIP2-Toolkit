@@ -10,7 +10,7 @@ package org.extensiblecatalog.ncip.v2.common;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer;
+
 
 import java.io.IOException;
 import java.util.Properties;
@@ -19,7 +19,7 @@ import java.util.Properties;
  * Uses Spring's {@link ServletContextPropertyPlaceholderConfigurer} to collect properties so
  * that ToolkitConfiguration classes can access properties loaded via Spring.
  */
-public class ToolkitServletPropertyPlaceholderConfigurer extends ServletContextPropertyPlaceholderConfigurer {
+public class ToolkitServletPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer {
 
     private static final Logger LOG = Logger.getLogger(ToolkitServletPropertyPlaceholderConfigurer.class);
 
@@ -27,7 +27,7 @@ public class ToolkitServletPropertyPlaceholderConfigurer extends ServletContextP
 
         Properties p = new Properties();
 
-        super.loadProperties(p);
+        loadProperties(p);
 
         return p;
     }
